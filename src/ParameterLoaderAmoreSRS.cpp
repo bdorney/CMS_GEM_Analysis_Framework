@@ -18,6 +18,7 @@ using std::vector;
 using Timing::getString;
 using Timing::printStreamStatus;
 using Timing::stofSafe;
+using Timing::stoiSafe;
 
 using namespace Uniformity;
 
@@ -65,15 +66,26 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
             //Parse the input line
             vec_strParam = Timing::getCharSeparatedList(strLine,',');
             
+            cout<<"Lines from " << strInputMappingFileName << endl;
+            for (int i=0; i < vec_strParam.size(); ++i) {
+                cout<<i<<"\t"<<vec_strParam[i]<<endl;
+            }
+            
             //expecting a tab+comma separated list ordered as:
             //#Header   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
             //(getCharSeparatedList should strip the tab's out)
-            if (vec_strParam.size() != 9) {
-                int iEta = Timing::stoiSafe("INTERNAL",getStringOnlyNumeric(vec_strParam[4]));
+            if (vec_strParam.size() == 9) { //Case: Correct Number of Parameters
+                int iEta = stoiSafe("INTERNAL",getStringOnlyNumeric(vec_strParam[4]));
                 
-                //det_GE11.setEtaSector
-            }
-            
+                det_GE11.setEtaSector(iEta, stofSafe("INTERNAL",vec_strParam[5]), stofSafe("INTERNAL",vec_strParam[6] ) );
+            } //End Case: Correct Number of Parameters
+            else{ //Case: Incorrect Number of Parameters
+                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("Error! - Found only " + getString(vec_strParam.size() ) + " Parameters (Expected 9) for line:").c_str() );
+                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("\t" + strLine).c_str() );
+                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("\tPlease Cross-Check Amore SRS Mapping File: " + strInputMappingFileName ).c_str() );
+                
+                continue;
+            } //End Case: Incorrect Number of Parameters
         } //End Case: Detector Mapping
         else if ( strLine.find("APV") != string::npos ) { //Case: APV Mapping
             //For now this information is not used, exit

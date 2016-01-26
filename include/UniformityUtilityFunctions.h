@@ -11,6 +11,8 @@
 
 //C++ Includes
 #include <algorithm>
+#include <cctype>
+#include <iostream>
 #include <stdio.h>
 #include <sstream>
 #include <string>
@@ -26,7 +28,7 @@
     printClassMethodMsg() -> Prints a message to the user indicating class/method template: "charClass::charMethod() - charMsg"
  
  string manipulation:
-    getStringOnlyNumeric() -> removes
+    getStringOnlyNumeric() -> strips alphabetical characters from the input string leaving only numbers
  */
 
 namespace Uniformity {

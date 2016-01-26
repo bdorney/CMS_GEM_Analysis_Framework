@@ -7,7 +7,6 @@
 //
 
 //C++ Includes
-#include <iostream>
 
 //My Includes
 #include "UniformityUtilityFunctions.h"
@@ -22,7 +21,8 @@ using namespace Uniformity;
 
 //Printers
 //==========================================
-//void Uniformity::printClassMethodMsg(string &strClass, string &strMethod, string &strMsg ){
+
+//Prints a message to the user indicating class/method template: "charClass::charMethod() - charMsg"
 void Uniformity::printClassMethodMsg(const char charClass[], const char charMethod[], const char charMsg[]){
     //cout<< (strClass + "::" + strMethod + "() - " + strMsg ).c_str() << endl;
     cout<< charClass << "::" << charMethod << "() - " << charMsg << endl;
@@ -32,8 +32,20 @@ void Uniformity::printClassMethodMsg(const char charClass[], const char charMeth
 
 //String manipulation
 //==========================================
+
+//strips alphabetical characters from the input string leaving only numbers
+//There has to be a better way to do the below O_o
 string Uniformity::getStringOnlyNumeric(string strInput){
-    strInput.erase(std::remove_if(strInput.begin(),strInput.end(), [](char c){ return !std::isalpha(c); } ) );
+    //Variable Declaration
+    string strTemp = strInput;  //store the original
+    
+    //remove all alphabetical characters from the input string
+    strTemp.erase(std::remove_if(strTemp.begin(),strTemp.end(), [](char c){ return !std::isalpha(c); } ) );
+    
+    //determine when in the original string the first non-
+    int iPosLastAlpha = strInput.find_first_not_of(strTemp);
+    
+    strInput.erase(strInput.begin(),strInput.begin()+iPosLastAlpha);
     
     return strInput;
 }

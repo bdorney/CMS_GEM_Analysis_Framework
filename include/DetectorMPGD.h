@@ -66,6 +66,9 @@ namespace Uniformity {
         //returns the eta sector
         virtual SectorEta getEtaSector(int iEta);
         
+        //returns the number of eta sectors
+        virtual int getNumEtaSectors(){ return map_sectorsEta.size(); };
+        
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
        
