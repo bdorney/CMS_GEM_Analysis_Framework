@@ -32,7 +32,7 @@ void Uniformity::printClassMethodMsg(const char charClass[], const char charMeth
 
 //String manipulation
 //==========================================
-string getStringOnlyNumeric(string strInput){
+string Uniformity::getStringOnlyNumeric(string strInput){
     strInput.erase(std::remove_if(strInput.begin(),strInput.end(), [](char c){ return !std::isalpha(c); } ) );
     
     return strInput;
