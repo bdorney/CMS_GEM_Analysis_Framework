@@ -1,0 +1,35 @@
+# Back-Up Files #
+#################
+*~
+
+# Binary Files #
+################
+.DS_Store
+
+# Compiled source #
+###################
+*.o
+*analyzeUniformity
+
+# Figures #
+###########
+#figures/
+#figures/*
+
+# Misc #
+########
+AnalysisCode.cpp
+AnalysisCode_GE4_V1.cpp
+AnalysisCode_GE6_V1.cpp
+
+# ROOT Files #
+##############
+*.root
+#TestBeamDataset_*.root
+#data/
+#data/*
+
+# Text Files #
+##############
+#*PFP.txt
+#setup_files/Production_ConfigFile.txt
