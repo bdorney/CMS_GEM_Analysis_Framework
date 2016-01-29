@@ -92,5 +92,15 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
             break;
         } //End Case: APV Mapping
     } //End Loop Over input mapping file
-        
+    
+    //Check to see if we had problems while reading the file
+    if (file_AmoreMapping.bad() && bVerbose_IO) {
+        perror( ("Uniformity::ParameterLoaderAmoreSRS::loadAmoreMapping(): error while reading file: " + strInputMappingFileName).c_str() );
+        printStreamStatus(file_AmoreMapping);
+    }
+    
+    //Close the file
+    file_AmoreMapping.close();
+    
+    return;
 } //End ParameterLoaderAmoreSRS::loadAmoreMapping()

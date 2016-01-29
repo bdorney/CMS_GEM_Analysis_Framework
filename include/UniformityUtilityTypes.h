@@ -12,6 +12,8 @@
 //C++ Includes
 #include <map>
 #include <stdio.h>
+#include <string>
+#include <utility>
 #include <vector>
 
 //My Includes
@@ -22,6 +24,47 @@
 using namespace ROOT;
 
 namespace Uniformity {
+    //Storage container for cluster selection parameters
+    struct SelParamClusters{
+        //Cut on cluster adc value
+        //Cluster::iADC greater than this number
+        int iCut_ADCNoise;
+        
+        //Cut on cluster size
+        //first -> Min Size; Cluster::iSize greater than this number
+        //second -> Max Size; Cluster::iSize less than this number
+        //std::pair<int,int> pair_iCut_Size;
+        int iCut_SizeMin;
+        int iCut_SizeMax;
+        
+        //Cut on cluster time bin
+        //first -> min time; Cluster::iTimeBin greater than this number
+        //second -> max time; Cluster::iTimeBin less than this number
+        //std::pair<int,int> pair_iCut_Time;
+        int iCut_TimeMin;
+        int iCut_TimeMax;
+        
+        //Default Values
+        SelParamClusters(){ //SelParamClusters Inital Values
+            iCut_ADCNoise = -1;
+            
+            iCut_SizeMin = iCut_TimeMin = -1;
+            iCut_SizeMax = iCut_TimeMax = 3072;
+            
+            //pair_iCut_Size = std::make_pair(1,20);
+            //pair_iCut_Time = std::make_pair(1,14);
+        } //End SelParamClusters Initial Values
+    }; //End SelParamClusters
+    
+    //Analysis Setup
+    struct AnalysisSetupUniformity{
+        int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
+        
+        SelParamClusters selClust; //Selection Criteria for Clusters
+        
+        std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
+        std::string strFit_Option;  //Fit Option, e.g. "R"
+    }; //End AnalysisSetupUniformity
     
     //Strip Cluster
     struct Cluster{

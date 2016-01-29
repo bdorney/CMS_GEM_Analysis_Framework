@@ -13,9 +13,10 @@
 #include <string>
 #include <vector>
 
-//My Includes
+//Framework Includes
 #include "DetectorMPGD.h"
 #include "ParameterLoaderAmoreSRS.h"
+#include "ParameterLoaderAnaysis.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -28,9 +29,14 @@ using std::vector;
 
 using namespace Uniformity;
 
+//Input Parameters
+//  0 -> Executable
+//  1 -> Amore Mapping File
+//  2 -> Analysis Config File
 int main( int argc_, char * argv_[]){
     //Variable Declaration
     ParameterLoaderAmoreSRS amoreLoader;
+    ParameterLoaderAnaysis analysisLoader;
     
     vector<string> vec_strInputArgs;
     
@@ -60,6 +66,14 @@ int main( int argc_, char * argv_[]){
         
         cout<<endl;
     }
+    
+    Uniformity::AnalysisSetupUniformity aSetup = analysisLoader.getAnalysisParameters( vec_strInputArgs[2] );
+    
+    cout<<"ADC Noise, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+    cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
+    cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
+    cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
+    cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
     
     cout<<"Success!"<<endl;
     
