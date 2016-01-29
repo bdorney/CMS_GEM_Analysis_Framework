@@ -19,7 +19,9 @@
 //My Includes
 
 //ROOT Includes
+#include "TFile.h"
 #include "TROOT.h"
+#include "TTree.h"
 
 using namespace ROOT;
 
@@ -29,6 +31,9 @@ namespace Uniformity {
         //Cut on cluster adc value
         //Cluster::iADC greater than this number
         int iCut_ADCNoise;
+        
+        //Cut on cluster multiplicity per event
+        int iCut_NClust;
         
         //Cut on cluster size
         //first -> Min Size; Cluster::iSize greater than this number
@@ -47,6 +52,8 @@ namespace Uniformity {
         //Default Values
         SelParamClusters(){ //SelParamClusters Inital Values
             iCut_ADCNoise = -1;
+            
+            iCut_NClust = 1;
             
             iCut_SizeMin = iCut_TimeMin = -1;
             iCut_SizeMax = iCut_TimeMax = 3072;

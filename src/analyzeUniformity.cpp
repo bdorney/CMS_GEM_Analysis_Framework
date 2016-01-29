@@ -14,6 +14,7 @@
 #include <vector>
 
 //Framework Includes
+#include "ClusterSelector.h"
 #include "DetectorMPGD.h"
 #include "ParameterLoaderAmoreSRS.h"
 #include "ParameterLoaderAnaysis.h"
@@ -33,6 +34,7 @@ using namespace Uniformity;
 //  0 -> Executable
 //  1 -> Amore Mapping File
 //  2 -> Analysis Config File
+//  3 -> ROOT File to be analyzed
 int main( int argc_, char * argv_[]){
     //Variable Declaration
     ParameterLoaderAmoreSRS amoreLoader;
@@ -74,6 +76,10 @@ int main( int argc_, char * argv_[]){
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
     cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
+    
+    ClusterSelector mySelection;
+    
+    mySelection.setClusters(vec_strInputArgs[3], myDet, aSetup);
     
     cout<<"Success!"<<endl;
     
