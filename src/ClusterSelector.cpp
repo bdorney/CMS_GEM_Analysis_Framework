@@ -21,7 +21,7 @@ ClusterSelector::ClusterSelector(){
 //Applies the cluster selection and stores those selected clusters in inputDet
 void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    int iClustMulti = -1;
+    Int_t iClustMulti;
     
     Cluster clust;
     
@@ -53,9 +53,9 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     //------------------------------------------------------
     tree_Clusters->SetBranchAddress("nclust", &iClustMulti);
     tree_Clusters->SetBranchAddress("clustPos", &clust.fPos_X);
-    tree_Clusters->SetBranchAddress("clusSize", &clust.iSize);
-    tree_Clusters->SetBranchAddress("clustADCs", &clust.iADC);
-    tree_Clusters->SetBranchAddress("clustTimebin", &clust.iTimeBin);
+    tree_Clusters->SetBranchAddress("clustSize", &clust.fSize);
+    tree_Clusters->SetBranchAddress("clustADCs", &clust.fADC);
+    tree_Clusters->SetBranchAddress("clustTimebin", &clust.fTimeBin);
     tree_Clusters->SetBranchAddress("planeID", &clust.fPos_Y);
     
     //Get data event-by-event
@@ -87,15 +87,16 @@ bool ClusterSelector::clusterPassesSelection(Cluster &inputClust){
     //Cluster Selection
     
     //Cluster with ADC below noise threshold?
-    if (inputClust.iADC < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
+	cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
+    if (inputClust.fADC[0] < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?
-    if (inputClust.iSize < aSetupUniformity.selClust.iCut_SizeMin){ return false; }
-    if (inputClust.iSize > aSetupUniformity.selClust.iCut_SizeMax) {return false; }
+    if (inputClust.fSize[0] < aSetupUniformity.selClust.iCut_SizeMin){ return false; }
+    if (inputClust.fSize[0] > aSetupUniformity.selClust.iCut_SizeMax) {return false; }
     
     //Cluster Time too early or too late?
-    if (inputClust.iSize < aSetupUniformity.selClust.iCut_TimeMin){ return false; }
-    if (inputClust.iSize > aSetupUniformity.selClust.iCut_TimeMax) {return false; }
+    if (inputClust.fTimeBin[0] < aSetupUniformity.selClust.iCut_TimeMin){ return false; }
+    if (inputClust.fTimeBin[0] > aSetupUniformity.selClust.iCut_TimeMax) {return false; }
     
     //If we arrive here the cluster passes our selection; give true
     return true;

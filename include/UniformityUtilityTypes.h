@@ -75,17 +75,17 @@ namespace Uniformity {
     
     //Strip Cluster
     struct Cluster{
-        float fPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from AMORE
-        float fPos_X;  //position within eta sector (in mm); e.g. clustPos from AMORE
+        Int_t *fPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from AMORE
+        Float_t *fPos_X;  //position within eta sector (in mm); e.g. clustPos from AMORE
         
-        int iADC;       //ADC value of cluster; e.g. clustADCs from AMORE
-        int iSize;      //Number of strips in cluster; e.g. clustSize from AMORE
-        int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from AMORE
+        Float_t *fADC;       //ADC value of cluster; e.g. clustADCs from AMORE
+        Int_t *fSize;      //Number of strips in cluster; e.g. clustSize from AMORE
+        Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from AMORE
         
         Cluster(){
-            fPos_Y = fPos_X = -1;
+            //fPos_Y = fPos_X = -1;
             
-            iADC = iSize = iTimeBin = -1;
+            //fADC = fSize = fTimeBin = -1;
         } //End initialization
     }; //End Cluster
     

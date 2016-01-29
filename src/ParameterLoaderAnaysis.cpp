@@ -168,20 +168,27 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             
             pair_strParam.first = strTmp;
             
+		cout<<pair_strParam.first<<"\t"<<pair_strParam.second;
+
             if ( 0 == pair_strParam.first.compare("CUT_ADC_MIN") ) {
                 aSetupUniformity.selClust.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
+		cout<<"\t"<<aSetupUniformity.selClust.iCut_ADCNoise<<endl;
             } //End Case: Minimum ADC Value
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERSIZE_MIN") ) {
                 aSetupUniformity.selClust.iCut_SizeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
+		cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMin<<endl;
             } //End Case: Min Cluster Size
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERSIZE_MAX") ) {
                 aSetupUniformity.selClust.iCut_SizeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
+		cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMax<<endl;
             } //End Case: Max Cluster Size
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERTIME_MIN") ) {
                 aSetupUniformity.selClust.iCut_TimeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
+		cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMin<<endl;
             } //End Case: Min Cluster Time
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERTIME_MAX") ) {
                 aSetupUniformity.selClust.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
+		cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
             } //End Case: Max Cluster Time
         } //End Case: Parameter Fetched Correctly
         else{ //Case: Parameter Failed to fetch correctly
