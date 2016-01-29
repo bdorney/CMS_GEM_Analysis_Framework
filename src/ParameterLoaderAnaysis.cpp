@@ -161,7 +161,12 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         pair_strParam = getParsedLine(strLine,bExitSuccess);
         
         if (bExitSuccess) { //Case: Parameter Fetched Correctly
-            transform(pair_strParam.first.begin(), pair_strParam.second.end(),pair_strParam.first.begin(),toupper);
+            //transform(pair_strParam.first.begin(), pair_strParam.second.end(),pair_strParam.first.begin(),toupper);
+            
+            string strTmp = pair_strParam.first;
+            transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
+            
+            pair_strParam.first = strTmp;
             
             if ( 0 == pair_strParam.first.compare("CUT_ADC_MIN") ) {
                 aSetupUniformity.selClust.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
