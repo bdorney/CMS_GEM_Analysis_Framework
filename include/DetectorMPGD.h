@@ -26,9 +26,11 @@ using namespace ROOT;
 
 namespace Uniformity {
     class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
+    class AnalyzeResponseUniformity; //Defined in "AnalyzeResponseUniformity.h"
     
     class DetectorMPGD {
         friend class ParameterLoaderAmoreSRS;
+        friend class AnalyzeResponseUniformity;
         
     public:
         //Constructors
@@ -54,20 +56,20 @@ namespace Uniformity {
         //Returns clusters for a given (iEta,iPhi value)
         virtual std::vector<Cluster> getClusters(int iEta, int iPhi);
         
-        //returns the phi sector
-        //virtual SectorPhi getPhiSector(int iEta, iPhi);
-        
         //returns the position of an iEta sector
         virtual float getEtaPos(int iEta);
-        
-        //returns the width of an iEta sector
-        virtual float getEtaWidth(int iEta);
         
         //returns the eta sector
         virtual SectorEta getEtaSector(int iEta);
         
+        //returns the width of an iEta sector
+        virtual float getEtaWidth(int iEta);
+        
         //returns the number of eta sectors
         virtual int getNumEtaSectors(){ return map_sectorsEta.size(); };
+
+        //returns the phi sector
+        virtual SectorPhi getPhiSector(int iEta, int iPhi);
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------

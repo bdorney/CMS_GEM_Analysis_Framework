@@ -20,6 +20,8 @@
 
 //ROOT Includes
 #include "TFile.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TROOT.h"
 #include "TTree.h"
 
@@ -102,16 +104,33 @@ namespace Uniformity {
         } //End initialization
     }; //End Cluster
     
+    //Defines a slice of a phi sector within the detector
+    struct SectorSlice{
+        //One dimensional histograms
+        std::shared_ptr<TH1F> hSlice_ClustADC;
+    };
+    
     //Defines the phi sector within the detector
     struct SectorPhi{
         float fPos_Xlow;    //Lower Bound X Position
         float fPos_Xhigh;   //Upper Bound X Position
         
+        std::map<int, SectorSlice> map_slices;  //Slices of this sector
+        
         std::vector<Cluster> vec_clusters;
         
+        //One dimensional histograms
+        std::shared_ptr<TH1F> hPhi_ClustADC;
+        std::shared_ptr<TH1F> hPhi_ClustMulti;
+        std::shared_ptr<TH1F> hPhi_ClustSize;
+        
+        //Two dimensional histograms
+        std::shared_ptr<TH2F> hPhi_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
+        
+        //initialization
         SectorPhi(){
             fPos_Xlow = fPos_Xhigh = -1;
-        }
+        } //End initialization
     };
     
     //Defines the pseudorapidity sector within the detector (note this is considered 3 phi sectors)
@@ -121,9 +140,19 @@ namespace Uniformity {
         
         std::map<int, SectorPhi> map_sectorsPhi;
         
+        //One dimensional histograms
+        std::shared_ptr<TH1F> hEta_ClustADC;    //ADC spectrum for all clusters in this eta sector
+        std::shared_ptr<TH1F> hEta_ClustMulti;  //Multiplicity  "                               "
+        std::shared_ptr<TH1F> hEta_ClustPos;    //Position      "                               "
+        std::shared_ptr<TH1F> hEta_ClustSize;   //Size          "                               "
+        
+        //Two dimensional histograms
+        std::shared_ptr<TH2F> hEta_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
+        
+        //initialization
         SectorEta(){
             fPos_Y = fWidth = -1;
-        }
+        } //End initialization
     }; //End SectorEta
     
 } //End namespace uniformity

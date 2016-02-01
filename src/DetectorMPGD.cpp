@@ -126,6 +126,28 @@ SectorEta DetectorMPGD::getEtaSector(int iEta){
     return retSector;
 } //End getEtaSector
 
+//Returns the phi sector
+SectorPhi DetectorMPGD::getPhiSector(int iEta, int iPhi){
+    SectorPhi retSector;
+    SectorEta etaSector = getEtaSector(iEta);
+    
+    if ( etaSector.map_sectorsPhi.size() > 0 ) { //Case: Requested iEta Value exists
+        if ( etaSector.map_sectorsPhi.count(iPhi) > 0 ) { //Case: Requested iPhi Value exists
+            retSector = etaSector.map_sectorsPhi[iPhi];
+        } //End Case: Requested iPhi Value exists
+        else{ //Case: Requested iPhi Value doesn ot exist, return an empty vector
+            printClassMethodMsg("DetectorMPGD","getPhiSector", ("Error: iPhi " + getString(iPhi) + " Does NOT Exists!!!" ).c_str() );
+            printClassMethodMsg("DetectorMPGD","getPhiSector", "\tThe Returned sector is Empty!!!");
+        } //End Case: Requested iPhi Value doesn ot exist, return an empty vector
+    } //End Case: Requested iEta Value exists
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
+        printClassMethodMsg("DetectorMPGD","getPhiSector", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
+        printClassMethodMsg("DetectorMPGD","getPhiSector", "\tThe Returned sector is Empty!!!");
+    } //End Case: Requested iEta Value doesn ot exist, return an empty vector
+    
+    return retSector;
+} //End getPhiSector
+
 //Sets a cluster
 void DetectorMPGD::setCluster(Cluster &inputCluster){
     //Check if the DetectorMPGD is initialized!
