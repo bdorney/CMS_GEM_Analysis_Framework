@@ -124,7 +124,7 @@ void AnalyzeResponseUniformity::fillHistos(){
         
         (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, hSetupClust_ADC ) );
         
-        cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName();
+        cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName() << endl;
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors

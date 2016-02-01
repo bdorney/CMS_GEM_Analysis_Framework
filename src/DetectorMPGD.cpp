@@ -8,6 +8,8 @@
 
 #include "DetectorMPGD.h"
 
+using std::cout;
+using std::endl;
 using std::map;
 using std::vector;
 
