@@ -13,6 +13,7 @@ using std::cout;
 using std::endl;
 using std::map;
 using std::string;
+using std::vector;
 
 using Timing::getString;
 using Timing::HistoSetup;
@@ -116,25 +117,41 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
 //Loops over all stored clusters in detMPGD and Book histograms for the full detector
 void AnalyzeResponseUniformity::fillHistos(){
     //Variable Declaration
+    //vector<Cluster> vec_clust;
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
-        //Initialize iEta Histograms
-        
+        //Initialize iEta Histograms - 1D
         (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, hSetupClust_ADC ) );
+        (*iterEta).second.hEta_ClustMulti = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, hSetupClust_Multi ) );
+        (*iterEta).second.hEta_ClustPos = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, hSetupClust_Pos ) );
+        (*iterEta).second.hEta_ClustSize = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, hSetupClust_Size ) );
         
-        cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName() << endl;
+        //Initialize iEta Histograms - 2D
+        (*iterEta).second.hEta_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity",200,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+        
+        //Debugging
+        //cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName() << endl;
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
             //Initialize iPhi Histograms
             
-            //Fill iEta Histograms
-            
-            //Fill iPhi Histograms
-            
+            //Loop Over Stored Clusters
+            for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
+                //Fill iEta Histograms
+                (*iterEta).second.hEta_ClustADC->Fill( (*iterClust).fADC );
+                //(*iterEta).second.hEta_ClustMulti->Fill( (*iterClust). );
+                (*iterEta).second.hEta_ClustPos->Fill( (*iterClust).fPos_X );
+                (*iterEta).second.hEta_ClustSize->Fill( (*iterClust).iSize );
+                
+                (*iterEta).second.hEta_ClustADC_v_ClustPos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
+                
+                //Fill iPhi Histograms
+                
+            } //End Loop Over Stored Clusters
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <map>
+#include <vector>
 
 //Framework Includes
 //#include "DetectorMPGD.h"
@@ -107,6 +108,7 @@ namespace Uniformity {
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Holds Setup Parameters for the
         Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size;
         
         Uniformity::AnalysisSetupUniformity aSetup;
