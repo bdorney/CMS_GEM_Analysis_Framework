@@ -15,7 +15,8 @@
 
 //Framework Includes
 #include "ClusterSelector.h"
-#include "DetectorMPGD.h"
+#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
+#include "AnalyzeResponseUniformity.h"
 #include "ParameterLoaderAmoreSRS.h"
 #include "ParameterLoaderAnaysis.h"
 #include "UniformityUtilityTypes.h"
@@ -82,6 +83,10 @@ int main( int argc_, char * argv_[]){
     mySelection.setClusters(vec_strInputArgs[3], myDet, aSetup);
     
     cout<<"Number of Selected Clusters = " << myDet.getClusters().size() << endl;
+    
+    AnalyzeResponseUniformity myAnalyzer(aSetup, myDet);
+    
+    myAnalyzer.fillHistos();
     
     cout<<"Success!"<<endl;
     
