@@ -33,7 +33,8 @@ namespace Uniformity {
         int iCut_ADCNoise;
         
         //Cut on cluster multiplicity per event
-        int iCut_NClust;
+        int iCut_MultiMin;
+        int iCut_MultiMax;
         
         //Cut on cluster size
         //first -> Min Size; Cluster::iSize greater than this number
@@ -53,10 +54,10 @@ namespace Uniformity {
         SelParamClusters(){ //SelParamClusters Inital Values
             iCut_ADCNoise = -1;
             
-            iCut_NClust = 1;
+            iCut_MultiMin = 0;
             
             iCut_SizeMin = iCut_TimeMin = -1;
-            iCut_SizeMax = iCut_TimeMax = 3072;
+            iCut_SizeMax = iCut_TimeMax = iCut_MultiMax = 3072;
             
             //pair_iCut_Size = std::make_pair(1,20);
             //pair_iCut_Time = std::make_pair(1,14);

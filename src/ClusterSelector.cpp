@@ -80,7 +80,8 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
         
         //If the event fails to pass the selection; skip it
         //---------------Event Selection---------------
-        if ( iClustMulti > aSetupUniformity.selClust.iCut_NClust ) continue;
+        //if ( iClustMulti > aSetupUniformity.selClust.iCut_NClust ) continue;
+        if ( !(aSetupUniformity.selClust.iCut_MultiMin < iClustMulti && iClustMulti < aSetupUniformity.selClust.iCut_MultiMax) ) continue;
         
         //Loop Over the elements of the cluster array (yes it must be done like this due to how hte NTuple from AMORE is created)
         //For each element create a cluster, and check if it passes the selection
@@ -112,7 +113,7 @@ bool ClusterSelector::clusterPassesSelection(Cluster &inputClust){
     //Cluster Selection
     
     //Cluster with ADC below noise threshold?
-	cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
+	//cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
     if (inputClust.fADC < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?

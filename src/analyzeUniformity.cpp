@@ -81,6 +81,8 @@ int main( int argc_, char * argv_[]){
     
     mySelection.setClusters(vec_strInputArgs[3], myDet, aSetup);
     
+    cout<<"Number of Selected Clusters = " << myDet.getClusters().size() << endl;
+    
     cout<<"Success!"<<endl;
     
     return 0;

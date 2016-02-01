@@ -168,28 +168,43 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             
             pair_strParam.first = strTmp;
             
-		cout<<pair_strParam.first<<"\t"<<pair_strParam.second;
+            //cout<<pair_strParam.first<<"\t"<<pair_strParam.second;
 
             if ( 0 == pair_strParam.first.compare("CUT_ADC_MIN") ) {
                 aSetupUniformity.selClust.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
-		cout<<"\t"<<aSetupUniformity.selClust.iCut_ADCNoise<<endl;
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_ADCNoise<<endl;
             } //End Case: Minimum ADC Value
+            else if( 0 == pair_strParam.first.compare("CUT_CLUSTERMULTI_MIN") ){ //Case: Min Cluster Multiplicity
+                aSetupUniformity.selClust.iCut_MultiMin = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Max Cluster Multiplicity
+            else if( 0 == pair_strParam.first.compare("CUT_CLUSTERMULTI_MAX") ){
+                aSetupUniformity.selClust.iCut_MultiMax = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case:
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERSIZE_MIN") ) {
                 aSetupUniformity.selClust.iCut_SizeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
-		cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMin<<endl;
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMin<<endl;
             } //End Case: Min Cluster Size
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERSIZE_MAX") ) {
                 aSetupUniformity.selClust.iCut_SizeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
-		cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMax<<endl;
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMax<<endl;
             } //End Case: Max Cluster Size
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERTIME_MIN") ) {
                 aSetupUniformity.selClust.iCut_TimeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
-		cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMin<<endl;
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMin<<endl;
             } //End Case: Min Cluster Time
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERTIME_MAX") ) {
                 aSetupUniformity.selClust.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
-		cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
             } //End Case: Max Cluster Time
+            else if( 0 == pair_strParam.first.compare("UNIFORMITY_GRANULARITY") ){ //Case: Uniformity Granularity
+                aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Uniformity Granularity
+            else{ //Case: Parameter Not Recognized
+                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
+                //printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\t(Field,Value) = (" + pair_strParam.first "," + pair_strParam.second + ")\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
+            } //End Case: Parameter Not Recognized
         } //End Case: Parameter Fetched Correctly
         else{ //Case: Parameter Failed to fetch correctly
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!!  I didn't parse parameter correctly\n");
