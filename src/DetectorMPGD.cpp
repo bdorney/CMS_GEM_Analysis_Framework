@@ -132,7 +132,7 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
     if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
             //Find matching eta sector
-            if ( ( (*iterEta).second.fPos_Y - 0.1 * (*iterEta).second.fPos_Y ) < inputCluster.fPos_Y && inputCluster.fPos_Y < ( (*iterEta).second.fPos_Y + 0.1 * (*iterEta).second.fPos_Y ) ) { //Case: Matching Eta Sector Found!
+            if ( ( (*iterEta).second.fPos_Y - 0.1 * (*iterEta).second.fPos_Y ) < inputCluster.iPos_Y && inputCluster.iPos_Y < ( (*iterEta).second.fPos_Y + 0.1 * (*iterEta).second.fPos_Y ) ) { //Case: Matching Eta Sector Found!
                 
                 //Find matching phi sector within this eta sector
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi

@@ -21,7 +21,13 @@ ClusterSelector::ClusterSelector(){
 //Applies the cluster selection and stores those selected clusters in inputDet
 void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    Int_t iClustMulti;
+    Int_t iClustMulti;  //I cry a little inside because of this
+    Int_t iClustPos_Y[55];
+    Int_t iClustSize[55];
+    Int_t iClustTimeBin[55];
+    
+    Float_t fClustPos_X[55];
+    Float_t fClustADC[55];
     
     Cluster clust;
     
@@ -52,11 +58,16 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     //Initialize Tree Branch Address to retrieve the cluster information
     //------------------------------------------------------
     tree_Clusters->SetBranchAddress("nclust", &iClustMulti);
-    tree_Clusters->SetBranchAddress("clustPos", &clust.fPos_X);
-    tree_Clusters->SetBranchAddress("clustSize", &clust.fSize);
-    tree_Clusters->SetBranchAddress("clustADCs", &clust.fADC);
-    tree_Clusters->SetBranchAddress("clustTimebin", &clust.fTimeBin);
-    tree_Clusters->SetBranchAddress("planeID", &clust.fPos_Y);
+    //tree_Clusters->SetBranchAddress("clustPos", &clust.fPos_X);
+    tree_Clusters->SetBranchAddress("clustPos",&fClustPos_X);
+    //tree_Clusters->SetBranchAddress("clustSize", &clust.fSize);
+    tree_Clusters->SetBranchAddress("clustSize",&iClustSize);
+    //tree_Clusters->SetBranchAddress("clustADCs", &clust.fADC);
+    tree_Clusters->SetBranchAddress("clustADCs",&fClustADC);
+    //tree_Clusters->SetBranchAddress("clustTimebin", &clust.fTimeBin);
+    tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
+    //tree_Clusters->SetBranchAddress("planeID", &clust.fPos_Y);
+    tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
     
     //Get data event-by-event
     //------------------------------------------------------
@@ -71,12 +82,26 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
         //---------------Event Selection---------------
         if ( iClustMulti > aSetupUniformity.selClust.iCut_NClust ) continue;
         
-        //If the cluster fails to pass the selection; skip it
-        //---------------Cluster Selection---------------
-        if ( !clusterPassesSelection(clust) ) continue;
-        
-        //If a cluster makes it here, store it in the detector
-        inputDet.setCluster(clust);
+        //Loop Over the elements of the cluster array (yes it must be done like this due to how hte NTuple from AMORE is created)
+        //For each element create a cluster, and check if it passes the selection
+        for (int j=0; j < iClustMulti; ++j) { //Loop Over Number of Clusters
+            //Set the cluster info
+            clust.iPos_Y = iClustPos_Y[j];
+            clust.fPos_X = fClustPos_X[j];
+            
+            clust.fADC = fClustADC[j];
+            
+            clust.iSize = iClustSize[j];
+            
+            clust.iTimeBin = iClustTimeBin[j];
+            
+            //If the cluster fails to pass the selection; skip it
+            //---------------Cluster Selection---------------
+            if ( !clusterPassesSelection(clust) ) continue;
+            
+            //If a cluster makes it here, store it in the detector
+            inputDet.setCluster(clust);
+        } //End Loop Over Number of Clusters
     } //End Loop Over "Events"
     
     return;
@@ -88,15 +113,15 @@ bool ClusterSelector::clusterPassesSelection(Cluster &inputClust){
     
     //Cluster with ADC below noise threshold?
 	cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
-    if (inputClust.fADC[0] < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
+    if (inputClust.fADC < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?
-    if (inputClust.fSize[0] < aSetupUniformity.selClust.iCut_SizeMin){ return false; }
-    if (inputClust.fSize[0] > aSetupUniformity.selClust.iCut_SizeMax) {return false; }
+    if (inputClust.iSize < aSetupUniformity.selClust.iCut_SizeMin){ return false; }
+    if (inputClust.iSize > aSetupUniformity.selClust.iCut_SizeMax) {return false; }
     
     //Cluster Time too early or too late?
-    if (inputClust.fTimeBin[0] < aSetupUniformity.selClust.iCut_TimeMin){ return false; }
-    if (inputClust.fTimeBin[0] > aSetupUniformity.selClust.iCut_TimeMax) {return false; }
+    if (inputClust.iTimeBin < aSetupUniformity.selClust.iCut_TimeMin){ return false; }
+    if (inputClust.iTimeBin > aSetupUniformity.selClust.iCut_TimeMax) {return false; }
     
     //If we arrive here the cluster passes our selection; give true
     return true;

@@ -1,6 +1,6 @@
 # Define the compiler
-CC = g++
-#CC = clang++ #For Mac OSX > 10.9 ???
+#CC = g++
+CC = clang++ #For Mac OSX > 10.9 ???
 
 # Define root-config 
 ROOTCONFIG = $(ROOTSYS)/bin/root-config
