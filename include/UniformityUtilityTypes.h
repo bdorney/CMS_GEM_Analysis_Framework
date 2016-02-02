@@ -142,6 +142,7 @@ namespace Uniformity {
         std::shared_ptr<TH1F> hPhi_ClustADC;
         std::shared_ptr<TH1F> hPhi_ClustMulti;
         std::shared_ptr<TH1F> hPhi_ClustSize;
+        std::shared_ptr<TH1F> hPhi_ClustTime;
         
         //Two dimensional histograms
         std::shared_ptr<TH2F> hPhi_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
@@ -164,6 +165,7 @@ namespace Uniformity {
         std::shared_ptr<TH1F> hEta_ClustMulti;  //Multiplicity  "                               "
         std::shared_ptr<TH1F> hEta_ClustPos;    //Position      "                               "
         std::shared_ptr<TH1F> hEta_ClustSize;   //Size          "                               "
+        std::shared_ptr<TH1F> hEta_ClustTime;   //Time          "                                   "
         
         //Two dimensional histograms
         std::shared_ptr<TH2F> hEta_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
