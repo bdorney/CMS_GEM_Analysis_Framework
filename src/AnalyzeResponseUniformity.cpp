@@ -233,6 +233,7 @@ void AnalyzeResponseUniformity::fitHistos(){
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
+    return;
 } //End AnalyzeResponseUniformity::fitHistos()
 
 //Loops over all stored clusters in a specific iEta sector of detMPGD and Book Histograms
