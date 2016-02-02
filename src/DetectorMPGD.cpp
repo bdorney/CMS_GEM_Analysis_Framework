@@ -205,6 +205,8 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth){
             phiSector.fPos_Xlow = -0.5 * fInputWidth + (i-1) * fInputWidth / 3.;
             phiSector.fPos_Xhigh= -0.5 * fInputWidth + (i) * fInputWidth / 3.;
             
+            phiSector.fWidth = fabs( phiSector.fPos_Xhigh - phiSector.fPos_Xlow );
+            
             etaSector.map_sectorsPhi[i] = phiSector;
         } //End make three phi sectors for this Eta Sector
         

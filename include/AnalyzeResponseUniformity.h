@@ -10,6 +10,7 @@
 #define ____AnalyzeResponseUniformity__
 
 //C++ Includes
+#include <iterator>
 #include <stdio.h>
 #include <string>
 #include <map>

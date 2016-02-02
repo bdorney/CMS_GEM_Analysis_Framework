@@ -106,14 +106,24 @@ namespace Uniformity {
     
     //Defines a slice of a phi sector within the detector
     struct SectorSlice{
+        float fPos_Center;    //Center of the slice;
+        float fWidth;       //Width of the slice;
+        
         //One dimensional histograms
         std::shared_ptr<TH1F> hSlice_ClustADC;
+        
+        //Initialization
+        SectorSlice(){
+            fPos_Center = fWidth = -1;
+        } //End Initialization
     };
     
     //Defines the phi sector within the detector
     struct SectorPhi{
         float fPos_Xlow;    //Lower Bound X Position
         float fPos_Xhigh;   //Upper Bound X Position
+        
+        float fWidth;       //Sector Width (mm)
         
         std::map<int, SectorSlice> map_slices;  //Slices of this sector
         
@@ -129,7 +139,7 @@ namespace Uniformity {
         
         //initialization
         SectorPhi(){
-            fPos_Xlow = fPos_Xhigh = -1;
+            fPos_Xlow = fPos_Xhigh = fWidth = -1;
         } //End initialization
     };
     
