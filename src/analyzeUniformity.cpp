@@ -36,6 +36,8 @@ using namespace Uniformity;
 //  1 -> Amore Mapping File
 //  2 -> Analysis Config File
 //  3 -> ROOT File to be analyzed
+//  4 -> ROOT File to be Generated
+//  5 -> Option
 int main( int argc_, char * argv_[]){
     //Variable Declaration
     ParameterLoaderAmoreSRS amoreLoader;
@@ -87,6 +89,7 @@ int main( int argc_, char * argv_[]){
     AnalyzeResponseUniformity myAnalyzer(aSetup, myDet);
     
     myAnalyzer.fillHistos();
+    myAnalyzer.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
     
     cout<<"Success!"<<endl;
     

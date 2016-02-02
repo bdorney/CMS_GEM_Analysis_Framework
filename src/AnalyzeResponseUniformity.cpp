@@ -148,7 +148,7 @@ void AnalyzeResponseUniformity::fillHistos(){
             (*iterPhi).second.hPhi_ClustSize = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, hSetupClust_Size ) );
             
             //Initialize iPhi Histograms - 2D
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity",200,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity",200,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
             
             //Loop Over Stored Clusters
             for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
