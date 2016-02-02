@@ -15,7 +15,7 @@ INCLUDES = -I include/ -I$(ROOTSYS)/include/
 LPATHS = -L $(ROOTSYS)/lib/
 
 # Define any libraries to link into executable
-#LIBS = -lSpectrum
+LIBS = -lSpectrum
 
 # Define source files
 SOURCES = src/DetectorMPGD.cpp src/ParameterLoaderAmoreSRS.cpp src/ParameterLoaderAnaysis.cpp src/ClusterSelector.cpp src/AnalyzeResponseUniformity.cpp src/UniformityUtilityFunctions.cpp src/TimingUtilityFunctions.cpp src/analyzeUniformity.cpp 

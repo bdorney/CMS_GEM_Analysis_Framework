@@ -196,6 +196,12 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
                 aSetupUniformity.selClust.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
             } //End Case: Max Cluster Time
+            else if( 0 == pair_strParam.first.compare("FIT_ADCSPECTRUM_EQUATION") ){ //Case: ADC Spectrum Fit Equation
+                aSetupUniformity.strFit_Eqn = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation
+            else if( 0 == pair_strParam.first.compare("FIT_ADCSPECTRUM_OPTION") ){ //Case: ADC Spectrum Fit Equation
+                aSetupUniformity.strFit_Option = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_GRANULARITY") ){ //Case: Uniformity Granularity
                 aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity

@@ -90,6 +90,9 @@ int main( int argc_, char * argv_[]){
     
     myAnalyzer.fillHistos();
     myAnalyzer.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
+    myAnalyzer.fitHistos();
+    myAnalyzer.storeHistos(vec_strInputArgs[4], "UPDATE");
+    
     
     cout<<"Success!"<<endl;
     

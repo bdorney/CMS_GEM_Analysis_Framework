@@ -74,6 +74,12 @@ namespace Uniformity {
         
         std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
         std::string strFit_Option;  //Fit Option, e.g. "R"
+        
+        //Initialization
+        AnalysisSetupUniformity(){
+            strFit_Eqn = "[0]*exp(-0.5*(x-[1])^2/[2]^2)";
+            strFit_Option = "QM";
+        } //End Initialization
     }; //End AnalysisSetupUniformity
     
     //Strip Cluster
@@ -108,6 +114,9 @@ namespace Uniformity {
     struct SectorSlice{
         float fPos_Center;    //Center of the slice;
         float fWidth;       //Width of the slice;
+        
+        //One dimensional fits
+        std::shared_ptr<TF1> fitSlice_ClustADC;
         
         //One dimensional histograms
         std::shared_ptr<TH1F> hSlice_ClustADC;
