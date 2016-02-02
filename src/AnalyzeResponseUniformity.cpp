@@ -139,6 +139,7 @@ void AnalyzeResponseUniformity::fillHistos(){
         
         //Initialize iEta Histograms - 2D
         (*iterEta).second.hEta_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", (int) (*iterEta).second.fWidth,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+        (*iterEta).second.hEta_ClustADC_v_ClustPos->Sumw2();
         
         //Debugging
         //cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName() << endl;
@@ -153,6 +154,7 @@ void AnalyzeResponseUniformity::fillHistos(){
             
             //Initialize iPhi Histograms - 2D
             (*iterPhi).second.hPhi_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Sumw2();
             
             //Loop Over Stored Clusters
             for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
@@ -189,7 +191,6 @@ void AnalyzeResponseUniformity::fillHistos(){
                 //Store the slice
                 (*iterPhi).second.map_slices[i] = slice;
             } //End Loop Over Slices
-            
         } //End Loop Over iPhi Sectors
         
         std::cout<<"(*iterEta).second.hEta_ClustADC->Integral() = " << (*iterEta).second.hEta_ClustADC->Integral() << std::endl;
