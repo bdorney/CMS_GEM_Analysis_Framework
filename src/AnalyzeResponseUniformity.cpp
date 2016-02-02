@@ -229,6 +229,10 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
         //Get Directory
         TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
         
+        if (dir_SectorEta == nullptr) {
+            dir_SectorEta = ptr_fileOutput->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
+        }
+        
         cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
     } //End Loop Over Stored iEta Sectors
