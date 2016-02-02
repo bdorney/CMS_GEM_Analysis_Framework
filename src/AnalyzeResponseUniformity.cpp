@@ -227,15 +227,56 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
         //Get Directory
+        //-------------------------------------
+        //Check to see if the directory exists already
         TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
         
-        if (dir_SectorEta == nullptr) {
+        //If the above pointer is null the directory does NOT exist, create it
+        if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
             dir_SectorEta = ptr_fileOutput->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
-        }
+        } //End Case: Directory did not exist in file, CREATE
         
+        //Debugging
         cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
+        //Store Histograms - SectorEta Level
+        //-------------------------------------
+        dir_SectorEta->cd();
+        (*iterEta).second.hEta_ClustADC->Write();
+        (*iterEta).second.hEta_ClustPos->Write();
+        (*iterEta).second.hEta_ClustSize->Write();
+        (*iterEta).second.hEta_ClustADC_v_ClustPos->Write();
+        
+        //Loop Over Stored iPhi Sectors within this iEta Sector
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
+            //Get Directory
+            //-------------------------------------
+            //Check to see if the directory exists already
+            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            
+            //If the above pointer is null the directory does NOT exist, create it
+            if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
+                dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
+            } //End Case: Directory did not exist in file, CREATE
+            
+            //Debugging
+            cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
+            
+            //Store Histograms - SectorEta Level
+            //-------------------------------------
+            dir_SectorPhi->cd();
+            (*iterPhi).second.hPhi_ClustADC->Write();
+            (*iterPhi).second.hPhi_ClustSize->Write();
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Write();
+            
+            //Loop through Slices
+                //To be implemented
+            
+        } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
+    
+    //Close the ROOT file
+    ptr_fileOutput->Close();
     
     return;
 } //End storeHistos()
