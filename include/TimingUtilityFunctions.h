@@ -104,6 +104,7 @@ namespace Timing {
     
     //printers
     void printROOTFileStatus(TFile *file_ROOT);
+    //void printROOTFileStatus(std::shared_ptr<TFile> file_ROOT);
     void printStreamStatus(std::ifstream &inputStream);
     void printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename);
     

@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <map>
+#include <memory>
 #include <vector>
 
 //Framework Includes
@@ -22,6 +23,10 @@
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
+#include "TDirectory.h"
+#include "TF1.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TROOT.h"
 
 namespace Uniformity {
@@ -103,11 +108,17 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+        //Returns a directory of a TFile
+        //Checks to see if the dir exists, if it does not it is created.
+        //TDirectory getDirectory(std::shared_ptr<TFile> inputFile, std::string strDirName);
         
+        //Returns a histogram whose parmeters match those defined in hte input HistoSetup object
+        TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
+        std::string analysisName;
+        
         //Holds Setup Parameters for the
         Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size;
         

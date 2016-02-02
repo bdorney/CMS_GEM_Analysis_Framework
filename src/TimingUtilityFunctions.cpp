@@ -147,7 +147,7 @@ int Timing::getMinForChannelOR(std::map<std::string, int> inputMap){
 //printers
 //----------------------------------------------------------------------------------------
 //Prints the status bits of an input TFile
-void Timing::printROOTFileStatus(TFile *file_ROOT){
+void Timing::printROOTFileStatus(TFile * file_ROOT){
     std::cout << "Input ROOT File Status:\n";
     std::cout << "\tIsOpen() = " << file_ROOT->IsOpen() << std::endl;
     std::cout << "\tIsZombie() = " << file_ROOT->IsZombie() << std::endl;

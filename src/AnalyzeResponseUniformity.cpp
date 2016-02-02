@@ -16,12 +16,15 @@ using std::string;
 using std::vector;
 
 using Timing::getString;
+using Timing::printROOTFileStatus;
 using Timing::HistoSetup;
 
 using namespace Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
+    analysisName = "analysis";
+    
     //Setup Histo Setup Containers
     //Cluster ADC Histos
     hSetupClust_ADC.fHisto_xLower = 0;
@@ -66,6 +69,8 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
 
 //Set inputs at construction
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
+    analysisName = "analysis";
+    
     //Setup Histo Setup Containers
     //Cluster ADC Histos
     hSetupClust_ADC.fHisto_xLower = 0;
@@ -137,7 +142,13 @@ void AnalyzeResponseUniformity::fillHistos(){
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
-            //Initialize iPhi Histograms
+            //Initialize iPhi Histograms - 1D
+            (*iterPhi).second.hPhi_ClustADC = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, hSetupClust_ADC ) );
+            (*iterPhi).second.hPhi_ClustMulti = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, hSetupClust_Multi ) );
+            (*iterPhi).second.hPhi_ClustSize = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, hSetupClust_Size ) );
+            
+            //Initialize iPhi Histograms - 2D
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity",200,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
             
             //Loop Over Stored Clusters
             for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
@@ -150,9 +161,19 @@ void AnalyzeResponseUniformity::fillHistos(){
                 (*iterEta).second.hEta_ClustADC_v_ClustPos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
                 
                 //Fill iPhi Histograms
+                (*iterPhi).second.hPhi_ClustADC->Fill( (*iterClust).fADC );
+                //(*iterPhi).second.hPhi_ClustMulti
+                (*iterPhi).second.hPhi_ClustSize->Fill( (*iterClust).iSize);
+                (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
+                
+                //Slices?
+                
+                //To Be Implemented
                 
             } //End Loop Over Stored Clusters
         } //End Loop Over iPhi Sectors
+        
+        std::cout<<"(*iterEta).second.hEta_ClustADC->Integral() = " << (*iterEta).second.hEta_ClustADC->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
 } //End AnalyzeResponseUniformity::fillHistos() - Full Detector
@@ -172,6 +193,56 @@ void AnalyzeResponseUniformity::fillHistos(SectorPhi &inputPhi){
     
 } //AnalysisSetupUniformity::fillHistos() - Specific iPhi
 
+//Stores booked histograms (for those histograms that are non-null)
+void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::string strOption ){
+    //Variable Declaration
+    //std::shared_ptr<TFile> ptr_fileOutput;
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Assign the TFile to the ptr_fileOutput
+    //ptr_fileOutput = std::make_shared<TFile>(TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1) );
+    
+    //Check if File Failed to Open Correctly
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("AnalyzeResponseUniformity","storeHistos","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("AnalyzeResponseUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("AnalyzeResponseUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Loop over ieta's
+        //Create/Load file structure
+        //Store ieta level histograms
+        //Loop over iphi's within ieta's
+            //Create/Load file structure
+            //Store iphi level histograms
+                //Loop over slices
+                    //Create/Load file structure
+                    //store slice level histograms
+    //Close File
+    
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Get Directory
+        TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        
+        cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        
+    } //End Loop Over Stored iEta Sectors
+    
+    return;
+} //End storeHistos()
+
+//Returns a directory of a TFile
+//Checks to see if the dir exists, if it does not it is created.
+/*TDirectory AnalyzeResponseUniformity::getDirectory(std::shared_ptr<TFile> inputFile, std::string strDirName){
+    
+}*/ //End getDirectory()
+
+//Returns a histogram whose parmeters match those defined in hte input HistoSetup object
 TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi,HistoSetup &setupHisto){
     //Variable Declaration
     string strName = setupHisto.strHisto_Name;
