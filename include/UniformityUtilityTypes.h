@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-//My Includes
+//Framework Includes
 
 //ROOT Includes
 #include "TFile.h"
@@ -70,15 +70,23 @@ namespace Uniformity {
     struct AnalysisSetupUniformity{
         int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
         
+        Timing::HistoSetup histoSetup_clustADC;
+        Timing::HistoSetup histoSetup_clustMulti;
+        Timing::HistoSetup histoSetup_clustPos;
+        Timing::HistoSetup histoSetup_clustSize;
+        Timing::HistoSetup histoSetup_clustTime;
+        
         SelParamClusters selClust; //Selection Criteria for Clusters
         
+        //Soon to be depreciated
         std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
         std::string strFit_Option;  //Fit Option, e.g. "R"
         
         //Initialization
         AnalysisSetupUniformity(){
-            strFit_Eqn = "[0]*exp(-0.5*(x-[1])^2/[2]^2)";
-            strFit_Option = "QM";
+            //strFit_Eqn = "[0]*exp(-0.5*(x-[1])^2/[2]^2)";
+            strFit_Eqn = "gaus";
+            strFit_Option = "QMR";
         } //End Initialization
     }; //End AnalysisSetupUniformity
     

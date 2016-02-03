@@ -52,24 +52,9 @@ namespace Uniformity {
         //Loops over all stored clusters in detMPGD and Book histograms for the full detector
         void fillHistos();
         
-        //Loops over all stored clusters in a specific iEta sector of detMPGD and Book Histograms
-        //void fillHistos(int iEta);
-        //void fillHistos(SectorEta &inputEta);
-        
-        //Loops over all stored clusters in a specific iPhi sector of detMPGD and Book Histograms
-        //void fillHistos(int iEta, int iPhi);
-        //void fillHistos(SectorPhi &inputPhi);
-        
-        //NOTE: NOT IMPLEMENTED YET
         //Fitting*****************
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
         void fitHistos();
-        
-        //Loops over all slices in a specific iEta sector of detMPGD and fits Booked Histograms
-        //void fitHistos(int iEta);
-        
-        //Loops over all slices in a specific iPhi sector of detMPGD and fits Book Histograms
-        //void fitHistos(int iEta, int iPhi);
         
         //Storing*****************
         //Stores booked histograms (for those histograms that are non-null)
@@ -77,6 +62,15 @@ namespace Uniformity {
         
         //Stores booked fits (for those fits that are non-null)
         void storeFits(std::string strOutputROOTFileName, std::string strOption);
+        
+        //Stores TObjects created in createResponseMap() in the requested output file
+        //Placeholder
+        //void storeResponseMap(std::string strOutputROOTFileName, std::string strOption);
+        
+        //Visualizing*************
+        //Displays the results of the analysis in a user friendly manner
+        //Placeholder
+        //void createResponseMap();
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,29 +87,15 @@ namespace Uniformity {
         //Sets the Detector
         void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
         
-        //Sets the requested response granularity;
-        //void setResponseGranularity(int iInput){ iNSlices = iInput; return; };
-        
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Filling*****************
-        //Loops over all stored clusters in a specific iEta sector of detMPGD and Book Histograms
-        //void fillHistos(int iEta);
-        //void fillHistos(SectorEta &inputEta);
-        
-        //Loops over all stored clusters in a specific iPhi sector of detMPGD and Book Histograms
-        //void fillHistos(int iEta, int iPhi);
-        //void fillHistos(SectorPhi &inputPhi);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Returns a directory of a TFile
-        //Checks to see if the dir exists, if it does not it is created.
-        //TDirectory getDirectory(std::shared_ptr<TFile> inputFile, std::string strDirName);
-        
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
-        TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
+        //TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
+        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto);
         
         //Returns a histogram whose parmeters match those defined in the input HistoSetup object
         TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
@@ -125,7 +105,7 @@ namespace Uniformity {
         std::string analysisName;
         
         //Holds Setup Parameters for the
-        Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size;
+        //Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size, hSetupClust_Time;
         
         Uniformity::AnalysisSetupUniformity aSetup;
         
