@@ -32,10 +32,15 @@ ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
     strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
     strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
     strSecBegin_Uniformity  = "[BEGIN_UNIFORMITY_INFO]";
+    strSecBegin_Uniformity_Fit = "[BEGIN_ADC_FIT_INFO]";
+    strSecBegin_Uniformity_Histo = "[BEGIN_HISTO_INFO]";
+       
     
     strSecEnd_Analysis      = "[END_ANALYSIS_INFO]";
     strSecEnd_Timing        = "[END_TIMING_INFO]";
     strSecEnd_Uniformity    = "[END_UNIFORMITY_INFO]";
+    strSecEnd_Uniformity_Fit = "[END_ADC_FIT_INFO]";
+    strSecEnd_Uniformity_Hiso = "[END_HISTO_INFO]";
 } //End default constructor
 
 //Opens a text file set by the user and loads the requested parameters
@@ -201,6 +206,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
     
     //Loop through to find "Histo_Name" Should be the first one
     while ( getlineNoSpaces(inputFileStream, strLine) ) { //Loop through file to find "Histo_Name"
+	//Debugging
+	//cout<<"loadAnalysisParametersHistograms (Top Level); strLine = " << strLine << endl;
+
         //Does the user want to comment out this line?
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
@@ -296,9 +304,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
     while ( getlineNoSpaces(inputFileStream, strLine) ) {
         bExitSuccess = false;
         
-        //Debugging
-        //cout<<"strLine = " << strLine << endl;
-        
+	//Debugging
+	//cout<<"loadAnalysisParametersHistograms (Base Level); strLine = " << strLine << endl;
+
         //Does the user want to comment out this line?
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
@@ -371,7 +379,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
                 hSetup.bFit = convert2bool(pair_strParam.second, bExitSuccess);
             }
             else{ //Case: Parameter not recognized
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","Error!!! Parameter Not Recognizd:\n");
+                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","Error!!! Parameter Not Recognized:\n");
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
 
@@ -424,9 +432,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         //Should we be storing histogram/fit setup parameters?
         if ( 0 == strLine.compare(strSecBegin_Uniformity_Fit) ) { //Case: Fit Setup
             loadAnalysisParametersFits(inputFileStream, aSetupUniformity.histoSetup_clustADC);
+	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Fit Setup
         else if( 0 == strLine.compare(strSecBegin_Uniformity_Histo) ){ //Case: Histo Setup
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity);
+	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Histo Setup
         
         //Debugging
