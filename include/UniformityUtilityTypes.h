@@ -20,6 +20,7 @@
 
 //ROOT Includes
 #include "TFile.h"
+#include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TROOT.h"
@@ -167,6 +168,10 @@ namespace Uniformity {
         float fWidth;       //Width of detector at this iEta value
         
         std::map<int, SectorPhi> map_sectorsPhi;
+        
+        //One dimensional graphs
+        std::shared_ptr<TGraphErrors> gEta_ClustADCFitRes_Response;
+        std::shared_ptr<TGraphErrors> gEta_ClustADCFitRes_NormChi2;
         
         //One dimensional histograms
         std::shared_ptr<TH1F> hEta_ClustADC;    //ADC spectrum for all clusters in this eta sector

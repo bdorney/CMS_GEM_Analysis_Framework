@@ -70,7 +70,7 @@ namespace Uniformity {
         //Visualizing*************
         //Displays the results of the analysis in a user friendly manner
         //Placeholder
-        //void createResponseMap();
+        void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,16 +93,26 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //template<class TFileStructure>
+        //TDirectory * getDirectory(int iIdentifier, std::string strName, TFileStructure *inputStructure);
+        
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
         //TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
         TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto);
         
+        //Returns a TGraph Errors whose parameters match those defined in the input HistoSetup object
+        TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+        
         //Returns a histogram whose parmeters match those defined in the input HistoSetup object
         TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
         
+        //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
+        std::string getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName);
+        std::string getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName);
+        
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
-        std::string analysisName;
+        std::string strAnalysisName;
         
         //Holds Setup Parameters for the
         //Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size, hSetupClust_Time;
@@ -112,6 +122,16 @@ namespace Uniformity {
         Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp
         
     }; //End class AnalyzeResponseUniformity
+    
+    //Works with TFileStructure = TFile || TDirectory
+    /*template<class TFileStructure>
+    TDirectory * AnalyzeResponseUniformity::getDirectory(int iIdentifier, std::string strName, TFileStructure *inputStructure){
+        //Variable Declaration
+        
+        //Get Directory
+        
+    }*/ //End AnalyzeResponseUniformity::getDirectory()
+    
 } //End namespace Uniformity
 
 

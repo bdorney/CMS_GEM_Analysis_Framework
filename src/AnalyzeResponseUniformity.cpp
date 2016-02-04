@@ -11,6 +11,7 @@
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 using std::map;
 using std::string;
 using std::vector;
@@ -23,7 +24,7 @@ using namespace Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
-    analysisName = "analysis";
+    strAnalysisName = "analysis";
     
     //Setup Histo Setup Containers
     //Cluster ADC Histos
@@ -79,7 +80,7 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
 
 //Set inputs at construction
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
-    analysisName = "analysis";
+    strAnalysisName = "analysis";
     
     //Setup Histo Setup Containers
     //Cluster ADC Histos
@@ -152,14 +153,14 @@ void AnalyzeResponseUniformity::fillHistos(){
         aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
         
         //Initialize iEta Histograms - 1D
-        (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
-        (*iterEta).second.hEta_ClustMulti = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
-        (*iterEta).second.hEta_ClustPos = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
-        (*iterEta).second.hEta_ClustSize = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
-        (*iterEta).second.hEta_ClustTime = std::make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
+        (*iterEta).second.hEta_ClustADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
+        (*iterEta).second.hEta_ClustMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
+        (*iterEta).second.hEta_ClustPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
+        (*iterEta).second.hEta_ClustSize = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
+        (*iterEta).second.hEta_ClustTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
         
         //Initialize iEta Histograms - 2D
-        (*iterEta).second.hEta_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", (int) (*iterEta).second.fWidth,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+        (*iterEta).second.hEta_ClustADC_v_ClustPos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", 3. * aSetup.iUniformityGranularity,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
         (*iterEta).second.hEta_ClustADC_v_ClustPos->Sumw2();
         
         //Debugging
@@ -169,13 +170,13 @@ void AnalyzeResponseUniformity::fillHistos(){
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
             //Initialize iPhi Histograms - 1D
-            (*iterPhi).second.hPhi_ClustADC = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
-            (*iterPhi).second.hPhi_ClustMulti = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
-            (*iterPhi).second.hPhi_ClustSize = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
-            (*iterPhi).second.hPhi_ClustTime = std::make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
+            (*iterPhi).second.hPhi_ClustADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
+            (*iterPhi).second.hPhi_ClustMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
+            (*iterPhi).second.hPhi_ClustSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
+            (*iterPhi).second.hPhi_ClustTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
             
             //Initialize iPhi Histograms - 2D
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = std::make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
             (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Sumw2();
             
             //Loop Over Stored Clusters
@@ -207,7 +208,7 @@ void AnalyzeResponseUniformity::fillHistos(){
                 //string strSliceName = "hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC";
                 
                 //Grab ADC spectrum for this slice
-                slice.hSlice_ClustADC = std::make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.hPhi_ClustADC_v_ClustPos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.hPhi_ClustADC_v_ClustPos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
                 
                 //Store position information for this slice
                 slice.fPos_Center = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinCenter(i);
@@ -232,7 +233,16 @@ void AnalyzeResponseUniformity::fitHistos(){
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-    
+        
+        //Initialize Response uniformity graphs
+        (*iterEta).second.gEta_ClustADCFitRes_Response = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        
+        (*iterEta).second.gEta_ClustADCFitRes_Response->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "ClustADCFitRes_Response" ) ).c_str() );
+        
+        (*iterEta).second.gEta_ClustADCFitRes_NormChi2 = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        
+        (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "ClustADCFitRes_NormChi2" ) ).c_str() );
+        
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
         
@@ -243,7 +253,7 @@ void AnalyzeResponseUniformity::fitHistos(){
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
                 
                 //Initialize Fit
-                (*iterSlice).second.fitSlice_ClustADC = std::make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC) );
+                (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC) );
                 
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
@@ -283,7 +293,7 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
     //Assign the TFile to the ptr_fileOutput
-    //ptr_fileOutput = std::make_shared<TFile>(TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1) );
+    //ptr_fileOutput = make_shared<TFile>(TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1) );
     
     //Check if File Failed to Open Correctly
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
@@ -472,17 +482,12 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
     return;
 } //End storeHistos()
 
-//Returns a directory of a TFile
-//Checks to see if the dir exists, if it does not it is created.
-/*TDirectory AnalyzeResponseUniformity::getDirectory(std::shared_ptr<TFile> inputFile, std::string strDirName){
-    
-}*/ //End getDirectory()
-
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto){
     //Variable Declaration
-    //string strName = "ClustADC";
+    string strPrefix = "fit";
+    string strName = getNameByIndex(iEta, iPhi, iSlice, strPrefix, setupHisto.strHisto_Name);
     
-    if (iSlice > -1) {
+    /*if (iSlice > -1) {
         setupHisto.strHisto_Name = "fit_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + setupHisto.strHisto_Name;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
@@ -490,10 +495,10 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     } //End Case: Specific (iEta,iPhi) sector
     else{ //Case: iEta Sector, sum over sector's iPhi
         setupHisto.strHisto_Name = "fit_iEta" + getString(iEta) + "_" + setupHisto.strHisto_Name;
-    } //End Case: iEta Sector, sum over sector's iPhi
+    }*/ //End Case: iEta Sector, sum over sector's iPhi
     
     //Fit Declaration
-    TF1 ret_Fit(setupHisto.strHisto_Name.c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
+    TF1 ret_Fit(strName.c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
     
     //Set Fit Data Members
     ret_Fit.SetLineColor(kRed);
@@ -503,18 +508,33 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     return ret_Fit;
 } //End AnalyzeResponseUniformity::getFit()
 
-//Returns a histogram whose parmeters match those defined in hte input HistoSetup object
-TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi,HistoSetup &setupHisto){
+TGraphErrors AnalyzeResponseUniformity::getGraph(int iEta, int iPhi, HistoSetup & setupHisto){
     //Variable Declaration
-    string strName = setupHisto.strHisto_Name;
+    string strPrefix = "g";
+    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto.strHisto_Name);
+    
+    //Graph Declaration
+    TGraphErrors ret_Graph;
+    
+    //Set Histo Data Members
+    ret_Graph.GetXaxis()->SetTitle( setupHisto.strHisto_Title_X.c_str() );
+    
+    return ret_Graph;
+} //End AnalyzeResponseUniformity::getGraph()
+
+//Returns a histogram whose parmeters match those defined in hte input HistoSetup object
+TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &setupHisto){
+    //Variable Declaration
+    string strPrefix = "h";
+    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto.strHisto_Name);
     
     //Alter the name to reflect the location within the detector
-    if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
+    /*if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
         strName = "hiEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strName;
     } //End Case: Specific (iEta,iPhi) sector
     else{ //Case: iEta Sector, sum over sector's iPhi
         strName = "hiEta" + getString(iEta) + "_" + strName;
-    } //End Case: iEta Sector, sum over sector's iPhi
+    }*/ //End Case: iEta Sector, sum over sector's iPhi
     
     //Histo Declaration
     TH1F ret_Histo(strName.c_str(), "", setupHisto.iHisto_nBins, setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
@@ -528,3 +548,41 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi,HistoSetup &setu
     //Return Histogram
     return ret_Histo;
 } //End AnalyzeResponseUniformity::getHistogram()
+
+
+//Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
+string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName){
+    //Variable Declaration
+    string ret_Name = "";
+    
+    if (iSlice > -1) {
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+    }
+    else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+    } //End Case: Specific (iEta,iPhi) sector
+    else{ //Case: iEta Sector, sum over sector's iPhi
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+    } //End Case: iEta Sector, sum over sector's iPhi
+    
+    return ret_Name;
+} //End AnalyzeResponseUniformity::getNameByIndex()
+
+//Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
+//Will take text written in quotes without requiring a variable
+string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName){
+    //Variable Declaration
+    string ret_Name = "";
+    
+    if (iSlice > -1) {
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+    }
+    else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+    } //End Case: Specific (iEta,iPhi) sector
+    else{ //Case: iEta Sector, sum over sector's iPhi
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+    } //End Case: iEta Sector, sum over sector's iPhi
+
+    return ret_Name;
+} //End AnalyzeResponseUniformity::getNameByIndex()
