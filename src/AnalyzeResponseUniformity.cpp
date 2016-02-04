@@ -258,7 +258,7 @@ void AnalyzeResponseUniformity::fitHistos(){
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC) );
                 
                 //Perform Fit
-                (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.strFit_Option.c_str(),"", dPeakPos[0]-600., dPeakPos[0]+600. );
+                (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
                 
                 //Determine which point in the TGraphs this is
                 int iPoint = std::distance( (*iterPhi).second.map_slices.begin(), iterSlice) + aSetup.iUniformityGranularity * std::distance((*iterEta).second.map_sectorsPhi.begin(), iterPhi);
@@ -270,8 +270,8 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, (*iterSlice).second.fitSlice_ClustADC->GetParError( ???? ) );
                 
                 //Store Fit parameters - NormChi2
-                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
-                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, 0. );
+                (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
+                (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
@@ -495,6 +495,8 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //Variable Declaration
     TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
     
+	cout<<"setupHisto.strFit_Formula.c_str() = " << setupHisto.strFit_Formula.c_str() << endl;
+
     //Set Fit Parameters
     //------------------------------------------------------
     //Check to see if user has correctly linking the meaning of the fit parameters and their initial guess
