@@ -110,6 +110,9 @@ namespace Uniformity {
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName);
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName);
         
+        //Searchs the input fit for the given variable; returns it
+        float getPeakPos( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;

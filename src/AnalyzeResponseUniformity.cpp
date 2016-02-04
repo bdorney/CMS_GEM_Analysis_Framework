@@ -257,6 +257,10 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //Initialize Fit
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC) );
                 
+                //Find peak & store it's position
+                //specADC.Search( hInput.get(), 2, "nobackground", 0.5 );
+                //dPeakPos = spec.GetPositionX();
+                
                 //Perform Fit
                 (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
                 
@@ -266,7 +270,7 @@ void AnalyzeResponseUniformity::fitHistos(){
                 cout<<"iPoint = " << iPoint << endl;
                 
                 //Store Fit parameters - Peak Position
-                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetParameter( ???? ) );
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, (*iterSlice).second.fitSlice_ClustADC->GetParError( ???? ) );
                 
                 //Store Fit parameters - NormChi2
@@ -436,8 +440,7 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
         //Store Fits - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
-        
-        //No Fits defined at this level - yet
+        (*iterEta).second.gEta_ClustADCFitRes_Response->Write();
         (*iterEta).second.gEta_ClustADCFitRes_NormChi2->Write();
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
@@ -495,7 +498,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //Variable Declaration
     TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
     
-	cout<<"setupHisto.strFit_Formula.c_str() = " << setupHisto.strFit_Formula.c_str() << endl;
+	//cout<<"setupHisto.strFit_Formula.c_str() = " << setupHisto.strFit_Formula.c_str() << endl;
 
     //Set Fit Parameters
     //------------------------------------------------------
@@ -637,3 +640,35 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
 
     return ret_Name;
 } //End AnalyzeResponseUniformity::getNameByIndex()
+
+float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
+    
+    //Search the peak parameter meaning vector for "PEAK"
+    //If found return this parameter
+    
+    //If not found, return -1;
+    //warn the user
+    
+    //Variable Declaration
+    int iParamPos = -1;
+    
+    float ret_Val = -1;
+    
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
+    
+    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+        
+        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        
+        ret_Val = fitInput->GetParameter(iParamPos);
+    } //End Case: Parameter Found!!!
+    else{ //Case: Parameter NOT Found
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
+    } //End Case: Parameter NOT Foun
+    
+    return ret_Val;
+} //End AnalyzeResponseUniformity::getPeakPos
