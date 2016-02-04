@@ -98,7 +98,7 @@ namespace Uniformity {
         
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
         //TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
-        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto);
+        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput );
         
         //Returns a TGraph Errors whose parameters match those defined in the input HistoSetup object
         TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);

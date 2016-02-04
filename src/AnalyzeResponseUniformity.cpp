@@ -13,6 +13,7 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 using std::map;
+using std::shared_ptr;
 using std::string;
 using std::vector;
 
@@ -234,11 +235,12 @@ void AnalyzeResponseUniformity::fitHistos(){
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
-        //Initialize Response uniformity graphs
+        //Initialize Response uniformity graphs - Fit Mean
         (*iterEta).second.gEta_ClustADCFitRes_Response = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
         
         (*iterEta).second.gEta_ClustADCFitRes_Response->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "ClustADCFitRes_Response" ) ).c_str() );
         
+        //
         (*iterEta).second.gEta_ClustADCFitRes_NormChi2 = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
         
         (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "ClustADCFitRes_NormChi2" ) ).c_str() );
@@ -253,17 +255,23 @@ void AnalyzeResponseUniformity::fitHistos(){
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
                 
                 //Initialize Fit
-                (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC) );
-                
-                //Find peak & store it's position
-                specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
-                dPeakPos = specADC.GetPositionX();
-                
-                //Set initial guess for fit
-                (*iterSlice).second.fitSlice_ClustADC->SetParameter(1, dPeakPos[0] );
+                (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC) );
                 
                 //Perform Fit
                 (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.strFit_Option.c_str(),"", dPeakPos[0]-600., dPeakPos[0]+600. );
+                
+                //Determine which point in the TGraphs this is
+                int iPoint = std::distance( (*iterPhi).second.map_slices.begin(), iterSlice) + aSetup.iUniformityGranularity * std::distance((*iterEta).second.map_sectorsPhi.begin(), iterPhi);
+                
+                cout<<"iPoint = " << iPoint << endl;
+                
+                //Store Fit parameters - Peak Position
+                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetParameter( ???? ) );
+                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, (*iterSlice).second.fitSlice_ClustADC->GetParError( ???? ) );
+                
+                //Store Fit parameters - NormChi2
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, 0. );
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
@@ -430,6 +438,7 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
         dir_SectorEta->cd();
         
         //No Fits defined at this level - yet
+        (*iterEta).second.gEta_ClustADCFitRes_NormChi2->Write();
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -482,30 +491,70 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
     return;
 } //End storeHistos()
 
-TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto){
+TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput ){
     //Variable Declaration
-    string strPrefix = "fit";
-    string strName = getNameByIndex(iEta, iPhi, iSlice, strPrefix, setupHisto.strHisto_Name);
+    TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
     
-    /*if (iSlice > -1) {
-        setupHisto.strHisto_Name = "fit_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + setupHisto.strHisto_Name;
-    }
-    else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        setupHisto.strHisto_Name = "fit_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + setupHisto.strHisto_Name;
-    } //End Case: Specific (iEta,iPhi) sector
-    else{ //Case: iEta Sector, sum over sector's iPhi
-        setupHisto.strHisto_Name = "fit_iEta" + getString(iEta) + "_" + setupHisto.strHisto_Name;
-    }*/ //End Case: iEta Sector, sum over sector's iPhi
-    
-    //Fit Declaration
-    TF1 ret_Fit(strName.c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
+    //Set Fit Parameters
+    //------------------------------------------------------
+    //Check to see if user has correctly linking the meaning of the fit parameters and their initial guess
+    if ( setupHisto.vec_strFit_ParamMeaning.size() == setupHisto.vec_strFit_ParamIGuess.size() ) {
+        
+        //AMPLITUDE, MEAN, PEAK, SIGMA
+        //We assume the user has correctly matched the indices of setupHisto.vec_strFit_ParamMeaning and setupHisto.vec_strFit_ParamIGuess to the formula given in setupHisto.strFit_Formula
+        for (int i=0; i<setupHisto.vec_strFit_ParamMeaning.size(); ++i) {
+            //Try to automatically assign a value
+            if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("AMPLITUDE") ) { //Case: Histo Amplitude
+                ret_Func.SetParameter(i, hInput->GetBinContent( hInput->GetMaximumBin() ) );
+            } //End Case: Histo Amplitude
+            else if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("MEAN") ) { //Case: Histo Mean
+                ret_Func.SetParameter(i, hInput->GetMean() );
+            } //End Case: Histo Mean
+            else if ( 0 == setupHisto.vec_strFit_ParamIGuess[i].compare("PEAK") ){ //Case: Histo Peak
+                TSpectrum spec;    //One peak; 2 sigma away from any other peak
+                
+                Double_t *dPeakPos;
+                
+                //Find peak & store it's position
+                spec.Search( hInput.get(), 2, "nobackground", 0.5 );
+                dPeakPos = spec.GetPositionX();
+                
+                //Set initial guess for fit
+                ret_Func.SetParameter(i, dPeakPos[0] );
+            } //End Case: Histo Peak
+            else if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("SIGMA") ) { //Case: Histo RMS
+                ret_Func.SetParameter(i, hInput->GetRMS() );
+            } //End Case: Histo RMS
+            else{ //Case: manual assignment
+                ret_Func.SetParameter(i, Timing::stofSafe("Fit_Param_IGuess", setupHisto.vec_strFit_ParamIGuess[i] ) );
+            } //End Case: manual assignment
+        } //End Loop over parameters
+    } //End Case: equal number of inputs, containers (should be) linked!!!
+    else{
+        cout<<"Uniformity::AnalyzeResponseUniformity::getFit() - Trying to set initial parameters for:\n";
+        cout<<"\tHisto Name = " << hInput->GetName() << endl;
+        cout<<"\tFunction Name = " << ret_Func.GetName() << endl;
+        
+        cout<<"\tFit_Param_Map (Parameter Meaning) Given:\n\t\t";
+        for (int i = 0; i < setupHisto.vec_strFit_ParamMeaning.size(); ++i) {
+            cout<<setupHisto.vec_strFit_ParamMeaning[i]<<"\t";
+        }
+        cout<<endl;
+        
+        cout<<"tFit_Param_IGuess (Parameter Initial Guess) Given:\n\t\t";
+        for (int i = 0; i < setupHisto.vec_strFit_ParamIGuess.size(); ++i) {
+            cout<<setupHisto.vec_strFit_ParamIGuess[i]<<"\t";
+        }
+        cout<<endl;
+        cout<<"\tParameters not linked!!! Please cross check input analysis config file!!!\n";
+    } //End Case: vec_strFit_ParamIGuess not linked with vec_strFit_ParamMeaning; skip
     
     //Set Fit Data Members
-    ret_Fit.SetLineColor(kRed);
-    ret_Fit.SetLineWidth(3);
+    ret_Func.SetLineColor(kRed);
+    ret_Func.SetLineWidth(3);
     
     //Return fit
-    return ret_Fit;
+    return ret_Func;
 } //End AnalyzeResponseUniformity::getFit()
 
 TGraphErrors AnalyzeResponseUniformity::getGraph(int iEta, int iPhi, HistoSetup & setupHisto){
