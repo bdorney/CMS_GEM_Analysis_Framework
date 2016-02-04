@@ -71,6 +71,8 @@ namespace Uniformity {
     struct AnalysisSetupUniformity{
         int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
         
+        float fUniformityTolerance; //Detector should be uniform within this percent
+        
         Timing::HistoSetup histoSetup_clustADC;
         Timing::HistoSetup histoSetup_clustMulti;
         Timing::HistoSetup histoSetup_clustPos;
@@ -80,14 +82,18 @@ namespace Uniformity {
         SelParamClusters selClust; //Selection Criteria for Clusters
         
         //Soon to be depreciated
-        std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
-        std::string strFit_Option;  //Fit Option, e.g. "R"
+        //std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
+        //std::string strFit_Option;  //Fit Option, e.g. "R"
         
         //Initialization
         AnalysisSetupUniformity(){
+            iUniformityGranularity = 4;
+            
+            fUniformityTolerance = 0.15;
+            
             //strFit_Eqn = "[0]*exp(-0.5*(x-[1])^2/[2]^2)";
-            strFit_Eqn = "gaus";
-            strFit_Option = "QMR";
+            //strFit_Eqn = "gaus";
+            //strFit_Option = "QMR";
         } //End Initialization
     }; //End AnalysisSetupUniformity
     

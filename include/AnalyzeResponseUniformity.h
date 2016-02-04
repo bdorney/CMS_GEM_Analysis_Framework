@@ -10,6 +10,7 @@
 #define ____AnalyzeResponseUniformity__
 
 //C++ Includes
+#include <algorithm>
 #include <iterator>
 #include <stdio.h>
 #include <string>
@@ -56,6 +57,11 @@ namespace Uniformity {
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
         void fitHistos();
         
+        //Pass/Fail***************
+        //Checks to see if the detector's uniformity is within requested amount
+        void checkUniformity();
+        //bool checkUniformity(bool &bInput);
+        
         //Storing*****************
         //Stores booked histograms (for those histograms that are non-null)
         void storeHistos(std::string strOutputROOTFileName, std::string strOption);
@@ -70,7 +76,7 @@ namespace Uniformity {
         //Visualizing*************
         //Displays the results of the analysis in a user friendly manner
         //Placeholder
-        void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
+        //void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,6 +118,9 @@ namespace Uniformity {
         
         //Searchs the input fit for the given variable; returns it
         float getPeakPos( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        
+        //Searchs the input fit for the given variable; returns it
+        float getPeakPosError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------

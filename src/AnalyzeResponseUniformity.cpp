@@ -26,113 +26,11 @@ using namespace Uniformity;
 //Default Constructor
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
     strAnalysisName = "analysis";
-    
-    //Setup Histo Setup Containers
-    //Cluster ADC Histos
-    /*hSetupClust_ADC.fHisto_xLower = 0;
-    hSetupClust_ADC.fHisto_xUpper = 15000;
-    
-    hSetupClust_ADC.iHisto_nBins = 300;
-    
-    hSetupClust_ADC.strHisto_Name = "clustADC";
-    hSetupClust_ADC.strHisto_Title_X = "ADC";
-    hSetupClust_ADC.strHisto_Title_Y = "N";
-    
-    //Cluster Multiplicity
-    hSetupClust_Multi.fHisto_xLower = 0;
-    hSetupClust_Multi.fHisto_xUpper = 20;
-    
-    hSetupClust_Multi.iHisto_nBins = 20;
-    
-    hSetupClust_Multi.strHisto_Name = "clustMulti";
-    hSetupClust_Multi.strHisto_Title_X = "Cluster Multiplicity";
-    hSetupClust_Multi.strHisto_Title_Y = "N";
-    
-    //Cluster Position
-    //hSetupClust_Pos.fHisto_xLower = 0;
-    //hSetupClust_Pos.fHisto_xUpper = 15000;
-    
-    hSetupClust_Pos.iHisto_nBins = 100;
-    
-    hSetupClust_Pos.strHisto_Name = "clustPos";
-    hSetupClust_Pos.strHisto_Title_X = "Position #left(mm#right)";
-    hSetupClust_Pos.strHisto_Title_Y = "N";
-    
-    //Cluster Size
-    hSetupClust_Size.fHisto_xLower = 0;
-    hSetupClust_Size.fHisto_xUpper = 10;
-    
-    hSetupClust_Size.iHisto_nBins = 10;
-    
-    hSetupClust_Size.strHisto_Name = "clustSize";
-    hSetupClust_Size.strHisto_Title_X = "Size #left(N_{strips}#right)";
-    hSetupClust_Size.strHisto_Title_Y = "N";
-    
-    //Cluster Time
-    hSetupClust_Time.fHisto_xLower = 0;
-    hSetupClust_Time.fHisto_xUpper = 15;
-    
-    hSetupClust_Time.iHisto_nBins = 15;
-    
-    hSetupClust_Time.strHisto_Name = "clustTime";
-    hSetupClust_Time.strHisto_Title_X = "Time Bin";
-    hSetupClust_Time.strHisto_Title_Y = "N";*/
 } //End Default Constructor
 
 //Set inputs at construction
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
     strAnalysisName = "analysis";
-    
-    //Setup Histo Setup Containers
-    //Cluster ADC Histos
-    /*hSetupClust_ADC.fHisto_xLower = 0;
-    hSetupClust_ADC.fHisto_xUpper = 15000;
-    
-    hSetupClust_ADC.iHisto_nBins = 300;
-    
-    hSetupClust_ADC.strHisto_Name = "clustADC";
-    hSetupClust_ADC.strHisto_Title_X = "ADC";
-    hSetupClust_ADC.strHisto_Title_Y = "N";
-    
-    //Cluster Multiplicity
-    hSetupClust_Multi.fHisto_xLower = 0;
-    hSetupClust_Multi.fHisto_xUpper = 20;
-    
-    hSetupClust_Multi.iHisto_nBins = 20;
-    
-    hSetupClust_Multi.strHisto_Name = "clustMulti";
-    hSetupClust_Multi.strHisto_Title_X = "Cluster Multiplicity";
-    hSetupClust_Multi.strHisto_Title_Y = "N";
-    
-    //Cluster Position
-    //hSetupClust_Pos.fHisto_xLower = 0;
-    //hSetupClust_Pos.fHisto_xUpper = 15000;
-    
-    hSetupClust_Pos.iHisto_nBins = 100;
-    
-    hSetupClust_Pos.strHisto_Name = "clustPos";
-    hSetupClust_Pos.strHisto_Title_X = "Position #left(mm#right)";
-    hSetupClust_Pos.strHisto_Title_Y = "N";
-    
-    //Cluster Size
-    hSetupClust_Size.fHisto_xLower = 0;
-    hSetupClust_Size.fHisto_xUpper = 10;
-    
-    hSetupClust_Size.iHisto_nBins = 10;
-    
-    hSetupClust_Size.strHisto_Name = "clustSize";
-    hSetupClust_Size.strHisto_Title_X = "Size #left(N_{strips}#right)";
-    hSetupClust_Size.strHisto_Title_Y = "N";
-    
-    //Cluster Time
-    hSetupClust_Time.fHisto_xLower = 0;
-    hSetupClust_Time.fHisto_xUpper = 15;
-    
-    hSetupClust_Time.iHisto_nBins = 15;
-    
-    hSetupClust_Time.strHisto_Name = "clustTime";
-    hSetupClust_Time.strHisto_Title_X = "Time Bin";
-    hSetupClust_Time.strHisto_Title_Y = "N";*/
     
     //Store Analysis Parameters
     aSetup = inputSetup;
@@ -140,6 +38,33 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
     //Store Detector
     detMPGD = inputDet;
 } //End Constructor
+
+//Checks to see if the detector's uniformity is within requested amount
+void AnalyzeResponseUniformity::checkUniformity(){
+    //Variable Declaration
+    float fResponse_Max = *(std::max_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
+    float fResponse_Min = *(std::min_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
+    float fResponse_Var = (fResponse_Max - fResponse_Min) / fResponse_Max;
+    
+    //Output Above Info to User
+    cout<<"============Analysis Summary============\n";
+    cout<<"Detector's Minimum Response: " << fResponse_Min << endl;
+    cout<<"Detector's Maximum Response: " << fResponse_Max << endl;
+    cout<<"Calculated Difference: " << fResponse_Var << endl;
+
+    //Check if Detector is within tolerance
+    if ( fabs(fResponse_Var) <= aSetup.fUniformityTolerance ) { //Case: Detector Within Tolerance
+        cout<<"This is found to be within Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER PASSES!!!\n";
+        cout<<"You should Investigate the output data file\n";
+    } //End Case: Detector Within Tolerance
+    else{ //Case: Detector OUTSIDE Tolerance
+        cout<<"This is found to be OUTSIDE Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER FAILS!!!\n";
+        cout<<"You should Investigate the output data file\n";
+    } //End Case: Detector OUTSIDE Tolerance
+    
+    return;
+} //check AnalyzeResponseUniformity::Uniformity
+
 
 //Loops over all stored clusters in detMPGD and Book histograms for the full detector
 void AnalyzeResponseUniformity::fillHistos(){
@@ -232,6 +157,9 @@ void AnalyzeResponseUniformity::fitHistos(){
     TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
     Double_t *dPeakPos;
     
+    //Clear Information from any previous analysis
+    detMPGD.vec_allADCPeaks.clear();
+    
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
@@ -262,16 +190,20 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //dPeakPos = spec.GetPositionX();
                 
                 //Perform Fit
-                (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
+                (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
                 
                 //Determine which point in the TGraphs this is
                 int iPoint = std::distance( (*iterPhi).second.map_slices.begin(), iterSlice) + aSetup.iUniformityGranularity * std::distance((*iterEta).second.map_sectorsPhi.begin(), iterPhi);
                 
-                cout<<"iPoint = " << iPoint << endl;
+                //cout<<"iPoint = " << iPoint << endl;
+                
+                //Store the Peak Position in the Detector
+                //Used for checking the uniformity
+                detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 
                 //Store Fit parameters - Peak Position
                 (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, (*iterSlice).second.fWidth, (*iterSlice).second.fitSlice_ClustADC->GetParError( ???? ) );
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 
                 //Store Fit parameters - NormChi2
                 (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
@@ -672,3 +604,35 @@ float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetu
     
     return ret_Val;
 } //End AnalyzeResponseUniformity::getPeakPos
+
+float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
+    
+    //Search the peak parameter meaning vector for "PEAK"
+    //If found return this parameter
+    
+    //If not found, return -1;
+    //warn the user
+    
+    //Variable Declaration
+    int iParamPos = -1;
+    
+    float ret_Val = -1;
+    
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
+    
+    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+        
+        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        
+        ret_Val = fitInput->GetParError(iParamPos);
+    } //End Case: Parameter Found!!!
+    else{ //Case: Parameter NOT Found
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
+    } //End Case: Parameter NOT Foun
+    
+    return ret_Val;
+} //End AnalyzeResponseUniformity::getPeakPosError

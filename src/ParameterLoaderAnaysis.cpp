@@ -484,6 +484,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_GRANULARITY") ){ //Case: Uniformity Granularity
                 aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity
+            else if( 0 == pair_strParam.first.compare("UNIFORMITY_TOLERANCE") ){ //Case: Uniformity Granularity
+                aSetupUniformity.fUniformityTolerance = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Uniformity Granularity
             else{ //Case: Parameter Not Recognized
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
