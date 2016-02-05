@@ -18,6 +18,7 @@
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
+#include "TDirectory.h"
 #include "TFile.h"
 #include "TGraphErrors.h"
 #include "TH1F.h"
@@ -29,7 +30,8 @@ using std::endl;
 using std::string;
 using std::vector;
 
-using::Timing::stoiSafe;
+using Timing::getString;
+using Timing::stoiSafe;
 
 using namespace ROOT;
 
@@ -62,8 +64,8 @@ int main( int argc_, char * argv_[] ){
     TFile *file_ROOT = NULL;    //Input ROOT File
     TFile *file_Output = NULL;  //Output ROOT File
     TH1F *hSpec = NULL;         //Histogram to be loaded from file_ROOT containing spectrum
-    TH1F *hBKG = NULL;          //Background found in hSpec;
-    TH1F *hSpecNoBKG = NULL;    //Spectrum After Background subtraction;
+    //TH1F *hBKG = NULL;          //Background found in hSpec;
+    //TH1F *hSpecNoBKG = NULL;    //Spectrum After Background subtraction;
     
     TGraphErrors *gIterImpact_PeakPos;// = new TGraphErrors( );
     TGraphErrors *gIterImpact_NormChi2;//= new TGraphErrors( );
@@ -92,7 +94,6 @@ int main( int argc_, char * argv_[] ){
     } //End Case: failed to load ROOT file
     
     hSpec = (TH1F*) file_ROOT->Get( vec_strInputArgs[2].c_str() );
-	//hSpec = new TH1F(*((TH1F*) file_ROOT->Get("SectorEta1/h_iEta1_clustADC")));    
 
     if ( nullptr == hSpec ) { //Case: failed to load TTree
         cout<<"error while fetching " << vec_strInputArgs[2].c_str() << " from " << vec_strInputArgs[1] << endl;
@@ -113,6 +114,11 @@ int main( int argc_, char * argv_[] ){
         return -2;
     } //End Check On Number of Found Peaks
     
+    //Setup Output File
+    //------------------------------------------------------
+    file_Output = new TFile("singleSpecAna.root","RECREATE","",1 );
+    //file_Output->cd();
+
     //Iteratively Find the Background And see Which is Best
     //------------------------------------------------------
     iNumIter = stoiSafe("INTERNAL",vec_strInputArgs[3]);
@@ -121,13 +127,11 @@ int main( int argc_, char * argv_[] ){
     gIterImpact_NormChi2= new TGraphErrors(iNumIter);  gIterImpact_NormChi2->SetName("gIterImpact_NormChi2");
 
     for (int i=1; i <= iNumIter; ++i) { //Background Testing Loop
-	//cout<<i<<"th Iteration Has Begun Processing\n";
-
         //Get the Background
-        hBKG = (TH1F*) specAnalyzer.Background(hSpec,i,"");
+        TH1F *hBKG = (TH1F*) specAnalyzer.Background(hSpec,i,"");
         
         //Subtract the background from the spectrum
-        hSpecNoBKG = (TH1F*) hSpec->Clone("hSpecNoBKG");
+        TH1F *hSpecNoBKG = (TH1F*) hSpec->Clone("hSpecNoBKG");
         
         hSpecNoBKG->Add(hBKG,-1.);
         
@@ -138,9 +142,9 @@ int main( int argc_, char * argv_[] ){
         //fit_SpecNoBKG->SetParameter(0, dPeakAmp[0] );
         fit_SpecNoBKG->SetParameter(1, dPeakPos[0] );
 
-	//Set bounds on the initial parmeters
+        //Set bounds on the initial parmeters
         fit_SpecNoBKG->SetParLimits(0,0,1e12);
-	fit_SpecNoBKG->SetParLimits(1,0,15000);
+        fit_SpecNoBKG->SetParLimits(1,0,15000);
 	
         //Perform Fit
         hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR","",dPeakPos[0]-600, dPeakPos[0]+600);
@@ -151,16 +155,19 @@ int main( int argc_, char * argv_[] ){
         
         gIterImpact_NormChi2->SetPoint(i, i, fit_SpecNoBKG->GetChisquare() / fit_SpecNoBKG->GetNDF() );
 
-	cout<<i<<"\t"<<dPeakPos[0]<<"\t"<<fit_SpecNoBKG->GetParameter(1)<<"\t"<<"+/-"<<fit_SpecNoBKG->GetParameter(2)<<"\t"<<fit_SpecNoBKG->GetChisquare() / fit_SpecNoBKG->GetNDF()<<endl;
+        cout<<i<<"\t"<<dPeakPos[0]<<"\t"<<fit_SpecNoBKG->GetParameter(1)<<"\t"<<"+/-"<<fit_SpecNoBKG->GetParameter(2)<<"\t"<<fit_SpecNoBKG->GetChisquare() / fit_SpecNoBKG->GetNDF()<<endl;
 
-	delete fit_SpecNoBKG;
+        TDirectory *dir_ThisIter = file_Output->mkdir( ("Iteration_" + getString(i) ).c_str() );
+        dir_ThisIter->cd();
+        hBKG->Write();
+        hSpecNoBKG->Write();
+        fit_SpecNoBKG->Write();
+        
+        //delete fit_SpecNoBKG;
     } //End Background Testing Loop
     
-    //Store
-    //------------------------------------------------------
-    file_Output = new TFile("singleSpecAna.root","RECREATE","",1 );
     file_Output->cd();
-
+    hSpec->Write();
     gIterImpact_PeakPos->Write();
     gIterImpact_NormChi2->Write();
     
