@@ -282,6 +282,7 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
         (*iterEta).second.hEta_ClustADC->Write();
         (*iterEta).second.hEta_ClustPos->Write();
         (*iterEta).second.hEta_ClustSize->Write();
+        (*iterEta).second.hEta_ClustTime->Write();
         (*iterEta).second.hEta_ClustADC_v_ClustPos->Write();
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
@@ -304,6 +305,7 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
             dir_SectorPhi->cd();
             (*iterPhi).second.hPhi_ClustADC->Write();
             (*iterPhi).second.hPhi_ClustSize->Write();
+            (*iterPhi).second.hPhi_ClustTime->Write();
             (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Write();
             
             //Loop through Slices

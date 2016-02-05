@@ -69,6 +69,8 @@ namespace Uniformity {
     
     //Analysis Setup
     struct AnalysisSetupUniformity{
+        int iEvt_First;  //Starting Event For Analysis
+        int iEvt_Total;    //Total number of Events to Analyze
         int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
         
         float fUniformityTolerance; //Detector should be uniform within this percent
@@ -87,6 +89,7 @@ namespace Uniformity {
         
         //Initialization
         AnalysisSetupUniformity(){
+            iEvt_First = iEvt_Total = -1;
             iUniformityGranularity = 4;
             
             fUniformityTolerance = 0.15;

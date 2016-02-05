@@ -38,7 +38,7 @@ using namespace Uniformity;
 //  3 -> ROOT File to be analyzed
 //  4 -> ROOT File to be Generated
 //  5 -> Option
-int main( int argc_, char * argv_[]){
+int main( int argc_, char * argv_[] ){
     //Variable Declaration
     ParameterLoaderAmoreSRS amoreLoader;
     ParameterLoaderAnaysis analysisLoader;

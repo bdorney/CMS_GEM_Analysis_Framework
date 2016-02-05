@@ -22,17 +22,19 @@ ClusterSelector::ClusterSelector(){
 void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
     Int_t iClustMulti;  //I cry a little inside because of this
-    //Int_t *iClustPos_Y = NULL;//[55];
-	Int_t iClustPos_Y[3072];
-    //Int_t *iClustSize = NULL;//[55];
+    Int_t iClustPos_Y[3072];
 	Int_t iClustSize[3072];
-    //Int_t *iClustTimeBin = NULL;//[55];
 	Int_t iClustTimeBin[3072];
     
-    //Float_t *fClustPos_X = NULL;//[55];
 	Float_t fClustPos_X[3072];
+    Float_t fClustADC[3072];
+    
+    //Int_t *iClustSize = NULL;//[55];
+    //Int_t *iClustPos_Y = NULL;//[55];
+    //Int_t *iClustTimeBin = NULL;//[55];
+
+    //Float_t *fClustPos_X = NULL;//[55];
     //Float_t *fClustADC = NULL;//[55];
-    	Float_t fClustADC[3072];
 
     Cluster clust;
     
@@ -72,60 +74,54 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     //Get data event-by-event
     //------------------------------------------------------
     for (int i=0; i < tree_Clusters->GetEntries(); ++i) {
-        //Need to implement a Hack
-	//Need to first get the number of clusters
-	//Then allocate the memory to the containers below
-	//Then set the branch address
-	//Then get the data & do the selection
-	//Then free the memory and reset the pointers
-
-	//NOTE: This hack causes the code to process *MUCH* slower
-	//Allocating memory on the fly seems to slow it down CONSIDERABLY (many factors)
-	//May need to invest some time into this
-	
-	//Make sure we only read the number of clusters
-	tree_Clusters->SetBranchStatus("*",0);
-	tree_Clusters->SetBranchStatus("nclust",1);
-	
-	//Get the number of clusters
+        //Needed to implement a Hack
+        //First check to make sure the cluster multiplicity is within the selection
+        //Only then get the info on the clusters
+        
+        //Make sure we only read the number of clusters
+        tree_Clusters->SetBranchStatus("*",0);
+        tree_Clusters->SetBranchStatus("nclust",1);
+        
+        //Get the number of clusters
         tree_Clusters->GetEntry(i);
 
-	//Allocate memory for this number of clusters
-	//iClustPos_Y = new Int_t[iClustMulti];
-	//iClustSize = new Int_t[iClustMulti];
+        //Allocate memory for this number of clusters
+        //NOTE: OLD WAY; VERY SLOW
+        //iClustPos_Y = new Int_t[iClustMulti];
+        //iClustSize = new Int_t[iClustMulti];
     	//iClustTimeBin = new Int_t[iClustMulti];
     
     	//fClustPos_X = new Float_t[iClustMulti];
     	//fClustADC = new Float_t[iClustMulti];
 
-	//These pointers are refreshed EVERY iteration; so we need to set the address every iteration
-	//tree_Clusters->SetBranchAddress("clustPos",&fClustPos_X);
+        //These pointers are refreshed EVERY iteration; so we need to set the address every iteration
+        //tree_Clusters->SetBranchAddress("clustPos",&fClustPos_X);
     	//tree_Clusters->SetBranchAddress("clustSize",&iClustSize);
     	//tree_Clusters->SetBranchAddress("clustADCs",&fClustADC);
     	//tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
     	//tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
     
-	//Okay make sure we can read all branches
-        //tree_Clusters->SetBranchStatus("*",1);
-	//tree_Clusters->SetBranchStatus("nclust",1);
+        //Okay make sure we can read all branches
+            //tree_Clusters->SetBranchStatus("*",1);
+        //tree_Clusters->SetBranchStatus("nclust",1);
 
-	//Now get the data
-	//tree_Clusters->GetEntry(i);
+        //Now get the data
+        //tree_Clusters->GetEntry(i);
 
         //Output to the user some message that we are still running
         if (i % 1000 == 0) cout<<"Cluster Selection; " <<i<<" Events Analyzed\n";
         
         //If the event fails to pass the selection; skip it
         //---------------Event Selection---------------
-	//Cut on number of clusters        
-	if ( !(aSetupUniformity.selClust.iCut_MultiMin < iClustMulti && iClustMulti < aSetupUniformity.selClust.iCut_MultiMax) ) continue;
+        //Cut on number of clusters
+        if ( !(aSetupUniformity.selClust.iCut_MultiMin < iClustMulti && iClustMulti < aSetupUniformity.selClust.iCut_MultiMax) ) continue;
         
-	//Okay make sure we can read all branches
+        //Okay make sure we can read all branches
         tree_Clusters->SetBranchStatus("*",1);
-	//tree_Clusters->SetBranchStatus("nclust",1);
+        //tree_Clusters->SetBranchStatus("nclust",1);
 
-	//Now get the remaining data
-	tree_Clusters->GetEntry(i);
+        //Now get the remaining data
+        tree_Clusters->GetEntry(i);
 
         //Loop Over the elements of the cluster array (yes it must be done like this due to how hte NTuple from AMORE is created)
         //For each element create a cluster, and check if it passes the selection
@@ -148,12 +144,12 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
             inputDet.setCluster(clust);
         } //End Loop Over Number of Clusters
 
-	//Unallocate pointers
-	//delete [] iClustPos_Y; iClustPos_Y = NULL;
-	//delete [] iClustSize; iClustSize = NULL;
-	//delete [] iClustTimeBin; iClustTimeBin = NULL;
-	//delete [] fClustPos_X; fClustPos_X = NULL;
-	//delete [] fClustADC; fClustADC = NULL;
+        //Unallocate pointers
+        //delete [] iClustPos_Y; iClustPos_Y = NULL;
+        //delete [] iClustSize; iClustSize = NULL;
+        //delete [] iClustTimeBin; iClustTimeBin = NULL;
+        //delete [] fClustPos_X; fClustPos_X = NULL;
+        //delete [] fClustADC; fClustADC = NULL;
     } //End Loop Over "Events"
     
     return;
