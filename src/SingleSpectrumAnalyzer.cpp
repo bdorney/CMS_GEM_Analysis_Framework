@@ -92,7 +92,8 @@ int main( int argc_, char * argv_[] ){
     } //End Case: failed to load ROOT file
     
     hSpec = (TH1F*) file_ROOT->Get( vec_strInputArgs[2].c_str() );
-    
+	//hSpec = new TH1F(*((TH1F*) file_ROOT->Get("SectorEta1/h_iEta1_clustADC")));    
+
     if ( nullptr == hSpec ) { //Case: failed to load TTree
         cout<<"error while fetching " << vec_strInputArgs[2].c_str() << " from " << vec_strInputArgs[1] << endl;
         cout<<"Exiting!!!\n";
@@ -119,7 +120,9 @@ int main( int argc_, char * argv_[] ){
     gIterImpact_PeakPos = new TGraphErrors(iNumIter);   gIterImpact_PeakPos->SetName("gIterImpact_PeakPos");
     gIterImpact_NormChi2= new TGraphErrors(iNumIter);  gIterImpact_NormChi2->SetName("gIterImpact_NormChi2");
 
-    for (int i=1; i <= iNumIter; ++iNumIter) { //Background Testing Loop
+    for (int i=1; i <= iNumIter; ++i) { //Background Testing Loop
+	//cout<<i<<"th Iteration Has Begun Processing\n";
+
         //Get the Background
         hBKG = (TH1F*) specAnalyzer.Background(hSpec,i,"");
         
@@ -133,16 +136,24 @@ int main( int argc_, char * argv_[] ){
         
         //Set the initial Fit Parmaeters
         //fit_SpecNoBKG->SetParameter(0, dPeakAmp[0] );
-        fit_SpecNoBKG->SetParameter(1, dPeakPos[1] );
-        
+        fit_SpecNoBKG->SetParameter(1, dPeakPos[0] );
+
+	//Set bounds on the initial parmeters
+        fit_SpecNoBKG->SetParLimits(0,0,1e12);
+	fit_SpecNoBKG->SetParLimits(1,0,15000);
+	
         //Perform Fit
-        hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR");
+        hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR","",dPeakPos[0]-600, dPeakPos[0]+600);
         
         //Store
-        gIterImpact_PeakPos->SetPoint(i, i, fit_SpecNoBKG->GetParameter(1) / dPeakPos[1] );
-        gIterImpact_PeakPos->SetPointError(i, 0, fit_SpecNoBKG->GetParError(1) / dPeakPos[1] );
+        gIterImpact_PeakPos->SetPoint(i, i, fit_SpecNoBKG->GetParameter(1) / dPeakPos[0] );
+        gIterImpact_PeakPos->SetPointError(i, 0, fit_SpecNoBKG->GetParError(1) / dPeakPos[0] );
         
         gIterImpact_NormChi2->SetPoint(i, i, fit_SpecNoBKG->GetChisquare() / fit_SpecNoBKG->GetNDF() );
+
+	cout<<i<<"\t"<<dPeakPos[0]<<"\t"<<fit_SpecNoBKG->GetParameter(1)<<"\t"<<"+/-"<<fit_SpecNoBKG->GetParameter(2)<<"\t"<<fit_SpecNoBKG->GetChisquare() / fit_SpecNoBKG->GetNDF()<<endl;
+
+	delete fit_SpecNoBKG;
     } //End Background Testing Loop
     
     //Store
