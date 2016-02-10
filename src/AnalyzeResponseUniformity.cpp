@@ -186,8 +186,8 @@ void AnalyzeResponseUniformity::fitHistos(){
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC) );
                 
                 //Find peak & store it's position
-                //specADC.Search( hInput.get(), 2, "nobackground", 0.5 );
-                //dPeakPos = spec.GetPositionX();
+                specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
+                dPeakPos = specADC.GetPositionX();
                 
                 //Perform Fit
                 (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
@@ -202,9 +202,11 @@ void AnalyzeResponseUniformity::fitHistos(){
                 detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 
                 //Store Fit parameters - Peak Position
-                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                
+                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+		(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, dPeakPos[0] );
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0 );
+                    
                 //Store Fit parameters - NormChi2
                 (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
                 (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );

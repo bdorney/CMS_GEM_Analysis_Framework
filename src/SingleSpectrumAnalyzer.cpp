@@ -136,7 +136,8 @@ int main( int argc_, char * argv_[] ){
         hSpecNoBKG->Add(hBKG,-1.);
         
         //Declare the Fit;
-        TF1 *fit_SpecNoBKG = new TF1("fit_SpecNoBKG","[0]*exp(-0.5*((x-[1])/[2])**2)",hSpec->GetBinLowEdge(1), hSpec->GetBinLowEdge( hSpec->GetNbinsX() ) );
+        //TF1 *fit_SpecNoBKG = new TF1("fit_SpecNoBKG","[0]*exp(-0.5*((x-[1])/[2])**2)+[3]/(x-[4])",hSpec->GetBinLowEdge(1), hSpec->GetBinLowEdge( hSpec->GetNbinsX() ) );
+        TF1 *fit_SpecNoBKG = new TF1("fit_SpecNoBKG","[0]*exp(-0.5*((x-[1])/[2])**2)",dPeakPos[0]-1000., dPeakPos[0]+1000. );
         
         //Set the initial Fit Parmaeters
         //fit_SpecNoBKG->SetParameter(0, dPeakAmp[0] );
@@ -147,7 +148,8 @@ int main( int argc_, char * argv_[] ){
         fit_SpecNoBKG->SetParLimits(1,0,15000);
 	
         //Perform Fit
-        hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR","",dPeakPos[0]-600, dPeakPos[0]+600);
+        hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR","",dPeakPos[0]-1000, dPeakPos[0]+1000);
+        //hSpecNoBKG->Fit(fit_SpecNoBKG,"QMR");
         
         //Store
         gIterImpact_PeakPos->SetPoint(i, i, fit_SpecNoBKG->GetParameter(1) / dPeakPos[0] );
