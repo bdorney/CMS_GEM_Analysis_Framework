@@ -473,7 +473,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
             fLimit_Min = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
             fLimit_Max = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
             
-            (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimit(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimit(i, fLimit_Max, fLimit_Min );
+            (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimits(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimits(i, fLimit_Max, fLimit_Min );
         } //End Loop over boundary parameters
     } //End Check: Stored Parameter Limits Match
     
