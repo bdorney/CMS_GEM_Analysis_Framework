@@ -61,6 +61,8 @@ namespace Timing {
         
         std::vector<std::string> vec_strFit_ParamMeaning;
         std::vector<std::string> vec_strFit_ParamIGuess;
+        std::vector<std::string> vec_strFit_ParamLimit_Min;
+        std::vector<std::string> vec_strFit_ParamLimit_Max;
         
         HistoSetup(){
             bFit = bFit_AutoRanging = bIsTrig = false;
