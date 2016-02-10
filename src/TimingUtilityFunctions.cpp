@@ -181,6 +181,55 @@ void Timing::printStreamStatus(std::ifstream &inputStream){
 //----------------------------------------------------------------------------------------
 //Safe conversion to float
 //Scientific notation not supported
+float Timing::stofSafe(std::string strInputValue){
+    bool bInputUnderstood = false;
+    bool bManualEntry = false;
+    
+    float ret_float = -1;
+    
+    std::string strUserInput;
+    
+    if (strInputValue.find_first_not_of( "0123456789." ) == std::string::npos) { //Case: only numeric data
+        ret_float =  std::stof(strInputValue);
+    } //End Case: only numeric data
+    else{ //Case: non numeric data entered
+        std::cout<<"Timing::stofSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"\tValue = " << strInputValue << std::endl;
+        std::cout<<"\tNonumeric characters present (sorry scientific notation not supported)\n";
+        std::cout<<"\tWould you like to enter a value manually [y/N]?\n";
+        
+        while (!bInputUnderstood) { //Loop requesting manual entry
+            std::cin>>strUserInput;
+            
+            std::transform(strUserInput.begin(), strUserInput.end(), strUserInput.begin(), toupper);
+            
+            if (0 == strUserInput.compare("Y") || 0 == strUserInput.compare("YES") || 0 == strUserInput.compare("1") ) { //Case: User wants to correct via manual entry
+                bInputUnderstood = true;
+                bManualEntry = true;
+            } //End Case: User wants to correct via manual entry
+            else if ( 0 == strUserInput.compare("N") || 0 == strUserInput.compare("NO") || 0 == strUserInput.compare("0") ){ //Case: User does not wish for manual entry
+                bInputUnderstood = true;
+                bManualEntry = false;
+            } //End Case: User does not wish for manual entry
+            else{ //Case: User Input Not Understood
+                std::cout<<"\tSorry your input was not understood\n";
+                std::cout<<"\tPlease answer from the set {y,yes,1,N,NO,0}\n";
+                std::cout<<"\tWould you like to enter a value manually {y,yes,1,N,NO,0}?\n";
+            } //End Case: User Input Not Understood
+        } //End Loop requesting manual entry
+        
+        if (bManualEntry) { //Case: Manual Entry
+            //std::cout<<"\tOkay, for Field = " << strInputField << " Enter a Numeric Value:\n";
+            std::cout<<"\tOkay, Enter a Numeric Value:\n";
+            std::cin>>strUserInput;
+            
+            ret_float = stofSafe(strUserInput); //Recursion
+        } //End Case: Manual Entry
+    } //End Case: non numeric data entered
+    
+    return ret_float;
+} //End Timing::stofSafe()
+
 float Timing::stofSafe(std::string strInputField, std::string strInputValue){
     bool bInputUnderstood = false;
     bool bManualEntry = false;
@@ -229,6 +278,54 @@ float Timing::stofSafe(std::string strInputField, std::string strInputValue){
     
     return ret_float;
 } //End Timing::stofSafe()
+
+int Timing::stoiSafe(std::string strInputValue){
+    bool bInputUnderstood = false;
+    bool bManualEntry = false;
+    
+    int ret_int = -1;
+    
+    std::string strUserInput;
+    
+    if (strInputValue.find_first_not_of( "0123456789" ) == std::string::npos) { //Case: only numeric data
+        ret_int =  std::stoi(strInputValue);
+    } //End Case: only numeric data
+    else{ //Case: non numeric data entered
+        std::cout<<"Timing::stoiSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"\tValue = " << strInputValue << std::endl;
+        std::cout<<"\tNonumeric characters present (or maybe you gave a floating point number instead?)\n";
+        std::cout<<"\tWould you like to enter a value manually [y/N]?\n";
+        
+        while (!bInputUnderstood) { //Loop requesting manual entry
+            std::cin>>strUserInput;
+            
+            std::transform(strUserInput.begin(), strUserInput.end(), strUserInput.begin(), toupper);
+            
+            if (0 == strUserInput.compare("Y") || 0 == strUserInput.compare("YES") || 0 == strUserInput.compare("1") ) { //Case: User wants to correct via manual entry
+                bInputUnderstood = true;
+                bManualEntry = true;
+            } //End Case: User wants to correct via manual entry
+            else if ( 0 == strUserInput.compare("N") || 0 == strUserInput.compare("NO") || 0 == strUserInput.compare("0") ){ //Case: User does not wish for manual entry
+                bInputUnderstood = true;
+                bManualEntry = false;
+            } //End Case: User does not wish for manual entry
+            else{ //Case: User Input Not Understood
+                std::cout<<"\tSorry your input was not understood\n";
+                std::cout<<"\tPlease answer from the set {y,yes,1,N,NO,0}\n";
+                std::cout<<"\tWould you like to enter a value manually {y,yes,1,N,NO,0}?\n";
+            } //End Case: User Input Not Understood
+        } //End Loop requesting manual entry
+        
+        if (bManualEntry) { //Case: Manual Entry
+            std::cout<<"\tOkay, Enter a Numeric Value:\n";
+            std::cin>>strUserInput;
+            
+            ret_int = stoiSafe(strUserInput); //Recursion
+        } //End Case: Manual Entry
+    } //End Case: non numeric data entered
+    
+    return ret_int;
+} //End Timing::stoiSafe()
 
 int Timing::stoiSafe(std::string strInputField, std::string strInputValue){
     bool bInputUnderstood = false;

@@ -20,6 +20,7 @@ using std::vector;
 using Timing::getString;
 using Timing::printROOTFileStatus;
 using Timing::HistoSetup;
+using Timing::stofSafe;
 
 using namespace Uniformity;
 
@@ -182,12 +183,11 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //Check if Histogram does not exist
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
                 
-                //Initialize Fit
-                (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC) );
-                
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
-                dPeakPos = specADC.GetPositionX();
+                
+                //Initialize Fit
+                (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
                 //Perform Fit
                 (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
@@ -202,11 +202,9 @@ void AnalyzeResponseUniformity::fitHistos(){
                 detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 
                 //Store Fit parameters - Peak Position
-                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                //(*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-		(*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, dPeakPos[0] );
-                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0 );
-                    
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                (*iterEta).second.gEta_ClustADCFitRes_Response->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                
                 //Store Fit parameters - NormChi2
                 (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
                 (*iterEta).second.gEta_ClustADCFitRes_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
@@ -430,16 +428,23 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
     return;
 } //End storeHistos()
 
-TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput ){
+TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
+    float fLimit_Max = 1e12, fLimit_Min = -1e12;
+    
+    vector<string>::const_iterator iterVec_IGuess, iterVec_IGuess_Fix, iterVec_IGuess_Min, iterVec_IGuess_Max, iterVec_IGuess_Op; //Iterator to look through initial guess, if it should be a fixed parameter, the lower bound, the upper bound, and the operator for the bounds (if any), respectively
+    //vector<string>::iterator iterVec_IGuess = NULL;
+    
     TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
     
-	//cout<<"setupHisto.strFit_Formula.c_str() = " << setupHisto.strFit_Formula.c_str() << endl;
-
+    //Initialize the pointers
+    //iterVec_IGuess = iterVec_IGuess_Fix = iterVec_IGuess_Max = iterVec_IGuess_Min = iterVec_IGuess_Op = nullptr;
+    
+    //DEPRECIATED
     //Set Fit Parameters
     //------------------------------------------------------
     //Check to see if user has correctly linking the meaning of the fit parameters and their initial guess
-    if ( setupHisto.vec_strFit_ParamMeaning.size() == setupHisto.vec_strFit_ParamIGuess.size() ) {
+    /*if ( setupHisto.vec_strFit_ParamMeaning.size() == setupHisto.vec_strFit_ParamIGuess.size() ) {
         
         //AMPLITUDE, MEAN, PEAK, SIGMA
         //We assume the user has correctly matched the indices of setupHisto.vec_strFit_ParamMeaning and setupHisto.vec_strFit_ParamIGuess to the formula given in setupHisto.strFit_Formula
@@ -488,11 +493,108 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
         }
         cout<<endl;
         cout<<"\tParameters not linked!!! Please cross check input analysis config file!!!\n";
-    } //End Case: vec_strFit_ParamIGuess not linked with vec_strFit_ParamMeaning; skip
+    }*/ //End Case: vec_strFit_ParamIGuess not linked with vec_strFit_ParamMeaning; skip
+    
+    //Check to see if the number of parameters in the TF1 meets the expectation
+    if ( ret_Func.GetNpar() < setupHisto.vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
+        
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit","Error! Number of Parameters in Function Less Than Requested Initial Guess Parameters!");
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Parameter: " + getString( ret_Func.GetNpar() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guesses: " + getString( setupHisto.vec_strFit_ParamIGuess.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Min): " + getString( setupHisto.vec_strFit_ParamLimit_Min.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Max): " + getString( setupHisto.vec_strFit_ParamLimit_Max.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", "No Initial Parameters Have Been Set! Please Cross-Check Input Analysis Config File" );
+        
+        return ret_Func;
+    } //End Case: Set points for initial parameters do not meet expectations
+    
+    //Set Fit Parameters - Initial Value
+    //------------------------------------------------------
+    //Keywords are AMPLITUDE, MEAN, PEAK, SIGMA
+    for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
+        iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
+        
+        if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
+            ret_Func.SetParameter(i, stofSafe( setupHisto.vec_strFit_ParamIGuess[i] ) );
+        } //End Case: No Keyword Found; Try to set a Numeric Value
+        else{ //Case: Keyword Found; Set Value based on Keyword
+            ret_Func.SetParameter(i, getValByKeyword( (*iterVec_IGuess), hInput, specInput ) );
+        } //End Case: Keyword Found; Set Value based on Keyword
+    } //End Loop over parameters - Initial Guess
+    
+    //Set Fit Parameters - Boundaries
+    //------------------------------------------------------
+    if (setupHisto.vec_strFit_ParamLimit_Min.size() == setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Check: Stored Parameter Limits Match
+
+        //Here we use vec_strFit_ParamLimit_Min but we know it has the same number of parameters as vec_strFit_ParamLimit_Max
+        for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
+            //Search for Keywords
+            /*iterVec_IGuess_Max = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamLimit_Max[i]);
+            iterVec_IGuess_Min = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamLimit_Min[i]);
+            
+            //Assign Max!
+            if ( iterVec_IGuess_Max == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; store a lower bounadry
+                fLimit_Max = stofSafe( setupHisto.vec_strFit_ParamLimit_Max[i] );
+            } //End Case: No Keyword Found; store a lower bounadry
+            else{ //Case: Keyword Found!
+                
+                while ( setupHisto.vec_strFit_ParamLimit_Max[i].find( (*iterVec_IGuess_Max) ) != std::string::npos ) {
+                    <#statements#>
+                }
+            }*/ //End Case: Keyword Found!
+            
+            map<string, float> map_keyValAssignment;
+            
+            for (int j=0; j < vec_strSupportedKeywords.size(); ++j) {
+                if ( setupHisto.vec_strFit_ParamLimit_Min[i].find( vec_strSupportedKeywords[j] ) != std::string::npos ) {
+                    map_keyValAssignment[vec_strSupportedKeywords[j]] = getValByKeyword( vec_strSupportedKeywords[j], hInput, specInput );
+                }
+            }
+            
+            if (map_keyValAssignment.size() > 0) {
+                symbol_table_t symbol_table;
+                expression_t expression;
+                parser_t parser;
+                
+                for (auto iterMap = map_keyValAssignment.begin(); iterMap != map_keyValAssignment.end(); ++iterMap) {
+                    symbol_table.add_variable( (*iterMap).first, (*iterMap).second);
+                }
+                
+                expression.register_symbol_table(symbol_table);
+                
+                parser.compile(setupHisto.vec_strFit_ParamLimit_Min[i], expression);
+                fLimit_Max = expression.value();
+                
+            }
+            else{
+                fLimit_Max = stofSafe( setupHisto.vec_strFit_ParamLimit_Max[i] );
+            }
+            
+            cout<<"setupHisto.vec_strFit_ParamLimit_Min["<<i<<"] = " << setupHisto.vec_strFit_ParamLimit_Min[i] << endl;
+            cout<<"fLimit_Max = " << fLimit_Max <<endl;
+            
+        } //End Loop over boundary parameters
+    } //End Check: Stored Parameter Limits Match
+    
+    
+    
+    //Set Fit Parameters - Upper Bound
+    //------------------------------------------------------
+    
+    //Set Fit Parameters - Fixed?
+    //------------------------------------------------------
+    
     
     //Set Fit Data Members
     ret_Func.SetLineColor(kRed);
     ret_Func.SetLineWidth(3);
+    
+    //Delete Pointers
+    //delete iterVec_IGuess;
+    //delete iterVec_IGuess_Fix;
+    //delete iterVec_IGuess_Max;
+    //delete iterVec_IGuess_Min;
+    //delete iterVec_IGuess_Op;
     
     //Return fit
     return ret_Func;
@@ -538,7 +640,6 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
     //Return Histogram
     return ret_Histo;
 } //End AnalyzeResponseUniformity::getHistogram()
-
 
 //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
 string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName){
@@ -640,3 +741,36 @@ float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, Hist
     
     return ret_Val;
 } //End AnalyzeResponseUniformity::getPeakPosError
+
+//Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
+float AnalyzeResponseUniformity::getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput){
+    
+    //Try to automatically assign a value
+    if (0 == strInputKeyword.compare("AMPLITUDE") ) { //Case: Histo Amplitude
+        return hInput->GetBinContent( hInput->GetMaximumBin() );
+    } //End Case: Histo Amplitude
+    else if (0 == strInputKeyword.compare("MEAN") ) { //Case: Histo Mean
+        return hInput->GetMean();
+    } //End Case: Histo Mean
+    else if ( 0 == strInputKeyword.compare("PEAK") ){ //Case: Histo Peak
+        Double_t *dPeakPos = specInput.GetPositionX();
+        
+        return dPeakPos[0];
+    } //End Case: Histo Peak
+    else if (0 == strInputKeyword.compare("SIGMA") ) { //Case: Histo RMS
+        return hInput->GetRMS();
+    } //End Case: Histo RMS
+    else{ //Case: manual assignment
+        printClassMethodMsg("AnalyzeResponseUniformity","getValByKeyword","Error! Input Keyword Not Recognized");
+        printClassMethodMsg("AnalyzeResponseUniformity","getValByKeyword", ("\tGiven: " + strInputKeyword ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getValByKeyword","\tRecognized Keywords:\n");
+        
+        for (int i=0; i < vec_strSupportedKeywords.size(); ++i) {
+            printClassMethodMsg("AnalyzeResponseUniformity","getValByKeyword", vec_strSupportedKeywords[i].c_str() );
+        }
+        
+        printClassMethodMsg("AnalyzeResponseUniformity","getValByKeyword","\tUndefined Behavior May Occur");
+        
+        return -1e12;
+    } //End Case: manual assignment
+} //End AnalyzeResponseUniformity::getValByKeyword()

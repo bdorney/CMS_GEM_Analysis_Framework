@@ -18,11 +18,13 @@ using std::vector;
 
 //using namespace Timing;
 using Timing::convert2bool;
+using Timing::getCharSeparatedList;
 using Timing::getlineNoSpaces;
 using Timing::getParsedLine;
 using Timing::getString;
 using Timing::HistoSetup;
 using Timing::printStreamStatus;
+using Timing::stofSafe;
 using Timing::stoiSafe;
 
 using namespace Uniformity;
@@ -172,7 +174,13 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
                 hSetup.strFit_Option = pair_strParam.second;
             } //End Case: ADC Spectrum Fit Equation
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_IGUESS") ){
-                hSetup.vec_strFit_ParamIGuess = Timing::getCharSeparatedList(pair_strParam.second,',');
+                hSetup.vec_strFit_ParamIGuess = getCharSeparatedList(pair_strParam.second,',');
+            }
+            else if( 0 == pair_strParam.first.compare("FIT_PARAM_LIMIT_MAX") ){
+                hSetup.vec_strFit_ParamLimit_Max = getCharSeparatedList(pair_strParam.second, ',');
+            }
+            else if( 0 == pair_strParam.first.compare("FIT_PARAM_LIMIT_MIN") ){
+                hSetup.vec_strFit_ParamLimit_Min = getCharSeparatedList(pair_strParam.second, ',');
             }
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_MAP") ){
                 hSetup.vec_strFit_ParamMeaning = Timing::getCharSeparatedList(pair_strParam.second,',');
@@ -485,7 +493,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
                 aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_TOLERANCE") ){ //Case: Uniformity Granularity
-                aSetupUniformity.fUniformityTolerance = stoiSafe(pair_strParam.first,pair_strParam.second);
+                aSetupUniformity.fUniformityTolerance = stofSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity
             else{ //Case: Parameter Not Recognized
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");

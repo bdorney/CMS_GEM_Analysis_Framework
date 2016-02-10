@@ -32,7 +32,16 @@
 #include "TROOT.h"
 #include "TSpectrum.h"
 
+//C++ Mathematical Expression Toolkit Library
+//By Arash Partow; http://www.partow.net/programming/exprtk/index.html
+#include "exprtk.hpp"
+
 namespace Uniformity {
+    //Used for evaluating fit limits given by user
+    typedef exprtk::symbol_table<float> symbol_table_t;
+    typedef exprtk::expression<float> expression_t;
+    typedef exprtk::parser<float> parser_t;
+    
     class AnalyzeResponseUniformity {
         
     public:
@@ -104,7 +113,8 @@ namespace Uniformity {
         
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
         //TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
-        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput );
+        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &inputSpec );
+        
         
         //Returns a TGraph Errors whose parameters match those defined in the input HistoSetup object
         TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
@@ -122,9 +132,15 @@ namespace Uniformity {
         //Searchs the input fit for the given variable; returns it
         float getPeakPosError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
         
+        //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
+        float getValByKeyword(std::string strInputKeyword, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);
+        
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;
+        
+        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "MEAN","PEAK","SIGMA"};
+        //const std::vector<std::string> vec_strSupportedOperators = {"+","-","/","*"};
         
         //Holds Setup Parameters for the
         //Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size, hSetupClust_Time;

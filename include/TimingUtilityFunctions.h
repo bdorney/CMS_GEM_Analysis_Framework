@@ -110,11 +110,16 @@ namespace Timing {
     
     //string manipulation
     std::vector<std::string> getCharSeparatedList(std::string strInput, char cDelimiter);
-    //std::vector<std::string> getCommaSeparatedList(std::string strInput);
+    
     std::pair<std::string,std::string> getParsedLine(std::string strInputLine, bool &bExitSuccess);
+    
     template<class TConversion>
     std::string getString(TConversion input);
+    
+    float stofSafe(std::string strInputValue);
     float stofSafe(std::string strInputField, std::string strInputValue);
+    
+    int stoiSafe(std::string strInputValue);
     int stoiSafe(std::string strInputField, std::string strInputValue);
     
     //unsorted
