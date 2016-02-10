@@ -432,68 +432,9 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //Variable Declaration
     float fLimit_Max = 1e12, fLimit_Min = -1e12;
     
-    vector<string>::const_iterator iterVec_IGuess, iterVec_IGuess_Fix, iterVec_IGuess_Min, iterVec_IGuess_Max, iterVec_IGuess_Op; //Iterator to look through initial guess, if it should be a fixed parameter, the lower bound, the upper bound, and the operator for the bounds (if any), respectively
-    //vector<string>::iterator iterVec_IGuess = NULL;
+    vector<string>::const_iterator iterVec_IGuess; //Iterator to use for setting initial guess of fit
     
     TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
-    
-    //Initialize the pointers
-    //iterVec_IGuess = iterVec_IGuess_Fix = iterVec_IGuess_Max = iterVec_IGuess_Min = iterVec_IGuess_Op = nullptr;
-    
-    //DEPRECIATED
-    //Set Fit Parameters
-    //------------------------------------------------------
-    //Check to see if user has correctly linking the meaning of the fit parameters and their initial guess
-    /*if ( setupHisto.vec_strFit_ParamMeaning.size() == setupHisto.vec_strFit_ParamIGuess.size() ) {
-        
-        //AMPLITUDE, MEAN, PEAK, SIGMA
-        //We assume the user has correctly matched the indices of setupHisto.vec_strFit_ParamMeaning and setupHisto.vec_strFit_ParamIGuess to the formula given in setupHisto.strFit_Formula
-        for (int i=0; i<setupHisto.vec_strFit_ParamMeaning.size(); ++i) {
-            //Try to automatically assign a value
-            if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("AMPLITUDE") ) { //Case: Histo Amplitude
-                ret_Func.SetParameter(i, hInput->GetBinContent( hInput->GetMaximumBin() ) );
-            } //End Case: Histo Amplitude
-            else if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("MEAN") ) { //Case: Histo Mean
-                ret_Func.SetParameter(i, hInput->GetMean() );
-            } //End Case: Histo Mean
-            else if ( 0 == setupHisto.vec_strFit_ParamIGuess[i].compare("PEAK") ){ //Case: Histo Peak
-                TSpectrum spec;    //One peak; 2 sigma away from any other peak
-                
-                Double_t *dPeakPos;
-                
-                //Find peak & store it's position
-                spec.Search( hInput.get(), 2, "nobackground", 0.5 );
-                dPeakPos = spec.GetPositionX();
-                
-                //Set initial guess for fit
-                ret_Func.SetParameter(i, dPeakPos[0] );
-            } //End Case: Histo Peak
-            else if (0 == setupHisto.vec_strFit_ParamIGuess[i].compare("SIGMA") ) { //Case: Histo RMS
-                ret_Func.SetParameter(i, hInput->GetRMS() );
-            } //End Case: Histo RMS
-            else{ //Case: manual assignment
-                ret_Func.SetParameter(i, Timing::stofSafe("Fit_Param_IGuess", setupHisto.vec_strFit_ParamIGuess[i] ) );
-            } //End Case: manual assignment
-        } //End Loop over parameters
-    } //End Case: equal number of inputs, containers (should be) linked!!!
-    else{
-        cout<<"Uniformity::AnalyzeResponseUniformity::getFit() - Trying to set initial parameters for:\n";
-        cout<<"\tHisto Name = " << hInput->GetName() << endl;
-        cout<<"\tFunction Name = " << ret_Func.GetName() << endl;
-        
-        cout<<"\tFit_Param_Map (Parameter Meaning) Given:\n\t\t";
-        for (int i = 0; i < setupHisto.vec_strFit_ParamMeaning.size(); ++i) {
-            cout<<setupHisto.vec_strFit_ParamMeaning[i]<<"\t";
-        }
-        cout<<endl;
-        
-        cout<<"tFit_Param_IGuess (Parameter Initial Guess) Given:\n\t\t";
-        for (int i = 0; i < setupHisto.vec_strFit_ParamIGuess.size(); ++i) {
-            cout<<setupHisto.vec_strFit_ParamIGuess[i]<<"\t";
-        }
-        cout<<endl;
-        cout<<"\tParameters not linked!!! Please cross check input analysis config file!!!\n";
-    }*/ //End Case: vec_strFit_ParamIGuess not linked with vec_strFit_ParamMeaning; skip
     
     //Check to see if the number of parameters in the TF1 meets the expectation
     if ( ret_Func.GetNpar() < setupHisto.vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
@@ -527,78 +468,71 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     if (setupHisto.vec_strFit_ParamLimit_Min.size() == setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Check: Stored Parameter Limits Match
 
         //Here we use vec_strFit_ParamLimit_Min but we know it has the same number of parameters as vec_strFit_ParamLimit_Max
+        //For each fit parameter, set the boundary
         for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
-            //Search for Keywords
-            /*iterVec_IGuess_Max = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamLimit_Max[i]);
-            iterVec_IGuess_Min = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamLimit_Min[i]);
+            fLimit_Min = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
+            fLimit_Max = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
             
-            //Assign Max!
-            if ( iterVec_IGuess_Max == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; store a lower bounadry
-                fLimit_Max = stofSafe( setupHisto.vec_strFit_ParamLimit_Max[i] );
-            } //End Case: No Keyword Found; store a lower bounadry
-            else{ //Case: Keyword Found!
-                
-                while ( setupHisto.vec_strFit_ParamLimit_Max[i].find( (*iterVec_IGuess_Max) ) != std::string::npos ) {
-                    <#statements#>
-                }
-            }*/ //End Case: Keyword Found!
-            
-            map<string, float> map_keyValAssignment;
-            
-            for (int j=0; j < vec_strSupportedKeywords.size(); ++j) {
-                if ( setupHisto.vec_strFit_ParamLimit_Min[i].find( vec_strSupportedKeywords[j] ) != std::string::npos ) {
-                    map_keyValAssignment[vec_strSupportedKeywords[j]] = getValByKeyword( vec_strSupportedKeywords[j], hInput, specInput );
-                }
-            }
-            
-            if (map_keyValAssignment.size() > 0) {
-                symbol_table_t symbol_table;
-                expression_t expression;
-                parser_t parser;
-                
-                for (auto iterMap = map_keyValAssignment.begin(); iterMap != map_keyValAssignment.end(); ++iterMap) {
-                    symbol_table.add_variable( (*iterMap).first, (*iterMap).second);
-                }
-                
-                expression.register_symbol_table(symbol_table);
-                
-                parser.compile(setupHisto.vec_strFit_ParamLimit_Min[i], expression);
-                fLimit_Max = expression.value();
-                
-            }
-            else{
-                fLimit_Max = stofSafe( setupHisto.vec_strFit_ParamLimit_Max[i] );
-            }
-            
-            cout<<"setupHisto.vec_strFit_ParamLimit_Min["<<i<<"] = " << setupHisto.vec_strFit_ParamLimit_Min[i] << endl;
-            cout<<"fLimit_Max = " << fLimit_Max <<endl;
-            
+            (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimit(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimit(i, fLimit_Max, fLimit_Min );
         } //End Loop over boundary parameters
     } //End Check: Stored Parameter Limits Match
-    
-    
-    
-    //Set Fit Parameters - Upper Bound
-    //------------------------------------------------------
     
     //Set Fit Parameters - Fixed?
     //------------------------------------------------------
     
+    //Placeholder; maybe we add functionality in the future
     
-    //Set Fit Data Members
+    //Set Other Fit Data Members
+    //------------------------------------------------------
     ret_Func.SetLineColor(kRed);
     ret_Func.SetLineWidth(3);
     
     //Delete Pointers
     //delete iterVec_IGuess;
-    //delete iterVec_IGuess_Fix;
-    //delete iterVec_IGuess_Max;
-    //delete iterVec_IGuess_Min;
-    //delete iterVec_IGuess_Op;
     
     //Return fit
+    //------------------------------------------------------
     return ret_Func;
 } //End AnalyzeResponseUniformity::getFit()
+
+float AnalyzeResponseUniformity::getFitBoundary(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput){
+    //Variable Declaration
+    map<string, float> map_key2Val;
+    
+    //Search the input expression for each of the supported keywords
+    //Store these Keywords with their values
+    for (int i=0; i < vec_strSupportedKeywords.size(); ++i) { //Loop Through Supported Keywords
+        if ( strInputExp.find( vec_strSupportedKeywords[i] ) != std::string::npos ) { //Case: Keyword Found!
+            map_key2Val[vec_strSupportedKeywords[i]] = getValByKeyword( vec_strSupportedKeywords[i], hInput, specInput );
+        } //End Case: Keyword Found!
+    } //End Loop Through Supported Keywords
+    
+    //Check if map_key2Val has any entries, if so user requested complex expression; parse!
+    //If map_key2Val is empty, user has a numeric input; convert to float!
+    if (map_key2Val.size() > 0) { //Case: Complex Expression!
+        //Setup the expression parser
+        symbol_table_t symbol_table;    //Stores the variables in expression and maps them to C++ objects
+        expression_t expression;        //Stores the actual expression & the symbol table
+        parser_t parser;                //Parses the information for evaluation
+        
+        //Load all found keywords into the symbol table
+        for (auto iterMap = map_key2Val.begin(); iterMap != map_key2Val.end(); ++iterMap) {
+            symbol_table.add_variable( (*iterMap).first, (*iterMap).second);
+        }
+        
+        //Give the expression the variables it should have
+        expression.register_symbol_table(symbol_table);
+        
+        //Compile the parsing
+        parser.compile(strInputExp, expression);
+        
+        //Return value to the user
+        return expression.value();
+    } //End Case: Complex Expression!
+    else{ //Case: Numeric Input
+        return stofSafe( strInputExp );
+    } //End Case: Numeric Input
+} //End AnalyzeResponseUniformity::getFitBoundary()
 
 TGraphErrors AnalyzeResponseUniformity::getGraph(int iEta, int iPhi, HistoSetup & setupHisto){
     //Variable Declaration
