@@ -112,9 +112,10 @@ namespace Uniformity {
         //TDirectory * getDirectory(int iIdentifier, std::string strName, TFileStructure *inputStructure);
         
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
-        //TF1 getFit(int iEta, int iPhi, int iSlice, Uniformity::AnalysisSetupUniformity & setupFit);
-        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &inputSpec );
+        TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
         
+        //Based on an input expression (strInputExp) returns the boundary of a fit parameter
+        float getFitBoundary(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);
         
         //Returns a TGraph Errors whose parameters match those defined in the input HistoSetup object
         TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
@@ -139,27 +140,14 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;
         
+        //Supported Keywords for fit setup
         const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "MEAN","PEAK","SIGMA"};
-        //const std::vector<std::string> vec_strSupportedOperators = {"+","-","/","*"};
-        
-        //Holds Setup Parameters for the
-        //Timing::HistoSetup hSetupClust_ADC, hSetupClust_Multi, hSetupClust_Pos, hSetupClust_Size, hSetupClust_Time;
         
         Uniformity::AnalysisSetupUniformity aSetup;
         
         Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp
         
     }; //End class AnalyzeResponseUniformity
-    
-    //Works with TFileStructure = TFile || TDirectory
-    /*template<class TFileStructure>
-    TDirectory * AnalyzeResponseUniformity::getDirectory(int iIdentifier, std::string strName, TFileStructure *inputStructure){
-        //Variable Declaration
-        
-        //Get Directory
-        
-    }*/ //End AnalyzeResponseUniformity::getDirectory()
-    
 } //End namespace Uniformity
 
 
