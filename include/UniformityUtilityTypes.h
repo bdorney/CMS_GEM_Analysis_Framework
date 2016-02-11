@@ -23,7 +23,9 @@
 #include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TPolyMarker.h"
 #include "TROOT.h"
+#include "TSpectrum.h"
 #include "TTree.h"
 
 using namespace ROOT;
@@ -138,6 +140,10 @@ namespace Uniformity {
         
         //One dimensional histograms
         std::shared_ptr<TH1F> hSlice_ClustADC;
+        
+        //Spectral analysis
+        //std::shared_ptr<TSpectrum> specSlice_ClustADC;
+        std::shared_ptr<TPolyMarker> pmrkSlice_ClustADC;
         
         //Initialization
         SectorSlice(){

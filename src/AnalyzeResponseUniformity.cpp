@@ -186,6 +186,12 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
                 
+                std::unique_ptr<TList> list_funcs = std::make_unique<TList>( (*(*iterSlice).second.hSlice_ClustADC->GetListOfFunctions() ) );
+                
+                (*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
+                
+                (*iterSlice).second.pmrkSlice_ClustADC->SetName( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "SpecPeakMrker" ).c_str() );
+                
                 //Initialize Fit
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
@@ -417,6 +423,7 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
                 //Store Fits - Slice Level
                 //-------------------------------------
                 dir_Slice->cd();
+                (*iterSlice).second.pmrkSlice_ClustADC->Write();
                 (*iterSlice).second.fitSlice_ClustADC->Write();
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors

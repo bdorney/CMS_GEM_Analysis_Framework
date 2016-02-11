@@ -20,6 +20,7 @@
 #include "UniformityUtilityFunctions.h"
 
 //ROOT Includes
+#include "TH2F.h"
 #include "TROOT.h"
 
 using namespace ROOT;

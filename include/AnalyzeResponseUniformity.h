@@ -29,6 +29,8 @@
 #include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TList.h"
+#include "TPolyMarker.h"
 #include "TROOT.h"
 #include "TSpectrum.h"
 
