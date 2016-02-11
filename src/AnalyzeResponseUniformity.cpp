@@ -198,6 +198,7 @@ void AnalyzeResponseUniformity::fitHistos(){
         
             //Loop Over Stored Slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
+                cout<<"Attempting to Fit (iEta, iPhi, iSlice) = (" << (*iterEta).first << ", " << (*iterPhi).first << ", " << (*iterSlice).first << ")\n";
                 
                 //Check if Histogram does not exist
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
@@ -208,7 +209,8 @@ void AnalyzeResponseUniformity::fitHistos(){
                 
                 TList * list_funcs = (*iterSlice).second.hSlice_ClustADC->GetListOfFunctions();
                 
-                (*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
+                //(*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
+                (*iterSlice).second.pmrkSlice_ClustADC = (TPolyMarker*) list_funcs->FindObject("TPolyMarker");
                 
                 //(*iterSlice).second.pmrkSlice_ClustADC->SetName( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 

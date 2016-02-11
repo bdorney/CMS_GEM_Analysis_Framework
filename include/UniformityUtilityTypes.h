@@ -19,7 +19,9 @@
 //Framework Includes
 
 //ROOT Includes
+//#include "FitResult.h"
 #include "TFile.h"
+//#include "TFitResultPtr.h"
 #include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -143,7 +145,8 @@ namespace Uniformity {
         
         //Spectral analysis
         //std::shared_ptr<TSpectrum> specSlice_ClustADC;
-        std::shared_ptr<TPolyMarker> pmrkSlice_ClustADC;
+        //std::shared_ptr<TPolyMarker> pmrkSlice_ClustADC;
+        TPolyMarker *pmrkSlice_ClustADC;
         
         //Initialization
         SectorSlice(){
