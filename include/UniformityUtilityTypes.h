@@ -185,8 +185,11 @@ namespace Uniformity {
         std::map<int, SectorPhi> map_sectorsPhi;
         
         //One dimensional graphs
-        std::shared_ptr<TGraphErrors> gEta_ClustADCFitRes_Response;
-        std::shared_ptr<TGraphErrors> gEta_ClustADCFitRes_NormChi2;
+        std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
+        std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
+        
+        std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
+        std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
         
         //One dimensional histograms
         std::shared_ptr<TH1F> hEta_ClustADC;    //ADC spectrum for all clusters in this eta sector

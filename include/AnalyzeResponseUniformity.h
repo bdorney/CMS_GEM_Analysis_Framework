@@ -124,6 +124,7 @@ namespace Uniformity {
         
         //Returns a histogram whose parmeters match those defined in the input HistoSetup object
         TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+        //TH2F getHistogram2D( Timing::HistoSetup &setupHisto );
         
         //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName);
@@ -142,13 +143,23 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;
         
-        //Supported Keywords for fit setup
-        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "MEAN","PEAK","SIGMA"};
+        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "MEAN","PEAK","SIGMA"}; //Supported Keywords for fit setup
         
-        Uniformity::AnalysisSetupUniformity aSetup;
+        Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         
-        Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp
+        Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp; Detector object
         
+        //std::shared_ptr<TH2F> hEta_v_Pos_Occupancy;
+        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Fit_PkPos;
+        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Fit_NormChi2;
+        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Spec_PkPos;
+        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Spec_NumPks;
+        
+        //std::shared_ptr<TH2F> hEta_v_SliceNum_Occupancy;
+        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Fit_PkPos;
+        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Fit_NormChi2;
+        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Spec_PkPos;
+        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Spec_NumPks;
     }; //End class AnalyzeResponseUniformity
 } //End namespace Uniformity
 

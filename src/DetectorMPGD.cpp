@@ -19,7 +19,7 @@ using namespace Uniformity;
 
 //Default constructor
 DetectorMPGD::DetectorMPGD(){
-    
+    //fMaxSectorWidth = -1;
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
@@ -197,6 +197,9 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth){
         
         etaSector.fPos_Y = fInputPos_Y;
         etaSector.fWidth = fInputWidth;
+        
+        //Is this sector the widest sector?
+        //if (fMaxSectorWidth < fInputWidth) fMaxSectorWidth = fInputWidth;
         
         //Make three Phi Sectors for this Eta Sector
         for (int i=1; i <=3; ++i) {

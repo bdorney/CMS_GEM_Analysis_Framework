@@ -94,7 +94,11 @@ namespace Uniformity {
         
         //Sets a single eta sector; over-writes what is currently stored (if any)
         virtual void setEtaSector(int iEta, SectorEta inputEtaSector){
-            map_sectorsEta[iEta] = inputEtaSector; return;
+            map_sectorsEta[iEta] = inputEtaSector;
+            /*if ( inputEtaSector.fWidth > fMaxSectorWidth) {
+                fMaxSectorWidth = inputEtaSector.fWidth;
+            }*/
+            return;
         };
         
         //Sets all eta sectors; over-writes what is currently stored (if any)
@@ -103,9 +107,12 @@ namespace Uniformity {
         };
         
     private:
+        //float fMaxSectorWidth;
+        
         std::map<int, SectorEta> map_sectorsEta;
         
         std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
+        
     };
 } //End namespace Uniformity
 
