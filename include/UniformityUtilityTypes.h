@@ -191,6 +191,7 @@ namespace Uniformity {
         //One dimensional graphs
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
+        std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_Failures;
         
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
