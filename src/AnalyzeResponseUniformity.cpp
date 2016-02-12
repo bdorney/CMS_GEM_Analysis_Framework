@@ -508,6 +508,16 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     float fLimit_Max = setupHisto.fHisto_xUpper, fLimit_Min = setupHisto.fHisto_xLower;
     
     vector<string>::const_iterator iterVec_IGuess; //Iterator to use for setting initial guess of fit
+    vector<float> vec_fFitRange;
+    
+    for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
+        vec_fFitRange.push_back( getFitBoundary( (*iterRange), (*iterSlice).second.hSlice_ClustADC, specADC ) );
+    } //End Loop Over Fit Range
+    
+    if (vec_fFitRange.size() > 1) {
+        fLimit_Min = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+        fLimit_Max = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+    }
     
     TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), fLimit_Min, fLimit_Max);
     
