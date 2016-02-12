@@ -112,8 +112,7 @@ namespace Uniformity {
         std::map<int, SectorEta> map_sectorsEta;
         
         std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
-        
-    };
+    }; //End Class DetectorMPGD
 } //End namespace Uniformity
 
 

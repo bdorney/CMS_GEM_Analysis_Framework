@@ -158,8 +158,12 @@ void AnalyzeResponseUniformity::fillHistos(){
 //Assumes Histos have been filled already (obviously)
 void AnalyzeResponseUniformity::fitHistos(){
     //Variable Declaration
-    TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
     Double_t *dPeakPos;
+    
+    TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
+    
+    float fMin = -1e12, fMax = 1e12;
+    vector<float> vec_fFitRange;
     
     //Clear Information from any previous analysis
     detMPGD.vec_allADCPeaks.clear();
@@ -172,10 +176,6 @@ void AnalyzeResponseUniformity::fitHistos(){
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Initialize Response uniformity graphs - Number of spectral peaks
-        //(*iterEta).second.gEta_ClustADC_Spec_NumPks = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        //(*iterEta).second.gEta_ClustADC_Spec_NumPks->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "ClustADC_Spec_NumPks" ) ).c_str() );
         
         //Initialize Response uniformity graphs - Fit norm Chi2
         (*iterEta).second.gEta_ClustADC_Fit_NormChi2 = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
@@ -204,35 +204,36 @@ void AnalyzeResponseUniformity::fitHistos(){
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
                 cout<<"Attempting to Fit (iEta, iPhi, iSlice) = (" << (*iterEta).first << ", " << (*iterPhi).first << ", " << (*iterSlice).first << ")\n";
                 
+                //Clear the calculated fit range from the previous slice
+                vec_fFitRange.clear();
+                
                 //Check if Histogram does not exist
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
                 
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
                 dPeakPos = specADC.GetPositionX();
-                //(*iterSlice).second.specSlice_ClustADC = make_shared<TSpectrum>( specADC );
-                
-                //TList * list_funcs = (*iterSlice).second.hSlice_ClustADC->GetListOfFunctions();
-                
-                //(*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
-                //(*iterSlice).second.pmrkSlice_ClustADC = (TPolyMarker*) list_funcs->FindObject("TPolyMarker");
-                //(*iterSlice).second.pmrkSlice_ClustADC = new TPolyMarker(specADC.GetNPeaks(),specADC.GetPositionX(), specADC.GetPositionY() );
-                
-                //(*iterSlice).second.pmrkSlice_ClustADC->SetName( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 
                 //Initialize Fit
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
+                for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
+                    vec_fFitRange.push_back( getFitBoundary( (*iterRange), (*iterSlice).second.hSlice_ClustADC, specADC ) );
+                } //End Loop Over Fit Range
+                
                 //Perform Fit & Store the Result
-                //(*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"");//, dPeakPos[0]-600., dPeakPos[0]+600. );
-                //TFitResultPtr ptrFitRes_ADC = (*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"");
-
-		//cout<<"ptrFitRes_ADC.Get() = " << ptrFitRes_ADC.Get() << endl;
-
-                //TFitResult fitRes_ADC = ( *ptrFitRes_ADC.Get() );
-
-		TFitResult fitRes_ADC = *((*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"") );                
-
+                TFitResult fitRes_ADC;
+                
+                if (vec_fFitRange.size() > 1) { //Case: Fit within the user specific range
+                    fMin = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+                    fMax = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+                    
+                    fitRes_ADC = *((*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"", fMin, fMax) );
+                } //End Case: Fit within the user specific range
+                else{ //Case: No range to use
+                    fitRes_ADC = *((*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"") );
+                } //End Case: No range to use
+                
                 //Determine which point in the TGraphs this is
                 int iPoint = std::distance( (*iterPhi).second.map_slices.begin(), iterSlice) + aSetup.iUniformityGranularity * std::distance((*iterEta).second.map_sectorsPhi.begin(), iterPhi);
                 

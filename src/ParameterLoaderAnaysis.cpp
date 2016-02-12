@@ -172,6 +172,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             } //End Case: ADC Spectrum Fit Equation
             else if( 0 == pair_strParam.first.compare("FIT_OPTION") ){ //Case: ADC Spectrum Fit Equation
                 hSetup.strFit_Option = pair_strParam.second;
+                
+                //Ensure that the result of the fit is returned in the TFitResultPtr by included the option "S" by default
+                if (hSetup.strFit_Option.find("S") == std::string::npos ) {
+                    hSetup.strFit_Option = hSetup.strFit_Option + "S";
+                }
             } //End Case: ADC Spectrum Fit Equation
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_IGUESS") ){
                 hSetup.vec_strFit_ParamIGuess = getCharSeparatedList(pair_strParam.second,',');
@@ -184,6 +189,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             }
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_MAP") ){
                 hSetup.vec_strFit_ParamMeaning = Timing::getCharSeparatedList(pair_strParam.second,',');
+            }
+            else if( 0 == pair_strParam.first.compare("FIT_RANGE") ){
+                hSetup.vec_strFit_Range = getCharSeparatedList(pair_strParam.second, ',');
             }
             else{ //Case: Parameter Not Recognized
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits","Error!!! Parameter Not Recognizd:\n");

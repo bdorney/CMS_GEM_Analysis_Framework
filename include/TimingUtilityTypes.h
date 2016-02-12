@@ -45,6 +45,9 @@ namespace Timing {
         bool bIsTrig;
         //bool bSubtractBkg;      //Background subtraction
         
+        //float fFitRange_xLower; //lower range of fit
+        //float fFitRange_xUpper; //upper range of fit
+        
         float fHisto_xLower;  //lower x range of histo
         float fHisto_xUpper;  //upper x range of histo
         
@@ -59,10 +62,12 @@ namespace Timing {
         std::string strHisto_Title_X;
         std::string strHisto_Title_Y;
         
+        //Allow for complex expressions
         std::vector<std::string> vec_strFit_ParamMeaning;
         std::vector<std::string> vec_strFit_ParamIGuess;
         std::vector<std::string> vec_strFit_ParamLimit_Min;
         std::vector<std::string> vec_strFit_ParamLimit_Max;
+        std::vector<std::string> vec_strFit_Range;
         
         HistoSetup(){
             bFit = bFit_AutoRanging = bIsTrig = false;
