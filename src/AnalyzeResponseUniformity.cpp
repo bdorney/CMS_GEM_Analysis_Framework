@@ -206,12 +206,13 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
                 dPeakPos = specADC.GetPositionX();
+                //(*iterSlice).second.specSlice_ClustADC = make_shared<TSpectrum>( specADC );
                 
                 //TList * list_funcs = (*iterSlice).second.hSlice_ClustADC->GetListOfFunctions();
                 
                 //(*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
                 //(*iterSlice).second.pmrkSlice_ClustADC = (TPolyMarker*) list_funcs->FindObject("TPolyMarker");
-                (*iterSlice).second.pmrkSlice_ClustADC = new TPolyMarker(specADC.GetNPeaks(),specADC.GetPositionX(), specADC.GetPositionY() );
+                //(*iterSlice).second.pmrkSlice_ClustADC = new TPolyMarker(specADC.GetNPeaks(),specADC.GetPositionX(), specADC.GetPositionY() );
                 
                 //(*iterSlice).second.pmrkSlice_ClustADC->SetName( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 
@@ -458,7 +459,7 @@ void AnalyzeResponseUniformity::storeFits( string strOutputROOTFileName, std::st
                 //Store Fits - Slice Level
                 //-------------------------------------
                 dir_Slice->cd();
-                (*iterSlice).second.pmrkSlice_ClustADC->Write( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
+                //(*iterSlice).second.pmrkSlice_ClustADC->Write( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 (*iterSlice).second.fitSlice_ClustADC->Write();
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors

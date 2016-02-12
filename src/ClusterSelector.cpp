@@ -21,6 +21,9 @@ ClusterSelector::ClusterSelector(){
 //Applies the cluster selection and stores those selected clusters in inputDet
 void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
+    int iFirstEvt = aSetupUniformity.iEvt_First;
+    int iNEvt = aSetupUniformity.iEvt_Total;
+    
     Int_t iClustMulti;  //I cry a little inside because of this
     Int_t iClustPos_Y[3072];
 	Int_t iClustSize[3072];
@@ -71,9 +74,37 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
     tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
     
+    //Check Event Range
+    //------------------------------------------------------
+    /*if (aSetupUniformity.iEvt_First < 0) { //Case: Negative Event Number for First Event
+        aSetupUniformity.iEvt_First = 0;
+    } //End Case: Negative Event Number for First Event
+    else if(aSetupUniformity.iEvt_First > tree_Clusters->GetEntries() ){ //Case: First Event Beyond Event Range
+        printClassMethodMsg("ClusterSelector","setClusters", ("Error, First Event Requested as " + getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + getString( tree_Clusters->GetEntries() ) ).c_str() );
+    }*/ //End Case: First Event Beyond Event Range
+    
+    if ( -1 == iNEvt ) { //Case: All Events
+        iFirstEvt = 0;
+        iNEvt = tree_Clusters->GetEntries();
+    } //End Case: All Events
+    else{ //Case: Event Range
+        if ( iFirstEvt > tree_Clusters->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
+            printClassMethodMsg("ClusterSelector","setClusters", ("Error, First Event Requested as " + getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + getString( tree_Clusters->GetEntries() ) ).c_str() );
+            printClassMethodMsg("ClusterSelector","setClusters", "Exiting!!!");
+            return;
+        } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
+        else if( (iFirstEvt + iNEvt) > tree_Clusters->GetEntries() ){
+            iNEvt = tree_Clusters->GetEntries() - iFirstEvt;
+        }
+        else if( iFirstEvt < 0){
+            iFirstEvt = 0;
+        }
+    } //End Case: Event Range
+    
     //Get data event-by-event
     //------------------------------------------------------
-    for (int i=0; i < tree_Clusters->GetEntries(); ++i) {
+    //for (int i=0; i < tree_Clusters->GetEntries(); ++i) {
+    for (int i=iFirstEvt; i < iNEvt; ++i) {
         //Needed to implement a Hack
         //First check to make sure the cluster multiplicity is within the selection
         //Only then get the info on the clusters
