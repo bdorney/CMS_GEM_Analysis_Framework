@@ -207,10 +207,11 @@ void AnalyzeResponseUniformity::fitHistos(){
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
                 dPeakPos = specADC.GetPositionX();
                 
-                TList * list_funcs = (*iterSlice).second.hSlice_ClustADC->GetListOfFunctions();
+                //TList * list_funcs = (*iterSlice).second.hSlice_ClustADC->GetListOfFunctions();
                 
                 //(*iterSlice).second.pmrkSlice_ClustADC = make_shared<TPolyMarker>( (*( (TPolyMarker*)list_funcs->FindObject("TPolyMarker") ) ) );
-                (*iterSlice).second.pmrkSlice_ClustADC = (TPolyMarker*) list_funcs->FindObject("TPolyMarker");
+                //(*iterSlice).second.pmrkSlice_ClustADC = (TPolyMarker*) list_funcs->FindObject("TPolyMarker");
+                (*iterSlice).second.pmrkSlice_ClustADC = new TPolyMarker(specADC.GetNPeaks(),specADC.GetPositionX(), specADC.GetPositionY() );
                 
                 //(*iterSlice).second.pmrkSlice_ClustADC->SetName( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 
