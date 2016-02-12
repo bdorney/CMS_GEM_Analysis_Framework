@@ -42,6 +42,14 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
 
 //Checks to see if the detector's uniformity is within requested amount
 void AnalyzeResponseUniformity::checkUniformity(){
+    //Check to make sure at least one peak exists
+    if(detMPGD.vec_allADCPeaks.size() == 0){
+	cout<<"============Analysis Summary============\n";
+    	cout<<"No Stored ADC Peaks; All Fits Failed!?\n";
+	cout<<"You should Investigate the output data file\n";
+	return;
+    }
+
     //Variable Declaration
     float fResponse_Max = *(std::max_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
     float fResponse_Min = *(std::min_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
