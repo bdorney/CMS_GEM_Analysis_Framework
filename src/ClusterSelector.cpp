@@ -89,7 +89,7 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     } //End Case: All Events
     else{ //Case: Event Range
         if ( iFirstEvt > tree_Clusters->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("ClusterSelector","setClusters", ("Error, First Event Requested as " + getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + getString( tree_Clusters->GetEntries() ) ).c_str() );
+            printClassMethodMsg("ClusterSelector","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
             printClassMethodMsg("ClusterSelector","setClusters", "Exiting!!!");
             return;
         } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events

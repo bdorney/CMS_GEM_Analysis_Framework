@@ -189,7 +189,7 @@ float Timing::stofSafe(std::string strInputValue){
     
     std::string strUserInput;
     
-    if (strInputValue.find_first_not_of( "0123456789." ) == std::string::npos) { //Case: only numeric data
+    if (strInputValue.find_first_not_of( "-0123456789." ) == std::string::npos) { //Case: only numeric data
         ret_float =  std::stof(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
@@ -238,7 +238,7 @@ float Timing::stofSafe(std::string strInputField, std::string strInputValue){
     
     std::string strUserInput;
     
-    if (strInputValue.find_first_not_of( "0123456789." ) == std::string::npos) { //Case: only numeric data
+    if (strInputValue.find_first_not_of( "-0123456789." ) == std::string::npos) { //Case: only numeric data
         ret_float =  std::stof(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
@@ -287,7 +287,7 @@ int Timing::stoiSafe(std::string strInputValue){
     
     std::string strUserInput;
     
-    if (strInputValue.find_first_not_of( "0123456789" ) == std::string::npos) { //Case: only numeric data
+    if (strInputValue.find_first_not_of( "-0123456789" ) == std::string::npos) { //Case: only numeric data
         ret_int =  std::stoi(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
@@ -335,7 +335,7 @@ int Timing::stoiSafe(std::string strInputField, std::string strInputValue){
     
     std::string strUserInput;
     
-    if (strInputValue.find_first_not_of( "0123456789" ) == std::string::npos) { //Case: only numeric data
+    if (strInputValue.find_first_not_of( "-0123456789" ) == std::string::npos) { //Case: only numeric data
         ret_int =  std::stoi(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
