@@ -58,8 +58,12 @@ std::istream & Timing::getlineNoSpaces(std::istream & stream, std::string & str)
         str.erase(remove(str.begin()+iLastQuote,str.end(), ' ' ), str.end() ); //Until last single-quote
         
         //tabs
-        str.erase(remove(str.begin(),str.begin()+iFirstQuote, '\t' ), str.begin()+iFirstQuote ); //Until first single-quote
-        str.erase(remove(str.begin()+iLastQuote,str.end(), '\t' ), str.end() ); //Until last single-quote
+	if(str.find('\t') != std::string::npos){ //Case: Tabs Found
+		cout<<"str = '" << str << "'\n";
+
+        	str.erase(remove(str.begin(),str.begin()+iFirstQuote, '\t' ), str.begin()+iFirstQuote ); //Until first single-quote
+        	str.erase(remove(str.begin()+iLastQuote,str.end(), '\t' ), str.end() ); //Until last single-quote
+	} //End Case: Tabs Found
     } //End Case: line input
     
     return stream;

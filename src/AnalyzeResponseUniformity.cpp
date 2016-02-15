@@ -511,7 +511,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     vector<float> vec_fFitRange;
     
     for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
-        vec_fFitRange.push_back( getFitBoundary( (*iterRange), (*iterSlice).second.hSlice_ClustADC, specADC ) );
+        vec_fFitRange.push_back( getFitBoundary( (*iterRange), hInput, specInput ) );
     } //End Loop Over Fit Range
     
     if (vec_fFitRange.size() > 1) {
