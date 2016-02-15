@@ -54,16 +54,16 @@ std::istream & Timing::getlineNoSpaces(std::istream & stream, std::string & str)
         int iLastQuote = str.rfind("'");
         
         //Spaces
-        str.erase(remove(str.begin(),str.begin()+iFirstQuote, ' ' ), str.begin()+iFirstQuote ); //Until first single-quote
-        str.erase(remove(str.begin()+iLastQuote,str.end(), ' ' ), str.end() ); //Until last single-quote
+        if (str.find(' ') != std::string::npos ) { //Case: Spaces Found
+            str.erase(remove(str.begin(),str.begin()+iFirstQuote, ' ' ), str.begin()+iFirstQuote ); //Until first single-quote
+            str.erase(remove(str.begin()+iLastQuote,str.end(), ' ' ), str.end() ); //Until last single-quote
+        } //End Case: Spaces Found
         
         //tabs
-	if(str.find('\t') != std::string::npos){ //Case: Tabs Found
-		cout<<"str = '" << str << "'\n";
-
-        	str.erase(remove(str.begin(),str.begin()+iFirstQuote, '\t' ), str.begin()+iFirstQuote ); //Until first single-quote
-        	str.erase(remove(str.begin()+iLastQuote,str.end(), '\t' ), str.end() ); //Until last single-quote
-	} //End Case: Tabs Found
+        if(str.find('\t') != std::string::npos){ //Case: Tabs Found
+            str.erase(remove(str.begin(),str.begin()+iFirstQuote, '\t' ), str.begin()+iFirstQuote ); //Until first single-quote
+            str.erase(remove(str.begin()+iLastQuote,str.end(), '\t' ), str.end() ); //Until last single-quote
+        } //End Case: Tabs Found
     } //End Case: line input
     
     return stream;
