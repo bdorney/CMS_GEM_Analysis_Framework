@@ -1,11 +1,20 @@
 
 **************************************************
 *                                                *
-*	CHANGELOG: CMS_GEM_Analysis_Framework    *
-*	VERSION: 2.1                             *
-*	LAST UPDATE: Jan 26 2016                 *
+*	CHANGELOG: CMS_GEM_Analysis_Framework        *
+*	VERSION: 2.1                                 *
+*	LAST UPDATE: Feb 15 2016                     *
 *                                                *
 **************************************************
+
+Update: Feb 15th 2016
+==================================================
+->First stable release to the repository
+->develop branch to be merged into the master branch
+->Implementation of all fundamental classes completed
+->Outstanding class includes only VisualizeUniformity
+->Able to reproduce results of S. Colafranceschi from FIT
+->Able to analyze detector data taken here at CERN
 
 Update: Jan 26th 2016
 ==================================================
