@@ -773,11 +773,13 @@
 # 5. Known & Outstanding Issues
 # ========================================================
 
+    ********ISSUE********
     Compiling on MAC OS v10.9.X with g++ (GCC) version 4.9.2 20141029 fails.  This is due to the
     default C++ library in apple software.  Before 10.9.X the default was "libstdc++" but after 10.9.X
     it has been renamed to "libc++".  We have provided a make file for the clang compiler ("Makefile.clang)
     but do not support this computing environemnt since lxplus is so readily accessible and configurable.
 
+    ********ISSUE********
     Running the analyzeUniformity executable in a MAC OS environment hangs indefinitely or seg faults
     when trying to parse the input analysis config file.  This appears to be due to the implementation of
     the standard library in MAC OS.  Specifically in the Timing::getlineNoSpaces() function declared in
@@ -787,6 +789,7 @@
     computer runs out of memory.  Our recommended solution is to use the linux computing environment
     specified above.
 
+    ********ISSUE********
     Running analyzeUniformity executable on linux crashes when parsing the input analysis config file.
     This is a very rare occurrence and it seems to be again coming from Timing::getlineNoSpaces();
     function declared in $GEM_BASE/include/TimingUtilityFunctions.h and implemented in
@@ -796,3 +799,29 @@
     a few spaces or tabs and then re-running.  This has been seen to solve the issue in the past.  If a
     developer can come up with a better implementation of Timing::getlineNoSpaces() this might solve
     both this issue and the above issue.
+
+    ********ISSUE********
+    Runing analyzeUniformity gives error messages when parsing the input analysis config file stating
+    it does not recognize a given (field, value) pair even though the field is listed in this README 
+    file and have double checked that it is spelled correctly:
+
+	strLine: = Cut_ClusterSize_Min='2';
+	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - Error!!! Parameter Not Recognizd:
+	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Field = CUT_CLUSTERSIZE_MIN
+	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Value = 2
+
+    We are puzzled by this also. Upon inspecting the output histograms it does appear that the specified
+    selection cut is correctly applied.  Need to spend sometime with just ParameterLoaderAnalysis to
+    understand what is going on.  Open issue.
+
+    ********ISSUE********
+    When attempting to run the executable analyzeUniformity I get the following error:
+
+   	./analyzeUniformity: error while loading shared libraries: 
+	libSpectrum.so: cannot open shared object file: No such file or directory
+
+    You did not run the setup script to initialize the computing environment.  Execute from the base 
+    directory of the repository the following command:
+
+	source scripts/setup_CMS_GEM.sh
+
