@@ -294,7 +294,7 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
     
     //TDirectory *dir_SectorEta = nullptr, *dir_SectorPhi = nullptr, *dir_Slice = nullptr;
     
-    TFile *file_ROOT = nullptr;
+    TFile *ptr_fileInput = nullptr;
     
     //This method will be called when the user wants to re-run the fitting on a previously created batch of histograms
     //The user will directly supply an AMORE mapping file, this will make the DetectorMPGD structure so that it matches the one created when the histograms where first booked
@@ -309,13 +309,13 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
     
     //Open the requested ROOT file
     //------------------------------------------------------
-    file_ROOT = new TFile(strInputROOTFileName.c_str(),"READ","",1);
+    ptr_fileInput = new TFile(strInputROOTFileName.c_str(),"READ","",1);
     
     //Check to see if data file opened successfully, if so load the tree
     //------------------------------------------------------
-    if ( !file_ROOT->IsOpen() || file_ROOT->IsZombie() ) { //Case: failed to load ROOT file
+    if ( !ptr_fileInput->IsOpen() || ptr_fileInput->IsZombie() ) { //Case: failed to load ROOT file
         perror( ("Uniformity::AnalyzeResponseUniformity::loadHistosFromFile() - error while opening file: " + strInputROOTFileName ).c_str() );
-        Timing::printROOTFileStatus(file_ROOT);
+        Timing::printROOTFileStatus(ptr_fileInput);
         std::cout << "Exiting!!!\n";
         
         return;
@@ -329,7 +329,7 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
         //Get Directory
         //-------------------------------------
         //Check to see if the directory exists already
-        TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        TDirectory *dir_SectorEta = ptr_fileInput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
         
         //If the above pointer is null the directory does NOT exist, skip this Eta Sector
         if (dir_SectorEta == nullptr) continue;
@@ -340,7 +340,7 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
         //Load Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
-        (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex(iEta, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
+        (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex( (*iterEta).first, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
         //(*iterEta).second.hEta_ClustPos
         //(*iterEta).second.hEta_ClustSize
         //(*iterEta).second.hEta_ClustTime
@@ -394,13 +394,13 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
 
     //Close the file
     //------------------------------------------------------
-    file_ROOT->Close();
+    ptr_fileInput->Close();
     
     return;
 } //End AnalyzeResponseUniformity::loadHistosFromFile()
 
 //Stores booked histograms (for those histograms that are non-null)
-void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std::string & strOption ){
+void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
     //std::shared_ptr<TFile> ptr_fileOutput;
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
@@ -505,7 +505,7 @@ void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std
     return;
 } //End storeHistos()
 
-void AnalyzeResponseUniformity::storeFits( string & strOutputROOTFileName, std::string & strOption ){
+void AnalyzeResponseUniformity::storeFits( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     

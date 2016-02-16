@@ -84,10 +84,10 @@ namespace Uniformity {
         
         //Storing*****************
         //Stores booked histograms (for those histograms that are non-null)
-        void storeHistos(std::string & strOutputROOTFileName, std::string & strOption);
+        void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
         
         //Stores booked fits (for those fits that are non-null)
-        void storeFits(std::string & strOutputROOTFileName, std::string & strOption);
+        void storeFits(std::string & strOutputROOTFileName, std::string strOption);
         
         //Stores TObjects created in createResponseMap() in the requested output file
         //Placeholder
