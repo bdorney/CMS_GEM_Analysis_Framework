@@ -7,6 +7,12 @@
 *                                                *
 **************************************************
 
+Update: Feb 16th 2016
+==================================================
+->New feature, adding functionality to AnalyzResponseUniformity
+->AnalyzeResponseUniformity will now be able to load previously created distributions and fit them
+->See AnalyzeResponseUniformity::loadHistosFromFile()
+
 Update: Feb 15th 2016
 ==================================================
 ->First stable release to the repository

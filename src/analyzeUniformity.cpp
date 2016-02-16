@@ -94,6 +94,9 @@ int main( int argc_, char * argv_[] ){
     myAnalyzer.storeFits(vec_strInputArgs[4], "UPDATE");
     myAnalyzer.checkUniformity();
     
+    //Debugging
+    myAnalyzer.loadHistosFromFile(vec_strInputArgs[4]);
+    
     cout<<"Success!"<<endl;
     
     return 0;

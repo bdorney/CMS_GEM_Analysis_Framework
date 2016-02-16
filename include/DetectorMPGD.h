@@ -46,6 +46,15 @@ namespace Uniformity {
         //Constructor to use when supplying a list of sectors;
         DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
         
+        //Actions - Methods that Do Something
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //wipes all stored information
+        virtual void reset(){
+            map_sectorsEta.clear();
+            vec_allADCPeaks.clear();
+            return;
+        } //End reset()
+        
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Returns all clusters

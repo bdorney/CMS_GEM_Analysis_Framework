@@ -285,20 +285,74 @@ void AnalyzeResponseUniformity::fitHistos(){
     return;
 } //End AnalyzeResponseUniformity::fitHistos()
 
-//Loops over all stored clusters in a specific iEta sector of detMPGD and Book Histograms
-//void AnalyzeResponseUniformity::fillHistos(int iEta){
-/*void AnalyzeResponseUniformity::fillHistos(SectorEta &inputEta){
+//Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
+//Loads all TObjects found in the input ROOT file into detMPGD;
+//Any previously stored information in detMPGD is lost.
+void AnalyzeResponseUniformity::loadHistosFromFile( string strInputROOTFileName ){
+    //Variable Declaration
+    int iEta = 1, iPhi = 1, iSlice = 1;
     
-    //Not Implemented Yet
+    TDirectory *dir_SectorEta = nullptr, *dir_SectorPhi = nullptr, *dir_Slice = nullptr;
     
-}*/ //AnalyzeResponseUniformity::fillHistos() - Specific iEta Sector
+    TFile *file_ROOT = nullptr;
+    
+    //Clear all previously stored information
+    detMPGD.reset();
+    
+    //Open the requested ROOT file
+    //------------------------------------------------------
+    file_ROOT = new TFile(strInputROOTFileName.c_str(),"READ","",1);
+    
+    //Check to see if data file opened successfully, if so load the tree
+    //------------------------------------------------------
+    if ( !file_ROOT->IsOpen() || file_ROOT->IsZombie() ) { //Case: failed to load ROOT file
+        perror( ("Uniformity::AnalyzeResponseUniformity::loadHistosFromFile() - error while opening file: " + strInputROOTFileName ).c_str() );
+        Timing::printROOTFileStatus(file_ROOT);
+        std::cout << "Exiting!!!\n";
+        
+        return;
+    } //End Case: failed to load ROOT file
+    
+    //Loop Through the file and load all stored TObjects
+    //------------------------------------------------------
+    while ( file_ROOT->GetDirectory( ( "SectorEta" + getString( iEta ) ).c_str(), false, "GetDirectory" ) != nullptr ) { //Search Loop for Sector Eta Directories
+        //Set the sector Eta directory
+        dir_SectorEta = file_ROOT->GetDirectory( ( "SectorEta" + getString( iEta ) ).c_str(), false, "GetDirectory" );
+        
+        //Declare and create a SectorEta
+        SectorEta etaSector;
+        
+        //Load Histograms
+        etaSector.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex(iEta, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
+        
 
-//void AnalyzeResponseUniformity::fillHistos(int iEta, int iPhi){
-/*void AnalyzeResponseUniformity::fillHistos(SectorPhi &inputPhi){
+        
+        //Loop through dir_SectorEta and find all phi directories
+        while ( dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( iPhi ) ).c_str(), false, "GetDirectory" ) ) { //Search Loop for Sector Phi Directories
+            //Set the sector Phi directory
+            dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( iPhi ) ).c_str() );
+            
+            //Loop through dir_SectorPhi and find all slice directories
+            while (dir_SectorPhi->GetDirectory( ( "Slice" + getString( iSlice ) ).c_str(), false, "GetDirectory" ) ) { //Search Loop for Sector Slice Directories
+                //Set the sector slice directory
+                dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( iSlice ) ).c_str(), false, "GetDirectory" );
+                
+                //End of SectorSlice Loop
+                ++iSlice;   //Increment iSlice index for next iteration
+            } //End Search Loop for Sector Slice Directories
+            
+            //End of SectorPhi Loop
+            ++iPhi;     //Increment iPhi index for next iteration
+            iSlice = 1; //Reset iSlice index for next iteration
+        } //End Search Loop for Sector Phi Directories
+        
+        //End of SectorEta Loop
+        ++iEta;     //Increment iEta index for next iteration
+        iPhi = 1;   //Reset iPhi index for next iteration
+    } //End Search Loop for Sector Eta Directories
     
-    //Not Implemented Yet
-    
-}*/ //AnalysisSetupUniformity::fillHistos() - Specific iPhi
+    return;
+} //End AnalyzeResponseUniformity::loadHistosFromFile()
 
 //Stores booked histograms (for those histograms that are non-null)
 void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::string strOption ){
@@ -368,7 +422,7 @@ void AnalyzeResponseUniformity::storeHistos( string strOutputROOTFileName, std::
             } //End Case: Directory did not exist in file, CREATE
             
             //Debugging
-            cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
+            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
             
             //Store Histograms - SectorPhi Level
             //-------------------------------------

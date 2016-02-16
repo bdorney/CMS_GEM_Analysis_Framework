@@ -70,6 +70,12 @@ namespace Uniformity {
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
         void fitHistos();
         
+        //Loading*****************
+        //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
+        //Loads all TObjects found in the input ROOT file into detMPGD;
+        //Any previously stored information in detMPGD is lost.
+        void loadHistosFromFile(std::string strInputROOTFileName);
+        
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
         void checkUniformity();
@@ -90,6 +96,7 @@ namespace Uniformity {
         //Displays the results of the analysis in a user friendly manner
         //Placeholder
         //void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
+        //Actually it's better to put this in a separate file
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
