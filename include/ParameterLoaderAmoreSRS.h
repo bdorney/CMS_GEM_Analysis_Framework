@@ -37,7 +37,7 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Load the Amore mapping file and initializes the detector
-        void loadAmoreMapping(std::string & strInputMappignFileName);
+        void loadAmoreMapping(std::string & strInputMappingFileName);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

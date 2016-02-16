@@ -95,7 +95,7 @@ int main( int argc_, char * argv_[] ){
     myAnalyzer.checkUniformity();
     
     //Debugging
-    myAnalyzer.loadHistosFromFile(vec_strInputArgs[4]);
+    myAnalyzer.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
     
     cout<<"Success!"<<endl;
     

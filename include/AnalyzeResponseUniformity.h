@@ -20,6 +20,7 @@
 
 //Framework Includes
 //#include "DetectorMPGD.h"
+#include "ParameterLoaderAmoreSRS.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityTypes.h"
@@ -74,7 +75,7 @@ namespace Uniformity {
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
         //Loads all TObjects found in the input ROOT file into detMPGD;
         //Any previously stored information in detMPGD is lost.
-        void loadHistosFromFile(std::string strInputROOTFileName);
+        void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
@@ -83,10 +84,10 @@ namespace Uniformity {
         
         //Storing*****************
         //Stores booked histograms (for those histograms that are non-null)
-        void storeHistos(std::string strOutputROOTFileName, std::string strOption);
+        void storeHistos(std::string & strOutputROOTFileName, std::string & strOption);
         
         //Stores booked fits (for those fits that are non-null)
-        void storeFits(std::string strOutputROOTFileName, std::string strOption);
+        void storeFits(std::string & strOutputROOTFileName, std::string & strOption);
         
         //Stores TObjects created in createResponseMap() in the requested output file
         //Placeholder
