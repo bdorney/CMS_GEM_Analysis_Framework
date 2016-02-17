@@ -346,6 +346,10 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
         //(*iterEta).second.hEta_ClustTime
         //(*iterEta).second.hEta_ClustADC_v_ClustPos
         
+	//Set to Global Directory - SectorEta Level
+        //-------------------------------------
+        (*iterEta).second.hEta_ClustADC->SetDirectory(gROOT);
+
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
             //Get Directory
