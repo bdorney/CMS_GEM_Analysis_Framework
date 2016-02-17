@@ -429,8 +429,8 @@
                     ...
                     ...
                     [BEGIN_HISTO_INFO]
-                    ...
-                    ...
+                        ...
+                        ...
                     [END_HISTO_INFO]
                 [END_UNIFORMITY_INFO]
             [END_ANALYSIS_INFO]
@@ -535,7 +535,7 @@
                                     fit parameter (e.g. TSpectrum::Search() and TSpectrum::GetPositionX()
                                     are used).
 
-                SIGMA               The fit parameter is set based on the MEAN of the distribution stored in
+                SIGMA               The fit parameter is set based on the SIGMA of the distribution stored in
                                     the TH1 object (e.g. TH1::GetRMS() ).
 
 
@@ -805,10 +805,10 @@
     it does not recognize a given (field, value) pair even though the field is listed in this README 
     file and have double checked that it is spelled correctly:
 
-	strLine: = Cut_ClusterSize_Min='2';
-	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - Error!!! Parameter Not Recognizd:
-	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Field = CUT_CLUSTERSIZE_MIN
-	ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Value = 2
+        strLine: = Cut_ClusterSize_Min='2';
+        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - Error!!! Parameter Not Recognizd:
+        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Field = CUT_CLUSTERSIZE_MIN
+        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Value = 2
 
     We are puzzled by this also. Upon inspecting the output histograms it does appear that the specified
     selection cut is correctly applied.  Need to spend sometime with just ParameterLoaderAnalysis to
@@ -817,11 +817,27 @@
     ********ISSUE********
     When attempting to run the executable analyzeUniformity I get the following error:
 
-   	./analyzeUniformity: error while loading shared libraries: 
-	libSpectrum.so: cannot open shared object file: No such file or directory
+        ./analyzeUniformity: error while loading shared libraries:
+        libSpectrum.so: cannot open shared object file: No such file or directory
 
     You did not run the setup script to initialize the computing environment.  Execute from the base 
     directory of the repository the following command:
 
-	source scripts/setup_CMS_GEM.sh
+        source scripts/setup_CMS_GEM.sh
 
+    Now attempt to re-run the executable.
+
+    ********ISSUE********
+    When attempting to compile I get the following error (or similar):
+
+        g++ -g3 -O0 `/bin/root-config --cflags --glibs --libs` -std=c++11 -I include/ -I/include/ -c src/DetectorMPGD.cpp -o src/DetectorMPGD.o  -L /lib/ -lSpectrum
+        /bin/sh: /bin/root-config: No such file or directory
+        cc1plus: error: unrecognized command line option "-std=c++11"
+        make: *** [src/DetectorMPGD.o] Error 1
+
+    You most likely did not run the setup script to initialize the computing environement.  Execute from
+    the base directory of the repository the following command:
+
+        source scripts/setup_CMS_GEM.sh
+
+    Now attempt to recompile.

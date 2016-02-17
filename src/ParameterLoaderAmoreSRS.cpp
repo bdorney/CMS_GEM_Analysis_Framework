@@ -75,9 +75,9 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
             //#Header   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
             //(getCharSeparatedList should strip the tab's out)
             if (vec_strParam.size() == 9) { //Case: Correct Number of Parameters
-                int iEta = stoiSafe("INTERNAL",getStringOnlyNumeric(vec_strParam[4]));
+                int iEta = stoiSafe( getStringOnlyNumeric(vec_strParam[4]) );
                 
-                det_GE11.setEtaSector(iEta, stofSafe("INTERNAL",vec_strParam[5]), stofSafe("INTERNAL",vec_strParam[6] ) );
+                det_GE11.setEtaSector(iEta, stofSafe( vec_strParam[5]), stofSafe( vec_strParam[6] ), stoiSafe( vec_strParam[7] ) );
             } //End Case: Correct Number of Parameters
             else{ //Case: Incorrect Number of Parameters
                 printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("Error! - Found only " + getString(vec_strParam.size() ) + " Parameters (Expected 9) for line:").c_str() );

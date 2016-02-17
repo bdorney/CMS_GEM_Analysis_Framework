@@ -3,9 +3,15 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.1                                 *
-*	LAST UPDATE: Feb 15 2016                     *
+*	LAST UPDATE: Feb 17 2016                     *
 *                                                *
 **************************************************
+
+Update: Feb 17th 2016
+==================================================
+->Changed DetectorMPGD and ParameterLoaderAmoreSRS
+->Now the number of SectorPhi's per SectorEta is no longer hardcoded
+->Instead the value of the "nbConnect" column in the AMORE mapping config file is used 
 
 Update: Feb 16th 2016
 ==================================================

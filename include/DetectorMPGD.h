@@ -99,7 +99,7 @@ namespace Uniformity {
         };
         
         //Defines an eta sector; will NOT over-write what is currently stored
-        virtual void setEtaSector(int iEta, float fInputPos_Y, float fInputWidth);
+        virtual void setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector);
         
         //Sets a single eta sector; over-writes what is currently stored (if any)
         virtual void setEtaSector(int iEta, SectorEta inputEtaSector){

@@ -183,7 +183,7 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
 } //End DetectorMPGD::setCluster
 
 //Defines an eta sector
-void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth){
+void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector){
     //Check to see if this iEta sector already exists
     if (map_sectorsEta.count(iEta) > 0) { //Case: Eta Sector Exists; DO NOTHING
         printClassMethodMsg("DetectorMPGD","setEtaSector", ("Error: iEta " + getString(iEta) + " Already Exists!!!" ).c_str() );
@@ -202,7 +202,7 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth){
         //if (fMaxSectorWidth < fInputWidth) fMaxSectorWidth = fInputWidth;
         
         //Make three Phi Sectors for this Eta Sector
-        for (int i=1; i <=3; ++i) {
+        for (int i=1; i <= iNumPhiSector; ++i) {
             SectorPhi phiSector;
             
             phiSector.fPos_Xlow = -0.5 * fInputWidth + (i-1) * fInputWidth / 3.;
