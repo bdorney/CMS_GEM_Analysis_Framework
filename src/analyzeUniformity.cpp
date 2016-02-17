@@ -95,8 +95,8 @@ int main( int argc_, char * argv_[] ){
     myAnalyzer.checkUniformity();
     
     //Debugging
-    myAnalyzer.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
-    myAnalyzer.fitHistos();
+    //myAnalyzer.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
+    //myAnalyzer.fitHistos();
     
     cout<<"Success!"<<endl;
     
