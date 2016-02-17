@@ -340,15 +340,16 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
         //Load Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
-        (*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex( (*iterEta).first, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
+        //Placeholder No fits performed on these histos for now
+        //(*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex( (*iterEta).first, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
         //(*iterEta).second.hEta_ClustPos
         //(*iterEta).second.hEta_ClustSize
         //(*iterEta).second.hEta_ClustTime
         //(*iterEta).second.hEta_ClustADC_v_ClustPos
         
-	//Set to Global Directory - SectorEta Level
+        //Set to Global Directory - SectorEta Level
         //-------------------------------------
-        (*iterEta).second.hEta_ClustADC->SetDirectory(gROOT);
+        //(*iterEta).second.hEta_ClustADC->SetDirectory(gROOT);
 
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -369,7 +370,15 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
             //(*iterPhi).second.hPhi_ClustADC
             //(*iterPhi).second.hPhi_ClustSize
             //(*iterPhi).second.hPhi_ClustTime
-            //(*iterPhi).second.hPhi_ClustADC_v_ClustPos
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
+            
+            //Check to see if 2D histo retrieved successfully
+            if ( (*iterPhi).second.hPhi_ClustADC_v_ClustPos == nullptr) continue;
+            
+            //Set to Global Directory - SectorPhi Level
+            //-------------------------------------
+            //Prevents seg faulting when closing ptr_fileInput
+            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->SetDirectory(gROOT);
             
             //Slices
             //These are little trickery, the detMPGD we have now should have the eta and phi sectors setup.
@@ -383,15 +392,29 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
                 //Get Directory
                 //-------------------------------------
                 //Check to see if the directory exists already
-                TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( i ) ).c_str(), false, "GetDirectory"  );
+                //TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( i ) ).c_str(), false, "GetDirectory"  );
                 
                 //If the above pointer is null the directory does NOT exist, skip this Slice
-                if (dir_Slice == nullptr) continue;
+                //if (dir_Slice == nullptr) continue;
                 
-                //Load Histograms - Slice Level
+                //Creat the slice
+                SectorSlice slice;
+                
+                //Set Histograms - Slice Level
                 //-------------------------------------
-                dir_Slice->cd();
+                //dir_Slice->cd();
                 //(*iterSlice).second.hSlice_ClustADC
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.hPhi_ClustADC_v_ClustPos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                
+                //Make sure to set this histo to the global directory
+                slice.hSlice_ClustADC->SetDirectory(gROOT);
+                
+                //Store position information for this slice
+                slice.fPos_Center = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinCenter(i);
+                slice.fWidth = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinWidth(i);
+                
+                //Store the slice
+                (*iterPhi).second.map_slices[i] = slice;
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
