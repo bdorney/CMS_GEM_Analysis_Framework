@@ -11,6 +11,7 @@
 
 //C++ Includes
 #include <map>
+#include <set>
 #include <stdio.h>
 #include <string>
 #include <utility>
@@ -133,6 +134,44 @@ namespace Uniformity {
         } //End initialization
     }; //End Cluster
     
+    //Cluster Histograms
+    struct ClusterHistos{
+        //One dimensional histograms
+        std::shared_ptr<TH1F> hADC;    //ADC spectrum for all clusters
+        std::shared_ptr<TH1F> hMulti;  //Multiplicity  "              "
+        std::shared_ptr<TH1F> hPos;    //Position      "              "
+        std::shared_ptr<TH1F> hSize;   //Size          "              "
+        std::shared_ptr<TH1F> hTime;   //Time          "              "
+        
+        //Two dimensional histograms
+        std::shared_ptr<TH2F> hADC_v_Pos; //ADC vs Position for all clusters
+    };
+    
+    //Summary Statistics
+    struct SummaryStatistics{
+        //Statistics from Fit
+        float fIQR;      //Inter-quantile range (IQR = Q3 - Q1);
+        float fMax;      //Max response;
+        float fMean;     //Mean response;
+        float fMin;      //Min response;
+        float fQ1;       //First Quantile (Q1)
+        float fQ2;       //Second Quantile (Q2, e.g. median)
+        float fQ3;       //Third Quantile (Q3)
+        float fStdDev;   //Standard Deviation
+        
+        //std::vector<float> vec_fOutliers;
+        std::multiset<float> mset_fOutliers;
+        
+        std::shared_ptr<TH1F> hDist;  //Distribution of Dataset
+        
+        //Initialize
+        SummaryStatistics(){
+            fIQR = fMax = fMean = fMin = -1;
+            fQ1 = fQ2 = fQ3 = -1;
+            fStdDev = -1;
+        }
+    }; //End SummaryStatistics
+    
     //Defines a slice of a phi sector within the detector
     struct SectorSlice{
         float fPos_Center;    //Center of the slice;
@@ -166,14 +205,8 @@ namespace Uniformity {
         
         std::vector<Cluster> vec_clusters;
         
-        //One dimensional histograms
-        std::shared_ptr<TH1F> hPhi_ClustADC;
-        std::shared_ptr<TH1F> hPhi_ClustMulti;
-        std::shared_ptr<TH1F> hPhi_ClustSize;
-        std::shared_ptr<TH1F> hPhi_ClustTime;
-        
-        //Two dimensional histograms
-        std::shared_ptr<TH2F> hPhi_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
+        //Histograms
+        ClusterHistos clustHistos;
         
         //initialization
         SectorPhi(){
@@ -188,6 +221,13 @@ namespace Uniformity {
         
         std::map<int, SectorPhi> map_sectorsPhi;
         
+        //std::vector<float> vec_fClustADC_Fit_PkPos;     //Response info, from Fit
+        std::multiset<float> mset_fClustADC_Fit_PkPos;
+        //std::vector<float> vec_fClustADC_Fit_PkWidth;   //Energy resolution info, from Fit
+        
+        //std::vector<float> vec_fClustADC_Spec_PkPos;     //Response info, from Spec
+        std::multiset<float> mset_fClustADC_Spec_PkPos;
+        
         //One dimensional graphs
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
@@ -196,15 +236,12 @@ namespace Uniformity {
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
         
-        //One dimensional histograms
-        std::shared_ptr<TH1F> hEta_ClustADC;    //ADC spectrum for all clusters in this eta sector
-        std::shared_ptr<TH1F> hEta_ClustMulti;  //Multiplicity  "                               "
-        std::shared_ptr<TH1F> hEta_ClustPos;    //Position      "                               "
-        std::shared_ptr<TH1F> hEta_ClustSize;   //Size          "                               "
-        std::shared_ptr<TH1F> hEta_ClustTime;   //Time          "                                   "
+        //histograms
+        ClusterHistos clustHistos;
         
-        //Two dimensional histograms
-        std::shared_ptr<TH2F> hEta_ClustADC_v_ClustPos; //ADC vs Position for all clusters in this eta sector
+        //Summary Statistics
+        SummaryStatistics statClustADC_Fit_PkPos;
+        SummaryStatistics statClustADC_Spec_PkPos;
         
         //initialization
         SectorEta(){

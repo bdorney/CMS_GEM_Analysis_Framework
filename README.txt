@@ -348,6 +348,9 @@
             SectorEta::fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
             SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
             SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
+            SectorEta::vec_fClustADC_Fit_PkPos      //Container storing peak position from Clust ADC Fit
+            SectorEta::vec_fClustADC_Fit_PkWidth    //Container storing peak width from Clust ADC Fit (not yet implemented)
+            SectorEta::vec_fClustADC_Spec_PkPos     //Container storing peak position from TSpectrum::Search() & TSpectrum::GetPositionX()
             SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
             SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
             SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima

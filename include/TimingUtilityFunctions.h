@@ -81,14 +81,14 @@ namespace Timing {
     
     //Can't seem to get the templated form above to work
     struct addVal{
-        int fVal;
+        int iVal;
         
-        addVal(int fAdd){
-            fVal = fAdd;
+        addVal(int iAdd){
+            iVal = iAdd;
         }
         
-        void operator()(int &fInput) const{
-            fInput += fVal;
+        void operator()(int &iInput) const{
+            iInput += iVal;
         }
         //usage example:
         //std::for_each(myvec.begin(), myvec.end(), addVal(1.0));

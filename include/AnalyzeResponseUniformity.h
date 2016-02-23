@@ -11,11 +11,14 @@
 
 //C++ Includes
 #include <algorithm>
+#include <cmath>
 #include <iterator>
-#include <stdio.h>
-#include <string>
 #include <map>
 #include <memory>
+#include <numeric>
+#include <set>
+#include <stdio.h>
+#include <string>
 #include <vector>
 
 //Framework Includes
@@ -23,6 +26,7 @@
 #include "ParameterLoaderAmoreSRS.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
+#include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -117,6 +121,7 @@ namespace Uniformity {
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

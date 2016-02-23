@@ -91,50 +91,50 @@ void AnalyzeResponseUniformity::fillHistos(){
         aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
         
         //Initialize iEta Histograms - 1D
-        (*iterEta).second.hEta_ClustADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
-        (*iterEta).second.hEta_ClustMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
-        (*iterEta).second.hEta_ClustPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
-        (*iterEta).second.hEta_ClustSize = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
-        (*iterEta).second.hEta_ClustTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
+        (*iterEta).second.clustHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
+        //(*iterEta).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
+        (*iterEta).second.clustHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
+        (*iterEta).second.clustHistos.hSize = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
+        (*iterEta).second.clustHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
         
         //Initialize iEta Histograms - 2D
-        (*iterEta).second.hEta_ClustADC_v_ClustPos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", 3. * aSetup.iUniformityGranularity,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
-        (*iterEta).second.hEta_ClustADC_v_ClustPos->Sumw2();
+        (*iterEta).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", 3. * aSetup.iUniformityGranularity,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+        (*iterEta).second.clustHistos.hADC_v_Pos->Sumw2();
         
         //Debugging
-        //cout<<"(*iterEta).second.hEta_ClustADC->GetName() = " << (*iterEta).second.hEta_ClustADC->GetName() << endl;
+        //cout<<"(*iterEta).second.clustHistos.hADC->GetName() = " << (*iterEta).second.clustHistos.hADC->GetName() << endl;
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
             //Initialize iPhi Histograms - 1D
-            (*iterPhi).second.hPhi_ClustADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
-            (*iterPhi).second.hPhi_ClustMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
-            (*iterPhi).second.hPhi_ClustSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
-            (*iterPhi).second.hPhi_ClustTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
+            (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
+            (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
+            (*iterPhi).second.clustHistos.hSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
+            (*iterPhi).second.clustHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
             
             //Initialize iPhi Histograms - 2D
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Sumw2();
+            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
+            (*iterPhi).second.clustHistos.hADC_v_Pos->Sumw2();
             
             //Loop Over Stored Clusters
             for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
                 //Fill iEta Histograms
-                (*iterEta).second.hEta_ClustADC->Fill( (*iterClust).fADC );
-                //(*iterEta).second.hEta_ClustMulti->Fill( (*iterClust). );
-                (*iterEta).second.hEta_ClustPos->Fill( (*iterClust).fPos_X );
-                (*iterEta).second.hEta_ClustSize->Fill( (*iterClust).iSize );
-                (*iterEta).second.hEta_ClustTime->Fill( (*iterClust).iTimeBin );
+                (*iterEta).second.clustHistos.hADC->Fill( (*iterClust).fADC );
+                //(*iterEta).second.clustHistos.hMulti->Fill( (*iterClust). );
+                (*iterEta).second.clustHistos.hPos->Fill( (*iterClust).fPos_X );
+                (*iterEta).second.clustHistos.hSize->Fill( (*iterClust).iSize );
+                (*iterEta).second.clustHistos.hTime->Fill( (*iterClust).iTimeBin );
                 
-                (*iterEta).second.hEta_ClustADC_v_ClustPos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
+                (*iterEta).second.clustHistos.hADC_v_Pos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
                 
                 //Fill iPhi Histograms
-                (*iterPhi).second.hPhi_ClustADC->Fill( (*iterClust).fADC );
-                //(*iterPhi).second.hPhi_ClustMulti
-                (*iterPhi).second.hPhi_ClustSize->Fill( (*iterClust).iSize);
-                (*iterPhi).second.hPhi_ClustTime->Fill( (*iterClust).iTimeBin);
+                (*iterPhi).second.clustHistos.hADC->Fill( (*iterClust).fADC );
+                //(*iterPhi).second.clustHistos.hMulti
+                (*iterPhi).second.clustHistos.hSize->Fill( (*iterClust).iSize);
+                (*iterPhi).second.clustHistos.hTime->Fill( (*iterClust).iTimeBin);
                 
-                (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
+                (*iterPhi).second.clustHistos.hADC_v_Pos->Fill( (*iterClust).fPos_X, (*iterClust).fADC );
             } //End Loop Over Stored Clusters
             
             //Slices
@@ -146,18 +146,18 @@ void AnalyzeResponseUniformity::fillHistos(){
                 //string strSliceName = "hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC";
                 
                 //Grab ADC spectrum for this slice
-                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.hPhi_ClustADC_v_ClustPos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
                 
                 //Store position information for this slice
-                slice.fPos_Center = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinCenter(i);
-                slice.fWidth = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinWidth(i);
+                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
+                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
                 
                 //Store the slice
                 (*iterPhi).second.map_slices[i] = slice;
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
         
-        std::cout<<"(*iterEta).second.hEta_ClustADC->Integral() = " << (*iterEta).second.hEta_ClustADC->Integral() << std::endl;
+        std::cout<<"(*iterEta).second.clustHistos.hADC->Integral() = " << (*iterEta).second.clustHistos.hADC->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
 } //End AnalyzeResponseUniformity::fillHistos() - Full Detector
@@ -175,12 +175,6 @@ void AnalyzeResponseUniformity::fitHistos(){
     
     //Clear Information from any previous analysis
     detMPGD.vec_allADCPeaks.clear();
-    
-    //Initialize Summary Histograms
-    //hEta_v_SliceNum_ClustADC_Fit_PkPos = std::make_shared<TH2F>( TH2F("hEta_v_SliceNum_ClustADC_Fit_PkPos","",3. * aSetup.iUniformityGranularity, 1, 3. * aSetup.iUniformityGranularity + 1, detMPGD.map_sectorsEta.size(), 1, detMPGD.map_sectorsEta.size() + 1 ) );
-    //hEta_v_SliceNum_ClustADC_Fit_NormChi2 = std::make_shared<TH2F>( TH2F("hEta_v_SliceNum_ClustADC_Fit_NormChi2","",3. * aSetup.iUniformityGranularity, 1, 3. * aSetup.iUniformityGranularity + 1, detMPGD.map_sectorsEta.size(), 1, detMPGD.map_sectorsEta.size() + 1 ) );
-    //hEta_v_SliceNum_ClustADC_Spec_PkPos = std::make_shared<TH2F>( TH2F("hEta_v_SliceNum_ClustADC_Spec_PkPos","",3. * aSetup.iUniformityGranularity, 1, 3. * aSetup.iUniformityGranularity + 1, detMPGD.map_sectorsEta.size(), 1, detMPGD.map_sectorsEta.size() + 1 ) );
-    //hEta_v_SliceNum_ClustADC_Spec_NumPks = std::make_shared<TH2F>( TH2F("hEta_v_SliceNum_ClustADC_Spec_NumPks","",3. * aSetup.iUniformityGranularity, 1, 3. * aSetup.iUniformityGranularity + 1, detMPGD.map_sectorsEta.size(), 1, detMPGD.map_sectorsEta.size() + 1 ) );
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
@@ -207,7 +201,7 @@ void AnalyzeResponseUniformity::fitHistos(){
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
-        
+            
             //Loop Over Stored Slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
                 cout<<"Attempting to Fit (iEta, iPhi, iSlice) = (" << (*iterEta).first << ", " << (*iterPhi).first << ", " << (*iterSlice).first << ")\n";
@@ -255,13 +249,15 @@ void AnalyzeResponseUniformity::fitHistos(){
                 //Store - Peak Position (from spectrum)
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, dPeakPos[0] );
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
+                (*iterEta).second.mset_fClustADC_Spec_PkPos.insert( dPeakPos[0] );
                 
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
                 if ( fitRes_ADC.IsValid() ) { //Case: Valid Fit!!!
                     //Store the Peak Position in the Detector
                     //Used for checking the uniformity
-                    detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    //detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.mset_fClustADC_Spec_PkPos.insert( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                     
                     //Store Fit parameters - NormChi2
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
@@ -290,10 +286,6 @@ void AnalyzeResponseUniformity::fitHistos(){
 //Any previously stored information in detMPGD is lost.
 void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
     //Variable Declaration
-    //int iEta = 1, iPhi = 1, iSlice = 1;
-    
-    //TDirectory *dir_SectorEta = nullptr, *dir_SectorPhi = nullptr, *dir_Slice = nullptr;
-    
     TFile *ptr_fileInput = nullptr;
     
     //This method will be called when the user wants to re-run the fitting on a previously created batch of histograms
@@ -341,16 +333,7 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
         //-------------------------------------
         dir_SectorEta->cd();
         //Placeholder No fits performed on these histos for now
-        //(*iterEta).second.hEta_ClustADC = std::make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( getNameByIndex( (*iterEta).first, -1, -1, "h", aSetup.histoSetup_clustADC.strHisto_Name ).c_str() ) ) );
-        //(*iterEta).second.hEta_ClustPos
-        //(*iterEta).second.hEta_ClustSize
-        //(*iterEta).second.hEta_ClustTime
-        //(*iterEta).second.hEta_ClustADC_v_ClustPos
         
-        //Set to Global Directory - SectorEta Level
-        //-------------------------------------
-        //(*iterEta).second.hEta_ClustADC->SetDirectory(gROOT);
-
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
             //Get Directory
@@ -367,51 +350,37 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
             //Load Histograms - SectorPhi Level
             //-------------------------------------
             dir_SectorPhi->cd();
-            //(*iterPhi).second.hPhi_ClustADC
-            //(*iterPhi).second.hPhi_ClustSize
-            //(*iterPhi).second.hPhi_ClustTime
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
+            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
             
             //Check to see if 2D histo retrieved successfully
-            if ( (*iterPhi).second.hPhi_ClustADC_v_ClustPos == nullptr) continue;
+            if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr) continue;
             
             //Set to Global Directory - SectorPhi Level
             //-------------------------------------
             //Prevents seg faulting when closing ptr_fileInput
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->SetDirectory(gROOT);
+            (*iterPhi).second.clustHistos.hADC_v_Pos->SetDirectory(gROOT);
             
             //Slices
-            //These are little trickery, the detMPGD we have now should have the eta and phi sectors setup.
-            //But the slices are NOT setup
-            //Here we should loop from 1 to aSetup.iUniformityGranularity
-            //We could either:
-            //      Option 1: Try to load the slices from the file (slower?)
-            //      Option 2: project out from SectorPhi::hPhi_ClustADC_v_ClustPos as we did when we first created the slices.
-            //I am leaning toward Option 2; I think this will be faster than aSetup.iUniformityGranularity number of I/O operations
+            //Trickery, detMPGD now has eta and phi sectors setup.
+            //Slices are NOT setup
+            //Here loop from 1 to aSetup.iUniformityGranularity and either:
+            //      Option 1: Load slices from the file (slower?)
+            //      Option 2: project out from SectorPhi::clustHistos::hADC_v_Pos
+            //Implemented Option 2; faster many large number of I/O operations??
             for (int i=1; i <= aSetup.iUniformityGranularity; ++i ) { //Loop Over Slices
-                //Get Directory
+                //Set Histograms - Slice Level
                 //-------------------------------------
-                //Check to see if the directory exists already
-                //TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( i ) ).c_str(), false, "GetDirectory"  );
-                
-                //If the above pointer is null the directory does NOT exist, skip this Slice
-                //if (dir_Slice == nullptr) continue;
-                
                 //Creat the slice
                 SectorSlice slice;
                 
-                //Set Histograms - Slice Level
-                //-------------------------------------
-                //dir_Slice->cd();
-                //(*iterSlice).second.hSlice_ClustADC
-                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.hPhi_ClustADC_v_ClustPos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
                 
                 //Make sure to set this histo to the global directory
                 slice.hSlice_ClustADC->SetDirectory(gROOT);
                 
                 //Store position information for this slice
-                slice.fPos_Center = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinCenter(i);
-                slice.fWidth = (*iterPhi).second.hPhi_ClustADC_v_ClustPos->GetXaxis()->GetBinWidth(i);
+                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
+                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
                 
                 //Store the slice
                 (*iterPhi).second.map_slices[i] = slice;
@@ -429,11 +398,7 @@ void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappin
 //Stores booked histograms (for those histograms that are non-null)
 void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
-    //std::shared_ptr<TFile> ptr_fileOutput;
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
-    
-    //Assign the TFile to the ptr_fileOutput
-    //ptr_fileOutput = make_shared<TFile>(TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1) );
     
     //Check if File Failed to Open Correctly
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
@@ -475,11 +440,11 @@ void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std
         //Store Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
-        (*iterEta).second.hEta_ClustADC->Write();
-        (*iterEta).second.hEta_ClustPos->Write();
-        (*iterEta).second.hEta_ClustSize->Write();
-        (*iterEta).second.hEta_ClustTime->Write();
-        (*iterEta).second.hEta_ClustADC_v_ClustPos->Write();
+        (*iterEta).second.clustHistos.hADC->Write();
+        (*iterEta).second.clustHistos.hPos->Write();
+        (*iterEta).second.clustHistos.hSize->Write();
+        (*iterEta).second.clustHistos.hTime->Write();
+        (*iterEta).second.clustHistos.hADC_v_Pos->Write();
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -499,10 +464,10 @@ void AnalyzeResponseUniformity::storeHistos( string & strOutputROOTFileName, std
             //Store Histograms - SectorPhi Level
             //-------------------------------------
             dir_SectorPhi->cd();
-            (*iterPhi).second.hPhi_ClustADC->Write();
-            (*iterPhi).second.hPhi_ClustSize->Write();
-            (*iterPhi).second.hPhi_ClustTime->Write();
-            (*iterPhi).second.hPhi_ClustADC_v_ClustPos->Write();
+            (*iterPhi).second.clustHistos.hADC->Write();
+            (*iterPhi).second.clustHistos.hSize->Write();
+            (*iterPhi).second.clustHistos.hTime->Write();
+            (*iterPhi).second.clustHistos.hADC_v_Pos->Write();
             
             //Slices
             //Now that all clusters have been analyzed we extract the slices
@@ -597,8 +562,6 @@ void AnalyzeResponseUniformity::storeFits( string & strOutputROOTFileName, std::
             //Now that all clusters have been analyzed we extract the slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
                 
-                //int iSliceCount = std::distance( (*iterPhi).second.map_slices.begin(), iterSlice );
-                
                 //Get Directory
                 //-------------------------------------
                 //Check to see if the directory exists already
@@ -612,7 +575,6 @@ void AnalyzeResponseUniformity::storeFits( string & strOutputROOTFileName, std::
                 //Store Fits - Slice Level
                 //-------------------------------------
                 dir_Slice->cd();
-                //(*iterSlice).second.pmrkSlice_ClustADC->Write( getNameByIndex( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, "PeakMrk", "clustADC" ).c_str() );
                 (*iterSlice).second.fitSlice_ClustADC->Write();
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
@@ -623,6 +585,51 @@ void AnalyzeResponseUniformity::storeFits( string & strOutputROOTFileName, std::
     
     return;
 } //End storeHistos()
+
+void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs){
+    //Variable Declaration;
+    std::multiset<float>::iterator iterQ1 = mset_fInputObs.begin();
+    std::multiset<float>::iterator iterQ2 = mset_fInputObs.begin();
+    std::multiset<float>::iterator iterQ3 = mset_fInputObs.begin();
+    
+    //Determine max, min, & mean
+    inputStatObs.fMax   = *mset_fInputObs.rbegin();   //Last member of the multiset
+    inputStatObs.fMin   = *mset_fInputObs.begin();    //First member of the multiset
+    inputStatObs.fMean  = std::accumulate( mset_fInputObs.begin(), mset_fInputObs.end(), 0. ) / mset_fInputObs.size();
+    
+    //Determine Q1, Q2, & Q3
+    std::advance(iterQ1, (int)std::ceil( mset_fInputObs.size() * 0.25 ) );  inputStatObs.fQ1 = *iterQ1;
+    std::advance(iterQ2, (int)std::ceil( mset_fInputObs.size() * 0.50 ) );  inputStatObs.fQ2 = *iterQ2;
+    std::advance(iterQ3, (int)std::ceil( mset_fInputObs.size() * 0.75 ) );  inputStatObs.fQ3 = *iterQ3;
+    
+    //if (iterQ1 != nullptr && iterQ1 != mset_fInputObs.end() )
+    //if (iterQ2 != nullptr && iterQ2 != mset_fInputObs.end() )
+    //if (iterQ3 != nullptr && iterQ3 != mset_fInputObs.end() )
+    
+    //Determine IQR
+    inputStatObs.fIQR = inputStatObs.fQ3 - inputStatObs.fQ1;
+    
+    //Determine all outliers
+    //inputStatObs.mset_fOutliers.resize(mset_fInputObs.size() );
+    float fLowerBound = inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR;
+    float fUpperBound = inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR;
+    /*auto msetIter = std::copy_if(
+        mset_fInputObs.begin(),
+        mset_fInputObs.end(),
+        inputStatObs.mset_fOutliers.begin(),
+        Uniformity::inRange(
+            fLowerBound,
+            fUpperBound
+        )
+    );*/
+    
+    inputStatObs.mset_fOutliers = mset_fInputObs;
+    inputStatObs.mset_fOutliers.erase(std::find_if_not(inputStatObs.mset_fOutliers.begin(),inputStatObs.mset_fOutliers.end(), Uniformity::lessThan(inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR ) ), std::find_if_not(inputStatObs.mset_fOutliers.rbegin(), inputStatObs.mset_fOutliers.rend(), Uniformity::greaterThan(inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR ) ) ) );
+    
+    //inputStatObs.mset_fOutliers.resize(std::distance(inputStatObs.mset_fOutliers.begin(),msetIter) );
+    
+    return;
+} //End AnalyzeResponseUniformity::calcStatistics()
 
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
@@ -695,9 +702,6 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     ret_Func.SetLineColor(kRed);
     ret_Func.SetLineWidth(3);
     
-    //Delete Pointers
-    //delete iterVec_IGuess;
-    
     //Return fit
     //------------------------------------------------------
     return ret_Func;
@@ -762,14 +766,6 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
     string strPrefix = "h";
     string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto.strHisto_Name);
     
-    //Alter the name to reflect the location within the detector
-    /*if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        strName = "hiEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strName;
-    } //End Case: Specific (iEta,iPhi) sector
-    else{ //Case: iEta Sector, sum over sector's iPhi
-        strName = "hiEta" + getString(iEta) + "_" + strName;
-    }*/ //End Case: iEta Sector, sum over sector's iPhi
-    
     //Histo Declaration
     TH1F ret_Histo(strName.c_str(), "", setupHisto.iHisto_nBins, setupHisto.fHisto_xLower, setupHisto.fHisto_xUpper );
 
@@ -821,7 +817,6 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
 } //End AnalyzeResponseUniformity::getNameByIndex()
 
 float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    
     //Search the peak parameter meaning vector for "PEAK"
     //If found return this parameter
     
@@ -853,7 +848,6 @@ float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetu
 } //End AnalyzeResponseUniformity::getPeakPos
 
 float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    
     //Search the peak parameter meaning vector for "PEAK"
     //If found return this parameter
     
