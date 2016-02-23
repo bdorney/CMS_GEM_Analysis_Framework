@@ -257,7 +257,7 @@ void AnalyzeResponseUniformity::fitHistos(){
                     //Store the Peak Position in the Detector
                     //Used for checking the uniformity
                     //detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                    (*iterEta).second.mset_fClustADC_Spec_PkPos.insert( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.mset_fClustADC_Fit_PkPos.insert( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                     
                     //Store Fit parameters - NormChi2
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
@@ -597,6 +597,8 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     std::multiset<float>::iterator iterQ1 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ2 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ3 = mset_fInputObs.begin();
+
+	cout<<"mset_fInputObs.size() = " << mset_fInputObs.size() << endl;
     
     //Determine max, min, & mean
     inputStatObs.fMax   = *mset_fInputObs.rbegin();   //Last member of the multiset

@@ -92,7 +92,7 @@ int main( int argc_, char * argv_[] ){
     myAnalyzer.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
     myAnalyzer.fitHistos();
     myAnalyzer.storeFits(vec_strInputArgs[4], "UPDATE");
-    myAnalyzer.checkUniformity();
+    //myAnalyzer.checkUniformity();
     
     //Debugging
     //myAnalyzer.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
