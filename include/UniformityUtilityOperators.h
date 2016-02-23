@@ -32,7 +32,7 @@ namespace Uniformity {
             fVal = fInput;
         }
         
-        bool operator()(float &fInput ) const{
+        bool operator()(float fInput ) const{
             return (fInput > fVal);
         }
         //usage example:
@@ -48,7 +48,7 @@ namespace Uniformity {
             fVal = fInput;
         }
         
-        bool operator()(float &fInput ) const{
+        bool operator()(float fInput ) const{
             return (fInput >= fVal);
         }
         //usage example:
@@ -64,7 +64,7 @@ namespace Uniformity {
             fVal = fInput;
         }
         
-        bool operator()(float &fInput ) const{
+        bool operator()(float fInput ) const{
             return (fInput < fVal);
         }
         //usage example:
@@ -80,7 +80,7 @@ namespace Uniformity {
             fVal = fInput;
         }
         
-        bool operator()(float &fInput ) const{
+        bool operator()(float fInput ) const{
             return (fInput <= fVal);
         }
         //usage example:
@@ -97,7 +97,7 @@ namespace Uniformity {
             fUpper = std::max(f1,f2);
         }
         
-        bool operator()(float &fInput) const{
+        bool operator()(float fInput) const{
             return (fInput < fLower && fUpper < fInput);
         }
         //usage example
@@ -114,7 +114,7 @@ namespace Uniformity {
             fUpper = std::max(f1,f2);
         }
         
-        bool operator()(float &fInput) const{
+        bool operator()(float fInput) {
             return (fLower <= fInput && fInput <= fUpper);
         }
         //usage example

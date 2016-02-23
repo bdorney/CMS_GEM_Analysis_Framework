@@ -275,7 +275,13 @@ void AnalyzeResponseUniformity::fitHistos(){
                     (*iterEta).second.gEta_ClustADC_Fit_Failures->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
                 } //End Case: Invalid Fit (minimizer did not find minum)
             } //End Loop Over Slices
+            
+            //Calculate statistics for this iPhi sector
+            //Placeholder
         } //End Loop Over iPhi Sectors
+        
+        //Calculate statistics for this iEta sector - Fit
+        calcStatistics( (*iterEta).second.statClustADC_Fit_PkPos, (*iterEta).second.mset_fClustADC_Fit_PkPos );
     } //End Loop Over iEta Sectors
     
     return;
@@ -610,23 +616,18 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     inputStatObs.fIQR = inputStatObs.fQ3 - inputStatObs.fQ1;
     
     //Determine all outliers
-    //inputStatObs.mset_fOutliers.resize(mset_fInputObs.size() );
     float fLowerBound = inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR;
     float fUpperBound = inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR;
-    /*auto msetIter = std::copy_if(
-        mset_fInputObs.begin(),
-        mset_fInputObs.end(),
-        inputStatObs.mset_fOutliers.begin(),
-        Uniformity::inRange(
-            fLowerBound,
-            fUpperBound
-        )
-    );*/
+    inRange inDataRange(fLowerBound, fUpperBound);
     
     inputStatObs.mset_fOutliers = mset_fInputObs;
-    inputStatObs.mset_fOutliers.erase(std::find_if_not(inputStatObs.mset_fOutliers.begin(),inputStatObs.mset_fOutliers.end(), Uniformity::lessThan(inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR ) ), std::find_if_not(inputStatObs.mset_fOutliers.rbegin(), inputStatObs.mset_fOutliers.rend(), Uniformity::greaterThan(inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR ) ) ) );
-    
-    //inputStatObs.mset_fOutliers.resize(std::distance(inputStatObs.mset_fOutliers.begin(),msetIter) );
+    for (auto iterSet = inputStatObs.mset_fOutliers.begin(); iterSet != inputStatObs.mset_fOutliers.end(); ++iterSet) { //Loop Over input multiset
+        
+        if (inDataRange( (*iterSet) ) ) {
+            iterSet = inputStatObs.mset_fOutliers.erase(iterSet);
+        }
+        
+    } //End Loop Over input multiset
     
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
