@@ -487,10 +487,10 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             } //End Case: Minimum ADC Value
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERMULTI_MIN") ){ //Case: Min Cluster Multiplicity
                 aSetupUniformity.selClust.iCut_MultiMin = stoiSafe(pair_strParam.first,pair_strParam.second);
-            } //End Case: Max Cluster Multiplicity
-            else if( 0 == pair_strParam.first.compare("CUT_CLUSTERMULTI_MAX") ){
+            } //End Case: Min Cluster Multiplicity
+            else if( 0 == pair_strParam.first.compare("CUT_CLUSTERMULTI_MAX") ){ //Case: Max Cluster Multiplicity
                 aSetupUniformity.selClust.iCut_MultiMax = stoiSafe(pair_strParam.first,pair_strParam.second);
-            } //End Case:
+            } //End Case: Max Cluster Multiplicity
             else if( 0 == pair_strParam.first.compare("CUT_CLUSTERSIZE_MIN") ) {
                 aSetupUniformity.selClust.iCut_SizeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_SizeMin<<endl;
@@ -507,12 +507,26 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
                 aSetupUniformity.selClust.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
             } //End Case: Max Cluster Time
-            if( 0 == pair_strParam.first.compare("EVENT_FIRST") ){ //Case: ADC Spectrum Fit Equation
+	    else if( 0 == pair_strParam.first.compare("CUT_HITMULTI_MIN") ){ //Case: Min Hit Multiplicity
+                aSetupUniformity.selHit.iCut_MultiMin = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Min Hit Multiplicity
+            else if( 0 == pair_strParam.first.compare("CUT_HITMULTI_MAX") ){ //Case: Max Hit Multiplicity
+                aSetupUniformity.selHit.iCut_MultiMax = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Max Hit Multiplicity
+	    else if( 0 == pair_strParam.first.compare("CUT_HITTIME_MIN") ) {
+                aSetupUniformity.selHit.iCut_TimeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMin<<endl;
+            } //End Case: Min Hit Time
+            else if( 0 == pair_strParam.first.compare("CUT_HITTIME_MAX") ) {
+                aSetupUniformity.selHit.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
+                //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
+            } //End Case: Max Hit Time
+            else if( 0 == pair_strParam.first.compare("EVENT_FIRST") ){ //Case: First Event To Process
                 aSetupUniformity.iEvt_First = stoiSafe(pair_strParam.second);
-            } //End Case: ADC Spectrum Fit Equation
-            else if( 0 == pair_strParam.first.compare("EVENT_TOTAL") ){ //Case: ADC Spectrum Fit Equation
+            } //End Case: First Event To Process
+            else if( 0 == pair_strParam.first.compare("EVENT_TOTAL") ){ //Case: Total Events To Process
                 aSetupUniformity.iEvt_Total = stoiSafe(pair_strParam.second);
-            } //End Case: ADC Spectrum Fit Equation
+            } //End Case: Total Events To Process
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_GRANULARITY") ){ //Case: Uniformity Granularity
                 aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity

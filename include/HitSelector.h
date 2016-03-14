@@ -13,12 +13,19 @@
 #include <stdio.h>
 
 //Framework Includes
+#include "DetectorMPGD.h"
 #include "Selector.h"
+#include "UniformityUtilityTypes.h"
 
 //ROOT Includes
+#include "TFile.h"
+#include "TROOT.h"
+#include "TTree.h"
 
 namespace Uniformity {
     class HitSelector : public Selector {
+
+    public:
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Default

@@ -6,9 +6,6 @@
 //
 //
 
-#ifndef ____HitSelector__
-#define ____HitSelector__
-
 //C++ Includes
 #include "HitSelector.h"
 
@@ -66,7 +63,7 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         printClassMethodMsg("HitSelector","setHits","\tTree returns nullptr; Exiting!!!");
     } //End Case: failed to load TTree
     
-    //Initialize Tree Branch Address to retrieve the cluster information
+    //Initialize Tree Branch Address to retrieve the hit information
     //------------------------------------------------------
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
     //tree_Hits->SetBranchAddress("adc?",&fHitADC); //Need some work
@@ -97,10 +94,10 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     //for (int i=0; i < tree_Hits->GetEntries(); ++i) {
     for (int i=iFirstEvt; i < iNEvt; ++i) {
         //Needed to implement a Hack
-        //First check to make sure the cluster multiplicity is within the selection
-        //Only then get the info on the clusters
+        //First check to make sure the hit multiplicity is within the selection
+        //Only then get the info on the hits
         
-        //Make sure we only read the number of clusters
+        //Make sure we only read the number of hits
         tree_Hits->SetBranchStatus("*",0);
         tree_Hits->SetBranchStatus("nch",1);
         
@@ -108,11 +105,11 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         tree_Hits->GetEntry(i);
         
         //Output to the user some message that we are still running
-        if (i % 1000 == 0) cout<<"Cluster Selection; " <<i<<" Events Analyzed\n";
+        if (i % 1000 == 0) cout<<"Hit Selection; " <<i<<" Events Analyzed\n";
         
         //If the event fails to pass the selection; skip it
         //---------------Event Selection---------------
-        //Cut on number of clusters
+        //Cut on number of hits
         if ( !(aSetupUniformity.selHit.iCut_MultiMin < iHitMulti && iHitMulti < aSetupUniformity.selHit.iCut_MultiMax) ) continue;
         
         //Okay make sure we can read all branches
@@ -131,13 +128,13 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
             
             //hitStrip.fADC = fHitADC[j];
             
-            //If the cluster fails to pass the selection; skip it
-            //---------------Cluster Selection---------------
+            //If the hit fails to pass the selection; skip it
+            //---------------Hit Selection---------------
             if ( !hitPassesSelection(hitStrip) ) continue;
             
-            //If a cluster makes it here, store it in the detector
+            //If a hit makes it here, store it in the detector
             inputDet.setHit(hitStrip);
-        } //End Loop Over Number of Clusters
+        } //End Loop Over Number of hits
     } //End Loop Over "Events"
     
     return;

@@ -15,6 +15,7 @@
 
 //Framework Includes
 #include "ClusterSelector.h"
+#include "HitSelector.h"
 #include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
 #include "AnalyzeResponseUniformityClusters.h"
 #include "AnalyzeResponseUniformityHits.h"
@@ -74,30 +75,45 @@ int main( int argc_, char * argv_[] ){
     }
     
     Uniformity::AnalysisSetupUniformity aSetup = analysisLoader.getAnalysisParameters( vec_strInputArgs[2] );
-    
+
+	//Hit Analysis
+
+	cout<<"Hit Multi Min = " << aSetup.selHit.iCut_MultiMin << endl;
+	cout<<"Hit Multi Max = " << aSetup.selHit.iCut_MultiMax << endl;
+    cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
+    cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
+
+	HitSelector mySelectionHits;
+
+	mySelectionHits.setHits(vec_strInputArgs[3], myDet, aSetup);
+
+    cout<<"Number of Selected Hits = " << myDet.getHits().size() << endl;
+
+	AnalyzeResponseUniformityHits myAnalyzerHit(aSetup, myDet);
+    myAnalyzerHit.fillHistos();
+    myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
+
+	//Cluster Analysis
+
     cout<<"ADC Noise, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
     cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
     
-    ClusterSelector mySelection;
+    ClusterSelector mySelectionClusters;
     
-    mySelection.setClusters(vec_strInputArgs[3], myDet, aSetup);
+    mySelectionClusters.setClusters(vec_strInputArgs[3], myDet, aSetup);
     
     cout<<"Number of Selected Clusters = " << myDet.getClusters().size() << endl;
     
     AnalyzeResponseUniformityClusters myAnalyzerCluster(aSetup, myDet);
     
     myAnalyzerCluster.fillHistos();
-    myAnalyzerCluster.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
+    myAnalyzerCluster.storeHistos(vec_strInputArgs[4], "UPDATE");
     myAnalyzerCluster.fitHistos();
     myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");
     //myAnalyzerCluster.checkUniformity();
-    
-    AnalyzeResponseUniformityHits myAnalyzerHit(aSetup, myDet);
-    myAnalyzerHit.fillHistos();
-    myAnalyzerHit.storeFits(vec_strInputArgs[4], "UPDATE");
     
     //Debugging
     //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
