@@ -297,6 +297,16 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_clustTime);
         } //End Case: Cluster Time
+        else if (0 == strTmp.compare("HITPOS") ) { //Case: Hit Position
+            aSetupUniformity.histoSetup_hitPos.strHisto_Name = strName;
+            
+            loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitPos);
+        } //End Case: Hit Position
+        else if (0 == strTmp.compare("HITTIME") ) { //Case: Hit Time
+            aSetupUniformity.histoSetup_hitTime.strHisto_Name = strName;
+            
+            loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitTime);
+        } //End Case: Cluster Time
         else{ //Case: Undefined Behavior
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", "\tI Only Support Case-Insenstive versions from this set {CLUSTADC, CLUSTMULTI, CLUSTPOS, CLUSTSIZE, CLUSTTIME}\n");
@@ -471,7 +481,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             
             //cout<<pair_strParam.first<<"\t"<<pair_strParam.second;
 
-            if ( 0 == pair_strParam.first.compare("CUT_ADC_MIN") ) {
+            if ( 0 == pair_strParam.first.compare("CUT_CLUSTERADC_MIN") ) {
                 aSetupUniformity.selClust.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_ADCNoise<<endl;
             } //End Case: Minimum ADC Value

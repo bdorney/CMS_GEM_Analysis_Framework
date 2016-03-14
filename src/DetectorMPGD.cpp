@@ -93,6 +93,68 @@ vector<Cluster> DetectorMPGD::getClusters(int iEta, int iPhi){
     return vec_retClus;
 } //End getClusters
 
+//Returns all hits
+vector<Hit> DetectorMPGD::getHits(){
+    //Variable Declaration
+    vector<Hit> vec_retHits;
+    
+    if (map_sectorsEta.size() > 0) { //Case: Eta Sectors Defined
+        for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
+            for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) {
+                vec_retHits.insert(vec_retHits.end(), (*iterPhi).second.vec_hits.begin(), (*iterPhi).second.vec_hits.end() );
+            } //End Loop Over Phi Sectors within an Eta Sector
+        } //End Loop Over map_sectorsEta
+    } //End Case: Eta Sectors Defined
+    else{ //Case: No Sectors Defined
+        printClassMethodMsg("DetectorMPGD","getHits","Error: DetectorMPGD Has No Defined Eta Sectors");
+        printClassMethodMsg("DetectorMPGD","getHits","\tPlease Initialize Eta Sectors Before Trying to Set Clusters");
+    } //End Case: No Sectors Defined
+    
+    return vec_retHits;
+} //End DetectorMPGD::getHits()
+
+//Returns hits associated with a specific iEta value (all iPhi for this sector)
+vector<Hit> DetectorMPGD::getHits(int iEta){
+    //Variable Declaration
+    vector<Hit> vec_retHits;
+    
+    if (map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value Exists!!
+        //return map_sectorsEta[iEta].vec_clusters;
+        
+        for (auto iterPhi = map_sectorsEta[iEta].map_sectorsPhi.begin(); iterPhi != map_sectorsEta[iEta].map_sectorsPhi.end(); ++iterPhi) {
+            vec_retHits.insert(vec_retHits.end(), (*iterPhi).second.vec_hits.begin(), (*iterPhi).second.vec_hits.end() );
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Case: Requested iEta Value Exists!!
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
+        printClassMethodMsg("DetectorMPGD","getHits", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
+        printClassMethodMsg("DetectorMPGD","getHits", "\tThe Returned vector is Empty!!!");
+    } //End Case: Requested iEta Value doesn ot exist, return an empty vector
+    
+    return vec_retHits;
+} //End DetectorMPGD::getHits()
+
+//Returns cluster associated with a specific (iEta, iPhi) location
+vector<Hit> DetectorMPGD::getHits(int iEta, int iPhi){
+    //Variable Declaration
+    vector<Hit> vec_retHits;
+    
+    if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
+        if ( map_sectorsEta[iEta].map_sectorsPhi.count(iPhi) > 0 ) { //Case: Requeste iPhi Value exists
+            vec_retHits = map_sectorsEta[iEta].map_sectorsPhi[iPhi].vec_hits;
+        } //End Case: Requeste iPhi Value exists
+        else{ //Case: Requested iPhi Value doesn ot exist, return an empty vector
+            printClassMethodMsg("DetectorMPGD","getHits", ("Error: (iEta,iPhi) = (" + getString(iEta) + "," + getString(iPhi) + ") Does NOT Exists!!!" ).c_str() );
+            printClassMethodMsg("DetectorMPGD","getHits", "\tThe Returned vector is Empty!!!");
+        } //End Case: Requested iPhi Value doesn ot exist, return an empty vector
+    } //End Case: Requested iEta Value exists
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
+        printClassMethodMsg("DetectorMPGD","getHits", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
+        printClassMethodMsg("DetectorMPGD","getHits", "\tThe Returned vector is Empty!!!");
+    } //End Case: Requested iEta Value doesn ot exist, return an empty vector
+    
+    return vec_retHits;
+} //End DetectorMPGD::getHits()
+
 //Returns the position of an iEta sector
 float DetectorMPGD::getEtaPos(int iEta){
     if (map_sectorsEta.count(iEta)) { //Case: iEta Value Exists, return position
@@ -182,6 +244,38 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
     return;
 } //End DetectorMPGD::setCluster
 
+//Sets a hit
+void DetectorMPGD::setHit(Hit &inputHit){
+    //Check if the DetectorMPGD is initialized!
+    if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
+        for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
+            //Find matching eta sector
+            if ( ( (*iterEta).second.fPos_Y - 0.1 * (*iterEta).second.fPos_Y ) < inputHit.iPos_Y && inputHit.iPos_Y < ( (*iterEta).second.fPos_Y + 0.1 * (*iterEta).second.fPos_Y ) ) { //Case: Matching Eta Sector Found!
+                
+                //Find matching phi sector within this eta sector
+                for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
+                    
+                    if ( (*iterPhi).second.iStripNum_Min <= inputHit.iStripNum && inputHit.iStripNum < (*iterPhi).second.iStripNum_Max ) { //Case: Matching Phi Sector Found!
+                        (*iterPhi).second.vec_hits.push_back(inputHit);
+                        break;
+                    } //End Case: Matching Phi Sector Found!
+                } //End Loop Over map_sectorsPhi
+                
+                break;
+            } //End Case: Matching Eta Sector Found!
+        } //End Loop Over map_sectorsEta
+    } //End Case: Eta Sectors Defined
+    else{ //Case: No Sectors Defined
+        printClassMethodMsg("DetectorMPGD","setHit","Error: DetectorMPGD Has No Defined Eta Sectors");
+        printClassMethodMsg("DetectorMPGD","setHit","\tPlease Initialize Eta Sectors Before Trying to Set Clusters");
+        return;
+    } //End Case: No Sectors Defined
+    
+    //If DetectorMPGD is initialized, loop through the eta sectors
+    
+    return;
+} //End DetectorMPGD::setHit
+
 //Defines an eta sector
 void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector){
     //Check to see if this iEta sector already exists
@@ -209,6 +303,9 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
             phiSector.fPos_Xhigh= -0.5 * fInputWidth + (i) * fInputWidth / 3.;
             
             phiSector.fWidth = fabs( phiSector.fPos_Xhigh - phiSector.fPos_Xlow );
+            
+            phiSector.iStripNum_Min = (i-1) * 128;
+            phiSector.iStripNum_Max = i * 128;
             
             etaSector.map_sectorsPhi[i] = phiSector;
         } //End make three phi sectors for this Eta Sector

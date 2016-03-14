@@ -68,30 +68,50 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Filling*****************
+        //Loops over all stored clusters and hits in detMPGD and books histograms for the full detector
+        /*void fillHistos(){
+            fillHistosCluster();
+            fillHistosHits();
+            return;
+        };*/
+        
         //Loops over all stored clusters in detMPGD and Book histograms for the full detector
-        void fillHistos();
+        //void fillHistosCluster();
+        
+        //Loops over all stored clusters in detMPGD and Book histograms for the full detector
+        //void fillHistosHits();
         
         //Fitting*****************
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
-        void fitHistos();
+        //void fitHistosClusters();
         
         //Loading*****************
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
         //Loads all TObjects found in the input ROOT file into detMPGD;
         //Any previously stored information in detMPGD is lost.
-        void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+        //virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
-        void checkUniformity();
+        virtual void checkUniformity();
         //bool checkUniformity(bool &bInput);
         
         //Storing*****************
-        //Stores booked histograms (for those histograms that are non-null)
-        void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
+        //Stores booked cluster & hit histograms (for those histograms that are non-null)
+        /*void storeHistos(std::string & strOutputROOTFileName, std::string strOption){
+            storeHistosClusters(strOutputROOTFileName, strOption);
+            storeHistosHits(strOutputROOTFileName, strOption);
+            return;
+        };*/
         
-        //Stores booked fits (for those fits that are non-null)
-        void storeFits(std::string & strOutputROOTFileName, std::string strOption);
+        //Stores booked cluster histograms (for those histograms that are non-null)
+        //void storeHistosClusters(std::string & strOutputROOTFileName, std::string strOption);
+        
+        //Stores booked hit histograms (for those histograms that are non-null)
+        //void storeHistosHits(std::string & strOutputROOTFileName, std::string strOption);
+        
+        //Stores booked cluster fits (for those fits that are non-null)
+        //void storeFits(std::string & strOutputROOTFileName, std::string strOption);
         
         //Stores TObjects created in createResponseMap() in the requested output file
         //Placeholder
@@ -105,7 +125,7 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
+        virtual Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -113,12 +133,12 @@ namespace Uniformity {
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Sets the Analysis Setup
-        void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
+        virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
-        void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
+        virtual void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
         
-    private:
+    protected:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
@@ -164,17 +184,6 @@ namespace Uniformity {
         
         Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp; Detector object
         
-        //std::shared_ptr<TH2F> hEta_v_Pos_Occupancy;
-        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Fit_PkPos;
-        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Fit_NormChi2;
-        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Spec_PkPos;
-        //std::shared_ptr<TH2F> hEta_v_Pos_ClustADC_Spec_NumPks;
-        
-        //std::shared_ptr<TH2F> hEta_v_SliceNum_Occupancy;
-        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Fit_PkPos;
-        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Fit_NormChi2;
-        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Spec_PkPos;
-        //std::shared_ptr<TH2F> hEta_v_SliceNum_ClustADC_Spec_NumPks;
     }; //End class AnalyzeResponseUniformity
 } //End namespace Uniformity
 

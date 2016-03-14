@@ -42,7 +42,6 @@ namespace Uniformity {
         //As loadAnalysisParameters() above but does not need an AnalysisSetupUniformity argument
         virtual AnalysisSetupUniformity getAnalysisParameters(std::string & strInputSetupFile);
         
-        
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         

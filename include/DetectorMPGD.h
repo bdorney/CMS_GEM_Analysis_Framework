@@ -27,11 +27,15 @@ using namespace ROOT;
 
 namespace Uniformity {
     class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
-    class AnalyzeResponseUniformity; //Defined in "AnalyzeResponseUniformity.h"
+    //class AnalyzeResponseUniformity; //Defined in "AnalyzeResponseUniformity.h"
+    //class AnalyzeResponseUniformityClusters; //Defined in "AnalyzeResponseUniformityClusters.h"
+    //class AnalyzeResponseUniformityHits; //Defined in "AnalyzeResponseUniformityClusters.h"
     
     class DetectorMPGD {
         friend class ParameterLoaderAmoreSRS;
         friend class AnalyzeResponseUniformity;
+        friend class AnalyzeResponseUniformityClusters;
+        friend class AnalyzeResponseUniformityHits;
         
     public:
         //Constructors
@@ -66,6 +70,15 @@ namespace Uniformity {
         //Returns clusters for a given (iEta,iPhi value)
         virtual std::vector<Cluster> getClusters(int iEta, int iPhi);
         
+        //Returns all hits
+        virtual std::vector<Hit> getHits();
+        
+        //Returns clusters for a given iEta value (all iPhi)
+        virtual std::vector<Hit> getHits(int iEta);
+        
+        //Returns clusters for a given (iEta,iPhi value)
+        virtual std::vector<Hit> getHits(int iEta, int iPhi);
+        
         //returns the position of an iEta sector
         virtual float getEtaPos(int iEta);
         
@@ -93,6 +106,18 @@ namespace Uniformity {
         virtual void setCluster(std::vector<Cluster> &vec_inputClusters){
             for (int i=0; i<vec_inputClusters.size(); ++i) {
                 setCluster(vec_inputClusters[i]);
+            }
+            
+            return;
+        };
+        
+        //Sets a hit
+        virtual void setHit(Hit &inputHit);
+        
+        //Sets all hits
+        virtual void setHits(std::vector<Hit> & vec_inputHits){
+            for (int i=0; i < vec_inputHits.size(); ++i) {
+                setHit(vec_inputHits[i]);
             }
             
             return;

@@ -16,7 +16,8 @@
 //Framework Includes
 #include "ClusterSelector.h"
 #include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
-#include "AnalyzeResponseUniformity.h"
+#include "AnalyzeResponseUniformityClusters.h"
+#include "AnalyzeResponseUniformityHits.h"
 #include "ParameterLoaderAmoreSRS.h"
 #include "ParameterLoaderAnaysis.h"
 #include "UniformityUtilityTypes.h"
@@ -86,17 +87,21 @@ int main( int argc_, char * argv_[] ){
     
     cout<<"Number of Selected Clusters = " << myDet.getClusters().size() << endl;
     
-    AnalyzeResponseUniformity myAnalyzer(aSetup, myDet);
+    AnalyzeResponseUniformityClusters myAnalyzerCluster(aSetup, myDet);
     
-    myAnalyzer.fillHistos();
-    myAnalyzer.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
-    myAnalyzer.fitHistos();
-    myAnalyzer.storeFits(vec_strInputArgs[4], "UPDATE");
-    //myAnalyzer.checkUniformity();
+    myAnalyzerCluster.fillHistos();
+    myAnalyzerCluster.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
+    myAnalyzerCluster.fitHistos();
+    myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");
+    //myAnalyzerCluster.checkUniformity();
+    
+    AnalyzeResponseUniformityHits myAnalyzerHit(aSetup, myDet);
+    myAnalyzerHit.fillHistos();
+    myAnalyzerHit.storeFits(vec_strInputArgs[4], "UPDATE");
     
     //Debugging
-    //myAnalyzer.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
-    //myAnalyzer.fitHistos();
+    //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
+    //myAnalyzerCluster.fitHistos();
     
     cout<<"Success!"<<endl;
     

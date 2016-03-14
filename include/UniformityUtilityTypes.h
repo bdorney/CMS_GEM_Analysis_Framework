@@ -18,6 +18,7 @@
 #include <vector>
 
 //Framework Includes
+#include "TimingUtilityTypes.h"
 
 //ROOT Includes
 //#include "FitResult.h"
@@ -35,40 +36,31 @@ using namespace ROOT;
 
 namespace Uniformity {
     //Storage container for cluster selection parameters
-    struct SelParamClusters{
-        //Cut on cluster adc value
+    struct SelParam{
+        //Cut on cluster/hit adc value
         //Cluster::iADC greater than this number
         int iCut_ADCNoise;
         
-        //Cut on cluster multiplicity per event
+        //Cut on cluster/hit multiplicity per event
         int iCut_MultiMin;
         int iCut_MultiMax;
         
-        //Cut on cluster size
-        //first -> Min Size; Cluster::iSize greater than this number
-        //second -> Max Size; Cluster::iSize less than this number
-        //std::pair<int,int> pair_iCut_Size;
+        //Cut on cluster size (not used for hits)
         int iCut_SizeMin;
         int iCut_SizeMax;
         
-        //Cut on cluster time bin
-        //first -> min time; Cluster::iTimeBin greater than this number
-        //second -> max time; Cluster::iTimeBin less than this number
-        //std::pair<int,int> pair_iCut_Time;
+        //Cut on cluster/hit time bin
         int iCut_TimeMin;
         int iCut_TimeMax;
         
         //Default Values
-        SelParamClusters(){ //SelParamClusters Inital Values
+        SelParam(){ //SelParamClusters Inital Values
             iCut_ADCNoise = -1;
             
             iCut_MultiMin = 0;
             
             iCut_SizeMin = iCut_TimeMin = -1;
             iCut_SizeMax = iCut_TimeMax = iCut_MultiMax = 3072;
-            
-            //pair_iCut_Size = std::make_pair(1,20);
-            //pair_iCut_Time = std::make_pair(1,14);
         } //End SelParamClusters Initial Values
     }; //End SelParamClusters
     
@@ -86,11 +78,11 @@ namespace Uniformity {
         Timing::HistoSetup histoSetup_clustSize;
         Timing::HistoSetup histoSetup_clustTime;
         
-        SelParamClusters selClust; //Selection Criteria for Clusters
+        Timing::HistoSetup histoSetup_hitPos;
+        Timing::HistoSetup histoSetup_hitTime;
         
-        //Soon to be depreciated
-        //std::string strFit_Eqn;     //Fit equation, e.g. "[0]*x+[1]"
-        //std::string strFit_Option;  //Fit Option, e.g. "R"
+        SelParam selClust;  //Selection Criteria for Clusters
+        SelParam selHit;    //Selection Criteria for Hits
         
         //Initialization
         AnalysisSetupUniformity(){
@@ -99,28 +91,40 @@ namespace Uniformity {
             iUniformityGranularity = 4;
             
             fUniformityTolerance = 0.15;
-            
-            //strFit_Eqn = "[0]*exp(-0.5*(x-[1])^2/[2]^2)";
-            //strFit_Eqn = "gaus";
-            //strFit_Option = "QMR";
         } //End Initialization
     }; //End AnalysisSetupUniformity
     
-    //Strip Cluster
+    struct Hit{
+        int iPos_Y; //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
+        
+        int iStripNum;  //Strip number; e.g. strip from amoreSRS in range [0,384)?
+        
+        int iTimeBin;   //Time bin with the maximum ADC value; e.g. hitTimebin from amoreSRS in range [1,30]? Corresponds to tree adcX where X is an integer iTimeBin - 1;
+        
+        //For now ADC is not used
+        //float fADC;     //ADC value of hit; e.g. adcX (where X is as above)
+        
+        //Set Initial Values
+        Hit(){
+            iPos_Y = iStripNum = iTimeBin = -1;
+        } //End Initialization
+    }; //End Hit
+    
+    //Cluster of strips
     struct Cluster{
-        //Int_t *fPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from AMORE
-        int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from AMORE
-        //Float_t *fPos_X;  //position within eta sector (in mm); e.g. clustPos from AMORE
-        float fPos_X;  //position within eta sector (in mm); e.g. clustPos from AMORE
+        //Int_t *fPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
+        int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
+        //Float_t *fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
+        float fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
         
-        //Float_t *fADC;       //ADC value of cluster; e.g. clustADCs from AMORE
-        float fADC;       //ADC value of cluster; e.g. clustADCs from AMORE
+        //Float_t *fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
+        float fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
         
-        //Int_t *fSize;      //Number of strips in cluster; e.g. clustSize from AMORE
-        int iSize;      //Number of strips in cluster; e.g. clustSize from AMORE
+        //Int_t *fSize;      //Number of strips in cluster; e.g. clustSize from amoreSRS
+        int iSize;      //Number of strips in cluster; e.g. clustSize from amoreSRS
         
-        //Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from AMORE
-        int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from AMORE
+        //Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
+        int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
         
         //Set Initial Values
         Cluster(){
@@ -135,16 +139,17 @@ namespace Uniformity {
     }; //End Cluster
     
     //Cluster Histograms
-    struct ClusterHistos{
+    struct HistosPhysObj{
         //One dimensional histograms
-        std::shared_ptr<TH1F> hADC;    //ADC spectrum for all clusters
-        std::shared_ptr<TH1F> hMulti;  //Multiplicity  "              "
-        std::shared_ptr<TH1F> hPos;    //Position      "              "
-        std::shared_ptr<TH1F> hSize;   //Size          "              "
-        std::shared_ptr<TH1F> hTime;   //Time          "              "
+        std::shared_ptr<TH1F> hADC;    //ADC spectrum for some physics object
+        std::shared_ptr<TH1F> hMulti;  //Multiplicity  "                    "
+        std::shared_ptr<TH1F> hPos;    //Position      "                    "
+        std::shared_ptr<TH1F> hSize;   //Size          "                    "
+        std::shared_ptr<TH1F> hTime;   //Time          "                    "
         
         //Two dimensional histograms
-        std::shared_ptr<TH2F> hADC_v_Pos; //ADC vs Position for all clusters
+        std::shared_ptr<TH2F> hADC_v_Pos; //ADC vs Position for all physics objects
+        //std::shared_ptr<TH2F> hPos_v_Sector; //Position vs. Sector No. for all physics objects
     };
     
     //Summary Statistics
@@ -201,16 +206,25 @@ namespace Uniformity {
         
         float fWidth;       //Sector Width (mm)
         
+        int iStripNum_Min;  //Minimum Strip number of sector (inclusive)
+        int iStripNum_Max;  //Maximum Strip number of sector (exclusive)
+        
         std::map<int, SectorSlice> map_slices;  //Slices of this sector
         
+        //std::pair<int,int> pair_iStripRange;  //Strip number range covered by sector [first,second)
+        
+        std::vector<Hit> vec_hits;
         std::vector<Cluster> vec_clusters;
         
         //Histograms
-        ClusterHistos clustHistos;
+        HistosPhysObj clustHistos;
+        HistosPhysObj hitHistos;
         
         //initialization
         SectorPhi(){
             fPos_Xlow = fPos_Xhigh = fWidth = -1;
+            
+            //pair_iStripRange = std::make_pair(-2,-1);
         } //End initialization
     };
     
@@ -237,7 +251,8 @@ namespace Uniformity {
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
         
         //histograms
-        ClusterHistos clustHistos;
+        HistosPhysObj clustHistos;
+        HistosPhysObj hitHistos;
         
         //Summary Statistics
         SummaryStatistics statClustADC_Fit_PkPos;

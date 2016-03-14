@@ -1,37 +1,34 @@
 //
-//  ClusterSelector.h
+//  Selector.h
 //  
 //
-//  Created by Brian L Dorney on 28/01/16.
+//  Created by Brian L Dorney on 14/03/16.
 //
 //
 
-#ifndef ____ClusterSelector__
-#define ____ClusterSelector__
+#ifndef ____Selector__
+#define ____Selector__
 
 //C++ Includes
 #include <stdio.h>
-#include <string>
 
 //Framework Includes
-#include "DetectorMPGD.h"
-#include "Selector.h"
-#include "TimingUtilityFunctions.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTree.h"
 
 namespace Uniformity {
-    class ClusterSelector : public Selector {
+    class Selector {
         
     public:
+        
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Default
-        ClusterSelector();
+        Selector();
+        
+        //With Analysis Setup File Given at time of construction
+        Selector(Uniformity::AnalysisSetupUniformity &inputSetup);
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,22 +41,15 @@ namespace Uniformity {
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Given an output ROOT file from amoreSRS with clusters
-        //Applies the cluster selection and stores those selected clusters in inputDet
-        virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet);
-        
-        //As above but overwrites the stored AnalysisSetupUniformity object
-        virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
-            setAnalysisParameters(inputSetup);
-            setClusters(strInputRootFileName, inputDet);
+        //Sets the analysis parameters
+        virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity &inputSetup){
+            aSetupUniformity = inputSetup;
             return;
         };
         
-    private:
+    protected:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Check if Cluster Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
-        bool clusterPassesSelection(Uniformity::Cluster &inputClust);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,8 +60,11 @@ namespace Uniformity {
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         
-    }; //End class ClusterSelector
+        //Data Members
+        Uniformity::AnalysisSetupUniformity aSetupUniformity;
+        
+    }; //End class Selector
+
 } //End namespace Uniformity
 
-
-#endif /* defined(____ClusterSelector__) */
+#endif /* defined(____Selector__) */

@@ -3,9 +3,57 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 1.0.1                               *
-*	LAST UPDATE: Feb 17 2016                     *
+*	LAST UPDATE: Feb 25 2016                     *
 *                                                *
 **************************************************
+
+Update: Mar 14th 2016
+==================================================
+->Re-naming the SelParamClusters struct in include/UniformityUtilityTypes.h to SelParam
+->SelParam struct is now used for both Cluster and Hit selection
+
+->Added in Uniformity::SectorPhi two data members to track minimum and maximum strip number
+
+->Adding functionality to set Hit Selection criteria in Uniformity::ParameterLoaderAnalysis
+
+->Renaming Uniformity::AnalyzeResponseUniformity to Uniformity::AnalyzeResponseUniformityClusters
+->Adding new generic analysis class called Uniformity::AnalyzeResponseUniformity
+->Uniformity::AnalyzeResponseUniformityClusters now inherits from Uniformity::AnalyzeResponseUniformity
+->Adding new class Uniformity::AnalyzeResponseUniformityHits which inherits from Uniformity::AnalyzeResponseUniformity
+->Making Uniformity::AnalyzeResponseUniformityClusters and Uniformity::AnalyzeResponseUniformityHits both friend classes of Uniformity::DetectorMPGD
+->For now base analyzer class Uniformity::AnalyzeResponseUniformity is also a friend class of Uniformity::DetectorMPGD (maybe not needed...)
+
+->Changes to Makefile.clang and Makefile.gpp to compile correctly the new classes.
+
+->Renamed struct ClusterHistos to HistosPhysObj in include/UniformityUtilityTypes.h
+
+Update: Mar 11th 2016
+==================================================
+->Adding support for a hit based analysis in addition to the cluster analysis
+->Adding struct in include/UniformityUtilityTypes.h called "Hit"
+->Adding a vector<Hit> object to struct SectorPhi
+
+->Adding new generic Selector class called "Selector"
+->Now ClusterSelector inherits from Selector
+->Adding new class HitSelector which inherits from Selector
+->We have moved setAnalysisParameters from ClusterSelector to Selector; also aSetupUniformity is now a protected data member of Selector (instead of private member of ClusterSelector)
+
+->Added functionality to get and set Uniformity::Hit in Uniformity::DetectorMPGD; implementation follows what is done for Uniformity::Cluster
+
+Update: Feb 23rd 2016
+==================================================
+->Created struct SummaryStatistics in include/UniformityUtilityTypes.h
+->SummaryStatistics contains statistical variables
+->An instance of SummaryStatistics has been added to SectorEta to track ADC Peak Position (from both fit & spectrum)
+
+->Created struct ClusterHistos in include/UniformityUtilityTypes.h
+->ClusterHistos now include an instance of the cluster histograms that were defined in SectorEta & SectorPhi
+->An instance of ClusterHistos has been created in SectorEta & SectorPhi, increases functionality for expanding histo list
+
+->Added to SectorEta two new std::multiset<float> objects (mset_fClustADC_Fit_PkPos, mset_fClustADC_Spec_PkPos) for tracking the results from the fit & TSpectrum
+->These two new multisets are used in AnalyzeResponseUniformity::calcStatistics method
+
+->Added AnalyzeResponseUniformity::calcStatistics method; sets the values of the SummaryStatistics container in SectorEta
 
 Update: Feb 17th 2016
 ==================================================
