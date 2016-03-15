@@ -7,6 +7,11 @@
 *                                                *
 **************************************************
 
+Update: Mar 15th 2016
+==================================================
+->Changing name of Uniformity::ClusterSelector to Uniformity::SelectorCluster
+->Changing name of Uniformity::HitSelector to Uniformity::SelectorHit
+
 Update: Mar 14th 2016
 ==================================================
 ->Re-naming the SelParamClusters struct in include/UniformityUtilityTypes.h to SelParam

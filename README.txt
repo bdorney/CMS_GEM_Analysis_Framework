@@ -29,12 +29,18 @@
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
-            4.b.i.      AnalyzeResponseUniformity
-            4.b.ii.     ClusterSelector
-            4.b.iii.    DetectorMPGD
-            4.b.iv.     ParameterLoaderAmoreSRS
-            4.b.v.      ParameterLoaderAnalysis
-            4.b.vi.     VisualizeUniformity
+            4.b.i.          Analyzers
+                4.b.i.I     AnalyzerResponseUniformity
+                4.b.i.II    AnalyzerResponseUniformityClusters
+                4.b.i.III   AnalyzerResponseUniformityHits
+            4.b.ii.         Selectors
+                4.b.ii.I    Selector
+                4.b.ii.II   SelectorClusters
+                4.b.ii.III  SelectorHits
+            4.b.iii.        DetectorMPGD
+            4.b.iv.         ParameterLoaderAmoreSRS
+            4.b.v.      	ParameterLoaderAnalysis
+            4.b.vi.         VisualizeUniformity
         4.c. Utilities
             4.c.i   Timing
             4.c.ii  Uniformity

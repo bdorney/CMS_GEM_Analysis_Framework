@@ -1,5 +1,5 @@
 //
-//  HitSelector.cpp
+//  SelectorHit.cpp
 //  
 //
 //  Created by Brian L Dorney on 11/03/16.
@@ -7,7 +7,7 @@
 //
 
 //C++ Includes
-#include "HitSelector.h"
+#include "SelectorHit.h"
 
 //Framework Includes
 
@@ -18,14 +18,14 @@ using std::cout;
 using namespace Uniformity;
 
 //Default Constructor
-HitSelector::HitSelector(){
+SelectorHit::SelectorHit(){
     
 } //End Default Constructor
 
 //Given an output ROOT file from amoreSRS with hits
 //Applies the hit selection and stores those selected hits in inputDet
 //Right now ADC information of hits is not yet supported
-void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
+void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
     int iFirstEvt = aSetupUniformity.iEvt_First;
     int iNEvt = aSetupUniformity.iEvt_Total;
@@ -49,7 +49,7 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     //Check to see if data file opened successfully, if so load the tree
     //------------------------------------------------------
     if ( !file_ROOT->IsOpen() || file_ROOT->IsZombie() ) { //Case: failed to load ROOT file
-        perror( ("Uniformity::HitSelector::setHits() - error while opening file: " + strInputRootFileName ).c_str() );
+        perror( ("Uniformity::SelectorHit::setHits() - error while opening file: " + strInputRootFileName ).c_str() );
         Timing::printROOTFileStatus(file_ROOT);
         std::cout << "Exiting!!!\n";
         
@@ -59,8 +59,8 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     tree_Hits = (TTree*) file_ROOT->Get("THit");
     
     if ( nullptr == tree_Hits ) { //Case: failed to load TTree
-        printClassMethodMsg("HitSelector","setHits",("error while fetching: " + strInputRootFileName ).c_str() );
-        printClassMethodMsg("HitSelector","setHits","\tTree returns nullptr; Exiting!!!");
+        printClassMethodMsg("SelectorHit","setHits",("error while fetching: " + strInputRootFileName ).c_str() );
+        printClassMethodMsg("SelectorHit","setHits","\tTree returns nullptr; Exiting!!!");
     } //End Case: failed to load TTree
     
     //Initialize Tree Branch Address to retrieve the hit information
@@ -77,8 +77,8 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     } //End Case: All Events
     else{ //Case: Event Range
         if ( iFirstEvt > tree_Hits->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("HitSelector","setHits", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Hits->GetEntries() ) ).c_str() );
-            printClassMethodMsg("HitSelector","setHits", "Exiting!!!");
+            printClassMethodMsg("SelectorHit","setHits", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Hits->GetEntries() ) ).c_str() );
+            printClassMethodMsg("SelectorHit","setHits", "Exiting!!!");
             return;
         } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
         else if( (iFirstEvt + iNEvt) > tree_Hits->GetEntries() ){
@@ -138,10 +138,10 @@ void HitSelector::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     } //End Loop Over "Events"
     
     return;
-} //End HitSelector::setHits()
+} //End SelectorHit::setHits()
 
 //Check if Hit Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
-bool HitSelector::hitPassesSelection(Uniformity::Hit &inputHit){
+bool SelectorHit::hitPassesSelection(Uniformity::Hit &inputHit){
     //Hit Selection
     
     //Hit with ADC below noise threshold?
@@ -154,4 +154,4 @@ bool HitSelector::hitPassesSelection(Uniformity::Hit &inputHit){
     
     //If we arrive here the hit passes our selection; give true
     return true;
-} //End HitSelector::hitPassesSelection()
+} //End SelectorHit::hitPassesSelection()

@@ -1,20 +1,22 @@
 //
-//  HitSelector.h
+//  SelectorCluster.h
 //  
 //
-//  Created by Brian L Dorney on 11/03/16.
+//  Created by Brian L Dorney on 28/01/16.
 //
 //
 
-#ifndef ____HitSelector__
-#define ____HitSelector__
+#ifndef ____SelectorCluster__
+#define ____SelectorCluster__
 
 //C++ Includes
 #include <stdio.h>
+#include <string>
 
 //Framework Includes
 #include "DetectorMPGD.h"
 #include "Selector.h"
+#include "TimingUtilityFunctions.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -23,13 +25,13 @@
 #include "TTree.h"
 
 namespace Uniformity {
-    class HitSelector : public Selector {
-
+    class SelectorCluster : public Selector {
+        
     public:
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Default
-        HitSelector();
+        SelectorCluster();
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,22 +44,22 @@ namespace Uniformity {
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Given an output ROOT file from amoreSRS with hits
-        //Applies the hit selection and stores those selected hits in inputDet
-        virtual void setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet);
+        //Given an output ROOT file from amoreSRS with clusters
+        //Applies the cluster selection and stores those selected clusters in inputDet
+        virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet);
         
         //As above but overwrites the stored AnalysisSetupUniformity object
-        virtual void setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
+        virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
             setAnalysisParameters(inputSetup);
-            setHits(strInputRootFileName, inputDet);
+            setClusters(strInputRootFileName, inputDet);
             return;
         };
         
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Check if Hit Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
-        bool hitPassesSelection(Uniformity::Hit &inputHit);
+        //Check if Cluster Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
+        bool clusterPassesSelection(Uniformity::Cluster &inputClust);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,8 +69,9 @@ namespace Uniformity {
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-    };
+        
+    }; //End class SelectorCluster
 } //End namespace Uniformity
 
 
-#endif /* defined(____HitSelector__) */
+#endif /* defined(____SelectorCluster__) */

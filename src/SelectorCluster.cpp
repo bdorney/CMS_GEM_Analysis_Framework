@@ -1,25 +1,25 @@
 //
-//  ClusterSelector.cpp
+//  SelectorCluster.cpp
 //  
 //
 //  Created by Brian L Dorney on 28/01/16.
 //
 //
 
-#include "ClusterSelector.h"
+#include "SelectorCluster.h"
 
 using std::cout;
 
 using namespace Uniformity;
 
 //Default Constructor
-ClusterSelector::ClusterSelector(){
+SelectorCluster::SelectorCluster(){
     
 } //End Default Constructor
 
 //Given an output ROOT file from AMORE (ROOTDATATYPE = CLUSTERS)
 //Applies the cluster selection and stores those selected clusters in inputDet
-void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
+void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
     int iFirstEvt = aSetupUniformity.iEvt_First;
     int iNEvt = aSetupUniformity.iEvt_Total;
@@ -44,7 +44,7 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     //Check to see if data file opened successfully, if so load the tree
     //------------------------------------------------------
     if ( !file_ROOT->IsOpen() || file_ROOT->IsZombie() ) { //Case: failed to load ROOT file
-        perror( ("Uniformity::ClusterSelector::setClusters() - error while opening file: " + strInputRootFileName ).c_str() );
+        perror( ("Uniformity::SelectorCluster::setClusters() - error while opening file: " + strInputRootFileName ).c_str() );
         Timing::printROOTFileStatus(file_ROOT);
         std::cout << "Exiting!!!\n";
         
@@ -54,8 +54,8 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     tree_Clusters = (TTree*) file_ROOT->Get("TCluster");
     
     if ( nullptr == tree_Clusters ) { //Case: failed to load TTree
-        printClassMethodMsg("ClusterSelector","setClusters",("error while fetching: " + strInputRootFileName ).c_str() );
-        printClassMethodMsg("ClusterSelector","setClusters","\tTree returns nullptr; Exiting!!!");
+        printClassMethodMsg("SelectorCluster","setClusters",("error while fetching: " + strInputRootFileName ).c_str() );
+        printClassMethodMsg("SelectorCluster","setClusters","\tTree returns nullptr; Exiting!!!");
     } //End Case: failed to load TTree
     
     //Initialize Tree Branch Address to retrieve the cluster information
@@ -73,8 +73,8 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     } //End Case: All Events
     else{ //Case: Event Range
         if ( iFirstEvt > tree_Clusters->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("ClusterSelector","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
-            printClassMethodMsg("ClusterSelector","setClusters", "Exiting!!!");
+            printClassMethodMsg("SelectorCluster","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
+            printClassMethodMsg("SelectorCluster","setClusters", "Exiting!!!");
             return;
         } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
         else if( (iFirstEvt + iNEvt) > tree_Clusters->GetEntries() ){
@@ -137,10 +137,10 @@ void ClusterSelector::setClusters(std::string &strInputRootFileName, Uniformity:
     } //End Loop Over "Events"
     
     return;
-} //End ClusterSelector::setClusters()
+} //End SelectorCluster::setClusters()
 
 //Check if Cluster Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
-bool ClusterSelector::clusterPassesSelection(Cluster &inputClust){
+bool SelectorCluster::clusterPassesSelection(Cluster &inputClust){
     //Cluster Selection
     
     //Cluster with ADC below noise threshold?

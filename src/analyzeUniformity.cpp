@@ -14,8 +14,8 @@
 #include <vector>
 
 //Framework Includes
-#include "ClusterSelector.h"
-#include "HitSelector.h"
+#include "SelectorCluster.h"
+#include "SelectorHit.h"
 #include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
 #include "AnalyzeResponseUniformityClusters.h"
 #include "AnalyzeResponseUniformityHits.h"
@@ -83,7 +83,7 @@ int main( int argc_, char * argv_[] ){
     cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
     cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
 
-	HitSelector mySelectionHits;
+	SelectorHit mySelectionHits;
 
 	mySelectionHits.setHits(vec_strInputArgs[3], myDet, aSetup);
 
@@ -101,7 +101,7 @@ int main( int argc_, char * argv_[] ){
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
     cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
     
-    ClusterSelector mySelectionClusters;
+    SelectorCluster mySelectionClusters;
     
     mySelectionClusters.setClusters(vec_strInputArgs[3], myDet, aSetup);
     
