@@ -110,7 +110,7 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         //If the event fails to pass the selection; skip it
         //---------------Event Selection---------------
         //Cut on number of hits
-        if ( !(aSetupUniformity.selHit.iCut_MultiMin < iHitMulti && iHitMulti < aSetupUniformity.selHit.iCut_MultiMax) ) continue;
+        if ( !(aSetupUniformity.selHit.iCut_MultiMin <= iHitMulti && iHitMulti <= aSetupUniformity.selHit.iCut_MultiMax) ) continue;
         
         //Okay make sure we can read all branches
         tree_Hits->SetBranchStatus("*",1);

@@ -235,11 +235,9 @@ namespace Uniformity {
         
         std::map<int, SectorPhi> map_sectorsPhi;
         
-        //std::vector<float> vec_fClustADC_Fit_PkPos;     //Response info, from Fit
         std::multiset<float> mset_fClustADC_Fit_PkPos;
         //std::vector<float> vec_fClustADC_Fit_PkWidth;   //Energy resolution info, from Fit
         
-        //std::vector<float> vec_fClustADC_Spec_PkPos;     //Response info, from Spec
         std::multiset<float> mset_fClustADC_Spec_PkPos;
         
         //One dimensional graphs
