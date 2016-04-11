@@ -109,6 +109,7 @@ namespace Uniformity {
         //Set Initial Values
         Hit(){
             iPos_Y = iStripNum = iTimeBin = -1;
+	    vec_sADC.resize(30);
         } //End Initialization
     }; //End Hit
     
