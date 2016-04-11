@@ -272,6 +272,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
         strTmp = strName;
         transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
         
+        //=======================Cluster Parameters=======================
         if (0 == strTmp.compare("CLUSTADC") ) { //Case: Cluster ADC's
             aSetupUniformity.histoSetup_clustADC.strHisto_Name = strName;
             
@@ -297,6 +298,12 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_clustTime);
         } //End Case: Cluster Time
+        //=======================Hit Parameters=======================
+        else if (0 == strTmp.compare("HITADC") ) { //Case: Hit ADC
+            aSetupUniformity.histoSetup_hitADC.strHisto_Name = strName;
+            
+            loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitADC);
+        } //End Case: Hit ADC
         else if (0 == strTmp.compare("HITPOS") ) { //Case: Hit Position
             aSetupUniformity.histoSetup_hitPos.strHisto_Name = strName;
             
@@ -307,6 +314,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitTime);
         } //End Case: Cluster Time
+        //=======================Unrecognized Parameters=======================
         else{ //Case: Undefined Behavior
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", "\tI Only Support Case-Insenstive versions from this set {CLUSTADC, CLUSTMULTI, CLUSTPOS, CLUSTSIZE, CLUSTTIME}\n");

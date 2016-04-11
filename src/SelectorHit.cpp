@@ -39,9 +39,7 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     Int_t iHitTimeBin[3072];
     
     Short_t sHitADC[30] = {0};
-    //vector<float> vec_fHitADC;
-    //vector<short> vec_sHitADC;
-
+    
     Hit hitStrip;
     
     TFile *file_ROOT = NULL;
@@ -72,10 +70,6 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     
     //Initialize Tree Branch Address to retrieve the hit information (ADC values are done separately below)
     //------------------------------------------------------
-    //vec_sHitADC.resize(30);
-    //for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
-        //vec_sHitADC[i] = 0;
-    //} //End Set Relevant Time Bins
     for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
         tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &sHitADC[i]);
     } //End Set Relevant Time Bins
@@ -133,11 +127,6 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         //Now get the remaining data
         tree_Hits->GetEntry(i);
         
-        //cout<<"vec_sHitADC.size() = " << vec_sHitADC.size() << endl;
-        //for (int i=0; i < vec_sHitADC.size(); ++i) {
-            //cout<<i<<"\t"<<vec_sHitADC[i]<<endl;
-        //}
-        
         //Loop Over the elements of the hit array (yes it must be done like this due to how hte NTuple from AMORE is created)
         //For each element create a hit, and check if it passes the selection
         for (int j=0; j < iHitMulti; ++j) { //Loop Over Number of Hits
@@ -147,7 +136,7 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
             hitStrip.iTimeBin   = iHitTimeBin[j];
             //hitStrip.vec_sADC   = vec_sHitADC;
             
-	    std::copy(std::begin(sHitADC), std::end(sHitADC), hitStrip.vec_sADC.begin() );
+            std::copy(std::begin(sHitADC), std::end(sHitADC), hitStrip.vec_sADC.begin() );
 
             //If the hit fails to pass the selection; skip it
             //---------------Hit Selection---------------
@@ -160,15 +149,11 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     
 	//Clear stl containers? (Not doing this seems to cause some pointer to be freed)
     //------------------------------------------------------
-    //vec_sHitADC.clear();
-
+    //  Placeholder
+    
 	//Close the Input ROOT File
     //------------------------------------------------------
-	//delete tree_Hits;
-
 	file_ROOT->Close();
-
-	//delete tree_Hits;
 
     return;
 } //End SelectorHit::setHits()

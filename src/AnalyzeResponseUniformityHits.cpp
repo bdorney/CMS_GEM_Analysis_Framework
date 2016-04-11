@@ -55,6 +55,7 @@ void AnalyzeResponseUniformityHits::fillHistos(){
         aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
         
         //Initialize iEta Histograms - 1D
+        (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
         (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
         (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
         
@@ -68,6 +69,7 @@ void AnalyzeResponseUniformityHits::fillHistos(){
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
             //Initialize iPhi Histograms - 1D
+            (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
             (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
             
             //Initialize iPhi Histograms - 2D
@@ -76,10 +78,12 @@ void AnalyzeResponseUniformityHits::fillHistos(){
             //Loop Over Stored Hits
             for (auto iterHit = (*iterPhi).second.vec_hits.begin(); iterHit != (*iterPhi).second.vec_hits.end(); ++iterHit) { //Loop Over Stored Hits
                 //Fill iEta Histograms
+                (*iterEta).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
                 (*iterEta).second.hitHistos.hPos->Fill( (*iterHit).iStripNum );
                 (*iterEta).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin );
                 
                 //Fill iPhi Histograms
+                (*iterPhi).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
                 (*iterPhi).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin);
             } //End Loop Over Stored Hits
         } //End Loop Over iPhi Sectors
@@ -155,6 +159,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         //Store Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
+        (*iterEta).second.hitHistos.hADC->Write();
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
         
@@ -176,6 +181,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
             //Store Histograms - SectorPhi Level
             //-------------------------------------
             dir_SectorPhi->cd();
+            (*iterPhi).second.hitHistos.hADC->Write();
             (*iterPhi).second.hitHistos.hTime->Write();
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors

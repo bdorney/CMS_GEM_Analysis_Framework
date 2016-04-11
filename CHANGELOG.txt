@@ -9,6 +9,7 @@
 
 Update: Apr 11th 2016
 ==================================================
+->Adding functionality for "hitADC" histogram to be created in the analysis
 ->Implemented vector for storing hit ADC values in Uniformity::Hit (e.g. Uniformity::Hit::vec_fADC )
 ->Implemented cut for saturated hit ADC values in Uniformity::SelParam (e.g. Uniformity::SelParam::iCut_ADCSat)
 ->Uniformity::ParameterLoaderAnalysis will now take a user input for the minimum ADC value for hits and the maximum ADC value for hits

@@ -23,9 +23,9 @@
 #include "TROOT.h"
 #include "TTree.h"
 
-#ifdef __MAKECINT__
-#pragma link C++ class vector<short>+;
-#endif
+//#ifdef __MAKECINT__
+//#pragma link C++ class vector<short>+;
+//#endif
 
 namespace Uniformity {
     class SelectorHit : public Selector {

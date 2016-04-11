@@ -79,6 +79,7 @@ namespace Uniformity {
         Timing::HistoSetup histoSetup_clustSize;
         Timing::HistoSetup histoSetup_clustTime;
         
+        Timing::HistoSetup histoSetup_hitADC;
         Timing::HistoSetup histoSetup_hitPos;
         Timing::HistoSetup histoSetup_hitTime;
         
