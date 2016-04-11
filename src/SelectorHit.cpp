@@ -14,8 +14,10 @@
 //ROOT Includes
 
 using std::cout;
+using std::vector;
 
 using namespace Uniformity;
+using namespace Timing;
 
 //Default Constructor
 SelectorHit::SelectorHit(){
@@ -35,7 +37,8 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     Int_t iHitStrip[3072];
     Int_t iHitTimeBin[3072];
     
-    //Float_t fHitADC[3072];
+    //Float_t fHitADC[30] = {0.};
+    vector<float> vec_fHitADC;
     
     Hit hitStrip;
     
@@ -63,14 +66,20 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         printClassMethodMsg("SelectorHit","setHits","\tTree returns nullptr; Exiting!!!");
     } //End Case: failed to load TTree
     
-    //Initialize Tree Branch Address to retrieve the hit information
+    //Initialize Tree Branch Address to retrieve the hit information (ADC values are done separately below)
     //------------------------------------------------------
+    vec_fHitADC.resize(30);
+    for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
+        //tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &fHitADC[i]);
+        tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &vec_fHitADC[i]);
+    } //End Set Relevant Time Bins
+    tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
-    //tree_Hits->SetBranchAddress("adc?",&fHitADC); //Need some work
     tree_Hits->SetBranchAddress("planeID",&iHitPos_Y);
     tree_Hits->SetBranchAddress("strip",iHitStrip);
-    tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     
+    //Determine Event Range
+    //------------------------------------------------------
     if ( -1 == iNEvt ) { //Case: All Events
         iFirstEvt = 0;
         iNEvt = tree_Hits->GetEntries();
@@ -125,8 +134,8 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
             hitStrip.iPos_Y     = iHitPos_Y[j];
             hitStrip.iStripNum  = iHitStrip[j];
             hitStrip.iTimeBin   = iHitTimeBin[j];
-            
-            //hitStrip.fADC = fHitADC[j];
+            //hitStrip.fADC       = fHitADC;
+            hitStrip.vec_fADC   = vec_fHitADC;
             
             //If the hit fails to pass the selection; skip it
             //---------------Hit Selection---------------
@@ -144,13 +153,17 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
 bool SelectorHit::hitPassesSelection(Uniformity::Hit &inputHit){
     //Hit Selection
     
-    //Hit with ADC below noise threshold?
-    //Not yet implemented
-    //if (inputHit.fADC < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
-    
     //Hit Time too early or too late?
     if (inputHit.iTimeBin < aSetupUniformity.selHit.iCut_TimeMin){ return false; }
     if (inputHit.iTimeBin > aSetupUniformity.selHit.iCut_TimeMax) {return false; }
+    
+    //Hit with ADC below noise threshold?
+    //if (inputHit.fADC[inputHit.iTimeBin] < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
+    if (inputHit.vec_fADC[inputHit.iTimeBin] < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
+    
+    //Hit with ADC above saturation threshold?
+    //if (inputHit.fADC[inputHit.iTimeBin] > aSetupUniformity.selHit.iCut_ADCSat){ return false; }
+    if (inputHit.vec_fADC[inputHit.iTimeBin] > aSetupUniformity.selHit.iCut_ADCSat){ return false; }
     
     //If we arrive here the hit passes our selection; give true
     return true;

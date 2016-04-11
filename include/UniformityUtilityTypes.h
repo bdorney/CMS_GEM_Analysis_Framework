@@ -38,8 +38,8 @@ namespace Uniformity {
     //Storage container for cluster selection parameters
     struct SelParam{
         //Cut on cluster/hit adc value
-        //Cluster::iADC greater than this number
-        int iCut_ADCNoise;
+        int iCut_ADCNoise;  //Cluster::fADC or Hit::fADC[i] greater than this number
+        int iCut_ADCSat;    //Hit::fADC[i] lower than this number (not applied to clusters)
         
         //Cut on cluster/hit multiplicity per event
         int iCut_MultiMin;
@@ -56,6 +56,7 @@ namespace Uniformity {
         //Default Values
         SelParam(){ //SelParamClusters Inital Values
             iCut_ADCNoise = -1;
+            iCut_ADCSat = 1600;
             
             iCut_MultiMin = 0;
             
@@ -102,7 +103,8 @@ namespace Uniformity {
         int iTimeBin;   //Time bin with the maximum ADC value; e.g. hitTimebin from amoreSRS in range [1,30]? Corresponds to tree adcX where X is an integer iTimeBin - 1;
         
         //For now ADC is not used
-        //float fADC;     //ADC value of hit; e.g. adcX (where X is as above)
+        //float fADC[30];           //ADC value of hit for time bin i; e.g. fADC[iTimeBine] gives the adc value at the assigned time bin
+        std::vector<float> vec_fADC;//ADC value of hit for time bin i; e.g. vec_fADC[iTimeBine] gives the adc value at the assigned time bin
         
         //Set Initial Values
         Hit(){

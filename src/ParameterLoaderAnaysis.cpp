@@ -481,6 +481,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             
             //cout<<pair_strParam.first<<"\t"<<pair_strParam.second;
 
+            //=======================Cluster Parameters=======================
             if ( 0 == pair_strParam.first.compare("CUT_CLUSTERADC_MIN") ) {
                 aSetupUniformity.selClust.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_ADCNoise<<endl;
@@ -507,20 +508,34 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
                 aSetupUniformity.selClust.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
             } //End Case: Max Cluster Time
-	    else if( 0 == pair_strParam.first.compare("CUT_HITMULTI_MIN") ){ //Case: Min Hit Multiplicity
+            //=======================Hit Parameters=======================
+            else if( 0 == pair_strParam.first.compare("CUT_HITADC_MIN") ){ //Case: Min Hit ADC
+                aSetupUniformity.selHit.iCut_ADCNoise = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Min Hit ADC
+            else if( 0 == pair_strParam.first.compare("CUT_HITADC_MAX") ){ //Case: Max Hit ADC
+                aSetupUniformity.selHit.iCut_ADCSat = stoiSafe(pair_strParam.first,pair_strParam.second);
+            } //End Case: Max Hit ADC
+            else if( 0 == pair_strParam.first.compare("CUT_HITMULTI_MIN") ){ //Case: Min Hit Multiplicity
                 aSetupUniformity.selHit.iCut_MultiMin = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Min Hit Multiplicity
             else if( 0 == pair_strParam.first.compare("CUT_HITMULTI_MAX") ){ //Case: Max Hit Multiplicity
                 aSetupUniformity.selHit.iCut_MultiMax = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Max Hit Multiplicity
-	    else if( 0 == pair_strParam.first.compare("CUT_HITTIME_MIN") ) {
+            else if( 0 == pair_strParam.first.compare("CUT_HITTIME_MIN") ) {
                 aSetupUniformity.selHit.iCut_TimeMin = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMin<<endl;
+                
+                //Check if aSetupUniformity.selHit.iCut_TimeMin is out of range
+                if( aSetupUniformity.selHit.iCut_TimeMin < 0){ aSetupUniformity.selHit.iCut_TimeMin = 0; }
             } //End Case: Min Hit Time
             else if( 0 == pair_strParam.first.compare("CUT_HITTIME_MAX") ) {
                 aSetupUniformity.selHit.iCut_TimeMax = stoiSafe(pair_strParam.first,pair_strParam.second);
                 //cout<<"\t"<<aSetupUniformity.selClust.iCut_TimeMax<<endl;
+                
+                //Check if aSetupUniformity.selHit.iCut_TimeMax is out of range
+                if( aSetupUniformity.selHit.iCut_TimeMax > 29){ aSetupUniformity.selHit.iCut_TimeMax = 29; }
             } //End Case: Max Hit Time
+            //=======================Event Parameters=======================
             else if( 0 == pair_strParam.first.compare("EVENT_FIRST") ){ //Case: First Event To Process
                 aSetupUniformity.iEvt_First = stoiSafe(pair_strParam.second);
             } //End Case: First Event To Process
@@ -533,6 +548,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_TOLERANCE") ){ //Case: Uniformity Granularity
                 aSetupUniformity.fUniformityTolerance = stofSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity
+            //=======================Unrecognized Parameters=======================
             else{ //Case: Parameter Not Recognized
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tField = " + pair_strParam.first + "\n" ).c_str() );

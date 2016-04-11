@@ -16,11 +16,16 @@
 #include "DetectorMPGD.h"
 #include "Selector.h"
 #include "UniformityUtilityTypes.h"
+#include "TimingUtilityFunctions.h"
 
 //ROOT Includes
 #include "TFile.h"
 #include "TROOT.h"
 #include "TTree.h"
+
+#ifdef __MAKECINT__
+#pragma link C++ class vector<float>+;
+#endif
 
 namespace Uniformity {
     class SelectorHit : public Selector {

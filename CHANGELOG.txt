@@ -7,6 +7,15 @@
 *                                                *
 **************************************************
 
+Update: Apr 11th 2016
+==================================================
+->Implemented vector for storing hit ADC values in Uniformity::Hit (e.g. Uniformity::Hit::vec_fADC )
+->Implemented cut for saturated hit ADC values in Uniformity::SelParam (e.g. Uniformity::SelParam::iCut_ADCSat)
+->Uniformity::ParameterLoaderAnalysis will now take a user input for the minimum ADC value for hits and the maximum ADC value for hits
+->Uniformity::ParameterLoaderAnalysis will now check to see if the cut on the min hit time is >= 0; if not it will be reset to 0
+->Uniformity::ParameterLoaderAnalysis will now check to see if the cut on the max hit time is <= 29; if not it will be reset to 29
+->Uniformity::SelectorHit will now load and cut on hit ADC values
+
 Update: Mar 15th 2016
 ==================================================
 ->Changing name of Uniformity::ClusterSelector to Uniformity::SelectorCluster
