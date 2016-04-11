@@ -132,6 +132,11 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         //Now get the remaining data
         tree_Hits->GetEntry(i);
         
+        cout<<"vec_sHitADC.size() = " << vec_sHitADC.size() << endl;
+        for (int i=0; i < vec_sHitADC.size(); ++i) {
+            cout<<i<<"\t"<<vec_sHitADC[i]<<endl;
+        }
+        
         //Loop Over the elements of the hit array (yes it must be done like this due to how hte NTuple from AMORE is created)
         //For each element create a hit, and check if it passes the selection
         for (int j=0; j < iHitMulti; ++j) { //Loop Over Number of Hits
@@ -156,7 +161,7 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
 
 	//Close the Input ROOT File
     //------------------------------------------------------
-	delete tree_Hits;
+	//delete tree_Hits;
 
 	file_ROOT->Close();
 
