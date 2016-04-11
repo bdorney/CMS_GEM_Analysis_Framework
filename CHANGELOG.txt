@@ -3,7 +3,7 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 1.0.1                               *
-*	LAST UPDATE: Feb 25 2016                     *
+*	LAST UPDATE: Apr 11 2016                     *
 *                                                *
 **************************************************
 
