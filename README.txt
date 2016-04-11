@@ -872,13 +872,15 @@
 
                     shared_ptr          For std::shared_ptr<T> follow the convention for type T.
 
+		    short		The sequence 's' should start the object name, e.g. sADC
+
                     string              The sequence 'str' should start the object name, e.g. "strName"
 
                     vector              Follow the convention for std::map but the starting sequence 'vec_'
                                         should be used instead. e.g. "vec_strName" or "vec_hClustHistos"
 
 
-        # 4.g.i. STL Objects
+        # 4.g.i. ROOT Objects
         # --------------------------------------------------------
 
         For those classes in ROOT that are the following listed classes, or inherit from the following

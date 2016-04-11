@@ -78,6 +78,8 @@ int main( int argc_, char * argv_[] ){
 
 	//Hit Analysis
 
+	cout<<"Hit ADC Min = " << aSetup.selHit.iCut_ADCNoise << endl;
+	cout<<"Hit ADC Max = " << aSetup.selHit.iCut_ADCSat << endl;
 	cout<<"Hit Multi Min = " << aSetup.selHit.iCut_MultiMin << endl;
 	cout<<"Hit Multi Max = " << aSetup.selHit.iCut_MultiMax << endl;
     cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
@@ -95,7 +97,7 @@ int main( int argc_, char * argv_[] ){
 
 	//Cluster Analysis
 
-    cout<<"ADC Noise, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+    cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;

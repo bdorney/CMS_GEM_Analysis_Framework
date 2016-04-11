@@ -38,8 +38,9 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     Int_t iHitTimeBin[3072];
     
     //Float_t fHitADC[30] = {0.};
-    vector<float> vec_fHitADC;
-    
+    //vector<float> vec_fHitADC;
+    vector<short> vec_sHitADC;
+
     Hit hitStrip;
     
     TFile *file_ROOT = NULL;
@@ -64,14 +65,18 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
     if ( nullptr == tree_Hits ) { //Case: failed to load TTree
         printClassMethodMsg("SelectorHit","setHits",("error while fetching: " + strInputRootFileName ).c_str() );
         printClassMethodMsg("SelectorHit","setHits","\tTree returns nullptr; Exiting!!!");
+
+	return;
     } //End Case: failed to load TTree
     
     //Initialize Tree Branch Address to retrieve the hit information (ADC values are done separately below)
     //------------------------------------------------------
-    vec_fHitADC.resize(30);
+    vec_sHitADC.resize(30);
+    //for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
+        //vec_sHitADC[i] = 0;
+    //} //End Set Relevant Time Bins
     for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
-        //tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &fHitADC[i]);
-        tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &vec_fHitADC[i]);
+        tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &vec_sHitADC[i]);
     } //End Set Relevant Time Bins
     tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
@@ -134,8 +139,7 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
             hitStrip.iPos_Y     = iHitPos_Y[j];
             hitStrip.iStripNum  = iHitStrip[j];
             hitStrip.iTimeBin   = iHitTimeBin[j];
-            //hitStrip.fADC       = fHitADC;
-            hitStrip.vec_fADC   = vec_fHitADC;
+            hitStrip.vec_sADC   = vec_sHitADC;
             
             //If the hit fails to pass the selection; skip it
             //---------------Hit Selection---------------
@@ -146,6 +150,18 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         } //End Loop Over Number of hits
     } //End Loop Over "Events"
     
+	//Clear stl containers? (Not doing this seems to cause some pointer to be freed)
+    //------------------------------------------------------
+    vec_sHitADC.clear();
+
+	//Close the Input ROOT File
+    //------------------------------------------------------
+	delete tree_Hits;
+
+	file_ROOT->Close();
+
+	//delete tree_Hits;
+
     return;
 } //End SelectorHit::setHits()
 
@@ -158,12 +174,10 @@ bool SelectorHit::hitPassesSelection(Uniformity::Hit &inputHit){
     if (inputHit.iTimeBin > aSetupUniformity.selHit.iCut_TimeMax) {return false; }
     
     //Hit with ADC below noise threshold?
-    //if (inputHit.fADC[inputHit.iTimeBin] < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
-    if (inputHit.vec_fADC[inputHit.iTimeBin] < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
+    if (inputHit.vec_sADC[inputHit.iTimeBin] < aSetupUniformity.selHit.iCut_ADCNoise){ return false; }
     
     //Hit with ADC above saturation threshold?
-    //if (inputHit.fADC[inputHit.iTimeBin] > aSetupUniformity.selHit.iCut_ADCSat){ return false; }
-    if (inputHit.vec_fADC[inputHit.iTimeBin] > aSetupUniformity.selHit.iCut_ADCSat){ return false; }
+    if (inputHit.vec_sADC[inputHit.iTimeBin] > aSetupUniformity.selHit.iCut_ADCSat){ return false; }
     
     //If we arrive here the hit passes our selection; give true
     return true;

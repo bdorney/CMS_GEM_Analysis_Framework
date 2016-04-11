@@ -56,6 +56,8 @@ void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity:
     if ( nullptr == tree_Clusters ) { //Case: failed to load TTree
         printClassMethodMsg("SelectorCluster","setClusters",("error while fetching: " + strInputRootFileName ).c_str() );
         printClassMethodMsg("SelectorCluster","setClusters","\tTree returns nullptr; Exiting!!!");
+
+	return;
     } //End Case: failed to load TTree
     
     //Initialize Tree Branch Address to retrieve the cluster information

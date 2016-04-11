@@ -104,7 +104,7 @@ namespace Uniformity {
         
         //For now ADC is not used
         //float fADC[30];           //ADC value of hit for time bin i; e.g. fADC[iTimeBine] gives the adc value at the assigned time bin
-        std::vector<float> vec_fADC;//ADC value of hit for time bin i; e.g. vec_fADC[iTimeBine] gives the adc value at the assigned time bin
+        std::vector<short> vec_sADC;//ADC value of hit for time bin i; e.g. vec_fADC[iTimeBine] gives the adc value at the assigned time bin
         
         //Set Initial Values
         Hit(){
