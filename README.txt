@@ -360,7 +360,12 @@
             AnalysisSetupUniformity::histoSetup_clustSize   //HistoSetup obejct for specifying cluster size TH1 objects
             AnalysisSetupUniformity::histoSetup_clustTime   //HistoSetup obejct for specifying cluster time bin TH1 objects
 
+            AnalysisSetupUniformity::histoSetup_hitADC      //HistoSetup object for specifying hit ADC TH1 objects
+            AnalysisSetupUniformity::histoSetup_hitPos      //HistoSetup object for specifying hit position TH1 objects (in strip No.)
+            AnalysisSetupUniformity::histoSetup_hitTime     //HistoSetup object for specifying hit time bin TH1 objects
+
             AnalysisSetupUniformity::selClust               //SelParam object specifying cluster selection cuts
+            AnalysisSetupUniformity::selHit                 //SelParam object specifying hit selection cuts
 
         The Uniformity::Cluster struct stores information relating to one reconstructed cluster
         stored in the TCluster TTree created by amoreSRS.  Data members of Uniformity::Cluster are:
@@ -396,6 +401,7 @@
             Hit::iPos_Y         //Distance in mm from wide base of trapezoid to hit (e.g. vertical midpoint of iEta sector)
             Hit::iStripNum      //Strip number of the hit, this ranges from 0 to 383?
             Hit::iTimeBin       //Time bin, e.g. latency value, of the hit
+            Hit::vec_sADC       //Vector of ADC values, each element of the vector represents ADC value at that time bin; e.g. vec_sADC[Hit::iTimeBin] gives the ADV value at the defined time bin
 
         Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
 
@@ -447,13 +453,14 @@
 
         Data members of Uniformity::SelParam are:
 
-            SelParam::iCut_ADCNoise     //Cluster rejected if ADC LESS than value
+            SelParam::iCut_ADCNoise     //Hit or Cluster rejected if ADC LESS than value
+            SelParam::iCut_ADCSat       //Hit rejected if ADC GREATER than value
             SelParam::iCut_MultiMin     //EVENT rejected if cluster multiplicity LESS than or equal to value
             SelParam::iCut_MultiMax     //EVENT rejected if cluster multiplicity GREATER than or equal to value
-            SelParam::iCut_SizeMin      //Cluster rejected if cluster size LESS than value
-            SelParam::iCut_SizeMax      //Cluster rejected if cluster size GREATER than value
-            SelParam::iCut_TimeMin      //Cluster rejected if cluster time bin LESS than value
-            SelParam::iCut_TimeMax      //Cluster rejected if cluster time bin GREATER than value
+            SelParam::iCut_SizeMin      //Cluster rejected if size LESS than value
+            SelParam::iCut_SizeMax      //Cluster rejected if size GREATER than value
+            SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
+            SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
 
         The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
         (e.g. fit results from all strips).  Data members of Uniformity::SummaryStatistics are:
@@ -584,6 +591,10 @@
 
                 Cut_ClusterTime_Max     integer, clusters with time bins greater than this value are rejected.
 
+                Cut_HitAdc_Min          integer, hits with ADC value less than this value are rejected.
+
+                Cut_HitAdc_Max          integer, hits with ADV value greater than this value are rejected.
+
                 Cut_HitMulti_Min        integer, events with hit multiplicity less than or equal to this
                                         value are rejected.
 
@@ -697,7 +708,7 @@
                                         this entry should appear as the first line below the section
                                         header ("BEGIN_HISTO_INFO") and only entries from the following
                                         set are allowed: {"clustADC", "clustMulti", "clustPos", "clustSize",
-                                        "clustTime", "hitPos", "hitTime"}.
+                                        "clustTime", "hitADC", "hitPos", "hitTime"}.
 
                 Histo_XTitle            string, title of the x-axis, full TLatex style entires are supported.
                                         Explicitly "cluster position #left(#mum#right)" will result in a

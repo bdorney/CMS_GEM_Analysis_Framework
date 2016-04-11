@@ -110,7 +110,8 @@ namespace Uniformity {
         //Set Initial Values
         Hit(){
             iPos_Y = iStripNum = iTimeBin = -1;
-	    vec_sADC.resize(30);
+            
+            vec_sADC.resize(30);
         } //End Initialization
     }; //End Hit
     
@@ -132,10 +133,6 @@ namespace Uniformity {
         
         //Set Initial Values
         Cluster(){
-            //fPos_Y = fPos_X = -1;
-            
-            //fADC = fSize = fTimeBin = -1;
-            
             iPos_Y = iSize = iTimeBin = -1;
             
             fPos_X = fADC = -1.;
