@@ -140,6 +140,23 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
                     //store slice level histograms
     //Close File
     
+    //Setup the summary histograms
+    HistosPhysObj summaryHistos; //Histograms for the entire Detector
+    
+    summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+    //summaryHistos.hMulti
+    summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+    summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+    
+    //Get/Make the Summary Directory
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = ptr_fileOutput->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
@@ -155,6 +172,12 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         
         //Debugging
         cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        
+        //Add this sector to the summary histogram
+        summaryHistos.hADC->Add((*iterEta).second.hitHistos.hADC.get() );
+        //summaryHistos.hMulti
+        summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
+        summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
         
         //Store Histograms - SectorEta Level
         //-------------------------------------
@@ -185,6 +208,14 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
             (*iterPhi).second.hitHistos.hTime->Write();
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
+    
+    //Store the Summary Histograms
+    dir_Summary->cd();
+    //Add this sector to the summary histogram
+    summaryHistos.hADC->Write();
+    //summaryHistos.hMulti
+    summaryHistos.hPos->Write();
+    summaryHistos.hTime->Write();
     
     //Close the ROOT file
     ptr_fileOutput->Close();

@@ -389,8 +389,11 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
-    else{ //Case: iEta Sector, sum over sector's iPhi
+    else if (iEta > -1){
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+    }
+    else{ //Case: iEta Sector, sum over sector's iPhi
+        ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;

@@ -2,10 +2,18 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.1                               *
-*	LAST UPDATE: Feb 25 2016                     *
+*	VERSION: 1.0.2                               *
+*	LAST UPDATE: Apr 22 2016                     *
 *                                                *
 **************************************************
+
+Update: Apr 22th 2016
+==================================================
+->Removing AnalysisCode.cpp, AnalysisCodeGE6_V1_fast_cl.cpp, AnalysisCodeGE6_V2.cpp, AnalysisCode_GE4_V1.cpp, and AnalysisCode_GE6_V1.cpp from repo
+->Removing Makefile_SingleSpecAna.clang and Makefile_SingleSpecAna.gpp from repo
+->Removing src/SingleSpectrumAnalyzer.cpp from repo
+->AnalyzeResponseUniformityClusters will now store a "Summary" set of of histograms (sum of all SectorEta) when AnalyzeResponseUniformityClusters::StoreHistos is called
+->AnalyzeResponseUniformityHits will now store a "Summary" set of of histograms (sum of all SectorEta) when AnalyzeResponseUniformityHits::StoreHistos is called
 
 Update: Apr 11th 2016
 ==================================================

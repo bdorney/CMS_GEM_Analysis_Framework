@@ -820,7 +820,7 @@
                 [END_UNIFORMITY_INFO]
             [END_ANALYSIS_INFO]
 
-    # 4.e. Output ROOT File
+    # 4.f. Output ROOT File
     # --------------------------------------------------------
 
     The output ROOT file produced by classes inheriting from AnalyzeResponseUniformity will contain the
@@ -843,6 +843,10 @@
     Uniformity::SectorSlice will be stored directly in this "SliceZ" TDirectory; they will only
     represent distributions from this (iEta, iPhi, Slice) value.  Again, the TName's for each TObject
     here will include the string "_iEtaXiPhiYSliceZ_" to ensure tehy are unique.
+
+    One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
+    for each cluster/hit observable.  The contents of these histograms is simply the sum of the
+    corresponding SectorEtaX histograms.
 
     The VisualizeUniformity class will offer additional TObjects (e.g. TCanvas, TH2F, etc...) to assist
     the analyst in making the "pass/fail" statement upon implementation.
