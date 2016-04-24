@@ -96,7 +96,7 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
 	//Cluster Analysis
-
+	
     cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
@@ -117,6 +117,7 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");
     //myAnalyzerCluster.checkUniformity();
     
+
     //Debugging
     //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
     //myAnalyzerCluster.fitHistos();

@@ -117,7 +117,7 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
 //Stores booked histograms (for those histograms that are non-null)
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
-    HistosPhysObj summaryHistos; //Histograms for the entire Detector
+    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
     
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
@@ -143,11 +143,14 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     //Close File
     
     //Setup the summary histograms
-    summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
-    //summaryHistos.hMulti
-    summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
-    summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+    //summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+    //summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+    //summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
     
+	TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+
     //Get/Make the Summary Directory
     //Check to see if the directory exists already
     TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
@@ -174,11 +177,14 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
         //Add this sector to the summary histogram
-        summaryHistos.hADC->Add((*iterEta).second.hitHistos.hADC.get() );
-        //summaryHistos.hMulti
-        summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
-        summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
+        //summaryHistos.hADC->Add((*iterEta).second.hitHistos.hADC.get() );
+	//summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
+        //summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
         
+	hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );                
+	hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );                
+	hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );  
+
         //Store Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
@@ -212,11 +218,14 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     //Store the Summary Histograms
     dir_Summary->cd();
     //Add this sector to the summary histogram
-    summaryHistos.hADC->Write();
-    //summaryHistos.hMulti
-    summaryHistos.hPos->Write();
-    summaryHistos.hTime->Write();
-    
+    //summaryHistos.hADC->Write();
+	//summaryHistos.hPos->Write();
+    //summaryHistos.hTime->Write();
+
+	hHitADC_All.Write();    
+	hHitPos_All.Write();    
+	hHitTime_All.Write();
+
     //Close the ROOT file
     ptr_fileOutput->Close();
     

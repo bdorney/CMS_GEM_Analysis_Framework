@@ -29,8 +29,8 @@ loopdir.C
 ##############
 *.root
 #TestBeamDataset_*.root
-#data/
-#data/*
+data/
+data/*
 
 # Text Files #
 ##############

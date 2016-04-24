@@ -374,6 +374,9 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
     
     ret_Histo.Sumw2();
     
+    //Set Directory to the global directory
+    ret_Histo.SetDirectory(gROOT);
+
     //Return Histogram
     return ret_Histo;
 } //End AnalyzeResponseUniformity::getHistogram()
