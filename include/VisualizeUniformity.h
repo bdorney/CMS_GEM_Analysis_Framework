@@ -23,6 +23,8 @@
 
 //ROOT Includes
 #include "TCanvas.h"
+#include "TDirectory.h"
+#include "TFile.h"
 //#include "TH1F.h"
 #include "TLatex.h"
 #include "TLine.h"

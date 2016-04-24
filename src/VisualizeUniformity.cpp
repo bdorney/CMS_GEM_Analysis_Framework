@@ -13,13 +13,57 @@ using std::shared_ptr;
 using std::string;
 
 using Timing::getString;
+using Timing::printROOTFileStatus;
 
 using namespace Uniformity;
 
+//Constructor
+VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet){
+    aSetup  = inputSetup;
+    detMPGD = inputDet;
+} //End Constructor
+
 void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
     //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
+    std::shared_ptr<TCanvas> canv_StoredCanv;
     
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = ptr_fileOutput->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Get the Canvas
+    //------------------------------------------------------
+    canv_StoredCanv = drawSectorEtaCanvas(strObsName, strDrawOption);
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_StoredCanv->Write();
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
 } //End VisualizeUniformity::storeHistos()
 
 std::shared_ptr<TCanvas>  VisualizeUniformity::drawSectorEtaCanvas(std::string &strObsName, std::string &strDrawOption){

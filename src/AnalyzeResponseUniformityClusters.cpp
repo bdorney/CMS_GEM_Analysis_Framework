@@ -255,7 +255,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
         if ((*iterEta).second.mset_fClustADC_Spec_PkPos.size() > 0) { //Check if stored Spec positions exist
             calcStatistics( (*iterEta).second.statClustADC_Spec_PkPos, (*iterEta).second.mset_fClustADC_Spec_PkPos );
         } //End Check if stored Spec positions exist
-        
     } //End Loop Over iEta Sectors
     
     return;

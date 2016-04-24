@@ -22,6 +22,7 @@
 #include "ParameterLoaderAmoreSRS.h"
 #include "ParameterLoaderAnaysis.h"
 #include "UniformityUtilityTypes.h"
+#include "VisualizeUniformity.h"
 
 //ROOT Includes
 
@@ -95,6 +96,10 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerHit.fillHistos();
     myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
+    //Visualize Hits
+    VisualizeUniformity myVisualizer(aSetup, myDet);
+    myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "");
+    
 	//Cluster Analysis
 	
     cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
