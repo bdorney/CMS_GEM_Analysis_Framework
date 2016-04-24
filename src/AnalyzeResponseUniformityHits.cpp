@@ -117,6 +117,8 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
 //Stores booked histograms (for those histograms that are non-null)
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
+    HistosPhysObj summaryHistos; //Histograms for the entire Detector
+    
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
     //Check if File Failed to Open Correctly
@@ -141,8 +143,6 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     //Close File
     
     //Setup the summary histograms
-    HistosPhysObj summaryHistos; //Histograms for the entire Detector
-    
     summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
     //summaryHistos.hMulti
     summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
