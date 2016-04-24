@@ -9,6 +9,8 @@
 #include "DetectorMPGD.h"
 #include "VisualizeUniformity.h"
 
+using std::cout;
+using std::endl;
 using std::shared_ptr;
 using std::string;
 
@@ -83,9 +85,13 @@ std::shared_ptr<TCanvas>  VisualizeUniformity::drawSectorEtaCanvas(std::string &
     for (int i=1; i <= iNumEta; ++i) {
         SectorEta etaSector = detMPGD.getEtaSector(i);
         
+	cout<<"tobjObs = " << tobjObs << endl;
+
         tobjObs = getRootObject(strObsName, etaSector);
         
-        drawSectorEtaObs(tobjObs, ret_Canvas, strDrawOption, i, iNumEta, etaSector);
+	cout<<"tobjObs = " << tobjObs << endl;
+        
+	drawSectorEtaObs(tobjObs, ret_Canvas, strDrawOption, i, iNumEta, etaSector);
     } //End Loop Over Detector's Eta Secto
     
     return ret_Canvas;
@@ -183,6 +189,7 @@ std::shared_ptr<TObject> VisualizeUniformity::getRootObject(std::string &strObsN
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
         ret_object = inputEta.clustHistos.hADC;
+	//ret_object = std::make_shared<TObject>( inputEta.clustHistos.hADC.get() );
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("CLUSTMULTI") ) { //Case: Cluster Multi
         ret_object = inputEta.clustHistos.hMulti;
@@ -201,7 +208,13 @@ std::shared_ptr<TObject> VisualizeUniformity::getRootObject(std::string &strObsN
         ret_object = inputEta.hitHistos.hADC;
     } //End Case: Hit ADC
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
+	cout<<"ret_object = " << ret_object << endl;
+	cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << endl;
+	cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << endl;
+	cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << endl;
+
         ret_object = inputEta.hitHistos.hPos;
+	cout<<"ret_object = " << ret_object << endl;
     } //End Case: Hit Position
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
         ret_object = inputEta.hitHistos.hTime;
