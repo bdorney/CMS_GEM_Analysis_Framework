@@ -313,7 +313,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             aSetupUniformity.histoSetup_hitTime.strHisto_Name = strName;
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitTime);
-        } //End Case: Cluster Time
+        } //End Case: Hit Time
         //=======================Unrecognized Parameters=======================
         else{ //Case: Undefined Behavior
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
