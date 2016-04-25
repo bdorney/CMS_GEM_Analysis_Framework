@@ -19,18 +19,25 @@ using namespace Uniformity;
 
 //Default constructor
 DetectorMPGD::DetectorMPGD(){
-    //fMaxSectorWidth = -1;
+    //bAnaSetup = false;
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
 DetectorMPGD::DetectorMPGD(vector<Cluster> vec_inputClusters){
+    //bAnaSetup = false;
     setCluster(vec_inputClusters);
 }
 
 //Constructor to use when supplying a map of eta sectors
 DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
+    //bAnaSetup = false;
     map_sectorsEta = map_inputSectors;
 }
+
+//Initializes TObjects for hits
+/*void DetectorMPGD::initializeDistsHits(){
+
+}*/ //End DetectorMPGD::initializeDistsHits()
 
 //Returns all clusters
 vector<Cluster> DetectorMPGD::getClusters(){
