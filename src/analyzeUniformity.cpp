@@ -97,16 +97,20 @@ int main( int argc_, char * argv_[] ){
 
 	AnalyzeResponseUniformityHits myAnalyzerHit(aSetup, myDet);
     myAnalyzerHit.fillHistos();
+
+	etaSector = myDet.getEtaSector(1);
+    cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;    
+
     myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
-    //etaSector = myDet.getEtaSector(1);
-    myDet.getEtaSector(1,etaSector);
+    etaSector = myDet.getEtaSector(1);
     cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;
-
-	cout<<"Press Ctrl+C"<<endl;
-	int dummy;
-	cin>>dummy;
-
+    
+    cout<<"Enter a number or press Ctrl+C"<<endl;
+    
+    int dummy;
+    cin>>dummy;
+    
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
     myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "");
