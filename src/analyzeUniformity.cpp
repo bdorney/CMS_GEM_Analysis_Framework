@@ -46,6 +46,8 @@ int main( int argc_, char * argv_[] ){
     ParameterLoaderAmoreSRS amoreLoader;
     ParameterLoaderAnaysis analysisLoader;
     
+    SectorEta etaSector;
+    
     vector<string> vec_strInputArgs;
     
     //Transfer Input Arguments into vec_strInputArgs
@@ -64,7 +66,7 @@ int main( int argc_, char * argv_[] ){
     for (int i=1; i <= myDet.getNumEtaSectors(); ++i) {
         cout<<i<<"\t";
         
-        SectorEta etaSector = myDet.getEtaSector(i);
+        etaSector = myDet.getEtaSector(i);
         
         cout<<etaSector.fPos_Y<<"\t"<<etaSector.fWidth<<"\t";
         
@@ -96,6 +98,9 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerHit.fillHistos();
     myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
+    etaSector = myDet.getEtaSector(1);
+    cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;
+    
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
     myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "");
