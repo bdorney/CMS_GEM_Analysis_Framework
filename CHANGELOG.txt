@@ -2,10 +2,23 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.2                               *
-*	LAST UPDATE: Apr 22 2016                     *
+*	VERSION: 1.0.4                               *
+*	LAST UPDATE: Apr 25 2016                     *
 *                                                *
 **************************************************
+
+Update: Apr 25th 2016
+==================================================
+->Added copy constructor and assignment operator to Uniformity::HistosPhysObj
+->Added copy constructor and assignment operator to Uniformity::SummaryStatistics
+->Added copy constructor and assignment operator to Uniformity::SectorSlice
+->Added copy constructor and assignment operator to Uniformity::SectorPhi
+->Added copy constructor and assignment operator to Uniformity::SectorEta
+
+Update: Apr 24th 2016
+==================================================
+->Added new class Uniformity::VisualizeUniformity which inherits from Uniformity::AnalyzeResponseUniformity
+->Class Uniformity::VisualizeUniformity makes a TCanvas for an input observable, the TCanvas has one pad for each SectorEta, the observable is drawn on the TCanvas
 
 Update: Apr 22th 2016
 ==================================================

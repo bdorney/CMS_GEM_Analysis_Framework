@@ -27,6 +27,7 @@
 //ROOT Includes
 
 //Namespaces
+using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
@@ -100,6 +101,11 @@ int main( int argc_, char * argv_[] ){
 
     etaSector = myDet.getEtaSector(1);
     cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;
+    
+    cout<<"Enter a number or press Ctrl+C"<<endl;
+    
+    int dummy;
+    cin>>dummy;
     
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
