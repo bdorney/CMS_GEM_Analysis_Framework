@@ -182,12 +182,26 @@ SectorEta DetectorMPGD::getEtaSector(int iEta){
     if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
         retSector = map_sectorsEta[iEta];
     } //End Case: Requested iEta Value exists
-    else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty sector
         printClassMethodMsg("DetectorMPGD","getEtaSector", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
         printClassMethodMsg("DetectorMPGD","getEtaSector", "\tThe Returned sector is Empty!!!");
-    } //End Case: Requested iEta Value doesn ot exist, return an empty vector
+    } //End Case: Requested iEta Value doesn ot exist, return an empty sector
     
     return retSector;
+} //End getEtaSector
+
+//Returns the eta sector
+void DetectorMPGD::getEtaSector(int iEta, SectorEta & retSector){
+    
+    if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
+        retSector = map_sectorsEta[iEta];
+    } //End Case: Requested iEta Value exists
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty sector
+        printClassMethodMsg("DetectorMPGD","getEtaSector", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
+        printClassMethodMsg("DetectorMPGD","getEtaSector", "\tThe Returned sector is Empty!!!");
+    } //End Case: Requested iEta Value doesn ot exist, return an empty sector
+    
+    return;
 } //End getEtaSector
 
 //Returns the phi sector

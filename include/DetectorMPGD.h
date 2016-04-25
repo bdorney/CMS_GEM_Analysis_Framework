@@ -84,6 +84,7 @@ namespace Uniformity {
         
         //returns the eta sector
         virtual SectorEta getEtaSector(int iEta);
+        virtual void getEtaSector(int iEta, SectorEta & retSector);
         
         //returns the width of an iEta sector
         virtual float getEtaWidth(int iEta);
