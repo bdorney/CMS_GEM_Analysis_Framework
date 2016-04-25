@@ -41,7 +41,7 @@ namespace Uniformity {
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         
-        //Default Constructor (empty for now)
+        //Default Constructor
         DetectorMPGD();
         
         //Constructor to use when supplying a vector of clusters
@@ -52,10 +52,15 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Initializes TObjects for hits, clusters, and graphs
+        //virtual void initializeDistsHits();
+        //virtual void initializeDistsClusters();
+        //virtual void initializeDistsGraphs();
+        
         //wipes all stored information
         virtual void reset(){
             map_sectorsEta.clear();
-            vec_allADCPeaks.clear();
+            //vec_allADCPeaks.clear();
             return;
         } //End reset()
         
@@ -100,6 +105,13 @@ namespace Uniformity {
        
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Sets the Analysis Setup
+        /*virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){
+            aSetup = inputSetup;
+            bAnaSetup = true;
+            return;
+        };*/
+        
         //Sets a cluster
         virtual void setCluster(Cluster &inputCluster);
         
@@ -141,12 +153,14 @@ namespace Uniformity {
             map_sectorsEta = map_inputSectors; return;
         };
         
-    private:
-        //float fMaxSectorWidth;
+    //private:
+        //bool bAnaSetup;
         
         std::map<int, SectorEta> map_sectorsEta;
         
-        std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
+        //Uniformity::AnalysisSetupUniformity aSetup;
+        
+        //std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD
 } //End namespace Uniformity
 
