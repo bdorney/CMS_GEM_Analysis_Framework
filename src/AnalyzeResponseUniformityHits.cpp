@@ -226,9 +226,14 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
 
+	cout<<"detMPGD.map_sectorsEta[1].hitHistos.hADC = " << detMPGD.map_sectorsEta[1].hitHistos.hADC << endl;
+
+
     //Close the ROOT file
     ptr_fileOutput->Close();
     
+	cout<<"detMPGD.map_sectorsEta[1].hitHistos.hADC = " << detMPGD.map_sectorsEta[1].hitHistos.hADC << endl;
+
     return;
 } //End storeHistos()
 

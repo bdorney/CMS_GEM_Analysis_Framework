@@ -101,11 +101,18 @@ int main( int argc_, char * argv_[] ){
 	etaSector = myDet.getEtaSector(1);
     cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;    
 
-    myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
+   // myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
     etaSector = myDet.getEtaSector(1);
     cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;
     
+	cout<<"myDet.map_sectorsEta[1].hitHistos.hADC = " << myDet.map_sectorsEta[1].hitHistos.hADC << endl;
+
+	for(auto iterEta = myDet.map_sectorsEta.begin(); iterEta != myDet.map_sectorsEta.end(); ++iterEta){
+		cout<<(*iterEta).first<<"\t"<<(*iterEta).second.hitHistos.hADC.get()<<endl;
+
+	}
+
     cout<<"Enter a number or press Ctrl+C"<<endl;
     
     int dummy;

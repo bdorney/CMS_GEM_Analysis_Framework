@@ -60,7 +60,7 @@ namespace Uniformity {
         //wipes all stored information
         virtual void reset(){
             map_sectorsEta.clear();
-            //vec_allADCPeaks.clear();
+            vec_allADCPeaks.clear();
             return;
         } //End reset()
         
@@ -160,7 +160,7 @@ namespace Uniformity {
         
         //Uniformity::AnalysisSetupUniformity aSetup;
         
-        //std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
+        std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD
 } //End namespace Uniformity
 
