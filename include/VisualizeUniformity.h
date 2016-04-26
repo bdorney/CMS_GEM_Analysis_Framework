@@ -81,7 +81,7 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        std::shared_ptr<TObject> getRootObject(std::string &strObsName, Uniformity::SectorEta &inputEta);
+	std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------

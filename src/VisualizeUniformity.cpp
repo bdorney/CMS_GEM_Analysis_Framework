@@ -82,7 +82,7 @@ void VisualizeUniformity::drawSectorEtaCanvas(TCanvas & inputCanvas, std::string
         
         cout<<"tobjObs = " << tobjObs << endl;
 
-        tobjObs = getRootObject(strObsName, etaSector);
+        tobjObs = getObsHisto(strObsName, etaSector);
         
         cout<<"tobjObs = " << tobjObs << endl;
         
@@ -107,7 +107,8 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
     float fYPad_High;
     
     string strName = inputObjPtr->GetName();
-    
+	cout<<"strName = " << strName << endl;    
+
     TLatex latex_EtaSector;
     
     TPad *pad_SectorObs;
@@ -125,17 +126,24 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
 
     //Determine the Pad Y-Coordinates
     //------------------------------------------------------
-    fYPad_Low   = (1. / iNumEta) * (iEta - 1);
-    fYPad_High  = (1. / iNumEta) * (iEta);
+    fYPad_Low   = (1. / iNumEta) * (iEta);
+    fYPad_High  = (1. / iNumEta) * (iEta - 1);
     
     //Initialize the Pad
     //------------------------------------------------------
     pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+    inputCanvas.cd();
+    pad_SectorObs->Draw();
     
     //Draw the Object
     //------------------------------------------------------
     pad_SectorObs->cd();
+	
+	cout<<"inputObjPtr = " << inputObjPtr << endl;
+
     inputObjPtr->Draw( strDrawOption.c_str() );
+
+	cout<<"I just drew inputObjPtr with draw option " << strDrawOption.c_str() << endl;
     
     //Draw the TLatex - Eta
     //------------------------------------------------------
@@ -156,7 +164,7 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
         
         //Draw the TLatex
         latex_PhiSector.SetTextSize(0.03);
-        latex_PhiSector.DrawLatexNDC(0.1+(iPhiPos-1)*(iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+        latex_PhiSector.DrawLatexNDC(0.1+(iPhiPos)*(iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
         
         //Segment the Plot with lines
         if (iPhiPos < (inputEta.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -165,68 +173,62 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
             line_PhiSeg.SetLineStyle(2);
             line_PhiSeg.SetLineWidth(2);
             
-            line_PhiSeg.DrawLineNDC( (iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 0., (iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 1. );
+            //line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)inputEta.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)inputEta.map_sectorsPhi.size() ), 1. );
         } //End Case: Not the Last Phi Segment Yet
     } //End Loop Over Sector Phi
-    
-    //Draw the Pad
-    //------------------------------------------------------
-    inputCanvas.cd();
-    pad_SectorObs->Draw();
     
     return;
 } //End VisualizeUniformity::drawSectorEtaObs()
 
-std::shared_ptr<TObject> VisualizeUniformity::getRootObject(std::string &strObsName, Uniformity::SectorEta &inputEta){
+std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration
-    std::shared_ptr<TObject> ret_object;
+    std::shared_ptr<TH1F> ret_histo;
     
-    cout<<"Calling VisualizeUniformity::getRootObject()\n";
+    std::cout<<"Calling VisualizeUniformity::getRootObject()\n";
     
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
-        ret_object = inputEta.clustHistos.hADC;
-	//ret_object = std::make_shared<TObject>( inputEta.clustHistos.hADC.get() );
+        ret_histo = inputEta.clustHistos.hADC;
+	//ret_histo = std::make_shared<TObject>( inputEta.clustHistos.hADC.get() );
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("CLUSTMULTI") ) { //Case: Cluster Multi
-        ret_object = inputEta.clustHistos.hMulti;
+        ret_histo = inputEta.clustHistos.hMulti;
     } //End Case: Cluster Multi
     else if (0 == strObsName.compare("CLUSTPOS") ) { //Case: Cluster Position
-        ret_object = inputEta.clustHistos.hPos;
+        ret_histo = inputEta.clustHistos.hPos;
     } //End Case: Cluster Position
     else if (0 == strObsName.compare("CLUSTSIZE") ) { //Case: Cluster Size
-        ret_object = inputEta.clustHistos.hSize;
+        ret_histo = inputEta.clustHistos.hSize;
     } //End Case: Cluster Size
     else if (0 == strObsName.compare("CLUSTTIME") ) { //Case: Cluster Time
-        ret_object = inputEta.clustHistos.hTime;
+        ret_histo = inputEta.clustHistos.hTime;
     } //End Case: Cluster Time
     //=======================Hit Parameters=======================
     else if (0 == strObsName.compare("HITADC") ) { //Case: Hit ADC
-        ret_object = inputEta.hitHistos.hADC;
+        ret_histo = inputEta.hitHistos.hADC;
     } //End Case: Hit ADC
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
-	cout<<"ret_object = " << ret_object << endl;
-	cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << endl;
-	cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << endl;
-	cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << endl;
+	std::cout<<"ret_histo = " << ret_histo << std::endl;
+	std::cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << std::endl;
+	std::cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << std::endl;
+	std::cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << std::endl;
 
-        ret_object = inputEta.hitHistos.hPos;
-	cout<<"ret_object = " << ret_object << endl;
+        ret_histo = inputEta.hitHistos.hPos;
+	std::cout<<"ret_histo = " << ret_histo << std::endl;
     } //End Case: Hit Position
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
-        ret_object = inputEta.hitHistos.hTime;
+        ret_histo = inputEta.hitHistos.hTime;
     } //End Case: Hit Time
     //=======================Results Parameters=======================
     else if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Norm Chi2
-        ret_object = inputEta.gEta_ClustADC_Fit_NormChi2;
+	inputEta.gEta_ClustADC_Fit_NormChi2->Draw(); //Hack
+        ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
     } //End Case: Fit Norm Chi2
     else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-        ret_object = inputEta.gEta_ClustADC_Fit_PkPos;
+	inputEta.gEta_ClustADC_Fit_PkPos->Draw(); //Hack
+        ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_PkPos->GetHistogram() );
     } //End Case: Fit Pk Pos
     
-    return ret_object;
-} //End VisualizeUniformity::getRootObject()
-
-
-
+    return ret_histo;
+} //End VisualizeUniformity::getObsHisto()
 
