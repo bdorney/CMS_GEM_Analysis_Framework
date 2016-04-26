@@ -30,7 +30,7 @@ AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(){
 } //End Default Constructor
 
 //Set inputs at construction
-AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
+AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(AnalysisSetupUniformity inputSetup, DetectorMPGD & inputDet){
     strAnalysisName = "analysis";
     
     //Store Analysis Parameters

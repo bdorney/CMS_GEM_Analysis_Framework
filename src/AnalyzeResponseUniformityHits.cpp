@@ -30,7 +30,7 @@ AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(){
 } //End Default Constructor
 
 //Set inputs at construction
-AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
+AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup, DetectorMPGD & inputDet){
     strAnalysisName = "analysis";
     
     //Store Analysis Parameters

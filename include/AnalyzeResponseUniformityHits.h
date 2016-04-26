@@ -61,7 +61,7 @@ namespace Uniformity {
         AnalyzeResponseUniformityHits();
         
         //Set the detector and anlysis parameters at construction
-        AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+        AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
