@@ -246,8 +246,6 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
         return;
     } //End Case: No Sectors Defined
     
-    //If DetectorMPGD is initialized, loop through the eta sectors
-    
     return;
 } //End DetectorMPGD::setCluster
 

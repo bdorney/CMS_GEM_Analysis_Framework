@@ -181,9 +181,9 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 	//summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
         //summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
         
-	hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );                
-	hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );                
-	hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );  
+        hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
+        hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
+        hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
 
         //Store Histograms - SectorEta Level
         //-------------------------------------
@@ -191,6 +191,10 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         (*iterEta).second.hitHistos.hADC->Write();
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
+        
+        (*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
+        (*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
+        (*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -227,7 +231,6 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 	hHitTime_All.Write();
 
 	cout<<"detMPGD.map_sectorsEta[1].hitHistos.hADC = " << detMPGD.map_sectorsEta[1].hitHistos.hADC << endl;
-
 
     //Close the ROOT file
     ptr_fileOutput->Close();

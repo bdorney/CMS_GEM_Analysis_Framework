@@ -27,9 +27,6 @@ using namespace ROOT;
 
 namespace Uniformity {
     class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
-    //class AnalyzeResponseUniformity; //Defined in "AnalyzeResponseUniformity.h"
-    //class AnalyzeResponseUniformityClusters; //Defined in "AnalyzeResponseUniformityClusters.h"
-    //class AnalyzeResponseUniformityHits; //Defined in "AnalyzeResponseUniformityClusters.h"
     
     class DetectorMPGD {
         friend class ParameterLoaderAmoreSRS;
