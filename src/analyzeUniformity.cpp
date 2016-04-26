@@ -112,7 +112,7 @@ int main( int argc_, char * argv_[] ){
     
 	//Cluster Analysis
 	
-    cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+    /*cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
@@ -129,7 +129,7 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerCluster.fillHistos();
     myAnalyzerCluster.storeHistos(vec_strInputArgs[4], "UPDATE");
     myAnalyzerCluster.fitHistos();
-    myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");
+    myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");*/
     //myAnalyzerCluster.checkUniformity();
     
 
