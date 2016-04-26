@@ -10,6 +10,7 @@
 #define ____VisualizeUniformity__
 
 //C++ Includes
+#include <cmath>
 #include <iterator>
 #include <stdio.h>
 #include <string>
@@ -25,7 +26,8 @@
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TFile.h"
-//#include "TH1F.h"
+#include "TGraphErrors.h"
+#include "TH1F.h"
 #include "TLatex.h"
 #include "TLine.h"
 #include "TObject.h"
@@ -77,7 +79,7 @@ namespace Uniformity {
         //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
         //Odd (even) values of iEta are on the left (right)
         //The SectorEta is used to determine the location of the SectorPhi's
-        virtual void drawSectorEtaObs(std::shared_ptr<TObject> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, Uniformity::SectorEta &inputEta);
+        virtual void drawSectorEtaObs(std::shared_ptr<TH1F> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, Uniformity::SectorEta &inputEta);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

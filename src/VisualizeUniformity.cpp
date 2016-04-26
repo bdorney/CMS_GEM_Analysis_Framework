@@ -32,7 +32,7 @@ void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
-    
+
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
@@ -58,6 +58,11 @@ void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::
     //------------------------------------------------------
     drawSectorEtaCanvas(canv_DetSum, strObsName, strDrawOption);
     
+	//TH1F *hTemp = new TH1F("hTemp","Test",100,0,100);
+
+	//canv_DetSum.cd();
+	//hTemp->Draw();
+
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
@@ -74,19 +79,29 @@ void VisualizeUniformity::drawSectorEtaCanvas(TCanvas & inputCanvas, std::string
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
-    shared_ptr<TObject> tobjObs; //Observable to be drawn
+    shared_ptr<TH1F> hObs; //Observable to be drawn
+    
+    //Partition the Canvas
+    //------------------------------------------------------
+    bool bEvenEtaNum = (bool) ( iNumEta % 2);
+
+    if (bEvenEtaNum) {
+        inputCanvas.Divide(2, iNumEta / 2);
+	cout<<"Even Number Of Pads"<<endl; 
+    }
+    else{
+        inputCanvas.Divide(2, std::ceil(iNumEta / 2.) );
+	cout<<"Odd Number of Pads"<<endl;
+    }
     
     //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
     for (int i=1; i <= iNumEta; ++i) {
         SectorEta etaSector = detMPGD.getEtaSector(i);
         
-        cout<<"tobjObs = " << tobjObs << endl;
-
-        tobjObs = getObsHisto(strObsName, etaSector);
+        hObs = getObsHisto(strObsName, etaSector);
         
-        cout<<"tobjObs = " << tobjObs << endl;
-        
-        drawSectorEtaObs(tobjObs, inputCanvas, strDrawOption, i, iNumEta, etaSector);
+        drawSectorEtaObs(hObs, inputCanvas, strDrawOption, i, iNumEta, etaSector);
     } //End Loop Over Detector's Eta Secto
     
     return;
@@ -97,7 +112,7 @@ void VisualizeUniformity::drawSectorEtaCanvas(TCanvas & inputCanvas, std::string
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
-void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, SectorEta &inputEta){
+void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TH1F> inputHisto, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, SectorEta &inputEta){
     
     //Variable Declaration
     float fXPad_Low;
@@ -106,55 +121,58 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
     float fYPad_Low;
     float fYPad_High;
     
-    string strName = inputObjPtr->GetName();
-	cout<<"strName = " << strName << endl;    
+    //string strName = inputHisto->GetName();
 
     TLatex latex_EtaSector;
     
-    TPad *pad_SectorObs;
+    //TPad *pad_SectorObs;
     
     //Determine the Pad X-Coordinates
     //------------------------------------------------------
-    if (iEta % 2 != 0){ //Case: iEta is Odd
+    /*if (iEta % 2 != 0){ //Case: iEta is Odd
         fXPad_Low   = 0.02;
         fXPad_High  = 0.48;
     } //End Case: iEta is Odd
     else{ //Case: iEta is Even
         fXPad_Low   = 0.52;
         fXPad_High  = 0.98;
-    } //End Case: iEta is Even
+    }*/ //End Case: iEta is Even
 
     //Determine the Pad Y-Coordinates
     //------------------------------------------------------
-    fYPad_Low   = (1. / iNumEta) * (iEta);
-    fYPad_High  = (1. / iNumEta) * (iEta - 1);
+    //fYPad_Low   = (1. / iNumEta) * (iEta - 1);
+    //fYPad_High  = (1. / iNumEta) * (iEta);
     
     //Initialize the Pad
     //------------------------------------------------------
-    pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
-    inputCanvas.cd();
-    pad_SectorObs->Draw();
-    
+    //pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+    //inputCanvas.cd();
+    //pad_SectorObs->Draw();
+
     //Draw the Object
     //------------------------------------------------------
-    pad_SectorObs->cd();
+    //pad_SectorObs->cd();
+    inputCanvas.cd(iEta);
 	
-	cout<<"inputObjPtr = " << inputObjPtr << endl;
+	inputHisto->SetDirectory(gROOT);
 
-    inputObjPtr->Draw( strDrawOption.c_str() );
+	cout<<"inputHisto = " << inputHisto << endl;
+	
+    inputHisto->Draw( strDrawOption.c_str() );
 
 	cout<<"I just drew inputObjPtr with draw option " << strDrawOption.c_str() << endl;
     
     //Draw the TLatex - Eta
     //------------------------------------------------------
     latex_EtaSector.SetTextSize(0.03);
-    latex_EtaSector.DrawLatexNDC(0.1, 0.9, ( "i#eta = " + getString(iEta) ).c_str() );
+    //latex_EtaSector.DrawLatexNDC(0.1, 0.9, ( "i#eta = " + getString(iEta) ).c_str() );
     
     //Draw the TLatex - Phi
     //------------------------------------------------------
     for(auto iterPhi = inputEta.map_sectorsPhi.begin(); iterPhi != inputEta.map_sectorsPhi.end(); ++iterPhi){
         //Ensure the pad is the active pad (it should be already but who knows...)
-        pad_SectorObs->cd();
+        //pad_SectorObs->cd();
+        inputCanvas.cd(iEta);
         
         //Declare the TLatex
         TLatex latex_PhiSector;
@@ -164,7 +182,7 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
         
         //Draw the TLatex
         latex_PhiSector.SetTextSize(0.03);
-        latex_PhiSector.DrawLatexNDC(0.1+(iPhiPos)*(iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+        //latex_PhiSector.DrawLatexNDC(0.1+(iPhiPos)*(iPhiPos / (float)inputEta.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
         
         //Segment the Plot with lines
         if (iPhiPos < (inputEta.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -176,7 +194,7 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
             //line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)inputEta.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)inputEta.map_sectorsPhi.size() ), 1. );
         } //End Case: Not the Last Phi Segment Yet
     } //End Loop Over Sector Phi
-    
+        
     return;
 } //End VisualizeUniformity::drawSectorEtaObs()
 
@@ -208,13 +226,14 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
         ret_histo = inputEta.hitHistos.hADC;
     } //End Case: Hit ADC
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
-	std::cout<<"ret_histo = " << ret_histo << std::endl;
-	std::cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << std::endl;
-	std::cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << std::endl;
-	std::cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << std::endl;
+	//std::cout<<"ret_histo = " << ret_histo << std::endl;
+	//std::cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << std::endl;
+	//std::cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << std::endl;
+	//std::cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << std::endl;
 
         ret_histo = inputEta.hitHistos.hPos;
-	std::cout<<"ret_histo = " << ret_histo << std::endl;
+	
+	//std::cout<<"ret_histo = " << ret_histo << std::endl;
     } //End Case: Hit Position
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
         ret_histo = inputEta.hitHistos.hTime;
