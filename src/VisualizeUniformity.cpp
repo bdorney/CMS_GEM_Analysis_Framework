@@ -33,7 +33,7 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
-void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
     //Variable Declaration
     //bool bEvenEtaNum = (bool) ( iNumEta % 2);
     
@@ -49,6 +49,12 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     
     SectorEta etaSector;
     
+    std::vector<shared_ptr<TH1F> > vec_hObs;
+    std::vector<TPad *> vec_padSectorObs;
+
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
     //Make the Canvas
@@ -90,39 +96,62 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     //Loop Over the detector's Eta Sectors
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Determine the Pad X-Coordinates
+        //Determine the Pad Coordinates
         if (iEta % 2 != 0){ //Case: iEta is Odd
             fXPad_Low   = 0.02;
             fXPad_High  = 0.48;
+
+	    //The y-pad coordinats should only be reset every 2 pads
+	    //fYPad_Low   = (1. / (0.5 * iNumEta) ) * (iEta - 1);
+            //fYPad_High  = (1. / (0.5 * iNumEta) ) * (iEta);
         } //End Case: iEta is Odd
         else{ //Case: iEta is Even
             fXPad_Low   = 0.52;
             fXPad_High  = 0.98;
         } //End Case: iEta is Even
         
-        //Determine the Pad Y-Coordinates
-        fYPad_Low   = (1. / iNumEta) * (iEta - 1);
-        fYPad_High  = (1. / iNumEta) * (iEta);
+        //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
+        fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
+        fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
         
+	cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
+
         //Initialize the Pad
-        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+	vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
+
         canv_DetSum.cd();
-        pad_SectorObs->Draw();
-        
+	vec_padSectorObs[iEta-1]->Draw();
+	vec_padSectorObs[iEta-1]->cd();
+        //pad_SectorObs->Draw();
+        //pad_SectorObs->cd();
+
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
         hObs = getObsHisto(strObsName, etaSector);
-        hObs->Draw( strDrawOption.c_str() );
-        
+	vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+
+	//hObs->SetDirectory(gROOT);
+        //hObs->Draw( strDrawOption.c_str() );
+	vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
+
+	//Setup the TLatex for "CMS Preliminary"
+	TLatex latex_CMSPrelim;
+	latex_CMSPrelim.SetTextSize(0.05);
+	if( 1 == iEta){
+	    latex_EtaSector.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+	}
+
         //Setup the TLatex for this iEta sector
         TLatex latex_EtaSector;
-        latex_EtaSector.SetTextSize(0.03);
-        latex_EtaSector.DrawLatexNDC(0.1, 0.9, ( "i#eta = " + getString(iEta) ).c_str() );
+        latex_EtaSector.SetTextSize(0.05);
+        latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
         
         //Setup the iPhi designation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the pad is the active pad (it should be already but who knows...)
-            pad_SectorObs->cd();
+	    vec_padSectorObs[iEta-1]->cd();
+            //pad_SectorObs->cd();
             
             //Declare the TLatex
             TLatex latex_PhiSector;
@@ -131,8 +160,8 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
             
             //Draw the TLatex
-            latex_PhiSector.SetTextSize(0.03);
-            latex_PhiSector.DrawLatexNDC(0.1+(iPhiPos)*(iPhiPos / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + ( (iPhiPos-1) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
             
             //Segment the Plot with lines
             if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -144,7 +173,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
                 line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
             } //End Case: Not the Last Phi Segment Yet
         } //End Loop Over Sector Phi
-    } //End Loop Over Detector's Eta Secto
+    } //End Loop Over Detector's Eta Sector
     
     //Write the Canvas to the File
     //------------------------------------------------------
@@ -208,6 +237,8 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
         ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_PkPos->GetHistogram() );
     } //End Case: Fit Pk Pos
     
+    //ret_histo->SetDirectory(gROOT);
+
     return ret_histo;
 } //End VisualizeUniformity::getObsHisto()
 

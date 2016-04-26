@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string>
 #include <utility>
+#include <vector>
 
 //Framework Includes
 #include "AnalyzeResponseUniformity.h"
@@ -27,6 +28,7 @@
 #include "TDirectory.h"
 #include "TFile.h"
 #include "TGraphErrors.h"
+#include "TH1.h"
 #include "TH1F.h"
 #include "TLatex.h"
 #include "TLine.h"
@@ -52,7 +54,7 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
