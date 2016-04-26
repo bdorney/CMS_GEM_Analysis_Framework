@@ -107,7 +107,7 @@ int main( int argc_, char * argv_[] ){
     
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
-    myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "E1");
+    myVisualizer.storeCanvas(vec_strInputArgs[4], "UPDATE", "HITPOS", "E1");
     
 	//Cluster Analysis
 	
