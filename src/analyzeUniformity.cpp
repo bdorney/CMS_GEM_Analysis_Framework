@@ -101,9 +101,8 @@ int main( int argc_, char * argv_[] ){
 	myDet = myAnalyzerHit.getDetector();
 
 	cout<<"Pointer References\n";
-	for(auto iterEta = myDet.map_sectorsEta.begin(); iterEta != myDet.map_sectorsEta.end(); ++iterEta){
-		cout<<(*iterEta).first<<"\t"<<(*iterEta).second.hitHistos.hADC.get()<<endl;
-
+	for(int i=1; i <= myDet.getNumEtaSectors(); ++i){
+		cout<<i<<"\t"<<( myDet.getEtaSector(i) ).hitHistos.hADC.get()<<endl;
 	}
     
     //Visualize Hits

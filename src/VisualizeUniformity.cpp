@@ -29,7 +29,9 @@ void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::
     //Variable Declaration
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    std::shared_ptr<TCanvas> canv_StoredCanv;
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -54,12 +56,12 @@ void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::
     
     //Get the Canvas
     //------------------------------------------------------
-    canv_StoredCanv = drawSectorEtaCanvas(strObsName, strDrawOption);
+    drawSectorEtaCanvas(canv_DetSum, strObsName, strDrawOption);
     
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
-    canv_StoredCanv->Write();
+    canv_DetSum.Write();
     
     //Close the File
     //------------------------------------------------------
@@ -68,33 +70,26 @@ void VisualizeUniformity::storeHistos(std::string & strOutputROOTFileName, std::
     return;
 } //End VisualizeUniformity::storeHistos()
 
-std::shared_ptr<TCanvas>  VisualizeUniformity::drawSectorEtaCanvas(std::string &strObsName, std::string &strDrawOption){
+void VisualizeUniformity::drawSectorEtaCanvas(TCanvas & inputCanvas, std::string &strObsName, std::string &strDrawOption){
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
-    shared_ptr<TCanvas> ret_Canvas;
-    
     shared_ptr<TObject> tobjObs; //Observable to be drawn
-    
-    //Make the Canvas
-    //------------------------------------------------------
-    TCanvas canv_Obs( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
-    ret_Canvas = std::make_shared<TCanvas>(canv_Obs.Clone() );
     
     //Loop Over the detector's Eta Sectors
     for (int i=1; i <= iNumEta; ++i) {
         SectorEta etaSector = detMPGD.getEtaSector(i);
         
-	cout<<"tobjObs = " << tobjObs << endl;
+        cout<<"tobjObs = " << tobjObs << endl;
 
         tobjObs = getRootObject(strObsName, etaSector);
         
-	cout<<"tobjObs = " << tobjObs << endl;
+        cout<<"tobjObs = " << tobjObs << endl;
         
-	drawSectorEtaObs(tobjObs, ret_Canvas, strDrawOption, i, iNumEta, etaSector);
+        drawSectorEtaObs(tobjObs, inputCanvas, strDrawOption, i, iNumEta, etaSector);
     } //End Loop Over Detector's Eta Secto
     
-    return ret_Canvas;
+    return;
 } //End VisualizeUniformity::drawSectorEtaCanvas()
 
 //Draws the distribution pointed to by inputObjPtr on a pad of inputCanvas
@@ -102,7 +97,7 @@ std::shared_ptr<TCanvas>  VisualizeUniformity::drawSectorEtaCanvas(std::string &
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
-void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, shared_ptr<TCanvas> inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, SectorEta &inputEta){
+void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, SectorEta &inputEta){
     
     //Variable Declaration
     float fXPad_Low;
@@ -176,7 +171,7 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, shar
     
     //Draw the Pad
     //------------------------------------------------------
-    inputCanvas->cd();
+    inputCanvas.cd();
     pad_SectorObs->Draw();
     
     return;

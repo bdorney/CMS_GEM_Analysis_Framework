@@ -168,7 +168,7 @@ namespace Uniformity {
             map_sectorsEta = map_inputSectors; return;
         };
         
-    //private:
+    private:
         //bool bAnaSetup;
         
         std::map<int, SectorEta> map_sectorsEta;

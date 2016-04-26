@@ -70,14 +70,14 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Prepares a Canvas for a requested observable
-        virtual std::shared_ptr<TCanvas> drawSectorEtaCanvas(std::string &strObsName, std::string &strDrawOption);
+        virtual void drawSectorEtaCanvas(TCanvas & inputCanvas, std::string &strObsName, std::string &strDrawOption);
         
         //Draws the distribution pointed to by inputObjPtr on a pad of inputCanvas
         //inputCanvas is split into two columns;
         //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
         //Odd (even) values of iEta are on the left (right)
         //The SectorEta is used to determine the location of the SectorPhi's
-        virtual void drawSectorEtaObs(std::shared_ptr<TObject> inputObjPtr, std::shared_ptr<TCanvas> inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, Uniformity::SectorEta &inputEta);
+        virtual void drawSectorEtaObs(std::shared_ptr<TObject> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, Uniformity::SectorEta &inputEta);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
