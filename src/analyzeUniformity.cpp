@@ -90,37 +90,25 @@ int main( int argc_, char * argv_[] ){
     cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
 
 	SelectorHit mySelectionHits;
-
 	mySelectionHits.setHits(vec_strInputArgs[3], myDet, aSetup);
 
     cout<<"Number of Selected Hits = " << myDet.getHits().size() << endl;
 
 	AnalyzeResponseUniformityHits myAnalyzerHit(aSetup, myDet);
     myAnalyzerHit.fillHistos();
+    myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
 
-	etaSector = myDet.getEtaSector(1);
-    cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;    
+	myDet = myAnalyzerHit.getDetector();
 
-   // myAnalyzerHit.storeHistos(vec_strInputArgs[4], vec_strInputArgs[5]);
-
-    etaSector = myDet.getEtaSector(1);
-    cout<<"etaSector.hitHistos.hADC = " << etaSector.hitHistos.hADC << endl;
-    
-	cout<<"myDet.map_sectorsEta[1].hitHistos.hADC = " << myDet.map_sectorsEta[1].hitHistos.hADC << endl;
-
+	cout<<"Pointer References\n";
 	for(auto iterEta = myDet.map_sectorsEta.begin(); iterEta != myDet.map_sectorsEta.end(); ++iterEta){
 		cout<<(*iterEta).first<<"\t"<<(*iterEta).second.hitHistos.hADC.get()<<endl;
 
 	}
-
-    cout<<"Enter a number or press Ctrl+C"<<endl;
-    
-    int dummy;
-    cin>>dummy;
     
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
-    myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "");
+    myVisualizer.storeHistos(vec_strInputArgs[4], "UPDATE", "HITPOS", "E1");
     
 	//Cluster Analysis
 	
