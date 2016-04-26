@@ -10,6 +10,7 @@
 #define ____VisualizeUniformity__
 
 //C++ Includes
+#include <cmath>
 #include <iterator>
 #include <stdio.h>
 #include <string>

@@ -76,7 +76,19 @@ void VisualizeUniformity::drawSectorEtaCanvas(TCanvas & inputCanvas, std::string
     
     shared_ptr<TObject> tobjObs; //Observable to be drawn
     
+    //Partition the Canvas
+    //------------------------------------------------------
+    bool bEvenEtaNum = (bool) ( iNumEta % 2);
+    
+    if (bEvenEtaNum) {
+        inputCanvas->Divide(2, iNumEta / 2);
+    }
+    else{
+        inputCanvas->Divide(2, std::ceil(iNumEta / 2.) );
+    }
+    
     //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
     for (int i=1; i <= iNumEta; ++i) {
         SectorEta etaSector = detMPGD.getEtaSector(i);
         
@@ -114,27 +126,28 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
     
     //Determine the Pad X-Coordinates
     //------------------------------------------------------
-    if (iEta % 2 != 0){ //Case: iEta is Odd
+    /*if (iEta % 2 != 0){ //Case: iEta is Odd
         fXPad_Low   = 0.02;
         fXPad_High  = 0.48;
     } //End Case: iEta is Odd
     else{ //Case: iEta is Even
         fXPad_Low   = 0.52;
         fXPad_High  = 0.98;
-    } //End Case: iEta is Even
+    }*/ //End Case: iEta is Even
 
     //Determine the Pad Y-Coordinates
     //------------------------------------------------------
-    fYPad_Low   = (1. / iNumEta) * (iEta - 1);
-    fYPad_High  = (1. / iNumEta) * (iEta);
+    //fYPad_Low   = (1. / iNumEta) * (iEta - 1);
+    //fYPad_High  = (1. / iNumEta) * (iEta);
     
     //Initialize the Pad
     //------------------------------------------------------
-    pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+    //pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
     
     //Draw the Object
     //------------------------------------------------------
-    pad_SectorObs->cd();
+    //pad_SectorObs->cd();
+    inputCanvas->cd(iEta);
     inputObjPtr->Draw( strDrawOption.c_str() );
     
     //Draw the TLatex - Eta
@@ -146,7 +159,8 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
     //------------------------------------------------------
     for(auto iterPhi = inputEta.map_sectorsPhi.begin(); iterPhi != inputEta.map_sectorsPhi.end(); ++iterPhi){
         //Ensure the pad is the active pad (it should be already but who knows...)
-        pad_SectorObs->cd();
+        //pad_SectorObs->cd();
+        inputCanvas->cd(iEta);
         
         //Declare the TLatex
         TLatex latex_PhiSector;
@@ -171,8 +185,8 @@ void VisualizeUniformity::drawSectorEtaObs(shared_ptr<TObject> inputObjPtr, TCan
     
     //Draw the Pad
     //------------------------------------------------------
-    inputCanvas.cd();
-    pad_SectorObs->Draw();
+    //inputCanvas.cd();
+    //pad_SectorObs->Draw();
     
     return;
 } //End VisualizeUniformity::drawSectorEtaObs()
