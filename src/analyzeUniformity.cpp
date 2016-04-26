@@ -100,18 +100,19 @@ int main( int argc_, char * argv_[] ){
 
 	myDet = myAnalyzerHit.getDetector();
 
-	cout<<"Pointer References\n";
+	/*cout<<"Pointer References\n";
 	for(int i=1; i <= myDet.getNumEtaSectors(); ++i){
 		cout<<i<<"\t"<<( myDet.getEtaSector(i) ).hitHistos.hADC.get()<<endl;
-	}
+	}*/
     
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HITPOS", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitADC", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitPos", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitTime", "E1");
     
 	//Cluster Analysis
-	
-    /*cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+    cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
@@ -128,9 +129,17 @@ int main( int argc_, char * argv_[] ){
     myAnalyzerCluster.fillHistos();
     myAnalyzerCluster.storeHistos(vec_strInputArgs[4], "UPDATE");
     myAnalyzerCluster.fitHistos();
-    myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");*/
+    myAnalyzerCluster.storeFits(vec_strInputArgs[4], "UPDATE");
     //myAnalyzerCluster.checkUniformity();
     
+    myDet = myAnalyzerHit.getDetector();
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustADC", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustPos", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustSize", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustTime", "E1");
+    
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ResponseFitChi2", "E1");
+    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ResponseFitPkPos", "E1");
 
     //Debugging
     //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);

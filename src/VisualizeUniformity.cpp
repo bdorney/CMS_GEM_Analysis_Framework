@@ -25,6 +25,126 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor
 
+void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TH1F> hObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    std::vector<shared_ptr<TH1F> > vec_hObs;
+    //std::vector<TPad *> vec_padSectorObs;
+    
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.8);
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = ptr_fileOutput->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Setup the Legend
+    //------------------------------------------------------
+    legObs->SetNColumns(2);
+    legObs->SetFillColor(kWhite);
+    legObs->SetLineColor(kBlack);
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        canv_DetSum.cd();
+        etaSector = detMPGD.getEtaSector(iEta);
+        hObs = getObsHisto(strObsName, etaSector);
+        
+        hObs->SetLineColor( Timing::getCyclicColor(iEta) );
+        hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
+        hObs->SetFillColor( Timing::getCyclicColor(iEta) );
+        legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
+        
+        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+        
+        //Setup the TLatex for "CMS Preliminary"
+        TLatex latex_CMSPrelim;
+        latex_CMSPrelim.SetTextSize(0.05);
+        if( 1 == iEta){
+            latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+        }
+        
+        //Setup the TLatex for this iEta sector
+        TLatex latex_EtaSector;
+        latex_EtaSector.SetTextSize(0.05);
+        latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
+        
+        //Setup the iPhi designation
+        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+            //Ensure the canvas is the active canvas (it should be already but who knows...)
+            canv_DetSum.cd();
+            
+            //Declare the TLatex
+            TLatex latex_PhiSector;
+            
+            //Determine the iPhi index
+            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+            
+            //Draw the TLatex
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + ( (iPhiPos-1) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+            
+            //Segment the Plot with lines
+            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                TLine line_PhiSeg;
+                
+                line_PhiSeg.SetLineStyle(2);
+                line_PhiSeg.SetLineWidth(2);
+                
+                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+            } //End Case: Not the Last Phi Segment Yet
+        } //End Loop Over Sector Phi
+    } //End Loop Over Detector's Eta Sector
+    
+    //Draw the Legend
+    //------------------------------------------------------
+    legObs->Draw("same");
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasSegmented()
+
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
 //So passing it to another method by reference keeps the TCanvas alive, but ends up being blank with nothing drawn on it =/
@@ -59,7 +179,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -81,17 +201,6 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = ptr_fileOutput->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
-    
-    //Partition the Canvas
-    //------------------------------------------------------
-    /*if (bEvenEtaNum) {
-        inputCanvas.Divide(2, iNumEta / 2);
-        cout<<"Even Number Of Pads"<<endl;
-    }
-    else{
-        inputCanvas.Divide(2, std::ceil(iNumEta / 2.) );
-        cout<<"Odd Number of Pads"<<endl;
-    }*/
     
     //Loop Over the detector's Eta Sectors
     //------------------------------------------------------
@@ -139,7 +248,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
 	TLatex latex_CMSPrelim;
 	latex_CMSPrelim.SetTextSize(0.05);
 	if( 1 == iEta){
-	    latex_EtaSector.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+	    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
 	}
 
         //Setup the TLatex for this iEta sector
@@ -185,7 +294,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::storeHistos()
+} //End VisualizeUniformity::storeCanvasSegmented()
 
 std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration
@@ -193,10 +302,11 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     
     std::cout<<"Calling VisualizeUniformity::getRootObject()\n";
     
+    std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
+    
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
         ret_histo = inputEta.clustHistos.hADC;
-	//ret_histo = std::make_shared<TObject>( inputEta.clustHistos.hADC.get() );
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("CLUSTMULTI") ) { //Case: Cluster Multi
         ret_histo = inputEta.clustHistos.hMulti;
@@ -215,30 +325,21 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
         ret_histo = inputEta.hitHistos.hADC;
     } //End Case: Hit ADC
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
-	//std::cout<<"ret_histo = " << ret_histo << std::endl;
-	//std::cout<<"inputEta.hitHistos.hPos = " << inputEta.hitHistos.hPos << std::endl;
-	//std::cout<<"inputEta.hitHistos.hPos.get() = " << inputEta.hitHistos.hPos.get() << std::endl;
-	//std::cout<<"inputEta.map_sectorsPhi.size() = " << inputEta.map_sectorsPhi.size() << std::endl;
-
-        ret_histo = inputEta.hitHistos.hPos;
-	
-	//std::cout<<"ret_histo = " << ret_histo << std::endl;
-    } //End Case: Hit Position
+	    ret_histo = inputEta.hitHistos.hPos;
+	} //End Case: Hit Position
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
         ret_histo = inputEta.hitHistos.hTime;
     } //End Case: Hit Time
     //=======================Results Parameters=======================
     else if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Norm Chi2
-	inputEta.gEta_ClustADC_Fit_NormChi2->Draw(); //Hack
+        inputEta.gEta_ClustADC_Fit_NormChi2->Draw(); //Hack
         ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
     } //End Case: Fit Norm Chi2
     else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-	inputEta.gEta_ClustADC_Fit_PkPos->Draw(); //Hack
+        inputEta.gEta_ClustADC_Fit_PkPos->Draw(); //Hack
         ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_PkPos->GetHistogram() );
     } //End Case: Fit Pk Pos
     
-    //ret_histo->SetDirectory(gROOT);
-
     return ret_histo;
 } //End VisualizeUniformity::getObsHisto()
 

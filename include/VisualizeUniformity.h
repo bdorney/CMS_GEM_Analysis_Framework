@@ -31,6 +31,7 @@
 #include "TH1.h"
 #include "TH1F.h"
 #include "TLatex.h"
+#include "TLegend.h"
 #include "TLine.h"
 #include "TObject.h"
 #include "TPad.h"
@@ -54,6 +55,10 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Draws a given observable onto a single pad off canvas
+        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        
+        //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
         
         //Getters - Methods that Get (i.e. Return) Something

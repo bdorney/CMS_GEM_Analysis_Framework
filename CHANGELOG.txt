@@ -9,8 +9,10 @@
 
 Update: Apr 26th 2016
 ==================================================
-->Fixed crash where invalid histogram pointer in VisualizeUniformity was causing a seg fault, need to use AnalyzeResponseUniformity::getDetector() in executable
+->Fixed crash where invalid histogram pointer in Uniformity::VisualizeUniformity was causing a seg fault, need to use Uniformity::AnalyzeResponseUniformity::getDetector() in executable
 ->Added copy constructor and assignment operator to Uniformity::DetectorMPGD
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with a physics observable drawn on a unique pad for each SectorEta
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with all physics observables drawn on the same for each SectorEta
 
 Update: Apr 25th 2016
 ==================================================
