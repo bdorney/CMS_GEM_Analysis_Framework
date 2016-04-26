@@ -160,14 +160,6 @@ namespace Uniformity {
         //Copy Constructor
         HistosPhysObj(const HistosPhysObj& other){
             //Deep copy
-            //if( other.hADC != NULL )    hADC    = (TH1*) other.hADC->Clone();
-            //if( other.hMulti != NULL )  hMulti  = (TH1*) other.hMulti->Clone();
-            //if( other.hPos != NULL )    hPos    = (TH1*) other.hPos->Clone();
-            //if( other.hSize != NULL )   hSize   = (TH1*) other.hSize->Clone();
-            //if( other.hTime != NULL )   hTime   = (TH1*) other.hTime->Clone();
-            
-            //if( other.hADC_v_Pos != NULL ) hADC_v_Pos = (TH2F*) other.hADC_v_Pos->Clone();
-            
             if( other.hADC != NULL )    hADC    = std::make_shared<TH1F>( *other.hADC.get() );
             if( other.hMulti != NULL )  hMulti  = std::make_shared<TH1F>( *other.hMulti.get() );
             if( other.hPos != NULL )    hPos    = std::make_shared<TH1F>( *other.hPos.get() );
@@ -181,14 +173,6 @@ namespace Uniformity {
         HistosPhysObj & operator=(const HistosPhysObj & other){
             if (this != &other ) { //Protect against invalid self-assignment
                 //Deep copy
-                //if( other.hADC != NULL )    hADC    = (TH1*) other.hADC->Clone();
-                //if( other.hMulti != NULL )  hMulti  = (TH1*) other.hMulti->Clone();
-                //if( other.hPos != NULL )    hPos    = (TH1*) other.hPos->Clone();
-                //if( other.hSize != NULL )   hSize   = (TH1*) other.hSize->Clone();
-                //if( other.hTime != NULL )   hTime   = (TH1*) other.hTime->Clone();
-                
-                //if( other.hADC_v_Pos != NULL ) hADC_v_Pos = (TH2F*) other.hADC_v_Pos->Clone();
-                
                 if( other.hADC != NULL )    hADC    = std::make_shared<TH1F>( *other.hADC.get() );
                 if( other.hMulti != NULL )  hMulti  = std::make_shared<TH1F>( *other.hMulti.get() );
                 if( other.hPos != NULL )    hPos    = std::make_shared<TH1F>( *other.hPos.get() );
@@ -196,7 +180,7 @@ namespace Uniformity {
                 if( other.hTime != NULL )   hTime   = std::make_shared<TH1F>( *other.hTime.get() );
                 
                 if( other.hADC_v_Pos != NULL ) hADC_v_Pos = std::make_shared<TH2F>( *other.hADC_v_Pos.get() );
-            } //Protectagainst invalid self-assignment
+            } //Protects against invalid self-assignment
             
             return *this;
         } //End Assignment operator

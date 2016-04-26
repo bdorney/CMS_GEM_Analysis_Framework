@@ -143,11 +143,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     //Close File
     
     //Setup the summary histograms
-    //summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
-    //summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
-    //summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
-    
-	TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+    TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
 	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
 	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
 
@@ -177,10 +173,6 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
         //Add this sector to the summary histogram
-        //summaryHistos.hADC->Add((*iterEta).second.hitHistos.hADC.get() );
-	//summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
-        //summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
-        
         hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
         hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
         hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
@@ -221,22 +213,13 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     
     //Store the Summary Histograms
     dir_Summary->cd();
-    //Add this sector to the summary histogram
-    //summaryHistos.hADC->Write();
-	//summaryHistos.hPos->Write();
-    //summaryHistos.hTime->Write();
-
-	hHitADC_All.Write();    
+    hHitADC_All.Write();
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
-
-	cout<<"detMPGD.map_sectorsEta[1].hitHistos.hADC = " << detMPGD.map_sectorsEta[1].hitHistos.hADC << endl;
 
     //Close the ROOT file
     ptr_fileOutput->Close();
     
-	cout<<"detMPGD.map_sectorsEta[1].hitHistos.hADC = " << detMPGD.map_sectorsEta[1].hitHistos.hADC << endl;
-
     return;
 } //End storeHistos()
 

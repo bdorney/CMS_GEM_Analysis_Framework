@@ -186,6 +186,8 @@ std::shared_ptr<TObject> VisualizeUniformity::getRootObject(std::string &strObsN
     //Variable Declaration
     std::shared_ptr<TObject> ret_object;
     
+    cout<<"Calling VisualizeUniformity::getRootObject()\n";
+    
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
         ret_object = inputEta.clustHistos.hADC;

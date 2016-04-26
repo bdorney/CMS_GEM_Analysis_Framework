@@ -7,6 +7,11 @@
 *                                                *
 **************************************************
 
+Update: Apr 26th 2016
+==================================================
+->Fixed crash where invalid histogram pointer in VisualizeUniformity was causing a seg fault, need to use AnalyzeResponseUniformity::getDetector() in executable
+->Added copy constructor and assignment operator to Uniformity::DetectorMPGD
+
 Update: Apr 25th 2016
 ==================================================
 ->Added copy constructor and assignment operator to Uniformity::HistosPhysObj

@@ -41,11 +41,29 @@ namespace Uniformity {
         //Default Constructor
         DetectorMPGD();
         
+        //Copy Constructor
+        DetectorMPGD(const DetectorMPGD& other){
+            map_sectorsEta  = other.map_sectorsEta;
+            vec_allADCPeaks = other.vec_allADCPeaks;
+        };
+        
         //Constructor to use when supplying a vector of clusters
         DetectorMPGD(std::vector<Cluster> vec_inputClusters);
         
         //Constructor to use when supplying a list of sectors;
         DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
+        
+        //Operators
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //Overloaded Assignment Operator
+        DetectorMPGD & operator=(const DetectorMPGD & other){
+            if (this != &other) { //Protects against invalid self-assignment
+                map_sectorsEta  = other.map_sectorsEta;
+                vec_allADCPeaks = other.vec_allADCPeaks;
+            } //Protects against invalid self-assignment
+            
+            return *this;
+        } //End Overloaded Assignment Operator
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
