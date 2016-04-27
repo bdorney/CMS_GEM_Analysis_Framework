@@ -223,33 +223,33 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
         fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
         fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
         
-	cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
+        cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
 
         //Initialize the Pad
         TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
-	vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
+        vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
 
         canv_DetSum.cd();
-	vec_padSectorObs[iEta-1]->Draw();
-	vec_padSectorObs[iEta-1]->cd();
+        vec_padSectorObs[iEta-1]->Draw();
+        vec_padSectorObs[iEta-1]->cd();
         //pad_SectorObs->Draw();
         //pad_SectorObs->cd();
 
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
         hObs = getObsHisto(strObsName, etaSector);
-	vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
 
-	//hObs->SetDirectory(gROOT);
+        //hObs->SetDirectory(gROOT);
         //hObs->Draw( strDrawOption.c_str() );
-	vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
+        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
 
-	//Setup the TLatex for "CMS Preliminary"
-	TLatex latex_CMSPrelim;
-	latex_CMSPrelim.SetTextSize(0.05);
-	if( 1 == iEta){
-	    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-	}
+        //Setup the TLatex for "CMS Preliminary"
+        TLatex latex_CMSPrelim;
+        latex_CMSPrelim.SetTextSize(0.05);
+        if( 1 == iEta){
+            latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+        }
 
         //Setup the TLatex for this iEta sector
         TLatex latex_EtaSector;
@@ -259,7 +259,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
         //Setup the iPhi designation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the pad is the active pad (it should be already but who knows...)
-	    vec_padSectorObs[iEta-1]->cd();
+            vec_padSectorObs[iEta-1]->cd();
             //pad_SectorObs->cd();
             
             //Declare the TLatex
