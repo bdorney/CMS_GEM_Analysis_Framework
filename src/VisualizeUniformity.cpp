@@ -41,11 +41,11 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.8);
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -117,7 +117,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
                 
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.775 * ( (iPhiPos-1) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
                 
                 //Segment the Plot with lines
                 if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -192,10 +192,10 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     //------------------------------------------------------
     for (int i=0; i < vec_strObsName.size(); ++i) { //Loop Over Requested Observables
         //Make the Canvas
-        canvDetSum = new TCanvas( ("canv_" + vec_strObsName[i] + "_AllEta" ).c_str(), ( vec_strObsName[i] + " for All Eta" ).c_str(), 1000, 2500);
+        canvDetSum = new TCanvas( ("canv_" + vec_strObsName[i] + "_AllEta" ).c_str(), ( vec_strObsName[i] + " for All Eta" ).c_str(), 600, 600);
         
         //Setup the Legend
-        legObs = new TLegend(0.2,0.2,0.6,0.8);
+        legObs = new TLegend(0.2,0.2,0.6,0.4);
         legObs->SetNColumns(2);
         legObs->SetFillColor(kWhite);
         legObs->SetLineColor(kBlack);
@@ -243,7 +243,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
                     
                     //Draw the TLatex
                     latex_PhiSector.SetTextSize(0.05);
-                    latex_PhiSector.DrawLatexNDC(0.125 + 0.775 * ( (iPhiPos-1) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+                    latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
                     
                     //Segment the Plot with lines
                     if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -403,8 +403,9 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
                 
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.775 * ( (iPhiPos-1) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos) ).c_str() );
+                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
                 
+		cout<<"iPhiPos = " << iPhiPos << endl;
                 
                 //Segment the Plot with lines
                 if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
