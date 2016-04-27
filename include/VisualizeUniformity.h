@@ -56,10 +56,10 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Draws a given observable onto a single pad off canvas
-        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
-        virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

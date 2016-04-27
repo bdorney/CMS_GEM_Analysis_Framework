@@ -25,7 +25,7 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor
 
-void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
@@ -78,7 +78,6 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
         //Get the histogram & draw it
-        canv_DetSum.cd();
         etaSector = detMPGD.getEtaSector(iEta);
         hObs = getObsHisto(strObsName, etaSector);
         
@@ -88,8 +87,15 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
         legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
         
         vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
-        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
-        
+
+	canv_DetSum.cd();
+	if( 1 == iEta ){
+	    vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+	}
+	else{
+	    vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
+	}
+
         //Setup the TLatex for "CMS Preliminary"
         TLatex latex_CMSPrelim;
         latex_CMSPrelim.SetTextSize(0.05);
@@ -97,12 +103,8 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
             latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
         }
         
-        //Setup the TLatex for this iEta sector
-        TLatex latex_EtaSector;
-        latex_EtaSector.SetTextSize(0.05);
-        latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
-        
         //Setup the iPhi designation
+	if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the canvas is the active canvas (it should be already but who knows...)
             canv_DetSum.cd();
@@ -127,6 +129,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
                 line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
             } //End Case: Not the Last Phi Segment Yet
         } //End Loop Over Sector Phi
+	} //End Case: Show iPhi Segmentation
     } //End Loop Over Detector's Eta Sector
     
     //Draw the Legend
@@ -153,7 +156,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
-void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
     //bool bEvenEtaNum = (bool) ( iNumEta % 2);
     
@@ -242,6 +245,12 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
 
 	//hObs->SetDirectory(gROOT);
         //hObs->Draw( strDrawOption.c_str() );
+
+	cout<<"hObs = " << hObs << endl;
+	cout<<"vec_hObs.size() = " << vec_hObs.size() << endl;
+	cout<<"vec_hObs["<<iEta-1<<"] = ";
+	cout<<vec_hObs[iEta-1]<<endl;
+
 	vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
 
 	//Setup the TLatex for "CMS Preliminary"
@@ -257,6 +266,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
         latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
         
         //Setup the iPhi designation
+	if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the pad is the active pad (it should be already but who knows...)
 	    vec_padSectorObs[iEta-1]->cd();
@@ -282,6 +292,7 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
                 line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
             } //End Case: Not the Last Phi Segment Yet
         } //End Loop Over Sector Phi
+	} //End Case: Show iPhi Segmentation
     } //End Loop Over Detector's Eta Sector
     
     //Write the Canvas to the File
@@ -306,7 +317,9 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
+	cout<<"inputEta.clustHistos.hADC = " << inputEta.clustHistos.hADC << endl;
         ret_histo = inputEta.clustHistos.hADC;
+	cout<<"ret_histo = " << ret_histo << endl;
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("CLUSTMULTI") ) { //Case: Cluster Multi
         ret_histo = inputEta.clustHistos.hMulti;
@@ -332,13 +345,23 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     } //End Case: Hit Time
     //=======================Results Parameters=======================
     else if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Norm Chi2
-        inputEta.gEta_ClustADC_Fit_NormChi2->Draw(); //Hack
+	TCanvas *canv_Temp = new TCanvas("canv_Temp","Temp",600,600);
+        inputEta.gEta_ClustADC_Fit_NormChi2->Draw("AP"); //Hack
         ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
+	cout<<"Case: RESPONSEFITCHI2\n";
+	cout<<"ret_histo = " << ret_histo << endl;
     } //End Case: Fit Norm Chi2
     else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-        inputEta.gEta_ClustADC_Fit_PkPos->Draw(); //Hack
+	TCanvas *canv_Temp = new TCanvas("canv_Temp","Temp",600,600);
+        inputEta.gEta_ClustADC_Fit_PkPos->Draw("AP"); //Hack
         ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_PkPos->GetHistogram() );
+	cout<<"Case: RESPONSEFITPKPOS\n";
+	cout<<"ret_histo = " << ret_histo << endl;
     } //End Case: Fit Pk Pos
+    //=======================Unrecognized Parameters=======================
+    else{ //Case: Unrecognized Parameter
+	cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+    } //End Case: Unrecognized Parameter
     
     return ret_histo;
 } //End VisualizeUniformity::getObsHisto()
