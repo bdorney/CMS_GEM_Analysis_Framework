@@ -68,7 +68,7 @@ namespace Uniformity {
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         //Draws a given observable on each pad
         //Makes one canvas for each element of vec_strObsName
-        virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        //virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

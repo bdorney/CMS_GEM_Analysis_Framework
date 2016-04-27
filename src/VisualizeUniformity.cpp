@@ -492,7 +492,7 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
         for (int i=1; i < ret_histo->GetNbinsX(); ++i) {
             cout<<i<<"\t"<<ret_histo->GetBinContent(i)<<"\t+/- "<<ret_histo->GetBinError(i)<<endl;
         }
-	} //End Case: Fit Pk Pos
+    } //End Case: Fit Pk Pos
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
