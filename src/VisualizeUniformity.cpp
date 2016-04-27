@@ -405,8 +405,6 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
                 latex_PhiSector.SetTextSize(0.05);
                 latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
                 
-		cout<<"iPhiPos = " << iPhiPos << endl;
-                
                 //Segment the Plot with lines
                 if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
                     TLine line_PhiSeg;
@@ -490,6 +488,10 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
             
             ret_histo->SetBinError(i+1, inputEta.gEta_ClustADC_Fit_NormChi2->GetErrorY(i) );
         } //End Loop through points
+        
+        for (int i=1; i < ret_histo->GetNbinsX(); ++i) {
+            cout<<i<<"\t"<<ret_histo->GetBinContent(i)<<"\t+/- "<<ret_histo->GetBinError(i)<<endl;
+        }
 	} //End Case: Fit Pk Pos
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
