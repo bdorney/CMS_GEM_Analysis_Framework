@@ -83,7 +83,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
         
         hObs->SetLineColor( Timing::getCyclicColor(iEta) );
         hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-        hObs->SetFillColor( Timing::getCyclicColor(iEta) );
+        //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
         legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
         
         vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
@@ -209,7 +209,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
             
             hObs->SetLineColor( Timing::getCyclicColor(iEta) );
             hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-            hObs->SetFillColor( Timing::getCyclicColor(iEta) );
+            //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
             legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
             
             vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
