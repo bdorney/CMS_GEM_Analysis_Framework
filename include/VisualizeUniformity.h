@@ -58,8 +58,18 @@ namespace Uniformity {
         //Draws a given observable onto a single pad off canvas
         virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
+        //Draws a set of observables onto a single pad off canvas
+        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+        //Draws a given observable on each pad
         virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
+        //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+        //Draws a given observable on each pad
+        //Makes one canvas for each element of vec_strObsName
+        //virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,7 +100,7 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-	std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
+        std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
