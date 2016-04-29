@@ -17,6 +17,7 @@
 #figures/
 #figures/*
 *.png
+*.pdf
 
 # Misc #
 ########
