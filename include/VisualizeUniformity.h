@@ -33,6 +33,7 @@
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "TMultiGraph.h"
 #include "TObject.h"
 #include "TPad.h"
 #include "TROOT.h"
@@ -56,19 +57,26 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Draws a given observable onto a single pad off canvas
-        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Draws a set of observables onto a single pad off canvas
-        virtual void storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        //virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
+        
+        //Draws a given observable onto a single pad off canvas
+        virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
+        //Draws a set of observables onto a single pad off canvas
+        virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         //Draws a given observable on each pad
-        virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         //Draws a given observable on each pad
         //Makes one canvas for each element of vec_strObsName
-        //virtual void storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        //virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -99,6 +107,9 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Could not make the below method work with the TGraphErrors Easily
+        std::shared_ptr<TGraphErrors> getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta);
+
         std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
         
         //Printers - Methods that Print Something

@@ -26,7 +26,130 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor
 
-void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TGraphErrors> gObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
+    
+    vector<shared_ptr<TGraphErrors> > vec_gObs;
+
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canvDetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = ptr_fileOutput->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Setup the Legend
+    //------------------------------------------------------
+    legObs->SetNColumns(2);
+    legObs->SetFillColor(kWhite);
+    legObs->SetLineColor(kBlack);
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        gObs = getObsGraph(strObsName, etaSector);
+        
+        gObs->SetLineColor( Timing::getCyclicColor(iEta) );
+        gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
+        //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
+        legObs->AddEntry(gObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
+        
+	vec_gObs.push_back(gObs);	//Need to keep this parameter alive?
+
+        mgraph_Obs->Add( gObs.get() );
+    } //End Loop Over Detector's Eta Sector
+    
+    //Draw mgraph_Obs
+    //------------------------------------------------------
+    canvDetSum.cd();
+    mgraph_Obs->Draw( strDrawOption.c_str() );
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Setup the iPhi designation
+    //------------------------------------------------------
+    //etaSector should be set here based on the last iteration of the above loop
+    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+            //Ensure the canvas is the active canvas (it should be already but who knows...)
+            canvDetSum.cd();
+            
+            //Declare the TLatex
+            TLatex latex_PhiSector;
+            
+            //Determine the iPhi index
+            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+            
+            //Draw the TLatex
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            
+            //Segment the Plot with lines
+            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                TLine line_PhiSeg;
+                
+                line_PhiSeg.SetLineStyle(2);
+                line_PhiSeg.SetLineWidth(2);
+                
+                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+            } //End Case: Not the Last Phi Segment Yet
+        } //End Loop Over Sector Phi
+    } //End Case: Show iPhi Segmentation
+    
+    //Draw the Legend
+    //------------------------------------------------------
+    legObs->Draw("same");
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canvDetSum.Write();
+    mgraph_Obs->Write();
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasGraph()
+
+void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
 
@@ -95,42 +218,43 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
         else{
             vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
         }
-
-        //Setup the TLatex for "CMS Preliminary"
-        TLatex latex_CMSPrelim;
-        latex_CMSPrelim.SetTextSize(0.05);
-        if( 1 == iEta){
-            latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-        }
-        
-        //Setup the iPhi designation
-        if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-            for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-                //Ensure the canvas is the active canvas (it should be already but who knows...)
-                canv_DetSum.cd();
-                
-                //Declare the TLatex
-                TLatex latex_PhiSector;
-                
-                //Determine the iPhi index
-                int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                
-                //Draw the TLatex
-                latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-                
-                //Segment the Plot with lines
-                if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                    TLine line_PhiSeg;
-                    
-                    line_PhiSeg.SetLineStyle(2);
-                    line_PhiSeg.SetLineWidth(2);
-                    
-                    line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-                } //End Case: Not the Last Phi Segment Yet
-            } //End Loop Over Sector Phi
-        } //End Case: Show iPhi Segmentation
     } //End Loop Over Detector's Eta Sector
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Setup the iPhi designation
+    //------------------------------------------------------
+    //etaSector should be set here based on the last iteration of the above loop
+    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+            //Ensure the canvas is the active canvas (it should be already but who knows...)
+            canv_DetSum.cd();
+            
+            //Declare the TLatex
+            TLatex latex_PhiSector;
+            
+            //Determine the iPhi index
+            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+            
+            //Draw the TLatex
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            
+            //Segment the Plot with lines
+            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                TLine line_PhiSeg;
+                
+                line_PhiSeg.SetLineStyle(2);
+                line_PhiSeg.SetLineWidth(2);
+                
+                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+            } //End Case: Not the Last Phi Segment Yet
+        } //End Loop Over Sector Phi
+    } //End Case: Show iPhi Segmentation
     
     //Draw the Legend
     //------------------------------------------------------
@@ -146,9 +270,9 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::storeCanvasSegmented()
+} //End VisualizeUniformity::storeCanvasHisto()
 
-void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::string strOption, vector<string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, vector<string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -221,42 +345,43 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
             else{
                 vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
             }
-            
-            //Setup the TLatex for "CMS Preliminary"
-            TLatex latex_CMSPrelim;
-            latex_CMSPrelim.SetTextSize(0.05);
-            if( 1 == iEta){
-                latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-            }
-            
-            //Setup the iPhi designation
-            if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-                for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-                    //Ensure the canvas is the active canvas (it should be already but who knows...)
-                    canvDetSum->cd();
-                    
-                    //Declare the TLatex
-                    TLatex latex_PhiSector;
-                    
-                    //Determine the iPhi index
-                    int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                    
-                    //Draw the TLatex
-                    latex_PhiSector.SetTextSize(0.05);
-                    latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-                    
-                    //Segment the Plot with lines
-                    if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                        TLine line_PhiSeg;
-                        
-                        line_PhiSeg.SetLineStyle(2);
-                        line_PhiSeg.SetLineWidth(2);
-                        
-                        line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-                    } //End Case: Not the Last Phi Segment Yet
-                } //End Loop Over Sector Phi
-            } //End Case: Show iPhi Segmentation
         } //End Loop Over Detector's Eta Sector
+        
+        //Setup the TLatex for "CMS Preliminary"
+        //------------------------------------------------------
+        TLatex latex_CMSPrelim;
+        latex_CMSPrelim.SetTextSize(0.05);
+        latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+        
+        //Setup the iPhi designation
+        //------------------------------------------------------
+        //etaSector should be set here based on the last iteration of the above loop
+        if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+            for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+                //Ensure the canvas is the active canvas (it should be already but who knows...)
+                canvDetSum->cd();
+                
+                //Declare the TLatex
+                TLatex latex_PhiSector;
+                
+                //Determine the iPhi index
+                int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+                
+                //Draw the TLatex
+                latex_PhiSector.SetTextSize(0.05);
+                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+                
+                //Segment the Plot with lines
+                if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                    TLine line_PhiSeg;
+                    
+                    line_PhiSeg.SetLineStyle(2);
+                    line_PhiSeg.SetLineWidth(2);
+                    
+                    line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+                } //End Case: Not the Last Phi Segment Yet
+            } //End Loop Over Sector Phi
+        } //End Case: Show iPhi Segmentation
         
         //Draw the Legend
         legObs->Draw("same");
@@ -274,7 +399,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::storeCanvasSegmented()
+} //End VisualizeUniformity::storeCanvasHisto()
 
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
@@ -284,7 +409,7 @@ void VisualizeUniformity::storeCanvas(std::string & strOutputROOTFileName, std::
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
-void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
     //bool bEvenEtaNum = (bool) ( iNumEta % 2);
     
@@ -428,7 +553,28 @@ void VisualizeUniformity::storeCanvasSegmented(std::string & strOutputROOTFileNa
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::storeCanvasSegmented()
+} //End VisualizeUniformity::storeCanvasHistoSegmented()
+
+std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta){
+    //Variable Declaration
+    std::shared_ptr<TGraphErrors> ret_graph;
+    
+    std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
+    
+    //=======================Fit Result Parameters=======================
+    if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Norm Chi2
+        ret_graph = inputEta.gEta_ClustADC_Fit_NormChi2;
+    } //End Case: Fit Norm Chi2
+    else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
+        ret_graph = inputEta.gEta_ClustADC_Fit_PkPos;
+    } //End Case: Fit Pk Pos
+    //=======================Unrecognized Parameters=======================
+    else{ //Case: Unrecognized Parameter
+        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+    } //End Case: Unrecognized Parameter
+    
+    return ret_graph;
+} //End VisualizeUniformity::getObsGraph()
 
 std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration
@@ -464,35 +610,6 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
         ret_histo = inputEta.hitHistos.hTime;
     } //End Case: Hit Time
-    //=======================Results Parameters=======================
-    else if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Norm Chi2
-        TCanvas *canv_Temp = new TCanvas("canv_Temp","Temp",600,600);
-        inputEta.gEta_ClustADC_Fit_NormChi2->Draw("AP"); //Hack
-        ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
-        ret_histo->Sumw2();
-        
-        //Set the error on each point
-        for (int i=0; i < inputEta.gEta_ClustADC_Fit_NormChi2->GetN(); ++i) { //Loop through points
-            
-            ret_histo->SetBinError(i+1, inputEta.gEta_ClustADC_Fit_NormChi2->GetErrorY(i) );
-        } //End Loop through points
-	} //End Case: Fit Norm Chi2
-    else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-        TCanvas *canv_Temp = new TCanvas("canv_Temp","Temp",600,600);
-        inputEta.gEta_ClustADC_Fit_PkPos->Draw("AP"); //Hack
-        ret_histo = std::make_shared<TH1F>( *inputEta.gEta_ClustADC_Fit_PkPos->GetHistogram() );
-        ret_histo->Sumw2();
-        
-        //Set the error on each point
-        for (int i=0; i < inputEta.gEta_ClustADC_Fit_NormChi2->GetN(); ++i) { //Loop through points
-            
-            ret_histo->SetBinError(i+1, inputEta.gEta_ClustADC_Fit_NormChi2->GetErrorY(i) );
-        } //End Loop through points
-        
-        for (int i=1; i < ret_histo->GetNbinsX(); ++i) {
-            cout<<i<<"\t"<<ret_histo->GetBinContent(i)<<"\t+/- "<<ret_histo->GetBinError(i)<<endl;
-        }
-    } //End Case: Fit Pk Pos
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";

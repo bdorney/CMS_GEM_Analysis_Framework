@@ -107,12 +107,12 @@ int main( int argc_, char * argv_[] ){
     
     //Visualize Hits
     VisualizeUniformity myVisualizer(aSetup, myDet);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitADC", "E1", false);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitPos", "E1", true);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "HitTime", "E1", false);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "HitADC", "E1", false);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "HitPos", "E1", true);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "HitTime", "E1", false);
     
 	//Cluster Analysis
-    cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+    /*cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
     cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
     cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
     cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
@@ -134,13 +134,13 @@ int main( int argc_, char * argv_[] ){
     
     myDet = myAnalyzerCluster.getDetector();
     myVisualizer.setDetector(myDet);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustADC", "E1", false);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustPos", "E1", true);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustSize", "E1", false);
-    myVisualizer.storeCanvasSegmented(vec_strInputArgs[4], "UPDATE", "ClustTime", "E1", false);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "ClustADC", "E1", false);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "ClustPos", "E1", true);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "ClustSize", "E1", false);
+    myVisualizer.storeCanvasHistoSegmented(vec_strInputArgs[4], "UPDATE", "ClustTime", "E1", false);
     
-    myVisualizer.storeCanvas(vec_strInputArgs[4], "UPDATE", "ResponseFitChi2", "E1", true);
-    myVisualizer.storeCanvas(vec_strInputArgs[4], "UPDATE", "ResponseFitPkPos", "E1", true);
+    myVisualizer.storeCanvasGraph(vec_strInputArgs[4], "UPDATE", "ResponseFitChi2", "AP", true);
+    myVisualizer.storeCanvasGraph(vec_strInputArgs[4], "UPDATE", "ResponseFitPkPos", "AP", true);*/
 
     //Debugging
     //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
