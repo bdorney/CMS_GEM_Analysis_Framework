@@ -522,7 +522,7 @@ int main( int argc_, char * argv_[] ){
             clustSelector.setClusters(vec_strInputFiles[i], detMPGD, aSetup);
     
             if (bVerboseMode) { //Print Number of Selected Clusters to User
-                cout<<vec_strInputFiles[i] << " has " << detMPGD.getClusters().size() << " hits passing selection" << endl;
+                cout<<vec_strInputFiles[i] << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
             } //End Print Number of Selected Clusters to User
             
             //Load the required input parameters
@@ -536,14 +536,21 @@ int main( int argc_, char * argv_[] ){
             clustAnalyzer.fillHistos();
             
             //Update the Detector!
-            detMPGD = hitAnalyzer.getDetector();
+            detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
     } //End Loop over vec_strInputFiles
     
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option);
-    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, "UPDATE");
+    if ( rSetup.bAnaStep_Clusters){
+	if ( !rSetup.bAnaStep_Hits){
+		clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option );
+	}
+	else{
+		clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, "UPDATE" );
+	}
+    }
     
     //Fit Histograms After Analyzing all input files
     //------------------------------------------------------
@@ -552,6 +559,9 @@ int main( int argc_, char * argv_[] ){
             clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
             clustAnalyzer.fitHistos();
             clustAnalyzer.storeFits(rSetup.strFile_Output_Name, "UPDATE");
+
+	    //Update the Detector!
+            detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
     } //End Case: Fitting Stored Distributions
     
@@ -574,8 +584,8 @@ int main( int argc_, char * argv_[] ){
             visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "ClustTime", "E1", false);
 
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
-                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitChi2", "E1", rSetup.bVisPlots_PhiLines);
-                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitPkPos", "E1", rSetup.bVisPlots_PhiLines);
+                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitChi2", "APE1", rSetup.bVisPlots_PhiLines);
+                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitPkPos", "APE1", rSetup.bVisPlots_PhiLines);
             } //End Case: Fitting
         } //End Case: Cluster Analysis
     } //End Case: Visualize Output

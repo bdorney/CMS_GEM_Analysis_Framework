@@ -50,16 +50,6 @@ void AnalyzeResponseUniformityClusters::fillHistos(){
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
-            //Initialize iPhi Histograms - 1D
-            (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
-            (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
-            (*iterPhi).second.clustHistos.hSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
-            (*iterPhi).second.clustHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
-            
-            //Initialize iPhi Histograms - 2D
-            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
-            (*iterPhi).second.clustHistos.hADC_v_Pos->Sumw2();
-            
             //Loop Over Stored Clusters
             for (auto iterClust = (*iterPhi).second.vec_clusters.begin(); iterClust != (*iterPhi).second.vec_clusters.end(); ++iterClust) { //Loop Over Stored Clusters
                 //Fill iEta Histograms
@@ -86,15 +76,18 @@ void AnalyzeResponseUniformityClusters::fillHistos(){
                 
                 //Two cases, the slice histogram is empty (first analyzed run), or the slice histogram has nonzero entries (subsequent runs)
                 //Projecting a slice from the 2D histogram, setting this to a temporary histogram, and then adding it to the slice histogram covers both cases!!!
-                TH1F *hTempSliceHisto = (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"");
+                //TH1F *hTempSliceHisto = (TH1D*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"");
                 
-                (*iterPhi).second.map_slices[i].hSlice_ClustADC->Add(hTempSliceHisto);
+		std::shared_ptr<TH1F> hTempSliceHisto = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( "hTempSliceHisto",i,i,"") ) );
+
+                (*iterPhi).second.map_slices[i].hSlice_ClustADC->Add( hTempSliceHisto.get() );
                 
-                delete hTempSliceHisto;
+                //delete hTempSliceHisto;
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
         
-        std::cout<<"(*iterEta).second.clustHistos.hADC->Integral() = " << (*iterEta).second.clustHistos.hADC->Integral() << std::endl;
+	//Debugging
+        //std::cout<<"(*iterEta).second.clustHistos.hADC->Integral() = " << (*iterEta).second.clustHistos.hADC->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
     return;
@@ -257,7 +250,6 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
-            
             //Initialize iPhi Histograms - 1D
             (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
             (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
@@ -430,14 +422,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
     //Close File
     
     //Setup the summary histograms
-    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
-    
-    //summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_clustADC) );
-    //summaryHistos.hMulti
-    //summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_clustPos) );
-    //summaryHistos.hSize = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_clustSize) );
-    //summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_clustTime) );
-    
 	TH1F hClustADC_All( getHistogram(-1, -1, aSetup.histoSetup_clustADC) );
 	TH1F hClustPos_All( getHistogram(-1, -1, aSetup.histoSetup_clustPos) );
 	TH1F hClustSize_All( getHistogram(-1, -1, aSetup.histoSetup_clustSize) );
@@ -466,15 +450,9 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
         } //End Case: Directory did not exist in file, CREATE
         
         //Debugging
-        cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
-        //Add this sector to the summary histogram
-        //summaryHistos.hADC->Add((*iterEta).second.clustHistos.hADC.get() );
-        //summaryHistos.hMulti
-        //summaryHistos.hPos->Add((*iterEta).second.clustHistos.hPos.get() );
-        //summaryHistos.hSize->Add((*iterEta).second.clustHistos.hSize.get() );
-        //summaryHistos.hTime->Add((*iterEta).second.clustHistos.hTime.get() );
-        
+	//Add this sector to the summary histogram
 	hClustADC_All.Add((*iterEta).second.clustHistos.hADC.get() );
 	hClustPos_All.Add((*iterEta).second.clustHistos.hPos.get() );
 	hClustSize_All.Add((*iterEta).second.clustHistos.hSize.get() );
@@ -536,13 +514,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
     
     //Store the Summary Histograms
     dir_Summary->cd();
-    //Add this sector to the summary histogram
-    //summaryHistos.hADC->Write();
-    //summaryHistos.hMulti
-    //summaryHistos.hPos->Write();
-    //summaryHistos.hSize->Write();
-    //summaryHistos.hTime->Write();
-    
 	hClustADC_All.Write();
 	hClustPos_All.Write();
 	hClustSize_All.Write();

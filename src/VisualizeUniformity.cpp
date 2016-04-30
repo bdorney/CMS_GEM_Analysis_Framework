@@ -44,15 +44,20 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     
     SectorEta etaSector;
     
+    std::vector<shared_ptr<TGraphErrors> > vec_gObs;
+
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
+    //TLatex *latex_PhiSector = new TLatex();            
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
-    
+    //TLine *line_PhiSeg = new TLine();    
+
     TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
     
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    //TCanvas *canv_DetSum = new TCanvas( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -88,11 +93,15 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
         etaSector = detMPGD.getEtaSector(iEta);
         gObs = getObsGraph(strObsName, etaSector);
         
+	cout<<"gObs = " << gObs << endl;
+
         gObs->SetLineColor( Timing::getCyclicColor(iEta) );
         gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-        //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
+
         legObs->AddEntry(gObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
         
+        vec_gObs.push_back(gObs);			//Need to keep this pointer alive outside of Loop?
+
         mgraph_Obs->Add( gObs.get() );
     } //End Loop Over Detector's Eta Sector
     
@@ -580,6 +589,8 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strO
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
+	cout<<"ret_graph = " << ret_graph << endl;
+
     return ret_graph;
 } //End VisualizeUniformity::getObsGraph()
 
