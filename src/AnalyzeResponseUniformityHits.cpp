@@ -44,36 +44,11 @@ AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUnifor
 void AnalyzeResponseUniformityHits::fillHistos(){
     //Variable Declaration
     
-    //Initialize Summary Histograms
-    //  Placeholder
-    
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
-        //Grab Eta Sector width (for ClustPos Histo)
-        aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
-        aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
-        
-        //Initialize iEta Histograms - 1D
-        (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
-        (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
-        (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
-        
-        //Initialize iEta Histograms - 2D
-        //  Placeholder
-        
-        //Debugging
-        //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
-        
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
-            
-            //Initialize iPhi Histograms - 1D
-            (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
-            (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
-            
-            //Initialize iPhi Histograms - 2D
-            //  Placeholder
             
             //Loop Over Stored Hits
             for (auto iterHit = (*iterPhi).second.vec_hits.begin(); iterHit != (*iterPhi).second.vec_hits.end(); ++iterHit) { //Loop Over Stored Hits
@@ -103,6 +78,40 @@ void AnalyzeResponseUniformityHits::fitHistos(){
     
     return;
 } //End AnalyzeResponseUniformityHits::fitHistos()
+
+//Loops through the detector and initalizes all cluster histograms
+void AnalyzeResponseUniformityHits::initHistosHits(){
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        //Grab Eta Sector width (for ClustPos Histo)
+        aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
+        aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
+        aSetup.histoSetup_hitPos.iHisto_nBins = 128. * (*iterEta).second.map_sectorsPhi.size();
+        
+        //Initialize iEta Histograms - 1D
+        (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
+        (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
+        (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
+        
+        //Initialize iEta Histograms - 2D
+        //  Placeholder
+        
+        //Debugging
+        //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
+        
+        //Loop Over Stored iPhi Sectors
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
+            //Initialize iPhi Histograms - 1D
+            (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
+            (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
+            
+            //Initialize iPhi Histograms - 2D
+            //  Placeholder
+        } //End Loop Over iPhi Sectors
+    } //End Loop Over iEta Sectors
+    
+    return;
+} //End AnalyzeResponseUniformityHits::initHistosHits()
 
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityHits
 //Loads all TObjects found in the input ROOT file into detMPGD;

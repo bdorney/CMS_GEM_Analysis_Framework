@@ -73,6 +73,10 @@ namespace Uniformity {
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
         virtual void fitHistos();
         
+        //Initialize**************
+        //Loops through the detector and initalizes all cluster histograms
+        virtual void initHistosClusters();
+        
         //Loading*****************
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
         //Loads all TObjects found in the input ROOT file into detMPGD;

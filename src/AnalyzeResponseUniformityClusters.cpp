@@ -43,31 +43,9 @@ AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(AnalysisSet
 //Loops over all stored clusters in detMPGD and Book histograms for the full detector
 void AnalyzeResponseUniformityClusters::fillHistos(){
     //Variable Declaration
-    //vector<Cluster> vec_clust;
-    
-    //Initialize Summary Histograms
-    //hEta_v_SliceNum_Occupancy = std::make_shared<TH2F>( TH2F("hEta_v_SliceNum_Occupancy","",3. * aSetup.iUniformityGranularity, 1, 3. * aSetup.iUniformityGranularity + 1, detMPGD.map_sectorsEta.size(), 1, detMPGD.map_sectorsEta.size() + 1 ) );
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Grab Eta Sector width (for ClustPos Histo)
-        aSetup.histoSetup_clustPos.fHisto_xLower = -0.5*(*iterEta).second.fWidth;
-        aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
-        
-        //Initialize iEta Histograms - 1D
-        (*iterEta).second.clustHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
-        //(*iterEta).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
-        (*iterEta).second.clustHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
-        (*iterEta).second.clustHistos.hSize = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
-        (*iterEta).second.clustHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
-        
-        //Initialize iEta Histograms - 2D
-        (*iterEta).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", 3. * aSetup.iUniformityGranularity,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
-        (*iterEta).second.clustHistos.hADC_v_Pos->Sumw2();
-        
-        //Debugging
-        //cout<<"(*iterEta).second.clustHistos.hADC->GetName() = " << (*iterEta).second.clustHistos.hADC->GetName() << endl;
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
@@ -105,20 +83,14 @@ void AnalyzeResponseUniformityClusters::fillHistos(){
             //Slices
             //Now that all clusters have been analyzed we extract the slices
             for (int i=1; i<= aSetup.iUniformityGranularity; ++i) { //Loop Over Slices
-                //Create the slice
-                SectorSlice slice;
                 
-                //string strSliceName = "hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC";
+                //Two cases, the slice histogram is empty (first analyzed run), or the slice histogram has nonzero entries (subsequent runs)
+                //Projecting a slice from the 2D histogram, setting this to a temporary histogram, and then adding it to the slice histogram covers both cases!!!
+                TH1F *hTempSliceHisto = (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"");
                 
-                //Grab ADC spectrum for this slice
-                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                (*iterPhi).second.map_slices[i].hSlice_ClustADC->Add(hTempSliceHisto);
                 
-                //Store position information for this slice
-                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
-                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
-                
-                //Store the slice
-                (*iterPhi).second.map_slices[i] = slice;
+                delete hTempSliceHisto;
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
         
@@ -259,6 +231,63 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
     
     return;
 } //End AnalyzeResponseUniformityClusters::fitHistos()
+
+//Loops through the detector and initalizes all cluster histograms
+void AnalyzeResponseUniformityClusters::initHistosClusters(){
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Grab Eta Sector width (for ClustPos Histo)
+        aSetup.histoSetup_clustPos.fHisto_xLower = -0.5*(*iterEta).second.fWidth;
+        aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
+        
+        //Initialize iEta Histograms - 1D
+        (*iterEta).second.clustHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustADC ) );
+        //(*iterEta).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustMulti ) );
+        (*iterEta).second.clustHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustPos ) );
+        (*iterEta).second.clustHistos.hSize = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustSize ) );
+        (*iterEta).second.clustHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_clustTime ) );
+        
+        //Initialize iEta Histograms - 2D
+        (*iterEta).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", 3. * aSetup.iUniformityGranularity,-0.5*(*iterEta).second.fWidth,0.5*(*iterEta).second.fWidth,300,0,15000) );
+        (*iterEta).second.clustHistos.hADC_v_Pos->Sumw2();
+        
+        //Debugging
+        //cout<<"(*iterEta).second.clustHistos.hADC->GetName() = " << (*iterEta).second.clustHistos.hADC->GetName() << endl;
+        
+        //Loop Over Stored iPhi Sectors
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
+            
+            //Initialize iPhi Histograms - 1D
+            (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
+            (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
+            (*iterPhi).second.clustHistos.hSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
+            (*iterPhi).second.clustHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
+            
+            //Initialize iPhi Histograms - 2D
+            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
+            (*iterPhi).second.clustHistos.hADC_v_Pos->Sumw2();
+            
+            //Setup the Slices
+            for (int i=1; i<= aSetup.iUniformityGranularity; ++i) { //Loop Over Slices
+                //Create the slice
+                SectorSlice slice;
+                
+                //Grab ADC spectrum for this slice
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                
+                //Store position information for this slice
+                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
+                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
+                
+                //Store the slice
+                (*iterPhi).second.map_slices[i] = slice;
+            } //End Loop Over Slices
+        } //End Loop Over iPhi Sectors
+    } //End Loop Over iEta Sectors
+    
+    return;
+} //End AnalyzeResponseUniformityClusters::initHistosClusters()
 
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
 //Loads all TObjects found in the input ROOT file into detMPGD;

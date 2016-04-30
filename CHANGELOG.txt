@@ -13,6 +13,12 @@ Update: Apr 30th 2016
 ->DetectorMPGD::resetClusters clears all stored clusters, but leaves all other data members (e.g. geometry, histograms, etc...) intact
 ->DetectorMPGD::resetHits clears all stored hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
 ->DetectorMPGD::resetPhysObj clears all stored clusters and hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->AnalyzeUniformityClusters has new method initHistosClusters
+->This method will initialize all histograms once, before looping through input clusters
+->Changed the way the slice histograms in AnalyzeUniformityClusters were made, now they will properly reflcet the aggregate of a multi run analysis (instead of being overwritten for each new run);
+->AnalyzeUniformityHits has new method initHistosHits
+->This method will initialize all histograms once, before looping through input hits
+->Fixed a bug in AnalyzeUniformityHits where the number of bins of hit position histogram did not equal the number of strips
 
 Update: Apr 29th 2016
 ==================================================

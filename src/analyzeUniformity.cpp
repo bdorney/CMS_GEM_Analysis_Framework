@@ -496,9 +496,14 @@ int main( int argc_, char * argv_[] ){
                 cout<<vec_strInputFiles[i] << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
             } //End Print Number of Selected Hits to User
             
-            //Hit Analysis
+            //Load the required input parameters
             hitAnalyzer.setAnalysisParameters(aSetup);
             hitAnalyzer.setDetector(detMPGD);
+            
+            //Initialize the hit histograms if this is the first run
+            if (i == 0) { hitAnalyzer.initHistosHits(); }
+            
+            //Hit Analysis
             hitAnalyzer.fillHistos();
             
             //Update the Detector!
@@ -520,9 +525,14 @@ int main( int argc_, char * argv_[] ){
                 cout<<vec_strInputFiles[i] << " has " << detMPGD.getClusters().size() << " hits passing selection" << endl;
             } //End Print Number of Selected Clusters to User
             
-            //Cluster Analysis
+            //Load the required input parameters
             clustAnalyzer.setAnalysisParameters(aSetup);
             clustAnalyzer.setDetector(detMPGD);
+            
+            //Initialize the cluster histograms if this is the first run
+            if (i == 0) { clustAnalyzer.initHistosClusters(); }
+            
+            //Cluster Analysis
             clustAnalyzer.fillHistos();
             
             //Update the Detector!
