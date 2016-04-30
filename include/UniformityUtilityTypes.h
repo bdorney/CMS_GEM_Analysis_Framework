@@ -131,6 +131,8 @@ namespace Uniformity {
         //Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
         int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
         
+        std::map<int, Hit> map_hits;    //Hits used to reconstruct this cluster; placeholder, key-val here is the hit's strip number iStripNum
+        
         //Set Initial Values
         Cluster(){
             iPos_Y = iSize = iTimeBin = -1;
