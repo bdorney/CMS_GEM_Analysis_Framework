@@ -307,8 +307,8 @@ namespace Uniformity {
         
         std::map<int, SectorSlice> map_slices;  //Slices of this sector
         
-        std::vector<Hit> vec_hits;
         std::vector<Cluster> vec_clusters;
+        std::vector<Hit> vec_hits;
         
         //Histograms
         HistosPhysObj clustHistos;

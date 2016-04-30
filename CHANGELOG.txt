@@ -2,10 +2,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.4                               *
+*	VERSION: 1.0.5                               *
 *	LAST UPDATE: Apr 25 2016                     *
 *                                                *
 **************************************************
+
+Update: Apr 27th 2016
+==================================================
+->Updating README file
+->Merging a first version of feature_VisualizeUniformity into the develop branch
 
 Update: Apr 26th 2016
 ==================================================

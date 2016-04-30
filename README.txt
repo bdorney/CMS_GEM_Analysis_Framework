@@ -164,7 +164,10 @@
 
     Inheritance relations:
 
-        -None for now
+        AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits, and VisualizeUniformity all
+        inherit from AnalyzeResponseUniformity.
+
+        SelectorHit and SelectorClusters all inherit from Selector.
 
     Friendship relations:
 
@@ -342,139 +345,184 @@
             SelParam
             SummaryStatistics
 
-        The AnalysisSetupUniformity struct stores user input defined in the Analysis Config file.  This
-        struct has one instance of a HistoSetup struct for each cluster physical obserable (e.g. ADC,
-        position, etc...).  Additionally this struct has one instance of a SelParam struct; which
-        stores user input defined in the Analysis Config file for cluster selection.
+        Each of these items are described in detail below.
 
-        Data members of Uniformity::AnalysisSetupUniformity are:
+            # 4.d.ii.1 AnalysisSetupUniformity
+            # --------------------------------------------------------
 
-            AnalysisSetupUniformity::iEvt_First             //First event of TTree, produced by amoreSRS, to process.
-            AnalysisSetupUniformity::iEvt_Total             //Total events of a TTree, produced by amoreSRS, to process.
-            AnalysisSetupUniformity::iUniformityGranularity //The level of granularity the analysis will be carried out on  all iPhi sectors of a DetectorMPGD object (e.g. a value of 128 means at the strip level, a value of 2 means two groups of 64 strips).
-            AnalysisSetupUniformity::fUniformityTolerance   //The requested tolerance on the gain uniformity
+            The AnalysisSetupUniformity struct stores user input defined in the Analysis Config file.  This
+            struct has one instance of a HistoSetup struct for each cluster physical obserable (e.g. ADC,
+            position, etc...).  Additionally this struct has one instance of a SelParam struct; which
+            stores user input defined in the Analysis Config file for cluster selection.
 
-            AnalysisSetupUniformity::histoSetup_clustADC    //HistoSetup obejct for specifying cluster ADC TH1 & TF1 objects
-            AnalysisSetupUniformity::histoSetup_clustMulti  //HistoSetup obejct for specifying cluster multiplicity TH1 objects
-            AnalysisSetupUniformity::histoSetup_clustPos    //HistoSetup obejct for specifying cluster position TH1 objects
-            AnalysisSetupUniformity::histoSetup_clustSize   //HistoSetup obejct for specifying cluster size TH1 objects
-            AnalysisSetupUniformity::histoSetup_clustTime   //HistoSetup obejct for specifying cluster time bin TH1 objects
+            Data members of Uniformity::AnalysisSetupUniformity are:
 
-            AnalysisSetupUniformity::histoSetup_hitADC      //HistoSetup object for specifying hit ADC TH1 objects
-            AnalysisSetupUniformity::histoSetup_hitPos      //HistoSetup object for specifying hit position TH1 objects (in strip No.)
-            AnalysisSetupUniformity::histoSetup_hitTime     //HistoSetup object for specifying hit time bin TH1 objects
+                AnalysisSetupUniformity::iEvt_First             //First event of TTree, produced by amoreSRS, to process.
+                AnalysisSetupUniformity::iEvt_Total             //Total events of a TTree, produced by amoreSRS, to process.
+                AnalysisSetupUniformity::iUniformityGranularity //The level of granularity the analysis will be carried out on  all iPhi sectors of a DetectorMPGD object (e.g. a value of 128 means at the strip level, a value of 2 means two groups of 64 strips).
+                AnalysisSetupUniformity::fUniformityTolerance   //The requested tolerance on the gain uniformity
 
-            AnalysisSetupUniformity::selClust               //SelParam object specifying cluster selection cuts
-            AnalysisSetupUniformity::selHit                 //SelParam object specifying hit selection cuts
+                AnalysisSetupUniformity::histoSetup_clustADC    //HistoSetup obejct for specifying cluster ADC TH1 & TF1 objects
+                AnalysisSetupUniformity::histoSetup_clustMulti  //HistoSetup obejct for specifying cluster multiplicity TH1 objects
+                AnalysisSetupUniformity::histoSetup_clustPos    //HistoSetup obejct for specifying cluster position TH1 objects
+                AnalysisSetupUniformity::histoSetup_clustSize   //HistoSetup obejct for specifying cluster size TH1 objects
+                AnalysisSetupUniformity::histoSetup_clustTime   //HistoSetup obejct for specifying cluster time bin TH1 objects
 
-        The Uniformity::Cluster struct stores information relating to one reconstructed cluster
-        stored in the TCluster TTree created by amoreSRS.  Data members of Uniformity::Cluster are:
+                AnalysisSetupUniformity::histoSetup_hitADC      //HistoSetup object for specifying hit ADC TH1 objects
+                AnalysisSetupUniformity::histoSetup_hitPos      //HistoSetup object for specifying hit position TH1 objects (in strip No.)
+                AnalysisSetupUniformity::histoSetup_hitTime     //HistoSetup object for specifying hit time bin TH1 objects
 
-            Cluster::iPos_Y     //Distance in mm from wide base of trapezoid to cluster (e.g. vertical midpoint of iEta sector)
-            Cluster::fPos_X     //Horizontal position within iEta sector (used to assign to correct iPhi sector)
-            Cluster::fADC       //ADC value of cluster
-            Cluster::iSize      //Number of strips in cluster
-            Cluster::iTimeBin   //Time bin, e.g. latency value, of the cluster
+                AnalysisSetupUniformity::selClust               //SelParam object specifying cluster selection cuts
+                AnalysisSetupUniformity::selHit                 //SelParam object specifying hit selection cuts
 
-        Note data types of Uniformity::Cluster (e.g. int, float, etc...) should closely match what amoreSRS stores
-        in TCluster TTree; e.g. ADC is intrinscially integer physically, but it is defined as a float in amoreSRS.
+            # 4.d.ii.2 Cluster
+            # --------------------------------------------------------
 
-        The Uniformity::HistosPhysObj struct is used as a container for ROOT histograms (i.e. TH1, TH2, etc...).
-        These histograms are tracked at varying levels of the DetectorMPGD geometry (e.g. per SectorEta, per
-        SectorPhi, etc...).  Each data member of Uniformity::HistosPhysObj is a std::shared_ptr of a ROOT object,
-        they are given specifically as:
+            The Uniformity::Cluster struct stores information relating to one reconstructed cluster
+            stored in the TCluster TTree created by amoreSRS.  Data members of Uniformity::Cluster are:
 
-            HistosPhysObj::hADC         //ADC Spectrum for some physics object (e.g. clusters, hits, etc...)
-            HistosPhysObj::hMulti       //Multiplicity "                                                    "
-            HistosPhysObj::hPos         //Position     "                                                    "
-            HistosPhysObj::hSize        //Size         "                                                    "
-            HistosPhysObj::hTime        //Time bin (e.g. latency) "                                         "
-            HistosPhysObj::hADC_v_Pos   //ADC vs Position "                                                 "
+                Cluster::iPos_Y     //Distance in mm from wide base of trapezoid to cluster (e.g. vertical midpoint of iEta sector)
+                Cluster::fPos_X     //Horizontal position within iEta sector (used to assign to correct iPhi sector)
+                Cluster::fADC       //ADC value of cluster
+                Cluster::iSize      //Number of strips in cluster
+                Cluster::iTimeBin   //Time bin, e.g. latency value, of the cluster
 
-        For clusters hPos is the position along the detector trapezoid in mm with the detector axis being 0 mm in
-        the iPhi=2 sector, negative (positive) position values occur in iPhi = 1 (3).  For hits teh position is
-        the strip number along the detector from 0 to 383 increasing with increasing iPhi.
+            Note data types of Uniformity::Cluster (e.g. int, float, etc...) should closely match what amoreSRS stores
+            in TCluster TTree; e.g. ADC is intrinscially integer physically, but it is defined as a float in amoreSRS.
 
-        The Uniformity::Hit struct stores information relating to one reconstructed hit stored in the THit TTree
-        created by amoreSRS.  Data members of Uniformity::Hit are:
+            # 4.d.ii.3 HistosPhysObj
+            # --------------------------------------------------------
 
-            Hit::iPos_Y         //Distance in mm from wide base of trapezoid to hit (e.g. vertical midpoint of iEta sector)
-            Hit::iStripNum      //Strip number of the hit, this ranges from 0 to 383?
-            Hit::iTimeBin       //Time bin, e.g. latency value, of the hit
-            Hit::vec_sADC       //Vector of ADC values, each element of the vector represents ADC value at that time bin; e.g. vec_sADC[Hit::iTimeBin] gives the ADV value at the defined time bin
+            The Uniformity::HistosPhysObj struct is used as a container for ROOT histograms (i.e. TH1, TH2, etc...).
+            These histograms are tracked at varying levels of the DetectorMPGD geometry (e.g. per SectorEta, per
+            SectorPhi, etc...).  Each data member of Uniformity::HistosPhysObj is a std::shared_ptr of a ROOT object,
+            they are given specifically as:
 
-        Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
+                HistosPhysObj::hADC         //ADC Spectrum for some physics object (e.g. clusters, hits, etc...)
+                HistosPhysObj::hMulti       //Multiplicity "                                                    "
+                HistosPhysObj::hPos         //Position     "                                                    "
+                HistosPhysObj::hSize        //Size         "                                                    "
+                HistosPhysObj::hTime        //Time bin (e.g. latency) "                                         "
+                HistosPhysObj::hADC_v_Pos   //ADC vs Position "                                                 "
 
-        The Uniformity::SectorEta struct represents one iEta row of a detector. Each instance of a
-        Uniformity::SectorEta will store nbConnect objects of a Uniformity::SectorPhi struct where
-        nbConnect is a field found in the amoreSRS mapping file defining the number of readout conncetors
-        per iEta row. Each object of a Uniformity::SectorPhi struct will store
-        Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice
-        struct objects.  An object of a Uniformity::DetectorMPGD class will store a number of
-        objects of Uniformity::SectorEta as defined in the amoreSRS mapping file (e.g. number of "DET" rows).
+            For clusters hPos is the position along the detector trapezoid in mm with the detector axis being 0 mm in
+            the iPhi=2 sector, negative (positive) position values occur in iPhi = 1 (3).  For hits the position is
+            the strip number along the detector from 0 to 383 increasing with increasing iPhi.
 
-        The data members of the Uniformity::SectorEta struct are:
+            There is also one copy constructor and one overloaded assignment operator.  These items perform a
+            deep copy of the std::shared_ptr objects above.
 
-            SectorEta::fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
-            SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
-            SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
-            SectorEta::mset_fClustADC_Fit_PkPos     //Container storing peak position from Clust ADC Fit
-            SectorEta::vec_fClustADC_Fit_PkWidth    //Container storing peak width from Clust ADC Fit (not yet implemented)
-            SectorEta::mset_fClustADC_Spec_PkPos    //Container storing peak position from TSpectrum::Search() & TSpectrum::GetPositionX()
-            SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
-            SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
-            SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
-            SectorEta::gEta_ClustADC_Spec_NumPks    //std::shared_ptr of a TGraphErrors storing number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
-            SectorEta::gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
-            SectorEta::clustHistos                  //An instance of the Uniformity::HistosPhysObj struct for Clusters; at present time all members of the struct are used except hMulti
-            SectorEta::hitHistos                    //An instance of the Uniformity::HistosPhysObj struct for Hits; at present time only hPos and hTime are used
-            SectorEta::statClustADC_Fit_PkPos       //An instance of the Uniformity::SummaryStatistics struct for results of the cluster ADC peak position fitting
-            SectorEta::statClustADC_Spec_PkPos      //As SectorEta::statClustADC_Fit_PkPos but from TSpectrum::Search() & TSpectrum::GetPositionX()
+            # 4.d.ii.4 Hit
+            # --------------------------------------------------------
 
-        The data members of the Uniformity::SectorPhi struct are:
+            The Uniformity::Hit struct stores information relating to one reconstructed hit stored in the THit TTree
+            created by amoreSRS.  Data members of Uniformity::Hit are:
 
-            SectorPhi::fPos_Xlow                //X lower boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
-            SectorPhi::fPos_Xhigh               //X upper boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
-            SectorPhi::fWidth                   //Width of iPhi sector, in mm, at SectorEta::fPos_Y;
-            SectorPhi::iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
-            SectorPhi::iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
-            SectorPhi::map_slices               //Container storing Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
-            SectorPhi::vec_clusters             //vector of stored Uniformity::Cluster located in this SectorPhi (iPhi value)
-            SectorPhi::vec_hits                 //vector of stored Uniformity::Hit located in this SectorPhi (iPhi value)
-            SectorPhi::clustHistos              //As SectorEta::clustHistos but only for this SectorPhi (iPhi value)
-            SectorPhi::hitHistos                //As SectorEta::hitHistos but only for this SectorPhi (iPhi value)
+                Hit::iPos_Y         //Distance in mm from wide base of trapezoid to hit (e.g. vertical midpoint of iEta sector)
+                Hit::iStripNum      //Strip number of the hit, this ranges from 0 to 383?
+                Hit::iTimeBin       //Time bin, e.g. latency value, of the hit
+                Hit::vec_sADC       //Vector of ADC values, each element of the vector represents ADC value at that time bin; e.g. vec_sADC[Hit::iTimeBin] gives the ADV value at the defined time bin
 
-        The data members of the Uniformity::SectorSlice struct are:
+            Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
 
-            SectorSlice::fPos_Center        //Location of the center of the slice, in mm, within the SectorPhi (iPhi value)
-            SectorSlice::fWidth             //Width of the slice in mm
-            SectorSlice::fitSlice_ClustADC  //std::shared_ptr of a TF1; used to fit SectorSlice::hSlice_ClustADC
-            SectorSlice::hSlice_ClustADC    //As SectorEta::hEta_ClustADC but only for this SectorSlice
+            # 4.d.ii.5 SectorEta
+            # --------------------------------------------------------
 
-        Data members of Uniformity::SelParam are:
+            The Uniformity::SectorEta struct represents one iEta row of a detector. Each instance of a
+            Uniformity::SectorEta will store nbConnect objects of a Uniformity::SectorPhi struct where
+            nbConnect is a field found in the amoreSRS mapping file defining the number of readout conncetors
+            per iEta row. Each object of a Uniformity::SectorPhi struct will store
+            Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice
+            struct objects.  An object of a Uniformity::DetectorMPGD class will store a number of
+            objects of Uniformity::SectorEta as defined in the amoreSRS mapping file (e.g. number of "DET" rows).
 
-            SelParam::iCut_ADCNoise     //Hit or Cluster rejected if ADC LESS than value
-            SelParam::iCut_ADCSat       //Hit rejected if ADC GREATER than value
-            SelParam::iCut_MultiMin     //EVENT rejected if cluster multiplicity LESS than or equal to value
-            SelParam::iCut_MultiMax     //EVENT rejected if cluster multiplicity GREATER than or equal to value
-            SelParam::iCut_SizeMin      //Cluster rejected if size LESS than value
-            SelParam::iCut_SizeMax      //Cluster rejected if size GREATER than value
-            SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
-            SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
+            The data members of the Uniformity::SectorEta struct are:
 
-        The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
-        (e.g. fit results from all strips).  Data members of Uniformity::SummaryStatistics are:
+                SectorEta::fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
+                SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
+                SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
+                SectorEta::mset_fClustADC_Fit_PkPos     //Container storing peak position from Clust ADC Fit
+                SectorEta::vec_fClustADC_Fit_PkWidth    //Container storing peak width from Clust ADC Fit (not yet implemented)
+                SectorEta::mset_fClustADC_Spec_PkPos    //Container storing peak position from TSpectrum::Search() & TSpectrum::GetPositionX()
+                SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
+                SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
+                SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
+                SectorEta::gEta_ClustADC_Spec_NumPks    //std::shared_ptr of a TGraphErrors storing number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
+                SectorEta::gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
+                SectorEta::clustHistos                  //An instance of the Uniformity::HistosPhysObj struct for Clusters; at present time all members of the struct are used except hMulti
+                SectorEta::hitHistos                    //An instance of the Uniformity::HistosPhysObj struct for Hits; at present time only hPos and hTime are used
+                SectorEta::statClustADC_Fit_PkPos       //An instance of the Uniformity::SummaryStatistics struct for results of the cluster ADC peak position fitting
+                SectorEta::statClustADC_Spec_PkPos      //As SectorEta::statClustADC_Fit_PkPos but from TSpectrum::Search() & TSpectrum::GetPositionX()
 
-            SummaryStatistics::fIQR             //Interquantile range of dataset; IQR = Q3 - Q1; intrinsically positive
-            SummaryStatistics::fMax             //Max value of dataset
-            SummaryStatistics::fMean            //Mean value of dataset
-            SummaryStatistics::fMin             //Min value of dataset
-            SummaryStatistics::fQ1              //First quantile (Q1) of dataset
-            SummaryStatistics::fQ2              //Second quantile (Q2) of dataset
-            SummaryStatistics::fQ3              //Third quantile (Q3) of dataset
-            SummaryStatistics::fStdDev          //Standard deviation of dataset
-            SummaryStatistics::mset_fOutliers   //Container storing outliers of a dataset; outlier definition is defined per Analyzer
-            SummaryStatistics::hDist            //TH1F object of which stores the distribution of the dataset
+            There is also one copy constructor and one overloaded assignment operator.  These items perform a
+            deep copy of the std::shared_ptr objects above.
+
+            4.d.ii.5 SectorPhi
+            # --------------------------------------------------------
+
+            The data members of the Uniformity::SectorPhi struct are:
+
+                SectorPhi::fPos_Xlow                //X lower boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
+                SectorPhi::fPos_Xhigh               //X upper boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
+                SectorPhi::fWidth                   //Width of iPhi sector, in mm, at SectorEta::fPos_Y;
+                SectorPhi::iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
+                SectorPhi::iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
+                SectorPhi::map_slices               //Container storing Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
+                SectorPhi::vec_clusters             //vector of stored Uniformity::Cluster located in this SectorPhi (iPhi value)
+                SectorPhi::vec_hits                 //vector of stored Uniformity::Hit located in this SectorPhi (iPhi value)
+                SectorPhi::clustHistos              //As SectorEta::clustHistos but only for this SectorPhi (iPhi value)
+                SectorPhi::hitHistos                //As SectorEta::hitHistos but only for this SectorPhi (iPhi value)
+
+            There is also one copy constructor and one overloaded assignment operator.  These items perform a
+            deep copy of the std::shared_ptr objects above.
+
+            4.d.ii.6 SectorSlice
+            # --------------------------------------------------------
+
+            The data members of the Uniformity::SectorSlice struct are:
+
+                SectorSlice::fPos_Center        //Location of the center of the slice, in mm, within the SectorPhi (iPhi value)
+                SectorSlice::fWidth             //Width of the slice in mm
+                SectorSlice::fitSlice_ClustADC  //std::shared_ptr of a TF1; used to fit SectorSlice::hSlice_ClustADC
+                SectorSlice::hSlice_ClustADC    //As SectorEta::hEta_ClustADC but only for this SectorSlice
+
+            There is also one copy constructor and one overloaded assignment operator.  These items perform a
+            deep copy of the std::shared_ptr objects above.
+
+            4.d.ii.7 SelParam
+            # --------------------------------------------------------
+
+            Data members of Uniformity::SelParam are:
+
+                SelParam::iCut_ADCNoise     //Hit or Cluster rejected if ADC LESS than value
+                SelParam::iCut_ADCSat       //Hit rejected if ADC GREATER than value
+                SelParam::iCut_MultiMin     //EVENT rejected if cluster multiplicity LESS than or equal to value
+                SelParam::iCut_MultiMax     //EVENT rejected if cluster multiplicity GREATER than or equal to value
+                SelParam::iCut_SizeMin      //Cluster rejected if size LESS than value
+                SelParam::iCut_SizeMax      //Cluster rejected if size GREATER than value
+                SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
+                SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
+
+            4.d.ii.8 SummaryStatistics
+            # --------------------------------------------------------
+
+            The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
+            (e.g. fit results from all strips).  Data members of Uniformity::SummaryStatistics are:
+
+                SummaryStatistics::fIQR             //Interquantile range of dataset; IQR = Q3 - Q1; intrinsically positive
+                SummaryStatistics::fMax             //Max value of dataset
+                SummaryStatistics::fMean            //Mean value of dataset
+                SummaryStatistics::fMin             //Min value of dataset
+                SummaryStatistics::fQ1              //First quantile (Q1) of dataset
+                SummaryStatistics::fQ2              //Second quantile (Q2) of dataset
+                SummaryStatistics::fQ3              //Third quantile (Q3) of dataset
+                SummaryStatistics::fStdDev          //Standard deviation of dataset
+                SummaryStatistics::mset_fOutliers   //Container storing outliers of a dataset; outlier definition is defined per Analyzer
+                SummaryStatistics::hDist            //TH1F object of which stores the distribution of the dataset
+
+            There is also one copy constructor and one overloaded assignment operator.  These items perform a
+            deep copy of the std::shared_ptr objects above.
+
 
     # 4.e. Configuration Files
     # --------------------------------------------------------
