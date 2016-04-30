@@ -64,7 +64,7 @@ void AnalyzeResponseUniformityHits::fillHistos(){
         } //End Loop Over iPhi Sectors
         
         //Debugging
-        std::cout<<"(*iterEta).second.hitHistos.hPos->Integral() = " << (*iterEta).second.hitHistos.hPos->Integral() << std::endl;
+        //std::cout<<"(*iterEta).second.hitHistos.hPos->Integral() = " << (*iterEta).second.hitHistos.hPos->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
     return;
@@ -95,6 +95,8 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
         aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
         aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
         aSetup.histoSetup_hitPos.iHisto_nBins = 128. * (*iterEta).second.map_sectorsPhi.size();
+        
+        cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
         
         //Initialize iEta Histograms - 1D
         (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
