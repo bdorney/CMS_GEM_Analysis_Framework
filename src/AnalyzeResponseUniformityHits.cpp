@@ -82,6 +82,14 @@ void AnalyzeResponseUniformityHits::fitHistos(){
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityHits::initHistosHits(){
     //Loop Over Stored iEta Sectors
+    
+    //Debugging
+    cout<<"AnalyzeResponseUniformityHits::initHistosHits()\n";
+    cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    
+    
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Grab Eta Sector width (for ClustPos Histo)
         aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
@@ -151,6 +159,11 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
                     //store slice level histograms
     //Close File
     
+    cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
+    cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    
     //Setup the summary histograms
     TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
 	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
@@ -193,9 +206,9 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
         
-        (*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
-        (*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
-        (*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
