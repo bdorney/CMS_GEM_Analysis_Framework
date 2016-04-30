@@ -2,10 +2,48 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.2                               *
-*	LAST UPDATE: Apr 22 2016                     *
+*	VERSION: 1.0.6                               *
+*	LAST UPDATE: Apr 29 2016                     *
 *                                                *
 **************************************************
+
+Update: Apr 30th 2016
+==================================================
+->DetectorMPGD has three new methods resetClusters, resetHits, and resetPhysObj
+->DetectorMPGD::resetClusters clears all stored clusters, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->DetectorMPGD::resetHits clears all stored hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->DetectorMPGD::resetPhysObj clears all stored clusters and hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+
+Update: Apr 29th 2016
+==================================================
+->New configuration file template exists referred to as the Run Config: config/configRun.cfg
+->analyzeUniformity Executable now takes a two argumenta, the run config file to be used and a true/false verbose mode flag
+->analyzeUniformity can now read in multiple input files
+
+Update: Apr 27th 2016
+==================================================
+->Updating README file
+->Merging a first version of feature_VisualizeUniformity into the develop branch
+
+Update: Apr 26th 2016
+==================================================
+->Fixed crash where invalid histogram pointer in Uniformity::VisualizeUniformity was causing a seg fault, need to use Uniformity::AnalyzeResponseUniformity::getDetector() in executable
+->Added copy constructor and assignment operator to Uniformity::DetectorMPGD
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with a physics observable drawn on a unique pad for each SectorEta
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with all physics observables drawn on the same for each SectorEta
+
+Update: Apr 25th 2016
+==================================================
+->Added copy constructor and assignment operator to Uniformity::HistosPhysObj
+->Added copy constructor and assignment operator to Uniformity::SummaryStatistics
+->Added copy constructor and assignment operator to Uniformity::SectorSlice
+->Added copy constructor and assignment operator to Uniformity::SectorPhi
+->Added copy constructor and assignment operator to Uniformity::SectorEta
+
+Update: Apr 24th 2016
+==================================================
+->Added new class Uniformity::VisualizeUniformity which inherits from Uniformity::AnalyzeResponseUniformity
+->Class Uniformity::VisualizeUniformity makes a TCanvas for an input observable, the TCanvas has one pad for each SectorEta, the observable is drawn on the TCanvas
 
 Update: Apr 22th 2016
 ==================================================

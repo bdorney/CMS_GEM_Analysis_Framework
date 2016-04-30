@@ -63,7 +63,7 @@ namespace Uniformity {
         //AnalyzeResponseUniformity(int iNSlices, Uniformity::DetectorMPGD inputDet);
         
         //Set the detector and anlysis parameters at construction
-        AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+        AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ namespace Uniformity {
         virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
-        virtual void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
+        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
         
     protected:
         //Actions - Methods that Do Something

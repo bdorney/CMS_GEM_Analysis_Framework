@@ -19,18 +19,57 @@ using namespace Uniformity;
 
 //Default constructor
 DetectorMPGD::DetectorMPGD(){
-    //fMaxSectorWidth = -1;
+    //bAnaSetup = false;
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
 DetectorMPGD::DetectorMPGD(vector<Cluster> vec_inputClusters){
+    //bAnaSetup = false;
     setCluster(vec_inputClusters);
 }
 
 //Constructor to use when supplying a map of eta sectors
 DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
+    //bAnaSetup = false;
     map_sectorsEta = map_inputSectors;
 }
+
+//Wipes all stored Clusters
+void DetectorMPGD::resetClusters(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_clusters.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetClusters()
+
+//Wipes all stored Hits
+void DetectorMPGD::resetHits(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_hits.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetHits()
+
+//Wipes all stored physics objects (Clusters and Hits)
+void DetectorMPGD::resetPhysObj(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_clusters.clear();
+            (*iterPhi).second.vec_hits.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetHits()
 
 //Returns all clusters
 vector<Cluster> DetectorMPGD::getClusters(){
@@ -182,10 +221,10 @@ SectorEta DetectorMPGD::getEtaSector(int iEta){
     if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
         retSector = map_sectorsEta[iEta];
     } //End Case: Requested iEta Value exists
-    else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
+    else{ //Case: Requested iEta Value doesn ot exist, return an empty sector
         printClassMethodMsg("DetectorMPGD","getEtaSector", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
         printClassMethodMsg("DetectorMPGD","getEtaSector", "\tThe Returned sector is Empty!!!");
-    } //End Case: Requested iEta Value doesn ot exist, return an empty vector
+    } //End Case: Requested iEta Value doesn ot exist, return an empty sector
     
     return retSector;
 } //End getEtaSector
@@ -238,8 +277,6 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
         printClassMethodMsg("DetectorMPGD","setCluster","\tPlease Initialize Eta Sectors Before Trying to Set Clusters");
         return;
     } //End Case: No Sectors Defined
-    
-    //If DetectorMPGD is initialized, loop through the eta sectors
     
     return;
 } //End DetectorMPGD::setCluster
