@@ -480,7 +480,8 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
         fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
         fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
         
-        cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
+        //Debugging
+        //cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
 
         //Initialize the Pad
         TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
@@ -497,12 +498,13 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
         hObs = getObsHisto(strObsName, etaSector);
         vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
 
+        //Debugging
         //hObs->SetDirectory(gROOT);
         //hObs->Draw( strDrawOption.c_str() );
-        cout<<"hObs = " << hObs << endl;
-        cout<<"vec_hObs.size() = " << vec_hObs.size() << endl;
-        cout<<"vec_hObs["<<iEta-1<<"] = ";
-        cout<<vec_hObs[iEta-1]<<endl;
+        //cout<<"hObs = " << hObs << endl;
+        //cout<<"vec_hObs.size() = " << vec_hObs.size() << endl;
+        //cout<<"vec_hObs["<<iEta-1<<"] = ";
+        //cout<<vec_hObs[iEta-1]<<endl;
 
         vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
 
@@ -585,7 +587,8 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     //Variable Declaration
     std::shared_ptr<TH1F> ret_histo;
     
-    std::cout<<"Calling VisualizeUniformity::getRootObject()\n";
+    //Debugging
+    //std::cout<<"Calling VisualizeUniformity::getRootObject()\n";
     
     std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
     
