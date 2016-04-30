@@ -19,6 +19,7 @@ Update: Apr 30th 2016
 ->AnalyzeUniformityHits has new method initHistosHits
 ->This method will initialize all histograms once, before looping through input hits
 ->Fixed a bug in AnalyzeUniformityHits where the number of bins of hit position histogram did not equal the number of strips
+->Reduced message spam to terminal from all classes
 
 Update: Apr 29th 2016
 ==================================================
