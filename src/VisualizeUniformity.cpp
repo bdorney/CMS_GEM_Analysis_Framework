@@ -20,11 +20,18 @@ using Timing::printROOTFileStatus;
 
 using namespace Uniformity;
 
-//Constructor
+//Default Constructor
+VisualizeUniformity::VisualizeUniformity(){
+    
+    //Place holder
+    
+} //End Default Constructor
+
+//Constructor with Setup & Detector inputs
 VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet){
     aSetup  = inputSetup;
     detMPGD = inputDet;
-} //End Constructor
+} //End Constructor with Setup & Detector inputs
 
 void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects

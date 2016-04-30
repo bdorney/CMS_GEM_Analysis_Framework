@@ -34,10 +34,42 @@ DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
     map_sectorsEta = map_inputSectors;
 }
 
-//Initializes TObjects for hits
-/*void DetectorMPGD::initializeDistsHits(){
+//Wipes all stored Clusters
+void DetectorMPGD::resetClusters(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_clusters.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetClusters()
 
-}*/ //End DetectorMPGD::initializeDistsHits()
+//Wipes all stored Hits
+void DetectorMPGD::resetHits(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_hits.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetHits()
+
+//Wipes all stored physics objects (Clusters and Hits)
+void DetectorMPGD::resetPhysObj(){
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+        
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
+            (*iterPhi).second.vec_clusters.clear();
+            (*iterPhi).second.vec_hits.clear();
+        } //End Loop Over Phi Sectors within an Eta Sector
+    } //End Loop Over Detector's SectorEta Objects
+    
+    return;
+} //End DetectorMPGD::resetHits()
 
 //Returns all clusters
 vector<Cluster> DetectorMPGD::getClusters(){

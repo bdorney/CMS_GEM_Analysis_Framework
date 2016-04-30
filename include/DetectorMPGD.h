@@ -78,6 +78,9 @@ namespace Uniformity {
             vec_allADCPeaks.clear();
             return;
         } //End reset()
+        virtual void resetClusters();
+        virtual void resetHits();
+        virtual void resetPhysObj();
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
