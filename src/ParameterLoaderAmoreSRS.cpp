@@ -66,10 +66,11 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
             //Parse the input line
             vec_strParam = Timing::getCharSeparatedList(strLine,',');
             
-            cout<<"Lines from " << strInputMappingFileName << endl;
-            for (int i=0; i < vec_strParam.size(); ++i) {
+            //Debugging
+            //cout<<"Lines from " << strInputMappingFileName << endl;
+            /*for (int i=0; i < vec_strParam.size(); ++i) {
                 cout<<i<<"\t"<<vec_strParam[i]<<endl;
-            }
+            }*/
             
             //expecting a tab+comma separated list ordered as:
             //#Header   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient

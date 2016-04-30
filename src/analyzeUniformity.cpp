@@ -497,7 +497,7 @@ int main( int argc_, char * argv_[] ){
             } //End Print Number of Selected Hits to User
             
             //Load the required input parameters
-            hitAnalyzer.setAnalysisParameters(aSetup);
+            if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
             hitAnalyzer.setDetector(detMPGD);
             
             //Initialize the hit histograms if this is the first run
@@ -526,7 +526,7 @@ int main( int argc_, char * argv_[] ){
             } //End Print Number of Selected Clusters to User
             
             //Load the required input parameters
-            clustAnalyzer.setAnalysisParameters(aSetup);
+            if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
             clustAnalyzer.setDetector(detMPGD);
             
             //Initialize the cluster histograms if this is the first run
