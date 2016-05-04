@@ -16,6 +16,8 @@ Update: May 4th 2016
 ->RunSetup struct now has a flag for if the struct was set correctly
 ->ParameterLoaderRun::getRunParameters now takes an input std::ifstream instead of a std::string
 ->Updated Makefile.clang and Makefile.gpp to compile InterfaceAnalysis and ParameterLoaderRun
+->AnalyzeResponseUniformityClusters::loadHistosFromFile() methods have been updated to load all histograms, not just those involved in fitting
+->Corrected an improper naming convention in AnalyzeResponseUniformityClusters, rare instances of "hiEta" changed to "h_iEta" in TH1 & TH2 TName fields.
 
 Update: May 3rd 2016
 ==================================================

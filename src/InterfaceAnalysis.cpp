@@ -39,8 +39,10 @@ void InterfaceAnalysis::analyzeInput(){
 
 //Runs the analysis framework on input created by amoreSRS
 void InterfaceAnalysis::analyzeInputAmoreSRS(){
+   //TFile does not automatically own histograms 
+   TH1::AddDirectory(kFALSE);
+
     //Variable Declaration
-    
     //ParameterLoaderAmoreSRS amoreLoader;
     
     SectorEta etaSector;
@@ -202,31 +204,35 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         delete file_ROOTInput;
     } //End Loop over vec_strRunList
     
-    //Create the output ROOT file & check to see if it opened successfully
+    //Create the summary TFile (only if multi file output is NOT requested)
     //------------------------------------------------------
-    file_ROOTOutput_All = new TFile(rSetup.strFile_Output_Name.c_str(), rSetup.strFile_Output_Option.c_str(),"",1);
+    if(!rSetup.bMultiOutput){ //Case: Create Summary TFile
+	file_ROOTOutput_All = new TFile(rSetup.strFile_Output_Name.c_str(), rSetup.strFile_Output_Option.c_str(),"",1);
     
-    if ( !file_ROOTOutput_All->IsOpen() || file_ROOTOutput_All->IsZombie() ) { //Case: failed to load ROOT file
-        perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + rSetup.strFile_Output_Name ).c_str() );
-        Timing::printROOTFileStatus(file_ROOTOutput_All);
-        std::cout << "Exiting!!!\n";
+    	if ( !file_ROOTOutput_All->IsOpen() || file_ROOTOutput_All->IsZombie() ) { //Case: failed to load ROOT file
+        	perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + rSetup.strFile_Output_Name ).c_str() );
+        	Timing::printROOTFileStatus(file_ROOTOutput_All);
+        	std::cout << "Exiting!!!\n";
         
-        return;
-    } //End Case: failed to load ROOT file
+        	return;
+    	} //End Case: failed to load ROOT file
     
-    //Store the results
-    storeResults(file_ROOTOutput_All);
+    	//Store the results
+    	storeResults(file_ROOTOutput_All);
     
-    //Close the file
-    file_ROOTOutput_All->Close();
-    
+   	//Close the file
+    	file_ROOTOutput_All->Close();
+    } //End Case: Create Summary TFile
+
     return;
 } //End InterfaceAnalysis::analyzeInputAmoreSRS()
 
 //Runs the analysis framework on input created by the CMS_GEM_AnalysisFramework
 void InterfaceAnalysis::analyzeInputFrmwrk(){
+    //TFile does not automatically own histograms 
+    TH1::AddDirectory(kFALSE);
+
     //Variable Declaration
-    
     TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
     //Loop over input files
@@ -263,6 +269,9 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         //Cluster Analysis
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
+	    //Load the required input parameters
+            if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
+            
             //Load previous cluster histograms
             clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
             
@@ -278,7 +287,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         string strTempRunName = vec_strRunList[i];
         
         if ( strTempRunName.find("Ana.root") != string::npos ) {
-            strTempRunName.erase(strTempRunName.find(".root"), strTempRunName.length() - strTempRunName.find(".root") );
+            strTempRunName.erase(strTempRunName.find("Ana.root"), strTempRunName.length() - strTempRunName.find("Ana.root") );
             strTempRunName = strTempRunName + "NewAna.root";
         } //End Case: Other ROOT file
         
@@ -299,6 +308,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         } //End Case: failed to load ROOT file
         
         //Store the results
+	cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
         storeResults(file_ROOTOutput_Single);
         
         //Close the files & delete pointers before the next iter
@@ -319,6 +329,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
     map<string,string> map_hit_ObsAndDrawOpt;   //as above but for hits
     map<string,string> map_res_ObsAndDrawOpt;   //as above but for results (e.g. fits)
     
+	cout<<"InterfaceAnalysis::storeResults(): file_Results = " << file_Results << endl;
+
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results);
