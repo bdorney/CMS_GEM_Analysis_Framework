@@ -84,11 +84,10 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
     //Loop Over Stored iEta Sectors
     
     //Debugging
-    cout<<"AnalyzeResponseUniformityHits::initHistosHits()\n";
-    cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
-    cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-    cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
-    
+    //cout<<"AnalyzeResponseUniformityHits::initHistosHits()\n";
+    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
     
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Grab Eta Sector width (for ClustPos Histo)
@@ -96,7 +95,7 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
         aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
         aSetup.histoSetup_hitPos.iHisto_nBins = 128. * (*iterEta).second.map_sectorsPhi.size();
         
-        cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+        //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
         
         //Initialize iEta Histograms - 1D
         (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
@@ -133,7 +132,9 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
     return;
 } //End AnalyzeResponseUniformityHits::loadHistosFromFile()
 
+
 //Stores booked histograms (for those histograms that are non-null)
+//Takes a std::string which stores the physical filename as input
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
     //HistosPhysObj summaryHistos; //Histograms for the entire Detector
@@ -151,26 +152,27 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     } //End Check if File Failed to Open Correctly
     
     //Loop over ieta's
-        //Create/Load file structure
-        //Store ieta level histograms
-        //Loop over iphi's within ieta's
-            //Create/Load file structure
-            //Store iphi level histograms
-                //Loop over slices
-                    //Create/Load file structure
-                    //store slice level histograms
+    //Create/Load file structure
+    //Store ieta level histograms
+    //Loop over iphi's within ieta's
+    //Create/Load file structure
+    //Store iphi level histograms
+    //Loop over slices
+    //Create/Load file structure
+    //store slice level histograms
     //Close File
     
-    cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
-    cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
-    cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-    cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    //Debugging
+    //cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
+    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
     
     //Setup the summary histograms
     TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
-	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
-	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
-
+    TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+    TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+    
     //Get/Make the Summary Directory
     //Check to see if the directory exists already
     TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
@@ -194,7 +196,121 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         } //End Case: Directory did not exist in file, CREATE
         
         //Debugging
-        cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        
+        //Add this sector to the summary histogram
+        hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
+        hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
+        hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
+        
+        //Store Histograms - SectorEta Level
+        //-------------------------------------
+        dir_SectorEta->cd();
+        (*iterEta).second.hitHistos.hADC->Write();
+        (*iterEta).second.hitHistos.hPos->Write();
+        (*iterEta).second.hitHistos.hTime->Write();
+        
+        //(*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
+        
+        //Loop Over Stored iPhi Sectors within this iEta Sector
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
+            //Get Directory
+            //-------------------------------------
+            //Check to see if the directory exists already
+            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            
+            //If the above pointer is null the directory does NOT exist, create it
+            if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
+                dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
+            } //End Case: Directory did not exist in file, CREATE
+            
+            //Debugging
+            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
+            
+            //Store Histograms - SectorPhi Level
+            //-------------------------------------
+            dir_SectorPhi->cd();
+            (*iterPhi).second.hitHistos.hADC->Write();
+            (*iterPhi).second.hitHistos.hTime->Write();
+        } //End Loop Over Stored iPhi Sectors
+    } //End Loop Over Stored iEta Sectors
+    
+    //Store the Summary Histograms
+    dir_Summary->cd();
+    hHitADC_All.Write();
+    hHitPos_All.Write();
+    hHitTime_All.Write();
+    
+    //Close the ROOT file
+    ptr_fileOutput->Close();
+    
+    return;
+} //End storeHistos()
+
+//Stores booked histograms (for those histograms that are non-null)
+//Takes a TFile * which the histograms are written to as input
+void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
+    //Variable Declaration
+    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
+    
+    //Check if File Failed to Open Correctly
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Loop over ieta's
+        //Create/Load file structure
+        //Store ieta level histograms
+        //Loop over iphi's within ieta's
+            //Create/Load file structure
+            //Store iphi level histograms
+                //Loop over slices
+                    //Create/Load file structure
+                    //store slice level histograms
+    //Close File
+    
+    //Debugging
+    //cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
+    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    
+    //Setup the summary histograms
+    TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+
+    //Get/Make the Summary Directory
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Get Directory
+        //-------------------------------------
+        //Check to see if the directory exists already
+        TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        
+        //If the above pointer is null the directory does NOT exist, create it
+        if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
+            dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
+        } //End Case: Directory did not exist in file, CREATE
+        
+        //Debugging
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
         //Add this sector to the summary histogram
         hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
@@ -241,8 +357,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
 
-    //Close the ROOT file
-    ptr_fileOutput->Close();
+    //Do not close the file it is used elsewhere
     
     return;
 } //End storeHistos()

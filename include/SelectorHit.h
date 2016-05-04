@@ -49,12 +49,28 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Given an output ROOT file from amoreSRS with hits
         //Applies the hit selection and stores those selected hits in inputDet
+        //Input is a std::string storing the physical filename
         virtual void setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet);
         
+        //Given an output ROOT file from amoreSRS with hits
+        //Applies the hit selection and stores those selected hits in inputDet
+        //Input is a TFile *
+        virtual void setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet);
+        
+        
         //As above but overwrites the stored AnalysisSetupUniformity object
+        //Input is a std::string storing the physical filename
         virtual void setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
             setAnalysisParameters(inputSetup);
             setHits(strInputRootFileName, inputDet);
+            return;
+        };
+        
+        //As above but overwrites the stored AnalysisSetupUniformity object
+        //Input is a TFile *
+        virtual void setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
+            setAnalysisParameters(inputSetup);
+            setHits(file_InputRootFile, inputDet);
             return;
         };
         

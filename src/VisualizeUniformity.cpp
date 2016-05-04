@@ -33,6 +33,8 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor with Setup & Detector inputs
 
+//Draws a given observable onto a single pad off canvas
+//Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
@@ -48,10 +50,8 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
 
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    //TLatex *latex_PhiSector = new TLatex();            
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
-    //TLine *line_PhiSeg = new TLine();    
-
+    
     TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
     
     //Make the Canvas
@@ -62,10 +62,10 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph","Error: File I/O");
         printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tExiting; No Histograms have been stored!\n" );
         
         return;
     } //End Check if File Failed to Open Correctly
@@ -93,7 +93,8 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
         etaSector = detMPGD.getEtaSector(iEta);
         gObs = getObsGraph(strObsName, etaSector);
         
-	cout<<"gObs = " << gObs << endl;
+        //Debugging
+        cout<<"gObs = " << gObs << endl;
 
         gObs->SetLineColor( Timing::getCyclicColor(iEta) );
         gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
@@ -163,6 +164,134 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     return;
 } //End VisualizeUniformity::storeCanvasGraph()
 
+//Draws a given observable onto a single pad off canvas
+//Takes a TFile * which the histograms are written to as input
+void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TGraphErrors> gObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    std::vector<shared_ptr<TGraphErrors> > vec_gObs;
+    
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    
+    TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Setup the Legend
+    //------------------------------------------------------
+    legObs->SetNColumns(2);
+    legObs->SetFillColor(kWhite);
+    legObs->SetLineColor(kBlack);
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        gObs = getObsGraph(strObsName, etaSector);
+        
+        //Debugging
+        //cout<<"gObs = " << gObs << endl;
+        
+        gObs->SetLineColor( Timing::getCyclicColor(iEta) );
+        gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
+        
+        legObs->AddEntry(gObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
+        
+        vec_gObs.push_back(gObs);			//Need to keep this pointer alive outside of Loop?
+        
+        mgraph_Obs->Add( gObs.get() );
+    } //End Loop Over Detector's Eta Sector
+    
+    //Draw mgraph_Obs
+    //------------------------------------------------------
+    canv_DetSum.cd();
+    mgraph_Obs->Draw( strDrawOption.c_str() );
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Setup the iPhi designation
+    //------------------------------------------------------
+    //etaSector should be set here based on the last iteration of the above loop
+    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+            //Ensure the canvas is the active canvas (it should be already but who knows...)
+            canv_DetSum.cd();
+            
+            //Declare the TLatex
+            TLatex latex_PhiSector;
+            
+            //Determine the iPhi index
+            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+            
+            //Draw the TLatex
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            
+            //Segment the Plot with lines
+            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                TLine line_PhiSeg;
+                
+                line_PhiSeg.SetLineStyle(2);
+                line_PhiSeg.SetLineWidth(2);
+                
+                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+            } //End Case: Not the Last Phi Segment Yet
+        } //End Loop Over Sector Phi
+    } //End Case: Show iPhi Segmentation
+    
+    //Draw the Legend
+    //------------------------------------------------------
+    legObs->Draw("same");
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    mgraph_Obs->Write();
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeCanvasGraph()
+
+//Draws a given observable onto a single pad off canvas
+//Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
@@ -187,10 +316,10 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto","Error: File I/O");
         printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto", "\tExiting; No Histograms have been stored!\n" );
         
         return;
     } //End Check if File Failed to Open Correctly
@@ -286,7 +415,127 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     return;
 } //End VisualizeUniformity::storeCanvasHisto()
 
-void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, vector<string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+//Draws a given observable onto a single pad off canvas
+//Takes a TFile * which the histograms are written to as input
+void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TH1F> hObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    std::vector<shared_ptr<TH1F> > vec_hObs;
+    
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Setup the Legend
+    //------------------------------------------------------
+    legObs->SetNColumns(2);
+    legObs->SetFillColor(kWhite);
+    legObs->SetLineColor(kBlack);
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        hObs = getObsHisto(strObsName, etaSector);
+        
+        hObs->SetLineColor( Timing::getCyclicColor(iEta) );
+        hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
+        legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
+        
+        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        
+        canv_DetSum.cd();
+        if( 1 == iEta ){
+            vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+        }
+        else{
+            vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
+        }
+    } //End Loop Over Detector's Eta Sector
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Setup the iPhi designation
+    //------------------------------------------------------
+    //etaSector should be set here based on the last iteration of the above loop
+    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+            //Ensure the canvas is the active canvas (it should be already but who knows...)
+            canv_DetSum.cd();
+            
+            //Declare the TLatex
+            TLatex latex_PhiSector;
+            
+            //Determine the iPhi index
+            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+            
+            //Draw the TLatex
+            latex_PhiSector.SetTextSize(0.05);
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            
+            //Segment the Plot with lines
+            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                TLine line_PhiSeg;
+                
+                line_PhiSeg.SetLineStyle(2);
+                line_PhiSeg.SetLineWidth(2);
+                
+                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+            } //End Case: Not the Last Phi Segment Yet
+        } //End Loop Over Sector Phi
+    } //End Case: Show iPhi Segmentation
+    
+    //Draw the Legend
+    //------------------------------------------------------
+    legObs->Draw("same");
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeCanvasHisto()
+
+/*void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, vector<string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -298,7 +547,6 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     SectorEta etaSector;
     
     vector<shared_ptr<TH1F> > vec_hObs;
-    //std::vector<TPad *> vec_padSectorObs;
     vector<TCanvas *> vec_canvDetSum;
     
     TCanvas *canvDetSum;
@@ -413,7 +661,7 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::storeCanvasHisto()
+}*/ //End VisualizeUniformity::storeCanvasHisto()
 
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
@@ -423,10 +671,9 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
 //The SectorEta is used to determine the location of the SectorPhi's
+//Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
-    //bool bEvenEtaNum = (bool) ( iNumEta % 2);
-    
     int iNumEta = detMPGD.getNumEtaSectors();
     
     float fXPad_Low;
@@ -454,10 +701,10 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented","Error: File I/O");
         printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tExiting; No Histograms have been stored!\n" );
         
         return;
     } //End Check if File Failed to Open Correctly
@@ -499,22 +746,11 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
         canv_DetSum.cd();
         vec_padSectorObs[iEta-1]->Draw();
         vec_padSectorObs[iEta-1]->cd();
-        //pad_SectorObs->Draw();
-        //pad_SectorObs->cd();
-
+        
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
         hObs = getObsHisto(strObsName, etaSector);
         vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
-
-        //Debugging
-        //hObs->SetDirectory(gROOT);
-        //hObs->Draw( strDrawOption.c_str() );
-        //cout<<"hObs = " << hObs << endl;
-        //cout<<"vec_hObs.size() = " << vec_hObs.size() << endl;
-        //cout<<"vec_hObs["<<iEta-1<<"] = ";
-        //cout<<vec_hObs[iEta-1]<<endl;
-
         vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
 
         //Setup the TLatex for "CMS Preliminary"
@@ -570,6 +806,340 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     
     return;
 } //End VisualizeUniformity::storeCanvasHistoSegmented()
+
+//This method is longer than I'd like it to be
+//But it seems that TCanvas doesn't perpetuate its drawn TObject's
+//So passing it to another method by reference keeps the TCanvas alive, but ends up being blank with nothing drawn on it =/
+//Draws the distribution pointed to by inputObjPtr on a pad of inputCanvas
+//inputCanvas is split into two columns;
+//The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
+//Odd (even) values of iEta are on the left (right)
+//The SectorEta is used to determine the location of the SectorPhi's
+//Takes a TFile * which the histograms are written to as input
+void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    float fXPad_Low;
+    float fXPad_High;
+    
+    float fYPad_Low;
+    float fYPad_High;
+    
+    shared_ptr<TH1F> hObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    std::vector<shared_ptr<TH1F> > vec_hObs;
+    std::vector<TPad *> vec_padSectorObs;
+    
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Determine the Pad Coordinates
+        if (iEta % 2 != 0){ //Case: iEta is Odd
+            fXPad_Low   = 0.02;
+            fXPad_High  = 0.48;
+        } //End Case: iEta is Odd
+        else{ //Case: iEta is Even
+            fXPad_Low   = 0.52;
+            fXPad_High  = 0.98;
+        } //End Case: iEta is Even
+        
+        //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
+        fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
+        fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
+        
+        //Debugging
+        //cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
+        
+        //Initialize the Pad
+        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+        vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
+        
+        canv_DetSum.cd();
+        vec_padSectorObs[iEta-1]->Draw();
+        vec_padSectorObs[iEta-1]->cd();
+        
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        hObs = getObsHisto(strObsName, etaSector);
+        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+        
+        //Setup the TLatex for "CMS Preliminary"
+        TLatex latex_CMSPrelim;
+        latex_CMSPrelim.SetTextSize(0.05);
+        if( 1 == iEta){
+            latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+        }
+        
+        //Setup the TLatex for this iEta sector
+        TLatex latex_EtaSector;
+        latex_EtaSector.SetTextSize(0.05);
+        latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
+        
+        //Setup the iPhi designation
+        if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
+            for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
+                //Ensure the pad is the active pad (it should be already but who knows...)
+                vec_padSectorObs[iEta-1]->cd();
+                //pad_SectorObs->cd();
+                
+                //Declare the TLatex
+                TLatex latex_PhiSector;
+                
+                //Determine the iPhi index
+                int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
+                
+                //Draw the TLatex
+                latex_PhiSector.SetTextSize(0.05);
+                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+                
+                //Segment the Plot with lines
+                if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
+                    TLine line_PhiSeg;
+                    
+                    line_PhiSeg.SetLineStyle(2);
+                    line_PhiSeg.SetLineWidth(2);
+                    
+                    line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
+                } //End Case: Not the Last Phi Segment Yet
+            } //End Loop Over Sector Phi
+        } //End Case: Show iPhi Segmentation
+    } //End Loop Over Detector's Eta Sector
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasHistoSegmented()
+
+//For each member of the input map storeListOfCanvasesGraph is called
+//Takes a std::string which stores the physical filename as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    storeListOfCanvasesGraph(ptr_fileOutput, map_strObsNameAndDrawOpt, bShowPhiSegmentation);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesGraph
+
+//For each member of the input map storeListOfCanvasesGraph is called
+//Takes a TFile * which the histograms are written to as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
+        
+        storeCanvasGraph(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+    } //End Loop over input observables
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesGraph
+
+//For each member of the input map storeListOfCanvasesHisto is called
+//Takes a std::string which stores the physical filename as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    storeListOfCanvasesHisto(ptr_fileOutput, map_strObsNameAndDrawOpt, bShowPhiSegmentation);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesHisto
+
+//For each member of the input map storeListOfCanvasesHisto is called
+//Takes a TFile * which the histograms are written to as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
+        
+        storeCanvasHisto(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+    } //End Loop over input observables
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesHisto
+
+//For each member of the input map storeListOfCanvasesHistoSegmented is called
+//Takes a std::string which stores the physical filename as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    storeListOfCanvasesHistoSegmented(ptr_fileOutput, map_strObsNameAndDrawOpt, bShowPhiSegmentation);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesHistoSegmented
+
+//For each member of the input map storeListOfCanvasesHistoSegmented is called
+//Takes a TFile * which the histograms are written to as input
+//map_strObsNameAndDrawOpt
+//  first   -> Obs Name
+//  second  -> Draw option
+void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
+        
+        storeCanvasHistoSegmented(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+    } //End Loop over input observables
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeListOfCanvasesHistoSegmented
 
 std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration

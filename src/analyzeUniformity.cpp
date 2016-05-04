@@ -10,245 +10,268 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <utility>
 #include <vector>
 
 //Framework Includes
-#include "SelectorCluster.h"
-#include "SelectorHit.h"
-#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
-#include "AnalyzeResponseUniformityClusters.h"
-#include "AnalyzeResponseUniformityHits.h"
+//#include "SelectorCluster.h"
+//#include "SelectorHit.h"
+//#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
+//#include "AnalyzeResponseUniformityClusters.h"
+//#include "AnalyzeResponseUniformityHits.h"
 #include "ParameterLoaderAmoreSRS.h"
 #include "ParameterLoaderAnaysis.h"
+#include "ParameterLoaderRun.h"
 #include "UniformityUtilityTypes.h"
-#include "VisualizeUniformity.h"
+//#include "VisualizeUniformity.h"
 
 //ROOT Includes
+#include "TROOT.h"
+#include "TFile.h"
 
 //Namespaces
 using std::cin;
 using std::cout;
 using std::endl;
 using std::ifstream;
+using std::map;
 using std::string;
 using std::vector;
 
-using Timing::convert2bool;
-using Timing::getlineNoSpaces;
-using Timing::getParsedLine;
+//using Timing::convert2bool;
+//using Timing::getlineNoSpaces;
+//using Timing::getParsedLine;
 
 using namespace Uniformity;
 
-struct RunSetup{
-    bool bAnaStep_Clusters;         //true -> perform the cluster analysis; false -> do not
-    bool bAnaStep_Fitting;          //true -> run fitting on output histo's; false -> do not
-    bool bAnaStep_Hits;             //true -> perform the hit analysis (NOTE if bAnaStep_Reco is true this must also be true); false -> do not
-    bool bAnaStep_Reco;             //true -> reconstruct clusters from input hits; false -> use clusters provided in amoreSRS output file;
-    bool bAnaStep_Visualize;        //true -> make summary plots at end of analysis; false -> do not
+void runAnalysis(bool bVerboseMode, RunSetup & rSetup, AnalysisSetupUniformity & aSetup, DetectorMPGD & detMPGD){
     
-    bool bInputFromFrmwrk;          //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
-    
-    bool bMultiOutput;              //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
-    bool bVisPlots_PhiLines;        //true -> summary plots have phi lines segmenting sectors; false -> they do not
-    
-    string strFile_Config_Ana;      //Name of analysis config file
-    string strFile_Config_Map;      //Name of mapping file
-    
-    string strFile_Output_Name;     //Name of output TFile to be created
-    string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
-    
-    //Default constructor
-    RunSetup(){
-        bAnaStep_Reco = false;
-        bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
-        
-        bInputFromFrmwrk = false;
-        
-        bMultiOutput = false;
-        
-        bVisPlots_PhiLines = true;
-        
-        strFile_Config_Ana = "config/configAnalysis.cfg";
-        strFile_Config_Map = "config/GE7MappingCMScernData2016.cfg";
-        
-        strFile_Output_Name = "FrameworkOutput.root";
-        strFile_Output_Option = "RECREATE";
-    } //End Default constructor
-};
-
-//Gets the list of input runs from the input config file
-vector<string> getRunList(ifstream &file_Input, bool bVerboseMode){
-    //Variable Declaration
-    bool bHeaderEnd = false;
-    
-    string strLine = "";
-    
-    vector<string> vec_strRetRuns;
-    
-    //Loop Through Data File
-    //Check for faults immediately afterward
-    //------------------------------------------------------
-    while ( getlineNoSpaces(file_Input, strLine )  ) { //Loop over input file
-        //Skip commented lines
-        if (strLine.compare(0,1,"#") == 0) continue;
-        
-        //Check for start of run list header
-        if ( strLine.compare( "[BEGIN_RUN_LIST]" ) == 0 ) { //Case: Run list header
-            
-            while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through run list header
-                //Skip commented lines
-                if (strLine.compare(0,1,"#") == 0 ) continue;
-                
-                //Has the header ended?
-                if ( strLine.compare( "[END_RUN_LIST]" ) == 0 ) { //Case: End of run list header
-                    if (bVerboseMode) { //Case: User Requested Verbose Input/Output
-                        cout<<"getRunList(): End of run list header reached!\n";
-                        cout<<"getRunList(): The following runs will be analyzed:\n";
-                        
-                        for (int i=0; i < vec_strRetRuns.size(); ++i) { //Loop over stored runs
-                            cout<<"\t"<<vec_strRetRuns[i]<<endl;
-                        } //End Loop over stored runs
-                    } //End Case: User Requested Verbose Input/Output
-                    
-                    bHeaderEnd = true;
-                    break;
-                } //End Case: End of run list header
-                
-                vec_strRetRuns.push_back(strLine);
-            } //End loop through run list header
-        } //End Case: Run list header
-        
-        if (bHeaderEnd) break;
-    } //End Loop over input file
-    if ( file_Input.bad() && bVerboseMode) {
-        perror( "getRunList(): error while reading config file" );
-        Timing::printStreamStatus(file_Input);
-    }
-    
-    //Do not close the input file, it will be used elsewhere
-    
-    return vec_strRetRuns;
-} ///End getRunList
-
-//Gets the run setup parameters from the input config file
-void setRunSetup(ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
-    //Variable Declaration
-    bool bHeaderEnd = false;
-    
-    std::pair<string,string> pair_strParam;
-    
-    string strLine = "";
-    
-    //Loop through input file
-    //Check for faults immediately afterward
-    //------------------------------------------------------
-    while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through input file
-        //Skip commented lines
-        if (strLine.compare(0,1,"#") == 0) continue;
-        
-        //Check for start of run info header
-        if ( strLine.compare( "[BEGIN_RUN_INFO]" ) == 0 ) { //Case: Run info header found!
-            cout<<"setRunSetup(): Run info header found!\n";
-            
-            while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through run info header
-                bool bExitSuccess;
-                
-                //Skip commented lines
-                if (strLine.compare(0,1,"#") == 0) continue;
-        
-                //Has this header ended?
-                //Has the header ended?
-                if ( strLine.compare( "[END_RUN_INFO]" ) == 0 ) { //Case: End of run list header
-                    if (bVerboseMode) { //Case: User Requested Verbose Input/Output
-                        cout<<"setRunSetup(): End of run info header reached!\n";
-                        
-                        /*
-                         
-                         Placeholder
-                         
-                         */
-                        
-                    } //End Case: User Requested Verbose Input/Output
-                    
-                    bHeaderEnd = true;
-                    break;
-                } //End Case: End of run list header
-                
-                //Get Parameter Pairing
-                pair_strParam = getParsedLine(strLine, bExitSuccess);
-                
-                if (bExitSuccess) { //Case: Parameter Fetched Successfully
-                    //Transform input field name to all capitals for case-insensitive string comparison
-                    string strTmp = pair_strParam.first;
-                    std::transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
-                    
-                    pair_strParam.first = strTmp;
-                    
-                    if ( pair_strParam.first.compare("ANA_CLUSTERS") == 0 ) {
-                        inputRunSetup.bAnaStep_Clusters = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("ANA_FITTING") == 0 ) {
-                        inputRunSetup.bAnaStep_Fitting = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("ANA_HITS") == 0 ) {
-                        inputRunSetup.bAnaStep_Hits = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("ANA_RECO_CLUSTERS") == 0 ) {
-                        inputRunSetup.bAnaStep_Reco = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("VISUALIZE_PLOTS") == 0 ) {
-                        inputRunSetup.bAnaStep_Visualize = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("INPUT_IS_FRMWRK_OUTPUT") == 0 ) {
-                        inputRunSetup.bInputFromFrmwrk = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("OUTPUT_INDIVIDUAL") == 0 ) {
-                        inputRunSetup.bMultiOutput = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("VISUALIZE_DRAWPHILINES") == 0 ) {
-                        inputRunSetup.bVisPlots_PhiLines = convert2bool(pair_strParam.second, bExitSuccess);
-                    }
-                    else if ( pair_strParam.first.compare("CONFIG_ANALYSIS") == 0 ) {
-                        inputRunSetup.strFile_Config_Ana = pair_strParam.second;
-                    }
-                    else if ( pair_strParam.first.compare("CONFIG_MAPPING") == 0 ) {
-                        inputRunSetup.strFile_Config_Map = pair_strParam.second;
-                    }
-                    else if ( pair_strParam.first.compare("OUTPUT_FILE_NAME") == 0 ) {
-                        inputRunSetup.strFile_Output_Name = pair_strParam.second;
-                    }
-                    else if ( pair_strParam.first.compare("OUTPUT_FILE_OPTION") == 0 ) {
-                        inputRunSetup.strFile_Output_Option = pair_strParam.second;
-                    }
-                    else{ //Case: Parameter Not Recognized
-                        cout<<"setRunSetup(): input field name:\n";
-                        cout<<"\t"<<pair_strParam.first<<endl;
-                        cout<<"setRunSetup(): not recognized! Please cross-check input file!!!\n";
-                    } //End Case: Parameter Not Recognized
-                } //End Case: Parameter Fetched Successfully
-                else{ //Case: Input line did NOT parse correctly
-                    cout<<"setRunSetup(): input line:\n";
-                    cout<<"\t"<<strLine<<endl;
-                    cout<<"setRunSetup(): did not parse correctly, please cross-check input file\n";
-                } //End Case: Input line did NOT parse correctly
-            } //End Loop through run info header
-        } //End Case: Run info header found!
-        
-        if (bHeaderEnd) break;
-    } //End Loop through input file
-    if ( file_Input.bad() && bVerboseMode) {
-        //perror( ("getProInfo(): error while reading file: " + strInputFileName).c_str() );
-        perror( "getProInfo(): error while reading config file" );
-        Timing::printStreamStatus(file_Input);
-    }
-    
-    //Do not close input file, it will be used elsewhere
     
     return;
-} //End setRunSetup
+} //End runAnalysis
+
+//Runs the analysis framework on a TFile created by amoreSRS
+void runOnOutputAmoreSRS(bool bVerboseMode, RunSetup & rSetup, AnalysisSetupUniformity & aSetup){
+    //Variable Declaration
+    AnalyzeResponseUniformityClusters clustAnalyzer;
+    AnalyzeResponseUniformityHits hitAnalyzer;
+    
+    map<string,string> map_clust_ObsAndDrawOpt; //Cluster observables & draw option
+    map<string,string> map_hit_ObsAndDrawOpt;   //as above but for hits
+    map<string,string> map_res_ObsAndDrawOpt;   //as above but for results (e.g. fits)
+    
+    ParameterLoaderAmoreSRS amoreLoader;
+    
+    SectorEta etaSector;
+    SelectorCluster clustSelector;
+    SelectorHit hitSelector;
+    
+    TFile *file_ROOTInput, file_ROOTOutput;
+    
+    VisualizeUniformity visualizeUni;
+    
+    //Load amore mapping file & setup the DetectorMPGD object
+    //------------------------------------------------------
+    amoreLoader.loadAmoreMapping( rSetup.strFile_Config_Map );
+    DetectorMPGD detMPGD = amoreLoader.getDetector();
+    
+    //Print the detector info to the user
+    if (bVerboseMode) { //Case: Verbose Printing
+        cout<<"iEta\tY_Pos\tWidth\tX_Low\tX_High\tX_Low\tX_High\tX_Low\tX_High\n";
+        for (int i=1; i <= detMPGD.getNumEtaSectors(); ++i) { //Loop through Detector's SectorEta objects
+            cout<<i<<"\t";
+            
+            etaSector = detMPGD.getEtaSector(i);
+            
+            cout<<etaSector.fPos_Y<<"\t"<<etaSector.fWidth<<"\t";
+            
+            for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) { //Loop through SectorEta's SectorPhi objects
+                cout<<(*iterPhi).second.fPos_Xlow<<"\t"<<(*iterPhi).second.fPos_Xhigh<<"\t";
+            } //End Loop through SectorEta's SectorPhi objects
+            
+            cout<<endl;
+        } //End Loop through Detector's SectorEta objects
+        
+    } //End Case: Verbose Printing
+    
+    //Print the analysis parameters to the user
+    if (bVerboseMode) { //Case: Print user defined selection cuts
+        cout<<"-----------------Hit Parameters-----------------\n";
+        cout<<"Hit ADC Min = " << aSetup.selHit.iCut_ADCNoise << endl;
+        cout<<"Hit ADC Max = " << aSetup.selHit.iCut_ADCSat << endl;
+        cout<<"Hit Multi Min = " << aSetup.selHit.iCut_MultiMin << endl;
+        cout<<"Hit Multi Max = " << aSetup.selHit.iCut_MultiMax << endl;
+        cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
+        cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
+        cout<<"-----------------Cluster Parameters-----------------\n";
+        cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
+        cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
+        cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
+        cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
+        cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
+    } //End Case: Print user defined selection cuts
+    
+    //Loop over input files
+    //------------------------------------------------------
+    for (int i=0; i < vec_strInputFiles.size(); ++i) { //Loop over vec_strInputFiles
+        //Wipe physics objects from previous file (prevent double counting)
+        detMPGD.resetPhysObj();
+        
+        //Open this run's root file & check to see if data file opened successfully
+        //------------------------------------------------------
+        file_ROOTInput = new TFile(vec_strInputFiles[i].c_str(),"READ","",1);
+        
+        if ( !file_ROOTInput->IsOpen() || file_ROOTInput->IsZombie() ) { //Case: failed to load ROOT file
+            perror( ("analyzeUniformity.cpp::runOnOutputAmoreSRS() - error while opening file: " + vec_strInputFiles[i] ).c_str() );
+            Timing::printROOTFileStatus(file_ROOTInput);
+            std::cout << "Skipping!!!\n";
+            
+            continue;
+        } //End Case: failed to load ROOT file
+        
+        //Hit Analysis
+        //------------------------------------------------------
+        //Force the hit analysis if the user requested cluster reconstruction
+        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+            //Hit Selection
+            hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
+            
+            if (bVerboseMode) { //Print Number of Selected Hits to User
+                cout<<vec_strInputFiles[i] << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
+            } //End Print Number of Selected Hits to User
+            
+            //Load the required input parameters
+            if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
+            hitAnalyzer.setDetector(detMPGD);
+            
+            //Initialize the hit histograms if this is the first run
+            if (i == 0) { hitAnalyzer.initHistosHits(); }
+            
+            //Hit Analysis
+            hitAnalyzer.fillHistos();
+            
+            //Update the Detector!
+            detMPGD = hitAnalyzer.getDetector();
+        } //End Case: Hit Analysis
+        
+        //Cluster Reconstruction
+        //------------------------------------------------------
+        if (rSetup.bAnaStep_Reco) { //Case: Cluster Reconstruction
+            
+            //Place holder for now
+            
+        } //End Case: Cluster Reconstruction
+        
+        //Cluster Analysis
+        //------------------------------------------------------
+        if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
+            clustSelector.setClusters(file_ROOTInput, detMPGD, aSetup);
+            
+            if (bVerboseMode) { //Print Number of Selected Clusters to User
+                cout<<vec_strInputFiles[i] << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
+            } //End Print Number of Selected Clusters to User
+            
+            //Load the required input parameters
+            if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
+            clustAnalyzer.setDetector(detMPGD);
+            
+            //Initialize the cluster histograms if this is the first run
+            if (i == 0) { clustAnalyzer.initHistosClusters(); }
+            
+            //Cluster Analysis
+            clustAnalyzer.fillHistos();
+            
+            //Update the Detector!
+            detMPGD = clustAnalyzer.getDetector();
+        } //End Case: Cluster Analysis
+        
+        //Close the file & delete pointer before the next iter
+        //------------------------------------------------------
+        file_ROOTInput->Close();
+        delete file_ROOTInput;
+    } //End Loop over vec_strInputFiles
+    
+    //Create the output ROOT file & check to see if it opened successfully
+    //------------------------------------------------------
+    file_ROOTOutput = new TFile(rSetup.strFile_Output_Name.c_str(), rSetup.strFile_Output_Option.c_str(),"",1);
+    
+    if ( !file_ROOTOutput->IsOpen() || file_ROOTOutput->IsZombie() ) { //Case: failed to load ROOT file
+        perror( ("analyzeUniformity.cpp::runOnOutputAmoreSRS() - error while opening file: " + vec_strInputFiles[i] ).c_str() );
+        Timing::printROOTFileStatus(file_ROOTOutput);
+        std::cout << "Skipping!!!\n";
+        
+        continue;
+    } //End Case: failed to load ROOT file
+    
+    //Store Histograms After Analyzing all input files
+    //------------------------------------------------------
+    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_ROOTOutput);
+    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_ROOTOutput);
+    /*if ( rSetup.bAnaStep_Clusters){
+        if ( !rSetup.bAnaStep_Hits){
+            clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option );
+        }
+        else{
+            clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, "UPDATE" );
+        }
+    }*/
+    
+    //Fit Histograms After Analyzing all input files
+    //------------------------------------------------------
+    if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
+        if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
+            clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
+            clustAnalyzer.fitHistos();
+            clustAnalyzer.storeFits(file_ROOTOutput);
+            
+            //Update the Detector!
+            detMPGD = clustAnalyzer.getDetector();
+        } //End Case: Cluster Analysis
+    } //End Case: Fitting Stored Distributions
+    
+    //Visualize Results
+    //------------------------------------------------------
+    if ( rSetup.bAnaStep_Visualize ) { //Case: Visualize Output
+        visualizeUni.setAnalysisParameters(aSetup);
+        visualizeUni.setDetector(detMPGD);
+        
+        if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
+            map_hit_ObsAndDrawOpt["HitADC"]="E1";
+            //map_hit_ObsAndDrawOpt["HitPos"]="E1";
+            map_hit_ObsAndDrawOpt["HitTime"]="E1";
+            
+            visualizeUni.storeCanvasHistoSegmented(file_ROOTOutput, "HitPos", "E1", rSetup.bVisPlots_PhiLines);
+            visualizeUni.storeListOfCanvasesHistoSegmented(file_ROOTOutput, map_hit_ObsAndDrawOpt, false);
+        } //End Case: Hit Analysis
+        
+        if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
+            map_clust_ObsAndDrawOpt["ClustADC"]="E1";
+            //map_clust_ObsAndDrawOpt["ClustPos"]="E1";
+            map_clust_ObsAndDrawOpt["ClustSize"]="E1";
+            map_clust_ObsAndDrawOpt["ClustTime"]="E1";
+            
+            visualizeUni.storeCanvasHistoSegmented(file_ROOTOutput, "ClustPos", "E1", rSetup.bVisPlots_PhiLines);
+            visualizeUni.storeListOfCanvasesHistoSegmented(file_ROOTOutput, map_clust_ObsAndDrawOpt, false);
+            
+            if (rSetup.bAnaStep_Fitting) { //Case: Fitting
+                map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
+                map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
+                
+                visualizeUni.storeListOfCanvasesGraph(file_ROOTOutput,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
+            } //End Case: Fitting
+        } //End Case: Cluster Analysis
+    } //End Case: Visualize Output
+    
+    return;
+} //End runOnOutputAmoreSRS()
+
+//Runs the analysis framework on a TFile created by the CMS_GEM_Analysis_Framework
+void runOnOutputFrmwrk(){
+    
+}
 
 //Input Parameters
 //  0 -> Executable
@@ -259,28 +282,17 @@ void setRunSetup(ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSet
 //  Analysis: ./analyzeUniformity config/configRun.cfg true
 int main( int argc_, char * argv_[] ){
     //Variable Declaration
-    AnalyzeResponseUniformityClusters clustAnalyzer;
-    AnalyzeResponseUniformityHits hitAnalyzer;
-    
     bool bVerboseMode = false;
     
     ifstream file_Config;
     
-    ParameterLoaderAmoreSRS amoreLoader;
     ParameterLoaderAnaysis analysisLoader;
     
     RunSetup rSetup;
     
-    SectorEta etaSector;
-    
-    SelectorCluster clustSelector;
-    SelectorHit hitSelector;
-    
     vector<string> vec_strInputArgs;
     vector<string> vec_strInputFiles;
     
-    VisualizeUniformity visualizeUni;
-
     //Transfer Input Arguments into vec_strInputArgs
     //------------------------------------------------------
     vec_strInputArgs.resize(argc_);
@@ -430,169 +442,19 @@ int main( int argc_, char * argv_[] ){
         return -3;
     } //End Case: Input Not Understood
     
+    //Debugging
+    //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
+    //myAnalyzerCluster.fitHistos();
+    
     //Set the Run Info and get input file(s)
     //------------------------------------------------------
     setRunSetup(file_Config, bVerboseMode, rSetup);
     vec_strInputFiles = getRunList(file_Config, bVerboseMode);
     
-    //Load amore mapping file & setup the DetectorMPGD object
-    //------------------------------------------------------
-    amoreLoader.loadAmoreMapping( rSetup.strFile_Config_Map );
-    DetectorMPGD detMPGD = amoreLoader.getDetector();
-    
-    //Print the detector info to the user
-    if (bVerboseMode) { //Case: Verbose Printing
-        cout<<"iEta\tY_Pos\tWidth\tX_Low\tX_High\tX_Low\tX_High\tX_Low\tX_High\n";
-        for (int i=1; i <= detMPGD.getNumEtaSectors(); ++i) { //Loop through Detector's SectorEta objects
-            cout<<i<<"\t";
-            
-            etaSector = detMPGD.getEtaSector(i);
-            
-            cout<<etaSector.fPos_Y<<"\t"<<etaSector.fWidth<<"\t";
-            
-            for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) { //Loop through SectorEta's SectorPhi objects
-                cout<<(*iterPhi).second.fPos_Xlow<<"\t"<<(*iterPhi).second.fPos_Xhigh<<"\t";
-            } //End Loop through SectorEta's SectorPhi objects
-            
-            cout<<endl;
-        } //End Loop through Detector's SectorEta objects
-        
-    } //End Case: Verbose Printing
-    
     //Load the requested analysis parameters
     //------------------------------------------------------
-    Uniformity::AnalysisSetupUniformity aSetup = analysisLoader.getAnalysisParameters( rSetup.strFile_Config_Ana );
+    AnalysisSetupUniformity aSetup = analysisLoader.getAnalysisParameters( rSetup.strFile_Config_Ana );
 
-	//Print the analysis parameters to the user
-    if (bVerboseMode) { //Case: Print user defined selection cuts
-        cout<<"-----------------Hit Parameters-----------------\n";
-        cout<<"Hit ADC Min = " << aSetup.selHit.iCut_ADCNoise << endl;
-        cout<<"Hit ADC Max = " << aSetup.selHit.iCut_ADCSat << endl;
-        cout<<"Hit Multi Min = " << aSetup.selHit.iCut_MultiMin << endl;
-        cout<<"Hit Multi Max = " << aSetup.selHit.iCut_MultiMax << endl;
-        cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
-        cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
-        cout<<"-----------------Cluster Parameters-----------------\n";
-        cout<<"Clust ADC, Min = " << aSetup.selClust.iCut_ADCNoise << endl;
-        cout<<"Clust Size, Min = " << aSetup.selClust.iCut_SizeMin << endl;
-        cout<<"Clust Size, Max = " << aSetup.selClust.iCut_SizeMax << endl;
-        cout<<"Clust Time, Min = " << aSetup.selClust.iCut_TimeMin << endl;
-        cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
-    } //End Case: Print user defined selection cuts
-    
-    //Loop over input files
-    //------------------------------------------------------
-    for (int i=0; i < vec_strInputFiles.size(); ++i) { //Loop over vec_strInputFiles
-        //Wipe physics objects from previous file (prevent double counting)
-        detMPGD.resetPhysObj();
-        
-        //Hit Analysis
-        //Force the hit analysis if the user requested cluster reconstruction
-        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
-            //Hit Selection
-            hitSelector.setHits(vec_strInputFiles[i], detMPGD, aSetup);
-
-            if (bVerboseMode) { //Print Number of Selected Hits to User
-                cout<<vec_strInputFiles[i] << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
-            } //End Print Number of Selected Hits to User
-            
-            //Load the required input parameters
-            if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            hitAnalyzer.setDetector(detMPGD);
-            
-            //Initialize the hit histograms if this is the first run
-            if (i == 0) { hitAnalyzer.initHistosHits(); }
-            
-            //Hit Analysis
-            hitAnalyzer.fillHistos();
-            
-            //Update the Detector!
-            detMPGD = hitAnalyzer.getDetector();
-        } //End Case: Hit Analysis
-        
-        //Cluster Reconstruction
-        if (rSetup.bAnaStep_Reco) { //Case: Cluster Reconstruction
-            
-            //Place holder for now
-            
-        } //End Case: Cluster Reconstruction
-        
-        //Cluster Analysis
-        if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
-            clustSelector.setClusters(vec_strInputFiles[i], detMPGD, aSetup);
-    
-            if (bVerboseMode) { //Print Number of Selected Clusters to User
-                cout<<vec_strInputFiles[i] << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
-            } //End Print Number of Selected Clusters to User
-            
-            //Load the required input parameters
-            if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            clustAnalyzer.setDetector(detMPGD);
-            
-            //Initialize the cluster histograms if this is the first run
-            if (i == 0) { clustAnalyzer.initHistosClusters(); }
-            
-            //Cluster Analysis
-            clustAnalyzer.fillHistos();
-            
-            //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();
-        } //End Case: Cluster Analysis
-    } //End Loop over vec_strInputFiles
-    
-    //Store Histograms After Analyzing all input files
-    //------------------------------------------------------
-    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option);
-    if ( rSetup.bAnaStep_Clusters){
-	if ( !rSetup.bAnaStep_Hits){
-		clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option );
-	}
-	else{
-		clustAnalyzer.storeHistos(rSetup.strFile_Output_Name, "UPDATE" );
-	}
-    }
-    
-    //Fit Histograms After Analyzing all input files
-    //------------------------------------------------------
-    if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
-        if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
-            clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
-            clustAnalyzer.fitHistos();
-            clustAnalyzer.storeFits(rSetup.strFile_Output_Name, "UPDATE");
-
-	    //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();
-        } //End Case: Cluster Analysis
-    } //End Case: Fitting Stored Distributions
-    
-    //Visualize Results
-    //------------------------------------------------------
-    if ( rSetup.bAnaStep_Visualize ) { //Case: Visualize Output
-        visualizeUni.setAnalysisParameters(aSetup);
-        visualizeUni.setDetector(detMPGD);
-        
-        if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "HitADC", "E1", false);
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "HitPos", "E1", rSetup.bVisPlots_PhiLines);
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "HitTime", "E1", false);
-        } //End Case: Hit Analysis
-        
-        if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "ClustADC", "E1", false);
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "ClustPos", "E1", rSetup.bVisPlots_PhiLines);
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "ClustSize", "E1", false);
-            visualizeUni.storeCanvasHistoSegmented(rSetup.strFile_Output_Name, "UPDATE", "ClustTime", "E1", false);
-
-            if (rSetup.bAnaStep_Fitting) { //Case: Fitting
-                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitChi2", "APE1", rSetup.bVisPlots_PhiLines);
-                visualizeUni.storeCanvasGraph(rSetup.strFile_Output_Name, "UPDATE", "ResponseFitPkPos", "APE1", rSetup.bVisPlots_PhiLines);
-            } //End Case: Fitting
-        } //End Case: Cluster Analysis
-    } //End Case: Visualize Output
-    
-    //Debugging
-    //myAnalyzerCluster.loadHistosFromFile(vec_strInputArgs[1], vec_strInputArgs[4]);
-    //myAnalyzerCluster.fitHistos();
     
     cout<<"Success!"<<endl;
     

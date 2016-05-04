@@ -46,12 +46,27 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Given an output ROOT file from amoreSRS with clusters
         //Applies the cluster selection and stores those selected clusters in inputDet
+        //Input is a std::string storing the physical filename
         virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet);
         
+        //Given an output ROOT file from amoreSRS with clusters
+        //Applies the cluster selection and stores those selected clusters in inputDet
+        //Input is a TFile *
+        virtual void setClusters(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet);
+        
         //As above but overwrites the stored AnalysisSetupUniformity object
+        //Input is a std::string storing the physical filename
         virtual void setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
             setAnalysisParameters(inputSetup);
             setClusters(strInputRootFileName, inputDet);
+            return;
+        };
+        
+        //As above but overwrites the stored AnalysisSetupUniformity object
+        //Input is a TFile *
+        virtual void setClusters(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet, Uniformity::AnalysisSetupUniformity inputSetup){
+            setAnalysisParameters(inputSetup);
+            setClusters(file_InputRootFile, inputDet);
             return;
         };
         

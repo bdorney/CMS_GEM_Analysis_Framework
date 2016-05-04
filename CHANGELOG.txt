@@ -2,10 +2,28 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.6                               *
-*	LAST UPDATE: Apr 29 2016                     *
+*	VERSION: 1.0.7                               *
+*	LAST UPDATE: May 03 2016                     *
 *                                                *
 **************************************************
+
+Update: May 03rd 2016
+==================================================
+->HitSelector::setHits() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->ClusterSelector::setClusters() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityHits::storeHistos() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityClusters::storeHistos() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityClusters::storeFits() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasGraph() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasHisto() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasHistoSegmented() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity has three new sets of overloaded methods called storeListOfCanvasesGraph, storeListOfCanvasesHisto, and storeListOfCanvasesHistoSegmented which either take a std::string (storing the physical filename) or an open TFile * object and a map<string,string> of observable (key) and draw option (value) to make the summary plots for
+->VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation) is depreciated, instead use VisualizeUniformity::storeListOfCanvasesHisto( ... )
+
+->Added new class Uniformity::ParameterLoaderRun for loading the RunSetup struct and determining the input file list
+->Moved the RunSetup struct from src/analyzeUniformity.cpp to include/UniformityUtilityTypes.h
+
+->Added new class Uniformity::InterfaceAnalysis for being the single access point for the analysis
 
 Update: Apr 30th 2016
 ==================================================

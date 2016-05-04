@@ -89,20 +89,20 @@ namespace Uniformity {
         
         //Storing*****************
         //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
         
+        //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        void storeHistos(TFile * file_InputRootFile);
+        
         //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeFits(std::string & strOutputROOTFileName, std::string strOption);
         
-        //Stores TObjects created in createResponseMap() in the requested output file
-        //Placeholder
-        //void storeResponseMap(std::string strOutputROOTFileName, std::string strOption);
-        
-        //Visualizing*************
-        //Displays the results of the analysis in a user friendly manner
-        //Placeholder
-        //void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
-        //Actually it's better to put this in a separate file
+        //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        //void storeFits(TFile * file_InputRootFile, std::string strOption);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
