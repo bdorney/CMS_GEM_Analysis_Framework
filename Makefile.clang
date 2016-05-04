@@ -18,7 +18,7 @@ LPATHS = -L $(ROOTSYS)/lib/
 LIBS = -lSpectrum
 
 # Define source files
-SOURCES = src/DetectorMPGD.cpp src/ParameterLoaderAmoreSRS.cpp src/ParameterLoaderAnaysis.cpp src/Selector.cpp src/SelectorCluster.cpp src/SelectorHit.cpp src/AnalyzeResponseUniformity.cpp src/AnalyzeResponseUniformityClusters.cpp src/AnalyzeResponseUniformityHits.cpp src/UniformityUtilityFunctions.cpp src/TimingUtilityFunctions.cpp src/VisualizeUniformity.cpp src/analyzeUniformity.cpp
+SOURCES = src/DetectorMPGD.cpp src/InterfaceAnalysis.cpp src/ParameterLoaderAmoreSRS.cpp src/ParameterLoaderAnaysis.cpp src/ParameterLoaderRun.cpp src/Selector.cpp src/SelectorCluster.cpp src/SelectorHit.cpp src/AnalyzeResponseUniformity.cpp src/AnalyzeResponseUniformityClusters.cpp src/AnalyzeResponseUniformityHits.cpp src/UniformityUtilityFunctions.cpp src/TimingUtilityFunctions.cpp src/VisualizeUniformity.cpp src/analyzeUniformity.cpp
 
 # Define object files
 #	We use Suffix Replacement

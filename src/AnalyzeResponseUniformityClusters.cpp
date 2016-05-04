@@ -281,9 +281,11 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
     return;
 } //End AnalyzeResponseUniformityClusters::initHistosClusters()
 
+
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
 //Loads all TObjects found in the input ROOT file into detMPGD;
 //Any previously stored information in detMPGD is lost.
+//Takes a std::string which stores the physical filename as input
 void AnalyzeResponseUniformityClusters::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
     //Variable Declaration
     TFile *ptr_fileInput = nullptr;
@@ -387,10 +389,118 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile( std::string & strInp
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
-
+    
     //Close the file
     //------------------------------------------------------
     ptr_fileInput->Close();
+    
+    return;
+} //End AnalyzeResponseUniformityClusters::loadHistosFromFile()
+
+//Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
+//Loads all TObjects found in the input ROOT file into detMPGD;
+//Any previously stored information in detMPGD is lost.
+//Takes a TFile * which the histograms are written to as input
+void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile ){
+    //Variable Declaration
+    
+    //This method will be called when the user wants to re-run the fitting on a previously created batch of histograms
+    //The user will directly supply an AMORE mapping file, this will make the DetectorMPGD structure so that it matches the one created when the histograms where first booked
+    //The user will indirectly supply an analysis config file because they want to re-run the fits and need to give new information
+    //Use previously existing framework code to setup the detector MPGD, then this method behaves as the reverse of storeHistos()
+    
+    //Setup the MPGD object
+    //------------------------------------------------------
+    ParameterLoaderAmoreSRS amoreLoader;
+    amoreLoader.loadAmoreMapping(strInputMappingFileName);
+    detMPGD = amoreLoader.getDetector();
+    
+    //Check to see if data file opened successfully, if so load the tree
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie() ) { //Case: failed to load ROOT file
+        perror( ("Uniformity::AnalyzeResponseUniformityClusters::loadHistosFromFile() - error while opening file: " + (string) file_InputRootFile->GetName() ).c_str() );
+        Timing::printROOTFileStatus(file_InputRootFile);
+        std::cout << "Exiting!!!\n";
+        
+        return;
+    } //End Case: failed to load ROOT file
+    
+    //Loop Through the file and load all stored TObjects
+    //------------------------------------------------------
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Get Directory
+        //-------------------------------------
+        //Check to see if the directory exists already
+        TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        
+        //If the above pointer is null the directory does NOT exist, skip this Eta Sector
+        if (dir_SectorEta == nullptr) continue;
+        
+        //Debugging
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        
+        //Load Histograms - SectorEta Level
+        //-------------------------------------
+        dir_SectorEta->cd();
+        //Placeholder No fits performed on these histos for now
+        
+        //Loop Over Stored iPhi Sectors within this iEta Sector
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
+            //Get Directory
+            //-------------------------------------
+            //Check to see if the directory exists already
+            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            
+            //If the above pointer is null the directory does NOT exist, skip this Phi Sector
+            if (dir_SectorPhi == nullptr) continue;
+            
+            //Debugging
+            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
+            
+            //Load Histograms - SectorPhi Level
+            //-------------------------------------
+            dir_SectorPhi->cd();
+            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
+            
+            //Check to see if 2D histo retrieved successfully
+            if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr) continue;
+            
+            //Set to Global Directory - SectorPhi Level
+            //-------------------------------------
+            //Prevents seg faulting when closing ptr_fileInput
+            (*iterPhi).second.clustHistos.hADC_v_Pos->SetDirectory(gROOT);
+            
+            //Slices
+            //Trickery, detMPGD now has eta and phi sectors setup.
+            //Slices are NOT setup
+            //Here loop from 1 to aSetup.iUniformityGranularity and either:
+            //      Option 1: Load slices from the file (slower?)
+            //      Option 2: project out from SectorPhi::clustHistos::hADC_v_Pos
+            //Implemented Option 2; faster many large number of I/O operations??
+            for (int i=1; i <= aSetup.iUniformityGranularity; ++i ) { //Loop Over Slices
+                //Set Histograms - Slice Level
+                //-------------------------------------
+                //Creat the slice
+                SectorSlice slice;
+                
+                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
+                
+                //Make sure to set this histo to the global directory
+                slice.hSlice_ClustADC->SetDirectory(gROOT);
+                
+                //Store position information for this slice
+                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
+                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
+                
+                //Store the slice
+                (*iterPhi).second.map_slices[i] = slice;
+            } //End Loop Over Slices
+        } //End Loop Over Stored iPhi Sectors
+    } //End Loop Over Stored iEta Sectors
+
+    //Do not close file_InputRootFile it is used elsewhere
     
     return;
 } //End AnalyzeResponseUniformityClusters::loadHistosFromFile()

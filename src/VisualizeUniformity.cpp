@@ -942,9 +942,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     dir_Summary->cd();
     canv_DetSum.Write();
     
-    //Close the File
-    //------------------------------------------------------
-    ptr_fileOutput->Close();
+    //Do not close file_InputRootFile it is used elsewhere
     
     return;
 } //End VisualizeUniformity::storeCanvasHistoSegmented()
@@ -954,7 +952,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
 //map_strObsNameAndDrawOpt
 //  first   -> Obs Name
 //  second  -> Draw option
-void VisualizeUniformity::storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -1005,7 +1003,7 @@ void VisualizeUniformity::storeListOfCanvasesGraph(TFile * file_InputRootFile, s
     
     for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
         
-        storeCanvasGraph(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+        storeCanvasGraph(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation);
     } //End Loop over input observables
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -1018,7 +1016,7 @@ void VisualizeUniformity::storeListOfCanvasesGraph(TFile * file_InputRootFile, s
 //map_strObsNameAndDrawOpt
 //  first   -> Obs Name
 //  second  -> Draw option
-void VisualizeUniformity::storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -1069,7 +1067,7 @@ void VisualizeUniformity::storeListOfCanvasesHisto(TFile * file_InputRootFile, s
     
     for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
         
-        storeCanvasHisto(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+        storeCanvasHisto(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation);
     } //End Loop over input observables
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -1082,7 +1080,7 @@ void VisualizeUniformity::storeListOfCanvasesHisto(TFile * file_InputRootFile, s
 //map_strObsNameAndDrawOpt
 //  first   -> Obs Name
 //  second  -> Draw option
-void VisualizeUniformity::storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
+void VisualizeUniformity::storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -1133,7 +1131,7 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
     
     for (auto iterMap = map_strObsNameAndDrawOpt.begin(); iterMap != map_strObsNameAndDrawOpt.end(); ++iterMap) { //Loop over input observables
         
-        storeCanvasHistoSegmented(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation)
+        storeCanvasHistoSegmented(file_InputRootFile, (*iterMap).first, (*iterMap).second, bShowPhiSegmentation);
     } //End Loop over input observables
     
     //Do not close file_InputRootFile it is used elsewhere

@@ -81,7 +81,14 @@ namespace Uniformity {
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
         //Loads all TObjects found in the input ROOT file into detMPGD;
         //Any previously stored information in detMPGD is lost.
+        //Takes a std::string which stores the physical filename as input
         virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+        
+        //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
+        //Loads all TObjects found in the input ROOT file into detMPGD;
+        //Any previously stored information in detMPGD is lost.
+        //Takes a TFile * which the histograms are written to as input
+        virtual void loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile);
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount

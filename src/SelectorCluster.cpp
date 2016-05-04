@@ -9,6 +9,7 @@
 #include "SelectorCluster.h"
 
 using std::cout;
+using std::string;
 
 using namespace Uniformity;
 
@@ -179,7 +180,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     tree_Clusters = (TTree*) file_InputRootFile->Get("TCluster");
     
     if ( nullptr == tree_Clusters ) { //Case: failed to load TTree
-        printClassMethodMsg("SelectorCluster","setClusters",("error while fetching: " + strInputRootFileName ).c_str() );
+        printClassMethodMsg("SelectorCluster","setClusters",("error while fetching: " + (string) file_InputRootFile->GetName() ).c_str() );
         printClassMethodMsg("SelectorCluster","setClusters","\tTree returns nullptr; Exiting!!!");
         
         return;
