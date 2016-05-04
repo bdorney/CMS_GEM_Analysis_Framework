@@ -89,10 +89,20 @@ namespace Uniformity {
         
         //Storing*****************
         //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
         
+        //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        void storeHistos(TFile * file_InputRootFile);
+        
         //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeFits(std::string & strOutputROOTFileName, std::string strOption);
+        
+        //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        void storeFits(TFile * file_InputRootFile);
         
         //Stores TObjects created in createResponseMap() in the requested output file
         //Placeholder

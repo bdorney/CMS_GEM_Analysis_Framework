@@ -96,6 +96,44 @@ namespace Uniformity {
         } //End Initialization
     }; //End AnalysisSetupUniformity
     
+    //Run Setup
+    struct RunSetup{
+        bool bAnaStep_Clusters;         //true -> perform the cluster analysis; false -> do not
+        bool bAnaStep_Fitting;          //true -> run fitting on output histo's; false -> do not
+        bool bAnaStep_Hits;             //true -> perform the hit analysis (NOTE if bAnaStep_Reco is true this must also be true); false -> do not
+        bool bAnaStep_Reco;             //true -> reconstruct clusters from input hits; false -> use clusters provided in amoreSRS output file;
+        bool bAnaStep_Visualize;        //true -> make summary plots at end of analysis; false -> do not
+        
+        bool bInputFromFrmwrk;          //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
+        
+        bool bMultiOutput;              //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
+        bool bVisPlots_PhiLines;        //true -> summary plots have phi lines segmenting sectors; false -> they do not
+        
+        string strFile_Config_Ana;      //Name of analysis config file
+        string strFile_Config_Map;      //Name of mapping file
+        
+        string strFile_Output_Name;     //Name of output TFile to be created
+        string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
+        
+        //Default constructor
+        RunSetup(){
+            bAnaStep_Reco = false;
+            bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
+            
+            bInputFromFrmwrk = false;
+            
+            bMultiOutput = false;
+            
+            bVisPlots_PhiLines = true;
+            
+            strFile_Config_Ana = "config/configAnalysis.cfg";
+            strFile_Config_Map = "config/GE7MappingCMScernData2016.cfg";
+            
+            strFile_Output_Name = "FrameworkOutput.root";
+            strFile_Output_Option = "RECREATE";
+        } //End Default constructor
+    }; //End RunSetup
+    
     struct Hit{
         int iPos_Y; //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
         
@@ -130,6 +168,8 @@ namespace Uniformity {
         
         //Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
         int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
+        
+        std::map<int, Hit> map_hits;    //Hits used to reconstruct this cluster; placeholder, key-val here is the hit's strip number iStripNum
         
         //Set Initial Values
         Cluster(){
