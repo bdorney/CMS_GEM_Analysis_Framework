@@ -9,6 +9,7 @@
 #include "ParameterLoaderRun.h"
 
 using std::cout;
+using std::endl;
 using std::ifstream;
 using std::string;
 using std::vector;
@@ -28,8 +29,7 @@ ParameterLoaderRun::ParameterLoaderRun(){
     strSecEnd_RunList = "[END_RUN_LIST]";
 } //End Default Constructor
 
-void ParameterLoaderRun::loadRunParameters(string & strInputSetupFile, bool bVerboseMode, RunSetup & inputRunSetup){
-    
+void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
     //Variable Declaration
     bool bHeaderEnd = false;
     
@@ -140,6 +140,8 @@ void ParameterLoaderRun::loadRunParameters(string & strInputSetupFile, bool bVer
     }
     
     //Do not close input file, it will be used elsewhere
+    
+    inputRunSetup.bLoadSuccess = true;
     
     return;
 } //End ParameterLoaderRun::loadRunParameters()

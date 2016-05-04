@@ -7,7 +7,17 @@
 *                                                *
 **************************************************
 
-Update: May 03rd 2016
+Update: May 4th 2016
+==================================================
+->Uniformity::InterfaceAnalysis methods for running analysis on TFile's created by amoreSRS have been implemented
+->Uniformity::InterfaceAnalysis methods for running analysis on TFile's created by CMS_GEM_Analysis_Framework have been implemented
+->AnalyzeResponseUniformityClusters::loadHistosFromFile() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->Updating src/analyzeUniformity.cpp to use InterfaceAnalysis and ParameterLoaderRun
+->RunSetup struct now has a flag for if the struct was set correctly
+->ParameterLoaderRun::getRunParameters now takes an input std::ifstream instead of a std::string
+->Updated Makefile.clang and Makefile.gpp to compile InterfaceAnalysis and ParameterLoaderRun
+
+Update: May 3rd 2016
 ==================================================
 ->HitSelector::setHits() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
 ->ClusterSelector::setClusters() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object

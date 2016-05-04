@@ -106,14 +106,16 @@ namespace Uniformity {
         
         bool bInputFromFrmwrk;          //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
         
+        bool bLoadSuccess;
+        
         bool bMultiOutput;              //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
         bool bVisPlots_PhiLines;        //true -> summary plots have phi lines segmenting sectors; false -> they do not
         
-        string strFile_Config_Ana;      //Name of analysis config file
-        string strFile_Config_Map;      //Name of mapping file
+        std::string strFile_Config_Ana;      //Name of analysis config file
+        std::string strFile_Config_Map;      //Name of mapping file
         
-        string strFile_Output_Name;     //Name of output TFile to be created
-        string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
+        std::string strFile_Output_Name;     //Name of output TFile to be created
+        std::string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
         
         //Default constructor
         RunSetup(){
@@ -121,6 +123,8 @@ namespace Uniformity {
             bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
             
             bInputFromFrmwrk = false;
+            
+            bLoadSuccess = false;   //This is set to true if the struct is loaded successfully
             
             bMultiOutput = false;
             

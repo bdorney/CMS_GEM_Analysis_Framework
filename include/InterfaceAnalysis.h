@@ -10,7 +10,9 @@
 #define ____InterfaceAnalysis__
 
 //C++ Includes
+#include <map>
 #include <stdio.h>
+#include <string>
 #include <vector>
 
 //Framework Includes
@@ -38,10 +40,11 @@ namespace Uniformity {
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Default
+        InterfaceAnalysis();
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Performs the analysis on the detMPGD object defined by rSetup and aSetup on the input files stored in vec_strRunList
+        //Calls either analyzeInputAmoreSRS() or analyzeInputFrmwrk() based on input rSetup
         virtual void analyzeInput();
         
         //As above, but resets vec_strRunList to be a single file
@@ -61,34 +64,39 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Sets the Run Setup
-        virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
-        
         //Sets the Analysis Setup
         virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
         virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
         
+        //Sets the Run Setup
+        virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
+
+        //Sets the Verbose Output Mode
+        virtual void setVerboseMode(bool bInput){ bVerboseMode = bInput; return; };
+        
         //Data Memebers
         
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Runs the analysis framework on a single file
-        virtual void analysisRoutine();
-        
+        //Performs the analysis on the detMPGD object defined by rSetup and aSetup on the input files stored in vec_strRunList
         //Runs the analysis framework on input created by amoreSRS
         virtual void analyzeInputAmoreSRS();
         
         //Runs the analysis framework on input created by the CMS_GEM_AnalysisFramework
         virtual void analyzeInputFrmwrk();
+        
+        //Stores the results of the analysis based on rSetup
+        virtual void storeResults(TFile * file_Results);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,13 +108,28 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         
         //Data Memebers
+        bool bVerboseMode;
+        
         std::vector<std::string> vec_strRunList;
         
+        //Analyzers
+        Uniformity::AnalyzeResponseUniformityClusters clustAnalyzer;
+        Uniformity::AnalyzeResponseUniformityHits hitAnalyzer;
+        
+        //Containers
         Uniformity::AnalysisSetupUniformity aSetup;
-        Uniformity::DetectorMPGD detMPGD;
         Uniformity::RunSetup rSetup;
+
+        //Detector
+        Uniformity::DetectorMPGD detMPGD;
+        
+        //Selectors
+        Uniformity::SelectorCluster clustSelector;
+        Uniformity::SelectorHit hitSelector;
+        
+        //Visualizer
+        Uniformity::VisualizeUniformity visualizeUni;
     }; //End InterfaceAnalysis
 } //End namespace Uniformity
-
 
 #endif /* defined(____InterfaceAnalysis__) */

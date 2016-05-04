@@ -36,7 +36,7 @@ namespace Uniformity {
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Opens a text file set by the user and loads the requested parameters
-        virtual void loadRunParameters(std::string & strInputSetupFile, bool bVerboseMode, RunSetup & inputRunSetup);
+        virtual void loadRunParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,9 +44,16 @@ namespace Uniformity {
         std::vector<std::string> getRunList(std::ifstream &file_Input, bool bVerboseMode);
         
         //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
-        virtual RunSetup getRunParameters(std::string & strInputSetupFile, bool bVerboseMode){
+        /*virtual RunSetup getRunParameters(std::string & strInputSetupFile, bool bVerboseMode){
             Uniformity::RunSetup rSetup;
             loadRunParameters(strInputSetupFile, bVerboseMode, rSetup);
+            return rSetup;
+        };*/
+        
+        //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
+        virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
+            Uniformity::RunSetup rSetup;
+            loadRunParameters(file_Input, bVerboseMode, rSetup);
             return rSetup;
         };
         

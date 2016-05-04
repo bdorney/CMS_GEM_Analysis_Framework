@@ -15,6 +15,7 @@
 
 using std::cout;
 using std::endl;
+using std::string;
 using std::vector;
 
 using namespace Uniformity;
@@ -192,7 +193,7 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     tree_Hits = (TTree*) file_InputRootFile->Get("THit");
     
     if ( nullptr == tree_Hits ) { //Case: failed to load TTree
-        printClassMethodMsg("SelectorHit","setHits",("error while fetching: " + strInputRootFileName ).c_str() );
+        printClassMethodMsg("SelectorHit","setHits",("error while fetching: " + (string) file_InputRootFile->GetName() ).c_str() );
         printClassMethodMsg("SelectorHit","setHits","\tTree returns nullptr; Exiting!!!");
         
         return;
