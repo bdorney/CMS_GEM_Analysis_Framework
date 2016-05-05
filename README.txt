@@ -38,8 +38,11 @@
                 4.b.ii.II   SelectorClusters
                 4.b.ii.III  SelectorHits
             4.b.iii.        DetectorMPGD
-            4.b.iv.         ParameterLoaderAmoreSRS
-            4.b.v.      	ParameterLoaderAnalysis
+            4.b.iv.         InterfaceAnalysis
+            4.b.v.          Loaders
+                4.b.v.I     ParameterLoaderAmoreSRS
+                4.b.v.II    ParameterLoaderAnalysis
+                4.b.v.III   ParameterLoaderRun
             4.b.vi.         VisualizeUniformity
         4.c. Utilities
             4.c.i   Timing
@@ -47,6 +50,16 @@
         4.d. Types
             4.d.i   Timing
             4.d.ii  Uniformity
+                4.d.ii.I    AnalysisSetupUniformity
+                4.d.ii.II   Cluster
+                4.d.ii.III  HistosPhysObj
+                4.d.ii.IV   Hit
+                4.d.ii.V    RunSetup
+                4.d.ii.VI   SectorEta
+                4.d.ii.VII  SectorPhi
+                4.d.ii.VIII SectorSlice
+                4.d.ii.IX   SelParam
+                4.d.ii.X    SummaryStatistics
         4.e. Configuration Files
             4.e.i   amoreSRS Mapping Config File
             4.e.ii  Analysis Config File
@@ -56,6 +69,13 @@
                 4.e.ii.IV   HEADER PARAMETERS - ADC_FIT_INFO
                 4.e.ii.V    HEADER PARAMETERS - HISTO_INFO
                 4.e.ii.VI   Example Config File
+            4.e.iii Run Config File
+                4.e.iii.I   HEADER PARAMETERS - RUN_INFO
+                4.e.iii.II  HEADER PARAMETERS - RUN_LIST
+                4.e.iii.III Configuration Options
+                4.e.iii.IV  Example Config File - Mode: Series
+                4.e.iii.V   Example Config File - Mode: Grid
+                4.e.iii.VI  Example Config File - Mode: Re-Run
         4.f. Output ROOT File
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
@@ -110,6 +130,28 @@
     The repository is now compiled.  Additionally the base directory of the repository
     has been exported to the shell variable "$GEM_BASE".
 
+    Please check https://github.com/bdorney/CMS_GEM_Analysis_Framework for the most-up-to-date
+    release.  You migrate your master branch to the most-up-to-date branch via:
+
+        git checkout -b <local_branch_name>
+
+        git pull origin <remote_branch_name>
+
+        make -f Makefile.gpp clean
+
+        make -f Makefile.gpp
+
+    The local_branch_name is the name of the branch on your local machine.The
+    remote_branch_name is the name of the branch you are checking out from the remote repository.
+    It is a good practice to make local_branch_name = remote_branch_name.  You can see the list
+    of available branches from command line via:
+
+        git fetch
+
+        git branch -a
+
+    The branch you are currently on will have the "*" character next to it.
+
     NOTE: a make file for clang has been included "Makefile.clang" for MAC OS users.  However
     presently there is no support for any installation/runtime errors on a MAC OS environemnt.
     It is strongly urged that you use the Linux computing environment mentioned above (since it
@@ -130,17 +172,21 @@
 
     The usage for the analyzeUniformity executable is:
 
-        ./analyzeUniformity <PFN of amoreSRS Mapping File> <PFN of Analysis Config File> <PFN input ROOT file> <PFN of output ROOT file> <Option for output ROOT file>
+        For help menu:  ./analyzeUniformity -h
+        For executing:  ./analyzeUniformity <PFN of Run Config File> <Verbose Mode true/false>
 
     Here the physical file name (PFN) represents the full path+filename to the file in question.
-    The two configuration files are described in Section 4.e.  The input ROOT file is a file
-    produced by either amoreSRS or amoreSRS_ZS and can analyze both a hit and/or cluster output file.
-    The contents and layout of the output root file are described in Section 4.f.  The option for
-    the output ROOT file are the standard set from the TFile documentation, e.g. "CREATE, NEW, READ, RECREATE, UPDATE"
+    The configuration files, including the run config file) are described in Section 4.e.  The
+    executable can analyze files produced either by amoreSRS/amoreSRS_ZS or by the
+    CMS_GEM_Analysis_Framework.  For a full explanation of the available configurations please
+    consult 4.e.
 
-    Two example config files have been provided in the default repository.  A usage example is given as:
+    The contents and layout of the output root file are described in Section 4.f.
 
-        ./analyzeUniformity config/GE7MappingCMScernData2016.cfg config/configAnalysis.cfg input.root output.root CREATE
+    Three example config files: 1) mapping config file, 2) analysis config file, and 3) run config
+    file have been provided in the default repository.  A usage example is given as:
+
+        ./analyzeUniformity config/configRun.cfg true
 
 # 4. Documentation
 # ========================================================
@@ -171,10 +217,8 @@
 
     Friendship relations:
 
-        AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits, and ParameterLoaderAmoreSRS
-        are all friend classes to DetectorMPGD
-
-        AnalyzeResponseUniformityClusters/Hits -> DetectorMPGD <- ParameterLoaderAmoreSRS
+        AnalyzeResponseUniformity, AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits,
+        and ParameterLoaderAmoreSRS are all friend classes to DetectorMPGD.
 
     Interactions:
 
@@ -186,6 +230,7 @@
 
         ParameterLoaderAmoreSRS -> creates a DetectorMPGD object
         ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
+        ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
         SelectorCluster -> Assigned an input DetectorMPGD object the opens an input root file and performs the cluster selection; selected clusters are stored based on their location in the DetectorMPGD object.
         SelectorHit -> As SelectorCluster but for hits (e.g. single strips).
         AnalyzeResponseUniformityCluster -> Acts on a DetectorMPGD object that has stored clusters and performs the user requested analysis
@@ -237,15 +282,30 @@
 
         Coming "soon"
 
-        # 4.b.iv. ParameterLoaderAmoreSRS
+        # 4.b.iv. InterfaceAnalysis
         # --------------------------------------------------------
 
         Coming "soon"
 
-        # 4.b.v. ParameterLoaderAnalysis
+        # 4.b.v. Loaders
         # --------------------------------------------------------
 
-        Coming "soon"
+        These classes are loading user specified parameters at runtime.
+
+            # 4.b.v.I ParameterLoaderAmoreSRS
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.v.II ParameterLoaderAnalysis
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.v.III ParameterLoaderRun
+            # --------------------------------------------------------
+
+            Coming "soon"
 
         # 4.b.vi. VisualizeUniformity
         # --------------------------------------------------------
@@ -339,6 +399,7 @@
             Cluster
             HistoPhysObj
             Hit
+            RunSetup
             SectorEta
             SectorPhi
             SectorSlice
@@ -347,7 +408,15 @@
 
         Each of these items are described in detail below.
 
-            # 4.d.ii.1 AnalysisSetupUniformity
+        Several of the above structs have both copy constructors and overloaded assignment operators which perform
+        a deep copy of all the objects stored in the struct.  For those unfamiliar with the term "deep copy" please
+        consult:
+
+            http://stackoverflow.com/questions/184710/what-is-the-difference-between-a-deep-copy-and-a-shallow-copy
+
+        or perform a google search of "deep copy C++" for further explanation.
+
+            # 4.d.ii.I AnalysisSetupUniformity
             # --------------------------------------------------------
 
             The AnalysisSetupUniformity struct stores user input defined in the Analysis Config file.  This
@@ -375,7 +444,7 @@
                 AnalysisSetupUniformity::selClust               //SelParam object specifying cluster selection cuts
                 AnalysisSetupUniformity::selHit                 //SelParam object specifying hit selection cuts
 
-            # 4.d.ii.2 Cluster
+            # 4.d.ii.II Cluster
             # --------------------------------------------------------
 
             The Uniformity::Cluster struct stores information relating to one reconstructed cluster
@@ -387,10 +456,12 @@
                 Cluster::iSize      //Number of strips in cluster
                 Cluster::iTimeBin   //Time bin, e.g. latency value, of the cluster
 
+                Cluster::map_hits   //map of Uniformity::Hit objects used to reconstruct this cluster.  Note presently just a placeholder.  Empty for all clusters presently.
+
             Note data types of Uniformity::Cluster (e.g. int, float, etc...) should closely match what amoreSRS stores
             in TCluster TTree; e.g. ADC is intrinscially integer physically, but it is defined as a float in amoreSRS.
 
-            # 4.d.ii.3 HistosPhysObj
+            # 4.d.ii.III HistosPhysObj
             # --------------------------------------------------------
 
             The Uniformity::HistosPhysObj struct is used as a container for ROOT histograms (i.e. TH1, TH2, etc...).
@@ -412,7 +483,7 @@
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            # 4.d.ii.4 Hit
+            # 4.d.ii.IV Hit
             # --------------------------------------------------------
 
             The Uniformity::Hit struct stores information relating to one reconstructed hit stored in the THit TTree
@@ -425,7 +496,37 @@
 
             Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
 
-            # 4.d.ii.5 SectorEta
+            # 4.d.ii.V RunSetup
+            # --------------------------------------------------------
+
+            The Uniformity::RunSetup struct stores user input defined in the RUN_INFO header of the Run Config
+            File.  It does not store the list of input files.  This struct is responsible for setting the analysis
+            configuration and is used by InterfaceAnalysis class for identifying what stages of the analysis
+            should be performed.
+
+            Data members of Uniformity::RunSetup are:
+
+                RunSetup::bAnaStep_Clusters     //True: perform the cluster analysis; false: do not.
+                RunSetup::bAnaStep_Fitting      //True: fit stored distributions; false: do not.  Note bAnaStep_Clusters (bAnaStep_Hits) must also be true for cluster (hit) distributions to be fitted.
+                RunSetup::bAnaStep_Hits         //True: perform the hit analysis; false: do not.
+                RunSetup::bAnaStep_Reco         //True: reconstruct clusters from hits; false: take clusters from input amoreSRS TTree.  Right now just a placeholder value.  Does nothing presently.
+                RunSetup::bAnaStep_Visualize    //True: make summary TCanvas objects after analyzing all input files; false: do not.
+
+                RunSetup::bInputFromFrmwrk      //True (false): input files are produced by the CMS_GEM_Analysis_Framework (amoreSRS)
+
+                RunSetup::bLoadSuccess          //True (false): the input parameters were (not) loaded successfully from the Run Config File. Defaults to false.  If after attempting to load these parameters from the Run Config File this is still false the analysis routine exits.
+
+                RunSetup::bMultiOutput          //True: one output file is made which represents the sum of all input files; false: one output file is made for each input file.  Note when bInputFromFrmwrk is true bMultiOutput must also be true.
+
+                RunSetup::bVisPlots_PhiLines    //True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
+
+                RunSetup::strFile_Config_Ana    //PFN of input analysis config file
+                RunSetup::strFile_Config_Map    //PFN of input mapping config file
+
+                RunSetup::strFile_Output_Name   //PFN of output TFile to be created when bMultiOutput is false
+                RunSetup::strFile_Output_Option //Option for TFile, e.g. CREATE, RECRATE, UPDATE, etc...
+
+            # 4.d.ii.VI SectorEta
             # --------------------------------------------------------
 
             The Uniformity::SectorEta struct represents one iEta row of a detector. Each instance of a
@@ -457,7 +558,7 @@
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            4.d.ii.5 SectorPhi
+            4.d.ii.VII SectorPhi
             # --------------------------------------------------------
 
             The data members of the Uniformity::SectorPhi struct are:
@@ -476,7 +577,7 @@
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            4.d.ii.6 SectorSlice
+            4.d.ii.VIII SectorSlice
             # --------------------------------------------------------
 
             The data members of the Uniformity::SectorSlice struct are:
@@ -489,7 +590,7 @@
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            4.d.ii.7 SelParam
+            4.d.ii.IX SelParam
             # --------------------------------------------------------
 
             Data members of Uniformity::SelParam are:
@@ -503,7 +604,7 @@
                 SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
                 SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
 
-            4.d.ii.8 SummaryStatistics
+            4.d.ii.X SummaryStatistics
             # --------------------------------------------------------
 
             The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
@@ -522,7 +623,6 @@
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
-
 
     # 4.e. Configuration Files
     # --------------------------------------------------------
@@ -868,6 +968,328 @@
                 [END_UNIFORMITY_INFO]
             [END_ANALYSIS_INFO]
 
+        # 4.e.iii. Run Config File
+        # --------------------------------------------------------
+
+        The run config file expects a certain "nested-header" style. The format should look something like:
+
+            [BEGIN_RUN_INFO]
+                ...
+                ...
+                ...
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                ...
+                ...
+                ...
+            [END_RUN_LIST]
+
+        Parameters found inside the "[BEGIN_RUN_INFO]" header expected to be entered in the following format:
+
+            field_name = 'value';
+
+        The field_name should be on the left followed by an equals sign "=" then the value should be enclosed
+        in single quote marks "'".  A semicolon ";" ends the statement.  Tabs "\t" and spaces outside of the
+        single quotes will be ignored, but will be preserved inside the single quotes.  Text after the ";" will
+        also be ignored.
+
+        Contrary to the "[BEGIN_RUN_INFO]" header the "[BEGIN_RUN_LIST]" header is simply a list of PFN of the
+        input files to be analyzed by the call of the executable.  Again tabs "\t" and spaces will be ignored.
+
+        The Uniformity::ParameterLoaderRun class understands the "#" character to indicate a comment; so
+        it is possible to comment out lines in the Run Config file you create for ease of use.  The template
+        run config file at the end of this subsection showns an example.
+
+        The value of true is understood as being from the case-insensitive set {t, true, 1} while the value of
+        false is understood as being from the case-insensitive set {f, false, 0}.
+
+        # 4.e.iii.I HEADER PARAMETERS - RUN_INFO
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+            The following parameters are supported:
+            #		<FIELD>             <DATA TYPE, DESCRIPTION>
+
+                Config_Analysis         string, PFN of the input analysis configuration file.
+
+                Config_Mapping          string, PFN of the input mapping configuration file.
+
+                Input_Is_Frmwrk_Output  boolean, set to true (false) if the input file/files is/are created
+                                        by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
+                                        option is set to true then Output_Individual must also be set to true.
+
+                Output_File_Name        string, PFN of the output TFile.  Note that if Output_Individual is
+                                        set to true and Input_Is_Frmwrk_Output is set to false then the PFN
+                                        defined here is not used.  Instead the PFN of the input TFile, created
+                                        by amoreSRS, is used but the "dataTree.root" ending of the file name is
+                                        removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
+                                        to true then the PFN defined here is again not used.  Instead the PFN of
+                                        the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
+                                        filename is appended with "NewAna.root".  This could be potentially
+                                        improved in the future.
+
+                Output_File_Option      string, the option for the output TFile taken from the standard set
+                                        defined in the TFile documentation, e.g. "CREATE, NEW, READ, RECREATE, UPDATE"
+
+                Output_Individual       boolean, setting to true produces one output file for each input file.
+                                        Setting to false produces one output file that represents the entirity
+                                        of the analysis of all input files.  Note that this should only be set
+                                        to false if Input_Is_Frmwrk_Output is also set to false.
+
+                Ana_Reco_Clusters       boolean, set to true if you would like to the framework to reconstruct
+                                        clusters from input hits found in the amoreSRS input TFile. Setting to
+                                        false takes the clusters from the input amoreSRS TFile.  Right now this
+                                        field does nothing and is only a placeholder.
+
+                Ana_Hits                boolean, setting to true will tell the framework to perform the analysis
+                                        of the input hits.
+
+                Ana_Clusters            boolean, setting to true will tell the framework to perform the analysis
+                                        of the input clusters.
+
+                Ana_Fitting             boolean, setting to true will tell the framework to fit the obtained
+                                        distributions.  Note that Ana_Clusters must also be true for those
+                                        distributions to be fitted.
+
+                Visualize_Plots         boolean, setting to true will tell the framework to prepare several
+                                        TCanvases after analyzing all input files (Output_Individual = false)
+                                        or each input file (Output_Individual = true).
+
+                Visualize_DrawPhiLines  boolean, setting to true will tell the framework to draw lines on the
+                                        summary TCanvases that show the iPhi segmentation.
+
+
+        # 4.e.iii.II  HEADER PARAMETERS - RUN_LIST
+        # --------------------------------------------------------
+
+        This header contains a list of PFN of the input files.  It is expected that there is one line for per
+        file.  White space, such as tabs '\t' and spaces ' ', is ignored when reading in these input files.
+        For example:
+
+            [BEGIN_RUN_LIST]
+                ...
+                ...
+                /filepath/filename3.root
+                /filepath/filename4.root
+                ...
+                ...
+            [END_RUN_LIST]
+
+        # 4.e.iii.III  Configuration Options
+        # --------------------------------------------------------
+
+        There are three modes that the analyzeUniformity executable can be used to analyze raw data taken
+        with RD51 Scaleable Readout System and unpacked amoreSRS.
+
+        The first mode is the "series" mode which will analyze all of the input files defined in the
+        "[BEGIN_RUN_LIST]" header, one after another, created by either amoreSRS or the
+        CMS_GEM_Analysis_Framework (but not a mix of both!).  The time of execution can vary depending on
+        the number of input files and the number of events/slice granularity present in each of those files.
+        However, care has been taken to maximimize performance while still maintaining modularity/flexibility
+        in the design.  Here the "[BEGIN_RUN_INFO]" header can be configured to execute whatever level of
+        the framework analysis is desired; but this will be applied to EACH of the input files defined in
+        the "[BEGIN_RUN_LIST]" header.  If the need arises we can implement a way to assign a different
+        analysis and mapping config file to each of the input files defined in the "[BEGIN_RUN_LIST]" header
+        but right now this functionality is not foreseen.
+
+        The second mode is the computing cluster mode; but to avoid confusion with charge clusters this is
+        referred to as "grid" mode. Here the input run config file contains only a single input file in the
+        "[BEGIN_RUN_LIST]" header and the "[BEGIN_RUN_INFO]" header is configured such that Ana_Fitting and
+        Visualize_Plots are set to false.  The user uses a script/scheduler of their choice to launch their
+        jobs to a computing cluster to analyze a set of input files in parallel (scripts to do this are not
+        yet present in the repository but is foreseen).  Then after all jobs are finished and the outputs
+        retrieved the user can merge the output files together (if running on amoreSRS input files) using
+        the "hadd" command in ROOT.  Then this merged file can be reprocessed in series mode with
+        Input_Is_Frmwrk_Output, Ana_Fitting, and Visualize_Plots set to true.
+
+        The third mode is the "re-run" mode.  Here one can take a TFile that has been previously produced by
+        the CMS_GEM_Analysis_Framework and reanalyze it after changing the fit parameters defined in the
+        analysis configuration file.  Each run will result in a new TFile (independent from the input) that
+        has the updated results.  This allows the user to more rapidly study variations in parameters without
+        having to waste time performing the base selection (which may not need to change).
+
+        Example configuration files illustrating these options are provided in the sections below.
+
+        # 4.e.iii.IV  Example Config File - Mode: Series
+        # --------------------------------------------------------
+
+        Two example files here are presented.
+
+        The first example illustrates a series run in which the entire analysis is requested on a list of
+        input TFile's create by amoreSRS.  Here the Output_Individual is set to false to create one output
+        file representing the results of the analysis on all input files. Changing Output_Individual to true
+        will produce one output file per input file.  The example is as follows:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Analysis = 'config/configAnalysis.cfg';
+                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                #Output Config
+                ####################################
+                Output_File_Name = 'myOutputFile.root';
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'false';        #indicates we are making one output file that represents results obtained from all inputs
+                #Analysis Steps
+                ####################################
+                Ana_Reco_Clusters = 'false';
+                Ana_Hits = 'true';
+                Ana_Clusters = 'true';
+                Ana_Fitting = 'true';
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'true';
+                Visualize_DrawPhiLines = 'true';
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/filename1.root
+                /base_dir/sub_dir/sub_dir/filename2.root
+                /base_dir/sub_dir/sub_dir/filename3.root
+                /base_dir/different_dir/filename4.root
+                /different_base_dir/filename5.root
+            [END_RUN_LIST]
+
+        Here leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+
+        The second example illustrates a series run in which only the final portion of the analysis (fitting
+        and visualizing) is performed on an input TFile created by the CMS_GEM_Analysis_Framework.  Here
+        Output_Individual is set to true, as it must be, and one output file for each input file will be
+        produced.  The example is as follows:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Analysis = 'config/configAnalysis.cfg';
+                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'true';    #indicates we are running on input created by the CMS_GEM_Analysis_Framework
+                #Output Config
+                ####################################
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'true';         #indicates we are making one output file for each input file
+                #Analysis Steps
+                ####################################
+                Ana_Reco_Clusters = 'false';
+                Ana_Hits = 'false';
+                Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
+                Ana_Fitting = 'true';
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'true';
+                Visualize_DrawPhiLines = 'true';
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1.root
+                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector2.root
+                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector3.root
+                /base_dir/different_dir/myPreviousFrmwrkOutput_Detector4.root
+                /different_base_dir/myPreviousFrmwrkOutput_Detector5.root
+            [END_RUN_LIST]
+
+        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+        In this case the framework should create the following list of output files:
+
+            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1_NewAna.root
+            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector2_NewAna.root
+            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector3_NewAna.root
+            /base_dir/different_dir/myPreviousFrmwrkOutput_Detector4_NewAna.root
+            /different_base_dir/myPreviousFrmwrkOutput_Detector5_NewAna.root
+
+        Pay special attention to the fact that these files will not necessarily be found in the directory you
+        are calling the executable from but in the directory the input file is found in.
+
+        # 4.e.iii.V  Example Config File - Mode: Grid
+        # --------------------------------------------------------
+
+        Grid mode is really designed for running the analysis on multiple input TFiles, created by amoreSRS,
+        in parallel.  One could use this option when running on multiple input TFiles created by the framework
+        but the increase in analysis speed would be small in comparison since usually you are only interested
+        in checking a new set of fit parameters on the previously obtained data.
+
+        Ideally you should submit this with a script/scheduler (not yet included in the repository but under
+        development) to a fast queue such as the 8 natural minute or 1 natural hour queues available on lxplus.
+        The example config file is shown as:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Analysis = 'config/configAnalysis.cfg';
+                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                #Output Config
+                ####################################
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+                #Analysis Steps
+                ####################################
+                Ana_Reco_Clusters = 'false';
+                Ana_Hits = 'true';
+                Ana_Clusters = 'true';
+                Ana_Fitting = 'false';              #Do not perform the fitting; input file is a subset of the total dataset
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'false';          #Do not perform the visualization; input file is a subset of the total dataset
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/myFileForThisJob.root
+            [END_RUN_LIST]
+
+        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+
+        # 4.e.iii.VI  Example Config File - Mode: Re-Run
+        # --------------------------------------------------------
+
+        The re-run mode is designed to allow a user to change the fit parameters defined in their analysis
+        config file and re-run on an input TFile previously produced by the framework.  This saves significant
+        time when tweaking the fit parameters being applied to a given input file since the selection does
+        not have to be repeated.  Obviously this mode should not be applied to input TFiles produced by amoreSRS.
+        The example config file is given below:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Analysis = 'config/configAnalysis.cfg';
+                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the
+                #Output Config
+                ####################################
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'true';         #must be set to true since Input_Is_Frmwrk_Output = true
+                #Analysis Steps
+                ####################################
+                Ana_Reco_Clusters = 'false';
+                Ana_Hits = 'false';
+                Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
+                Ana_Fitting = 'true';
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'true'; #true -> make summary canvas plots; false -> do not make summary canvas plots
+                Visualize_DrawPhiLines = 'true'; #true -> draw iPhi lines; false -> do not draw iPhi lines
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1.root
+            [END_RUN_LIST]
+
+        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+        In this case the framework should create the following list of output files:
+
+            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1_NewAna.root
+
+        Again pay special attention to the fact that these files will not necessarily be found in the directory you
+        are calling the executable from but in the directory the input file is found in.
+
+        Astute readers will note this is identical to the series mode example 2 with just one input file.
+        This is true; however, I felt the explicit example could prove useful.
+
     # 4.f. Output ROOT File
     # --------------------------------------------------------
 
@@ -897,7 +1319,7 @@
     corresponding SectorEtaX histograms.
 
     The VisualizeUniformity class will offer additional TObjects (e.g. TCanvas, TH2F, etc...) to assist
-    the analyst in making the "pass/fail" statement upon implementation.
+    the analyst in making the "pass/fail" statement.
 
     # 4.g. Source Code Name Conventions
     # --------------------------------------------------------

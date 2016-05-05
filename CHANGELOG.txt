@@ -2,10 +2,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.7                               *
-*	LAST UPDATE: May 03 2016                     *
+*	VERSION: 1.0.8                               *
+*	LAST UPDATE: May 05 2016                     *
 *                                                *
 **************************************************
+
+Update: May 5th 2016
+==================================================
+->Updated README.txt file to reflect changes
+->Merged feature_UpdatedExec into develop
 
 Update: May 4th 2016
 ==================================================
@@ -18,6 +23,7 @@ Update: May 4th 2016
 ->Updated Makefile.clang and Makefile.gpp to compile InterfaceAnalysis and ParameterLoaderRun
 ->AnalyzeResponseUniformityClusters::loadHistosFromFile() methods have been updated to load all histograms, not just those involved in fitting
 ->Corrected an improper naming convention in AnalyzeResponseUniformityClusters, rare instances of "hiEta" changed to "h_iEta" in TH1 & TH2 TName fields.
+->May the force by with you.
 
 Update: May 3rd 2016
 ==================================================
