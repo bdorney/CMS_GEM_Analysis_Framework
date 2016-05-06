@@ -193,9 +193,12 @@ namespace Uniformity {
         std::shared_ptr<TH1F> hTime;   //Time          "                    "
         
         //Two dimensional histograms
-        std::shared_ptr<TH2F> hADC_v_Pos; //ADC vs Position for all physics objects
-        //std::shared_ptr<TH2F> hPos_v_Sector; //Position vs. Sector No. for all physics objects
-    
+        std::shared_ptr<TH2F> hADC_v_Pos;       //ADC vs Position for all physics objects
+        std::shared_ptr<TH2F> hADC_v_Size;      //ADC vs Size for all physics objects
+        //std::shared_ptr<TH2F> hPos_v_Sector;  //Position vs. Sector No. for all physics objects
+        
+        //Three dimensional histograms
+        
         //Default Constructor
         HistosPhysObj(){
             

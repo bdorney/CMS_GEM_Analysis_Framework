@@ -23,21 +23,21 @@ SelectorCluster::SelectorCluster(){
 //Input is a std::string storing the physical filename
 void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    int iFirstEvt = aSetupUniformity.iEvt_First;
-    int iNEvt = aSetupUniformity.iEvt_Total;
+    //int iFirstEvt = aSetupUniformity.iEvt_First;
+    //int iNEvt = aSetupUniformity.iEvt_Total;
     
-    Int_t iClustMulti;  //I cry a little inside because of this
-    Int_t iClustPos_Y[3072];
-	Int_t iClustSize[3072];
-	Int_t iClustTimeBin[3072];
+    //Int_t iClustMulti;  //I cry a little inside because of this
+    //Int_t iClustPos_Y[3072];
+	//Int_t iClustSize[3072];
+	//Int_t iClustTimeBin[3072];
     
-	Float_t fClustPos_X[3072];
-    Float_t fClustADC[3072];
+	//Float_t fClustPos_X[3072];
+    //Float_t fClustADC[3072];
     
-    Cluster clust;
+    //Cluster clust;
     
     TFile *file_ROOT = NULL;
-    TTree *tree_Clusters = NULL;
+    //TTree *tree_Clusters = NULL;
     
     //Open this run's root file
     //------------------------------------------------------
@@ -53,7 +53,8 @@ void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity:
         return;
     } //End Case: failed to load ROOT file
     
-    tree_Clusters = (TTree*) file_ROOT->Get("TCluster");
+    //Simplied to just call the method below
+    /*tree_Clusters = (TTree*) file_ROOT->Get("TCluster");
     
     if ( nullptr == tree_Clusters ) { //Case: failed to load TTree
         printClassMethodMsg("SelectorCluster","setClusters",("error while fetching: " + strInputRootFileName ).c_str() );
@@ -139,6 +140,11 @@ void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity:
             inputDet.setCluster(clust);
         } //End Loop Over Number of Clusters
     } //End Loop Over "Events"
+    */
+    
+    //Calling setClusters
+    //------------------------------------------------------
+    setClusters(file_ROOT, inputDet);
     
     //Close the Input ROOT File
     //------------------------------------------------------

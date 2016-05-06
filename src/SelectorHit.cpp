@@ -32,20 +32,20 @@ SelectorHit::SelectorHit(){
 //Input is a std::string storing the physical filename
 void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    int iFirstEvt = aSetupUniformity.iEvt_First;
-    int iNEvt = aSetupUniformity.iEvt_Total;
+    //int iFirstEvt = aSetupUniformity.iEvt_First;
+    //int iNEvt = aSetupUniformity.iEvt_Total;
     
-    Int_t iHitMulti;  //I cry a little inside because of this
-    Int_t iHitPos_Y[3072];
-    Int_t iHitStrip[3072];
-    Int_t iHitTimeBin[3072];
+    //Int_t iHitMulti;  //I cry a little inside because of this
+    //Int_t iHitPos_Y[3072];
+    //Int_t iHitStrip[3072];
+    //Int_t iHitTimeBin[3072];
     
-    Short_t sHitADC[30] = {0};
+    //Short_t sHitADC[30] = {0};
     
-    Hit hitStrip;
+    //Hit hitStrip;
     
     TFile *file_ROOT = NULL;
-    TTree *tree_Hits = NULL;
+    //TTree *tree_Hits = NULL;
     
     //Open this run's root file
     //------------------------------------------------------
@@ -61,7 +61,8 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
         return;
     } //End Case: failed to load ROOT file
     
-    tree_Hits = (TTree*) file_ROOT->Get("THit");
+    //Simplified to just call the method below
+    /*tree_Hits = (TTree*) file_ROOT->Get("THit");
     
     if ( nullptr == tree_Hits ) { //Case: failed to load TTree
         printClassMethodMsg("SelectorHit","setHits",("error while fetching: " + strInputRootFileName ).c_str() );
@@ -148,10 +149,15 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
             inputDet.setHit(hitStrip);
         } //End Loop Over Number of hits
     } //End Loop Over "Events"
-    
+    */
+     
 	//Clear stl containers? (Not doing this seems to cause some pointer to be freed)
     //------------------------------------------------------
     //  Placeholder
+    
+    //Call setHits()
+    //------------------------------------------------------
+    setHits(file_ROOT, inputDet);
     
 	//Close the Input ROOT File
     //------------------------------------------------------

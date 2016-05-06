@@ -151,23 +151,8 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         return;
     } //End Check if File Failed to Open Correctly
     
-    //Loop over ieta's
-    //Create/Load file structure
-    //Store ieta level histograms
-    //Loop over iphi's within ieta's
-    //Create/Load file structure
-    //Store iphi level histograms
-    //Loop over slices
-    //Create/Load file structure
-    //store slice level histograms
-    //Close File
-    
-    //Debugging
-    //cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
-    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
-    
+    //Simplied to just call the method below
+    /*
     //Setup the summary histograms
     TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
     TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
@@ -242,7 +227,11 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     hHitADC_All.Write();
     hHitPos_All.Write();
     hHitTime_All.Write();
+    */
     
+    //Call the store histos sequence
+    storeHistos(ptr_fileOutput);
+     
     //Close the ROOT file
     ptr_fileOutput->Close();
     

@@ -7,6 +7,20 @@
 *                                                *
 **************************************************
 
+Update: May 6th 2016
+==================================================
+->Added new data member to Uniformity::HistosPhysObj called std::shared_ptr<TH2F> hADC_v_Size
+->Uniformity::AnalyzeResponseUniformityClusters::fillHistos now filles HistosPhysObj.hADC_v_Size for clusters at both SectorEta and SectorPhi level
+->Uniformity::AnalyzeResponseUniformityClusters::loadHistosFromFile now filles HistosPhysObj.hADC_v_Size for clusters at both SectorEta and SectorPhi level
+->Uniformity::AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::SelectorCluster::setClusters(std::string &strInputRootFileName, ... ) now just calls SelectorCluster::setClusters(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::SelectorHit::setHits(std::string &strInputRootFileName, ... ) now just calls SelectorHit::setHits(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, ... ) instead of duplicating the method
+
 Update: May 5th 2016
 ==================================================
 ->Updated README.txt file to reflect changes

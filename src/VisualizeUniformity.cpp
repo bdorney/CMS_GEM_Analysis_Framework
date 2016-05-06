@@ -40,24 +40,23 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     TH1::AddDirectory(kFALSE);
     
     //Variable Declaration
-    int iNumEta = detMPGD.getNumEtaSectors();
+    //int iNumEta = detMPGD.getNumEtaSectors();
     
-    shared_ptr<TGraphErrors> gObs; //Observable to be drawn
+    //shared_ptr<TGraphErrors> gObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    //SectorEta etaSector;
     
-    std::vector<shared_ptr<TGraphErrors> > vec_gObs;
+    //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
 
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
-    TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
+    //TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    //TCanvas *canv_DetSum = new TCanvas( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    //TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -70,6 +69,8 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
         return;
     } //End Check if File Failed to Open Correctly
     
+    //Simplier to call the method below
+    /*
     //Get/Make the Summary Directory
     //------------------------------------------------------
     //Check to see if the directory exists already
@@ -156,6 +157,10 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     dir_Summary->cd();
     canv_DetSum.Write();
     mgraph_Obs->Write();
+    */
+    
+    //Call the method below
+    storeCanvasGraph(ptr_fileOutput, strObsName, strDrawOption, bShowPhiSegmentation);
     
     //Close the File
     //------------------------------------------------------
@@ -297,17 +302,17 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     TH1::AddDirectory(kFALSE);
 
     //Variable Declaration
-    int iNumEta = detMPGD.getNumEtaSectors();
+    //int iNumEta = detMPGD.getNumEtaSectors();
     
-    shared_ptr<TH1F> hObs; //Observable to be drawn
+    //shared_ptr<TH1F> hObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    //SectorEta etaSector;
     
-    std::vector<shared_ptr<TH1F> > vec_hObs;
+    //std::vector<shared_ptr<TH1F> > vec_hObs;
     
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
     //Make the Canvas
     //------------------------------------------------------
@@ -324,6 +329,8 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
         return;
     } //End Check if File Failed to Open Correctly
     
+    //Simpler to just call the method below
+    /*
     //Get/Make the Summary Directory
     //------------------------------------------------------
     //Check to see if the directory exists already
@@ -407,7 +414,12 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    */
     
+    //Call the method below
+    //------------------------------------------------------
+    storeCanvasHisto(ptr_fileOutput, strObsName, strDrawOption, bShowPhiSegmentation);
+     
     //Close the File
     //------------------------------------------------------
     ptr_fileOutput->Close();
@@ -674,20 +686,20 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
 //Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
-    int iNumEta = detMPGD.getNumEtaSectors();
+    //int iNumEta = detMPGD.getNumEtaSectors();
     
-    float fXPad_Low;
-    float fXPad_High;
+    //float fXPad_Low;
+    //float fXPad_High;
     
-    float fYPad_Low;
-    float fYPad_High;
+    //float fYPad_Low;
+    //float fYPad_High;
     
-    shared_ptr<TH1F> hObs; //Observable to be drawn
+    //shared_ptr<TH1F> hObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    //SectorEta etaSector;
     
-    std::vector<shared_ptr<TH1F> > vec_hObs;
-    std::vector<TPad *> vec_padSectorObs;
+    //std::vector<shared_ptr<TH1F> > vec_hObs;
+    //std::vector<TPad *> vec_padSectorObs;
 
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
@@ -696,7 +708,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    //TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -709,6 +721,8 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
         return;
     } //End Check if File Failed to Open Correctly
     
+    //Simplier to call the method below
+    /*
     //Get/Make the Summary Directory
     //------------------------------------------------------
     //Check to see if the directory exists already
@@ -799,6 +813,11 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    */
+    
+    //Call the method below
+    //------------------------------------------------------
+    storeCanvasHistoSegmented(ptr_fileOutput, strObsName, strDrawOption, bShowPhiSegmentation);
     
     //Close the File
     //------------------------------------------------------
