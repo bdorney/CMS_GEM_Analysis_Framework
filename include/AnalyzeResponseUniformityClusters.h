@@ -61,7 +61,7 @@ namespace Uniformity {
         AnalyzeResponseUniformityClusters();
         
         //Set the detector and anlysis parameters at construction
-        AnalyzeResponseUniformityClusters(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+        AnalyzeResponseUniformityClusters(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,11 +73,22 @@ namespace Uniformity {
         //Loops over all slices in detMPGD and fits Booked histograms for the full detector
         virtual void fitHistos();
         
+        //Initialize**************
+        //Loops through the detector and initalizes all cluster histograms
+        virtual void initHistosClusters();
+        
         //Loading*****************
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
         //Loads all TObjects found in the input ROOT file into detMPGD;
         //Any previously stored information in detMPGD is lost.
+        //Takes a std::string which stores the physical filename as input
         virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+        
+        //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
+        //Loads all TObjects found in the input ROOT file into detMPGD;
+        //Any previously stored information in detMPGD is lost.
+        //Takes a TFile * which the histograms are written to as input
+        virtual void loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile);
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
@@ -85,10 +96,20 @@ namespace Uniformity {
         
         //Storing*****************
         //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
         
+        //Stores booked cluster histograms (for those histograms that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        void storeHistos(TFile * file_InputRootFile);
+        
         //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a std::string which stores the physical filename as input
         void storeFits(std::string & strOutputROOTFileName, std::string strOption);
+        
+        //Stores booked cluster fits (for those fits that are non-null)
+        //Takes a TFile * which the histograms are written to as input
+        void storeFits(TFile * file_InputRootFile);
         
         //Stores TObjects created in createResponseMap() in the requested output file
         //Placeholder

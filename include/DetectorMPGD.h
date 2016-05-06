@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <vector>
 
-//My Includes
+//Framework Includes
 #include "TimingUtilityFunctions.h"
 #include "UniformityUtilityTypes.h"
 #include "UniformityUtilityFunctions.h"
@@ -27,9 +27,6 @@ using namespace ROOT;
 
 namespace Uniformity {
     class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
-    //class AnalyzeResponseUniformity; //Defined in "AnalyzeResponseUniformity.h"
-    //class AnalyzeResponseUniformityClusters; //Defined in "AnalyzeResponseUniformityClusters.h"
-    //class AnalyzeResponseUniformityHits; //Defined in "AnalyzeResponseUniformityClusters.h"
     
     class DetectorMPGD {
         friend class ParameterLoaderAmoreSRS;
@@ -41,8 +38,14 @@ namespace Uniformity {
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
         
-        //Default Constructor (empty for now)
+        //Default Constructor
         DetectorMPGD();
+        
+        //Copy Constructor
+        DetectorMPGD(const DetectorMPGD& other){
+            map_sectorsEta  = other.map_sectorsEta;
+            vec_allADCPeaks = other.vec_allADCPeaks;
+        };
         
         //Constructor to use when supplying a vector of clusters
         DetectorMPGD(std::vector<Cluster> vec_inputClusters);
@@ -50,14 +53,34 @@ namespace Uniformity {
         //Constructor to use when supplying a list of sectors;
         DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
         
+        //Operators
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //Overloaded Assignment Operator
+        DetectorMPGD & operator=(const DetectorMPGD & other){
+            if (this != &other) { //Protects against invalid self-assignment
+                map_sectorsEta  = other.map_sectorsEta;
+                vec_allADCPeaks = other.vec_allADCPeaks;
+            } //Protects against invalid self-assignment
+            
+            return *this;
+        } //End Overloaded Assignment Operator
+        
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Initializes TObjects for hits, clusters, and graphs
+        //virtual void initializeDistsHits();
+        //virtual void initializeDistsClusters();
+        //virtual void initializeDistsGraphs();
+        
         //wipes all stored information
         virtual void reset(){
             map_sectorsEta.clear();
             vec_allADCPeaks.clear();
             return;
         } //End reset()
+        virtual void resetClusters();
+        virtual void resetHits();
+        virtual void resetPhysObj();
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,6 +107,7 @@ namespace Uniformity {
         
         //returns the eta sector
         virtual SectorEta getEtaSector(int iEta);
+        //virtual void getEtaSector(int iEta, SectorEta & retSector);
         
         //returns the width of an iEta sector
         virtual float getEtaWidth(int iEta);
@@ -99,6 +123,13 @@ namespace Uniformity {
        
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Sets the Analysis Setup
+        /*virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){
+            aSetup = inputSetup;
+            bAnaSetup = true;
+            return;
+        };*/
+        
         //Sets a cluster
         virtual void setCluster(Cluster &inputCluster);
         
@@ -141,9 +172,11 @@ namespace Uniformity {
         };
         
     private:
-        //float fMaxSectorWidth;
+        //bool bAnaSetup;
         
         std::map<int, SectorEta> map_sectorsEta;
+        
+        //Uniformity::AnalysisSetupUniformity aSetup;
         
         std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD

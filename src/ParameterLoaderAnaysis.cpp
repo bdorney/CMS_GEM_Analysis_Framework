@@ -86,13 +86,13 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Debugging
-        cout<<"strLine = " << strLine.c_str() << endl;
+        //cout<<"strLine = " << strLine.c_str() << endl;
         
         //Identify Section Headers
         if ( 0 == strLine.compare(strSecEnd_Analysis) ) { //Case: Reached End of File
             
             //Debugging
-            cout<<"Found End of Analysis Section"<<endl;
+            //cout<<"Found End of Analysis Section"<<endl;
             
             break;
         } //End Case: Reached End of File
@@ -103,13 +103,13 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         } //End Case: Analysis Header
         else if ( 0 == strLine.compare(strSecBegin_Timing) ) { //Case: Timing Parameters
             //Debugging
-            cout<<"Found Start of Timing Section"<<endl;
+            //cout<<"Found Start of Timing Section"<<endl;
             
             loadAnalysisParametersTiming(fStream, aSetupUniformity);
         } //End Case: Timing Parameters
         else if ( 0 == strLine.compare(strSecBegin_Uniformity) ) { //Case: Uniformity Parameters
             //Debugging
-            cout<<"Found Start of Uniformity Section"<<endl;
+            //cout<<"Found Start of Uniformity Section"<<endl;
             
             loadAnalysisParametersUniformity(fStream, aSetupUniformity);
         } //End Case: Uniformity Parameters
@@ -152,7 +152,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
         if ( 0 == strLine.compare(strSecEnd_Uniformity_Fit ) ) break;
         
         //Debugging
-        cout<<"strLine: = " << strLine.c_str() << endl;
+        //cout<<"strLine: = " << strLine.c_str() << endl;
         
         //Parse the line
         pair_strParam = getParsedLine(strLine,bExitSuccess);
@@ -313,7 +313,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             aSetupUniformity.histoSetup_hitTime.strHisto_Name = strName;
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitTime);
-        } //End Case: Cluster Time
+        } //End Case: Hit Time
         //=======================Unrecognized Parameters=======================
         else{ //Case: Undefined Behavior
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
@@ -474,7 +474,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         } //End Case: Histo Setup
         
         //Debugging
-        cout<<"strLine: = " << strLine.c_str() << endl;
+        //cout<<"strLine: = " << strLine.c_str() << endl;
         
         //Parse the line
         pair_strParam = getParsedLine(strLine,bExitSuccess);

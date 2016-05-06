@@ -30,7 +30,7 @@ AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(){
 } //End Default Constructor
 
 //Set inputs at construction
-AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
+AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup, DetectorMPGD & inputDet){
     strAnalysisName = "analysis";
     
     //Store Analysis Parameters
@@ -44,36 +44,11 @@ AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUnifor
 void AnalyzeResponseUniformityHits::fillHistos(){
     //Variable Declaration
     
-    //Initialize Summary Histograms
-    //  Placeholder
-    
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
-        //Grab Eta Sector width (for ClustPos Histo)
-        aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
-        aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
-        
-        //Initialize iEta Histograms - 1D
-        (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
-        (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
-        (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
-        
-        //Initialize iEta Histograms - 2D
-        //  Placeholder
-        
-        //Debugging
-        //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
-        
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
-            
-            //Initialize iPhi Histograms - 1D
-            (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
-            (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
-            
-            //Initialize iPhi Histograms - 2D
-            //  Placeholder
             
             //Loop Over Stored Hits
             for (auto iterHit = (*iterPhi).second.vec_hits.begin(); iterHit != (*iterPhi).second.vec_hits.end(); ++iterHit) { //Loop Over Stored Hits
@@ -89,7 +64,7 @@ void AnalyzeResponseUniformityHits::fillHistos(){
         } //End Loop Over iPhi Sectors
         
         //Debugging
-        std::cout<<"(*iterEta).second.hitHistos.hPos->Integral() = " << (*iterEta).second.hitHistos.hPos->Integral() << std::endl;
+        //std::cout<<"(*iterEta).second.hitHistos.hPos->Integral() = " << (*iterEta).second.hitHistos.hPos->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
     return;
@@ -104,6 +79,49 @@ void AnalyzeResponseUniformityHits::fitHistos(){
     return;
 } //End AnalyzeResponseUniformityHits::fitHistos()
 
+//Loops through the detector and initalizes all cluster histograms
+void AnalyzeResponseUniformityHits::initHistosHits(){
+    //Loop Over Stored iEta Sectors
+    
+    //Debugging
+    //cout<<"AnalyzeResponseUniformityHits::initHistosHits()\n";
+    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        //Grab Eta Sector width (for ClustPos Histo)
+        aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
+        aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
+        aSetup.histoSetup_hitPos.iHisto_nBins = 128. * (*iterEta).second.map_sectorsPhi.size();
+        
+        //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+        
+        //Initialize iEta Histograms - 1D
+        (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
+        (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
+        (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
+        
+        //Initialize iEta Histograms - 2D
+        //  Placeholder
+        
+        //Debugging
+        //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
+        
+        //Loop Over Stored iPhi Sectors
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
+            //Initialize iPhi Histograms - 1D
+            (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
+            (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
+            
+            //Initialize iPhi Histograms - 2D
+            //  Placeholder
+        } //End Loop Over iPhi Sectors
+    } //End Loop Over iEta Sectors
+    
+    return;
+} //End AnalyzeResponseUniformityHits::initHistosHits()
+
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityHits
 //Loads all TObjects found in the input ROOT file into detMPGD;
 //Any previously stored information in detMPGD is lost.
@@ -114,7 +132,9 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
     return;
 } //End AnalyzeResponseUniformityHits::loadHistosFromFile()
 
+
 //Stores booked histograms (for those histograms that are non-null)
+//Takes a std::string which stores the physical filename as input
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){
     //Variable Declaration
     //HistosPhysObj summaryHistos; //Histograms for the entire Detector
@@ -131,26 +151,13 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         return;
     } //End Check if File Failed to Open Correctly
     
-    //Loop over ieta's
-        //Create/Load file structure
-        //Store ieta level histograms
-        //Loop over iphi's within ieta's
-            //Create/Load file structure
-            //Store iphi level histograms
-                //Loop over slices
-                    //Create/Load file structure
-                    //store slice level histograms
-    //Close File
-    
+    //Simplied to just call the method below
+    /*
     //Setup the summary histograms
-    //summaryHistos.hADC  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
-    //summaryHistos.hPos  = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
-    //summaryHistos.hTime = make_shared<TH1F>( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+    TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+    TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+    TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
     
-	TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
-	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
-	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
-
     //Get/Make the Summary Directory
     //Check to see if the directory exists already
     TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
@@ -174,23 +181,23 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
         } //End Case: Directory did not exist in file, CREATE
         
         //Debugging
-        cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
         
         //Add this sector to the summary histogram
-        //summaryHistos.hADC->Add((*iterEta).second.hitHistos.hADC.get() );
-	//summaryHistos.hPos->Add((*iterEta).second.hitHistos.hPos.get() );
-        //summaryHistos.hTime->Add((*iterEta).second.hitHistos.hTime.get() );
+        hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
+        hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
+        hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
         
-	hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );                
-	hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );                
-	hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );  
-
         //Store Histograms - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
         (*iterEta).second.hitHistos.hADC->Write();
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
+        
+        //(*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -217,17 +224,129 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     
     //Store the Summary Histograms
     dir_Summary->cd();
-    //Add this sector to the summary histogram
-    //summaryHistos.hADC->Write();
-	//summaryHistos.hPos->Write();
-    //summaryHistos.hTime->Write();
+    hHitADC_All.Write();
+    hHitPos_All.Write();
+    hHitTime_All.Write();
+    */
+    
+    //Call the store histos sequence
+    storeHistos(ptr_fileOutput);
+     
+    //Close the ROOT file
+    ptr_fileOutput->Close();
+    
+    return;
+} //End storeHistos()
 
-	hHitADC_All.Write();    
+//Stores booked histograms (for those histograms that are non-null)
+//Takes a TFile * which the histograms are written to as input
+void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
+    //Variable Declaration
+    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
+    
+    //Check if File Failed to Open Correctly
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("AnalyzeResponseUniformityHits","storeHistos", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Loop over ieta's
+        //Create/Load file structure
+        //Store ieta level histograms
+        //Loop over iphi's within ieta's
+            //Create/Load file structure
+            //Store iphi level histograms
+                //Loop over slices
+                    //Create/Load file structure
+                    //store slice level histograms
+    //Close File
+    
+    //Debugging
+    //cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
+    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
+    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
+    
+    //Setup the summary histograms
+    TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
+	TH1F hHitPos_All( getHistogram(-1, -1, aSetup.histoSetup_hitPos) );
+	TH1F hHitTime_All( getHistogram(-1, -1, aSetup.histoSetup_hitTime) );
+
+    //Get/Make the Summary Directory
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Get Directory
+        //-------------------------------------
+        //Check to see if the directory exists already
+        TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        
+        //If the above pointer is null the directory does NOT exist, create it
+        if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
+            dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
+        } //End Case: Directory did not exist in file, CREATE
+        
+        //Debugging
+        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
+        
+        //Add this sector to the summary histogram
+        hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
+        hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
+        hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
+
+        //Store Histograms - SectorEta Level
+        //-------------------------------------
+        dir_SectorEta->cd();
+        (*iterEta).second.hitHistos.hADC->Write();
+        (*iterEta).second.hitHistos.hPos->Write();
+        (*iterEta).second.hitHistos.hTime->Write();
+        
+        //(*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
+        //(*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
+        
+        //Loop Over Stored iPhi Sectors within this iEta Sector
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
+            //Get Directory
+            //-------------------------------------
+            //Check to see if the directory exists already
+            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            
+            //If the above pointer is null the directory does NOT exist, create it
+            if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
+                dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
+            } //End Case: Directory did not exist in file, CREATE
+            
+            //Debugging
+            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
+            
+            //Store Histograms - SectorPhi Level
+            //-------------------------------------
+            dir_SectorPhi->cd();
+            (*iterPhi).second.hitHistos.hADC->Write();
+            (*iterPhi).second.hitHistos.hTime->Write();
+        } //End Loop Over Stored iPhi Sectors
+    } //End Loop Over Stored iEta Sectors
+    
+    //Store the Summary Histograms
+    dir_Summary->cd();
+    hHitADC_All.Write();
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
 
-    //Close the ROOT file
-    ptr_fileOutput->Close();
+    //Do not close the file it is used elsewhere
     
     return;
 } //End storeHistos()
