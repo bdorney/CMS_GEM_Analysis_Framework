@@ -2,10 +2,16 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.8                               *
-*	LAST UPDATE: May 05 2016                     *
+*	VERSION: 1.0.9                               *
+*	LAST UPDATE: May 10 2016                     *
 *                                                *
 **************************************************
+
+Update: May 10th 2016
+==================================================
+->Added a template run config file for running in "series mode" found in: config/configRun_Template_Series.cfg
+->Added a script to automatically configure a "series mode" run using the above template file for a list of input files found in a given directory, script found in scripts/runMode_Series.sh
+->Updated the mapping configuration file to the reflect the updated, and hopefully correct, APV-to-FEC mapping: config/GE7MappingCMScernData2016_v2.cfg 
 
 Update: May 6th 2016
 ==================================================
