@@ -263,10 +263,12 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
             
             //Determine the iPhi index
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-            
+	    //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
+
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             
             //Segment the Plot with lines
             if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -516,10 +518,12 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
             
             //Determine the iPhi index
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-            
+	    //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
+
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             
             //Segment the Plot with lines
             if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
@@ -938,10 +942,12 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
                 
                 //Determine the iPhi index
                 int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                
+	        //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
+
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+                //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
+                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
                 
                 //Segment the Plot with lines
                 if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
