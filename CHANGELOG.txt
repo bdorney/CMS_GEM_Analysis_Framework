@@ -11,6 +11,7 @@ Update: May 13th 2016
 ==================================================
 ->Added method Uniformity::VisualizeUniformity::storeCanvasGraph2D() for making 2D plots from TGraph's of each SectorEta in DetectorMPGD
 ->Uniformity::InterfaceAnalysis::storeResults() now calls VisualizeUniformity::storeCanvasGraph2D()
+->Added method Uniformity::VisualizeUniformity::storeCanvasHisto2D() for making 2D plots from TGraph's of each SectorEta in DetectorMPGD
 
 Update: May 10th 2016
 ==================================================

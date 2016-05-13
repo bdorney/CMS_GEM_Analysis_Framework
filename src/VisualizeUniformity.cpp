@@ -280,11 +280,12 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
         //Setup the 2D graph
         if (iEta == 1) { //Case: First Sector, Setup g2DObs
             g2DObs = new TGraph2D( gObs->GetN() * iNumEta );
+            g2DObs->SetName( "g2D_" + strObsName + "_AllEta");
         } //End Case: First Sector, Setup g2DObs
         
         //Fill the points of the 2D graph
         double fPx=0, fPy=etaSector.fPos_Y, fObs=0;
-        for (int i=0; i<gObs->GetN(); ++i) { //Loop Over Points of gObs
+        for (int i=(iEta-1) * gObs->GetN() * iNumEta; i < gObs->GetN(); ++i) { //Loop Over Points of gObs
             gObs->GetPoint(i,fPx, fObs);
             
             g2DObs->SetPoint(i,fPx, fPy, fObs);
@@ -308,6 +309,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     g2DObs->GetXaxis()->SetTitle( g2DObs->GetXaxis()->GetTitle() );
     g2DObs->GetYaxis()->SetTitle( "Position Y #left(mm#right)" );
     g2DObs->GetZaxis()->SetTitle( g2DObs->GetYaxis()->GetTitle() );
+    g2DObs->UseCurrentStyle();
     g2DObs->Draw( strDrawOption.c_str() );
     
     //Setup the TLatex for "CMS Preliminary"
@@ -483,6 +485,43 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     return;
 } //End VisualizeUniformity::storeCanvasHisto()
+
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a std::string which stores the physical filename as input
+void VisualizeUniformity::storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tExiting; Nothing has been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Call the method below
+    storeCanvasHisto2D(ptr_fileOutput, strObsName, strDrawOption);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasHisto2D()
+
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a TFile *, which the canvas is writtent to, as input
+void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+    
+} //End VisualizeUniformity::storeCanvasHisto2D()
+
 
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
@@ -878,7 +917,8 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strO
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
-	cout<<"ret_graph = " << ret_graph << endl;
+	//Debugging
+    //cout<<"ret_graph = " << ret_graph << endl;
 
     return ret_graph;
 } //End VisualizeUniformity::getObsGraph()

@@ -84,6 +84,14 @@ namespace Uniformity {
         //Takes a TFile * which the histograms are written to as input
         virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
+        //Makes a 2D plot of a given observable in the detector's active area
+        //Takes a std::string which stores the physical filename as input
+        virtual void storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        
+        //Makes a 2D plot of a given observable in the detector's active area
+        //Takes a TFile *, which the canvas is writtent to, as input
+        virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+        
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         //Draws a given observable on each pad
         //Takes a std::string which stores the physical filename as input
