@@ -40,23 +40,7 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
     TH1::AddDirectory(kFALSE);
     
     //Variable Declaration
-    //int iNumEta = detMPGD.getNumEtaSectors();
-    
-    //shared_ptr<TGraphErrors> gObs; //Observable to be drawn
-    
-    //SectorEta etaSector;
-    
-    //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
-
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
-    
-    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
-    
-    //TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
-    
-    //Make the Canvas
-    //------------------------------------------------------
-    //TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -68,96 +52,6 @@ void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, 
         
         return;
     } //End Check if File Failed to Open Correctly
-    
-    //Simplier to call the method below
-    /*
-    //Get/Make the Summary Directory
-    //------------------------------------------------------
-    //Check to see if the directory exists already
-    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
-    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-        dir_Summary = ptr_fileOutput->mkdir("Summary");
-    } //End Case: Directory did not exist in file, CREATE
-    
-    //Setup the Legend
-    //------------------------------------------------------
-    legObs->SetNColumns(2);
-    legObs->SetFillColor(kWhite);
-    legObs->SetLineColor(kBlack);
-    
-    //Loop Over the detector's Eta Sectors
-    //------------------------------------------------------
-    for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Get the histogram & draw it
-        etaSector = detMPGD.getEtaSector(iEta);
-        gObs = getObsGraph(strObsName, etaSector);
-        
-        //Debugging
-        cout<<"gObs = " << gObs << endl;
-
-        gObs->SetLineColor( Timing::getCyclicColor(iEta) );
-        gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-
-        legObs->AddEntry(gObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
-        
-        vec_gObs.push_back(gObs);			//Need to keep this pointer alive outside of Loop?
-
-        mgraph_Obs->Add( gObs.get() );
-    } //End Loop Over Detector's Eta Sector
-    
-    //Draw mgraph_Obs
-    //------------------------------------------------------
-    canv_DetSum.cd();
-    mgraph_Obs->Draw( strDrawOption.c_str() );
-    
-    //Setup the TLatex for "CMS Preliminary"
-    //------------------------------------------------------
-    TLatex latex_CMSPrelim;
-    latex_CMSPrelim.SetTextSize(0.05);
-    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    
-    //Setup the iPhi designation
-    //------------------------------------------------------
-    //etaSector should be set here based on the last iteration of the above loop
-    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-            //Ensure the canvas is the active canvas (it should be already but who knows...)
-            canv_DetSum.cd();
-            
-            //Declare the TLatex
-            TLatex latex_PhiSector;
-            
-            //Determine the iPhi index
-            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-            
-            //Draw the TLatex
-            latex_PhiSector.SetTextSize(0.05);
-            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-            
-            //Segment the Plot with lines
-            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                TLine line_PhiSeg;
-                
-                line_PhiSeg.SetLineStyle(2);
-                line_PhiSeg.SetLineWidth(2);
-                
-                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-            } //End Case: Not the Last Phi Segment Yet
-        } //End Loop Over Sector Phi
-    } //End Case: Show iPhi Segmentation
-    
-    //Draw the Legend
-    //------------------------------------------------------
-    legObs->Draw("same");
-    
-    //Write the Canvas to the File
-    //------------------------------------------------------
-    dir_Summary->cd();
-    canv_DetSum.Write();
-    mgraph_Obs->Write();
-    */
     
     //Call the method below
     storeCanvasGraph(ptr_fileOutput, strObsName, strDrawOption, bShowPhiSegmentation);
@@ -297,6 +191,142 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     return;
 } //End VisualizeUniformity::storeCanvasGraph()
 
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a std::string which stores the physical filename as input
+void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tExiting; Nothing has been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Call the method below
+    storeCanvasGraph2D(ptr_fileOutput, strObsName, strDrawOption);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasGraph2D()
+
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a TFile *, which the canvas is writtent to, as input
+void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TGraphErrors> gObs; //Observable to be drawn
+    
+    SectorEta etaSector;
+    
+    //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
+    
+    TGraph2D *g2DObs;   //Two dimmensional graph
+    
+    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over the detector's Eta Sectors
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        gObs = getObsGraph(strObsName, etaSector);
+        
+        //Debugging
+        //cout<<"gObs = " << gObs << endl;
+        
+        //vec_gObs.push_back(gObs);			//Need to keep this pointer alive outside of Loop?
+        
+        //Setup the 2D graph
+        if (iEta == 1) { //Case: First Sector, Setup g2DObs
+            g2DObs = new TGraph2D( gObs->GetN() * iNumEta );
+        } //End Case: First Sector, Setup g2DObs
+        
+        //Fill the points of the 2D graph
+        double fPx=0, fPy=etaSector.fPos_Y, fObs=0;
+        for (int i=0; i<gObs->GetN(); ++i) { //Loop Over Points of gObs
+            gObs->GetPoint(i,fPx, fObs);
+            
+            g2DObs->SetPoint(i,fPx, fPy, fObs);
+        } //End Loop Over Points of gObs
+    } //End Loop Over Detector's Eta Sector
+    
+    //Make the color Palette
+    //------------------------------------------------------
+    const Int_t NRGBs = 5;
+    const Int_t NCont = 255;
+    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+    gStyle->SetNumberContours(NCont);
+    
+    //Draw the g2DObs
+    //------------------------------------------------------
+    canv_DetSum.cd();
+    g2DObs->GetXaxis()->SetTitle( g2DObs->GetXaxis()->GetTitle() );
+    g2DObs->GetYaxis()->SetTitle( "Position Y #left(mm#right)" );
+    g2DObs->GetZaxis()->SetTitle( g2DObs->GetYaxis()->GetTitle() );
+    g2DObs->Draw( strDrawOption.c_str() );
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    g2DObs->Write();
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeCanvasGraph2D
+
 //Draws a given observable onto a single pad off canvas
 //Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
@@ -304,17 +334,7 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     TH1::AddDirectory(kFALSE);
 
     //Variable Declaration
-    //int iNumEta = detMPGD.getNumEtaSectors();
-    
-    //shared_ptr<TH1F> hObs; //Observable to be drawn
-    
-    //SectorEta etaSector;
-    
-    //std::vector<shared_ptr<TH1F> > vec_hObs;
-    
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
-    
-    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
     //Make the Canvas
     //------------------------------------------------------
@@ -330,93 +350,6 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
         
         return;
     } //End Check if File Failed to Open Correctly
-    
-    //Simpler to just call the method below
-    /*
-    //Get/Make the Summary Directory
-    //------------------------------------------------------
-    //Check to see if the directory exists already
-    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
-    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-        dir_Summary = ptr_fileOutput->mkdir("Summary");
-    } //End Case: Directory did not exist in file, CREATE
-    
-    //Setup the Legend
-    //------------------------------------------------------
-    legObs->SetNColumns(2);
-    legObs->SetFillColor(kWhite);
-    legObs->SetLineColor(kBlack);
-    
-    //Loop Over the detector's Eta Sectors
-    //------------------------------------------------------
-    for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Get the histogram & draw it
-        etaSector = detMPGD.getEtaSector(iEta);
-        hObs = getObsHisto(strObsName, etaSector);
-        
-        hObs->SetLineColor( Timing::getCyclicColor(iEta) );
-        hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-        //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
-        legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
-        
-        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
-
-        canv_DetSum.cd();
-        if( 1 == iEta ){
-            vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
-        }
-        else{
-            vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
-        }
-    } //End Loop Over Detector's Eta Sector
-    
-    //Setup the TLatex for "CMS Preliminary"
-    //------------------------------------------------------
-    TLatex latex_CMSPrelim;
-    latex_CMSPrelim.SetTextSize(0.05);
-    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    
-    //Setup the iPhi designation
-    //------------------------------------------------------
-    //etaSector should be set here based on the last iteration of the above loop
-    if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-        for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-            //Ensure the canvas is the active canvas (it should be already but who knows...)
-            canv_DetSum.cd();
-            
-            //Declare the TLatex
-            TLatex latex_PhiSector;
-            
-            //Determine the iPhi index
-            int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-            
-            //Draw the TLatex
-            latex_PhiSector.SetTextSize(0.05);
-            latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-            
-            //Segment the Plot with lines
-            if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                TLine line_PhiSeg;
-                
-                line_PhiSeg.SetLineStyle(2);
-                line_PhiSeg.SetLineWidth(2);
-                
-                line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-            } //End Case: Not the Last Phi Segment Yet
-        } //End Loop Over Sector Phi
-    } //End Case: Show iPhi Segmentation
-    
-    //Draw the Legend
-    //------------------------------------------------------
-    legObs->Draw("same");
-    
-    //Write the Canvas to the File
-    //------------------------------------------------------
-    dir_Summary->cd();
-    canv_DetSum.Write();
-    */
     
     //Call the method below
     //------------------------------------------------------
@@ -518,7 +451,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
             
             //Determine the iPhi index
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-	    //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
+            //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
 
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
@@ -551,134 +484,6 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     return;
 } //End VisualizeUniformity::storeCanvasHisto()
 
-/*void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, vector<string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
-    //TFile does not manage objects
-    TH1::AddDirectory(kFALSE);
-    
-    //Variable Declaration
-    int iNumEta = detMPGD.getNumEtaSectors();
-    
-    shared_ptr<TH1F> hObs; //Observable to be drawn
-    
-    SectorEta etaSector;
-    
-    vector<shared_ptr<TH1F> > vec_hObs;
-    vector<TCanvas *> vec_canvDetSum;
-    
-    TCanvas *canvDetSum;
-    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
-    TLegend *legObs;
-    
-    //Check if File Failed to Open Correctly
-    //------------------------------------------------------
-    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeHistos","Error: File I/O");
-        printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeHistos", "\tExiting; No Histograms have been stored!\n" );
-        
-        return;
-    } //End Check if File Failed to Open Correctly
-    
-    //Get/Make the Summary Directory
-    //------------------------------------------------------
-    //Check to see if the directory exists already
-    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
-    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-        dir_Summary = ptr_fileOutput->mkdir("Summary");
-    } //End Case: Directory did not exist in file, CREATE
-    
-    //Create a canvas for each observable
-    //------------------------------------------------------
-    for (int i=0; i < vec_strObsName.size(); ++i) { //Loop Over Requested Observables
-        //Make the Canvas
-        canvDetSum = new TCanvas( ("canv_" + vec_strObsName[i] + "_AllEta" ).c_str(), ( vec_strObsName[i] + " for All Eta" ).c_str(), 600, 600);
-        
-        //Setup the Legend
-        legObs = new TLegend(0.2,0.2,0.6,0.4);
-        legObs->SetNColumns(2);
-        legObs->SetFillColor(kWhite);
-        legObs->SetLineColor(kBlack);
-        
-        //Loop Over the detector's Eta Sectors
-        //------------------------------------------------------
-        for (int iEta=1; iEta <= iNumEta; ++iEta) {
-            //Get the histogram & draw it
-            etaSector = detMPGD.getEtaSector(iEta);
-            hObs = getObsHisto(vec_strObsName[i], etaSector);
-            
-            hObs->SetLineColor( Timing::getCyclicColor(iEta) );
-            hObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
-            //hObs->SetFillColor( Timing::getCyclicColor(iEta) );
-            legObs->AddEntry(hObs.get(), ( "i#eta = " + getString(iEta) ).c_str(), "LPE");
-            
-            vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
-            
-            canvDetSum->cd();
-            if( 1 == iEta ){
-                vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
-            }
-            else{
-                vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
-            }
-        } //End Loop Over Detector's Eta Sector
-        
-        //Setup the TLatex for "CMS Preliminary"
-        //------------------------------------------------------
-        TLatex latex_CMSPrelim;
-        latex_CMSPrelim.SetTextSize(0.05);
-        latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-        
-        //Setup the iPhi designation
-        //------------------------------------------------------
-        //etaSector should be set here based on the last iteration of the above loop
-        if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-            for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-                //Ensure the canvas is the active canvas (it should be already but who knows...)
-                canvDetSum->cd();
-                
-                //Declare the TLatex
-                TLatex latex_PhiSector;
-                
-                //Determine the iPhi index
-                int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                
-                //Draw the TLatex
-                latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-                
-                //Segment the Plot with lines
-                if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                    TLine line_PhiSeg;
-                    
-                    line_PhiSeg.SetLineStyle(2);
-                    line_PhiSeg.SetLineWidth(2);
-                    
-                    line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-                } //End Case: Not the Last Phi Segment Yet
-            } //End Loop Over Sector Phi
-        } //End Case: Show iPhi Segmentation
-        
-        //Draw the Legend
-        legObs->Draw("same");
-        
-        //Store the canvas (keeps the pointer alive?)
-        vec_canvDetSum.push_back(canvDetSum);
-        
-        //Write the Canvas to the File
-        dir_Summary->cd();
-        canvDetSum->Write();
-    } //End Loop Over Requested Observables
-    
-    //Close the File
-    //------------------------------------------------------
-    ptr_fileOutput->Close();
-    
-    return;
-}*/ //End VisualizeUniformity::storeCanvasHisto()
-
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
 //So passing it to another method by reference keeps the TCanvas alive, but ends up being blank with nothing drawn on it =/
@@ -689,25 +494,10 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
 //The SectorEta is used to determine the location of the SectorPhi's
 //Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
-    //Variable Declaration
-    //int iNumEta = detMPGD.getNumEtaSectors();
-    
-    //float fXPad_Low;
-    //float fXPad_High;
-    
-    //float fYPad_Low;
-    //float fYPad_High;
-    
-    //shared_ptr<TH1F> hObs; //Observable to be drawn
-    
-    //SectorEta etaSector;
-    
-    //std::vector<shared_ptr<TH1F> > vec_hObs;
-    //std::vector<TPad *> vec_padSectorObs;
-
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
 
+    //Variable Declaration
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
     //Make the Canvas
@@ -724,100 +514,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
         
         return;
     } //End Check if File Failed to Open Correctly
-    
-    //Simplier to call the method below
-    /*
-    //Get/Make the Summary Directory
-    //------------------------------------------------------
-    //Check to see if the directory exists already
-    TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
-    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-        dir_Summary = ptr_fileOutput->mkdir("Summary");
-    } //End Case: Directory did not exist in file, CREATE
-    
-    //Loop Over the detector's Eta Sectors
-    //------------------------------------------------------
-    for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Determine the Pad Coordinates
-        if (iEta % 2 != 0){ //Case: iEta is Odd
-            fXPad_Low   = 0.02;
-            fXPad_High  = 0.48;
-        } //End Case: iEta is Odd
-        else{ //Case: iEta is Even
-            fXPad_Low   = 0.52;
-            fXPad_High  = 0.98;
-        } //End Case: iEta is Even
-        
-        //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
-        fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
-        fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
-        
-        //Debugging
-        //cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
-
-        //Initialize the Pad
-        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
-        vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
-
-        canv_DetSum.cd();
-        vec_padSectorObs[iEta-1]->Draw();
-        vec_padSectorObs[iEta-1]->cd();
-        
-        //Get the histogram & draw it
-        etaSector = detMPGD.getEtaSector(iEta);
-        hObs = getObsHisto(strObsName, etaSector);
-        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
-        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );        
-
-        //Setup the TLatex for "CMS Preliminary"
-        TLatex latex_CMSPrelim;
-        latex_CMSPrelim.SetTextSize(0.05);
-        if( 1 == iEta){
-            latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-        }
-
-        //Setup the TLatex for this iEta sector
-        TLatex latex_EtaSector;
-        latex_EtaSector.SetTextSize(0.05);
-        latex_EtaSector.DrawLatexNDC(0.125, 0.85, ( "i#eta = " + getString(iEta) ).c_str() );
-        
-        //Setup the iPhi designation
-        if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
-            for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
-                //Ensure the pad is the active pad (it should be already but who knows...)
-                vec_padSectorObs[iEta-1]->cd();
-                //pad_SectorObs->cd();
-                
-                //Declare the TLatex
-                TLatex latex_PhiSector;
-                
-                //Determine the iPhi index
-                int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                
-                //Draw the TLatex
-                latex_PhiSector.SetTextSize(0.05);
-                latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
-                
-                //Segment the Plot with lines
-                if (iPhiPos < (etaSector.map_sectorsPhi.size() - 1) ) { //Case: Not the Last Phi Segment Yet
-                    TLine line_PhiSeg;
-                    
-                    line_PhiSeg.SetLineStyle(2);
-                    line_PhiSeg.SetLineWidth(2);
-                    
-                    line_PhiSeg.DrawLineNDC( ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 0., ( (iPhiPos+1) / (float)etaSector.map_sectorsPhi.size() ), 1. );
-                } //End Case: Not the Last Phi Segment Yet
-            } //End Loop Over Sector Phi
-        } //End Case: Show iPhi Segmentation
-    } //End Loop Over Detector's Eta Sector
-    
-    //Write the Canvas to the File
-    //------------------------------------------------------
-    dir_Summary->cd();
-    canv_DetSum.Write();
-    */
     
     //Call the method below
     //------------------------------------------------------
@@ -942,7 +638,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
                 
                 //Determine the iPhi index
                 int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-	        //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
+                //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
 
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);

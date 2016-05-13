@@ -207,7 +207,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     //Create the summary TFile (only if multi file output is NOT requested)
     //------------------------------------------------------
     if(!rSetup.bMultiOutput){ //Case: Create Summary TFile
-	file_ROOTOutput_All = new TFile(rSetup.strFile_Output_Name.c_str(), rSetup.strFile_Output_Option.c_str(),"",1);
+        file_ROOTOutput_All = new TFile(rSetup.strFile_Output_Name.c_str(), rSetup.strFile_Output_Option.c_str(),"",1);
     
     	if ( !file_ROOTOutput_All->IsOpen() || file_ROOTOutput_All->IsZombie() ) { //Case: failed to load ROOT file
         	perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + rSetup.strFile_Output_Name ).c_str() );
@@ -220,7 +220,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     	//Store the results
     	storeResults(file_ROOTOutput_All);
     
-   	//Close the file
+        //Close the file
     	file_ROOTOutput_All->Close();
     } //End Case: Create Summary TFile
 
@@ -308,7 +308,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         } //End Case: failed to load ROOT file
         
         //Store the results
-	cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
+        cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
         storeResults(file_ROOTOutput_Single);
         
         //Close the files & delete pointers before the next iter
@@ -376,6 +376,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
                 
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","COLZ");
             } //End Case: Fitting
         } //End Case: Cluster Analysis
     } //End Case: Visualize Output

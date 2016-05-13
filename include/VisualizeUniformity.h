@@ -28,6 +28,8 @@
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TGraph2D.h"
+//#include "TGraph2DErrors.h"
 #include "TGraphErrors.h"
 #include "TH1.h"
 #include "TH1F.h"
@@ -38,6 +40,7 @@
 #include "TObject.h"
 #include "TPad.h"
 #include "TROOT.h"
+#include "TStyle.h"
 
 using namespace ROOT;
 
@@ -62,8 +65,16 @@ namespace Uniformity {
         virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Draws a given observable onto a single pad off canvas
-        //Takes a TFile * which the histograms are written to as input
+        //Takes a TFile *, which the canvas is written to, as input
         virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+        
+        //Makes a 2D plot of a given observable in the detector's active area
+        //Takes a std::string which stores the physical filename as input
+        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        
+        //Makes a 2D plot of a given observable in the detector's active area
+        //Takes a TFile *, which the canvas is writtent to, as input
+        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
         
         //Draws a given observable onto a single pad off canvas
         //Takes a std::string which stores the physical filename as input
@@ -72,9 +83,6 @@ namespace Uniformity {
         //Draws a given observable onto a single pad off canvas
         //Takes a TFile * which the histograms are written to as input
         virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Draws a set of observables onto a single pad off canvas
-        //virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
         //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
         //Draws a given observable on each pad
@@ -146,15 +154,7 @@ namespace Uniformity {
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Prepares a Canvas for a requested observable
-        //virtual void drawSectorEtaCanvas(TCanvas & inputCanvas, std::string &strObsName, std::string &strDrawOption);
         
-        //Draws the distribution pointed to by inputObjPtr on a pad of inputCanvas
-        //inputCanvas is split into two columns;
-        //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
-        //Odd (even) values of iEta are on the left (right)
-        //The SectorEta is used to determine the location of the SectorPhi's
-        //virtual void drawSectorEtaObs(std::shared_ptr<TH1F> inputObjPtr, TCanvas & inputCanvas, std::string &strDrawOption, int iEta, int iNumEta, Uniformity::SectorEta &inputEta);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

@@ -3,9 +3,14 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 1.0.9                               *
-*	LAST UPDATE: May 10 2016                     *
+*	LAST UPDATE: May 13 2016                     *
 *                                                *
 **************************************************
+
+Update: May 13th 2016
+==================================================
+->Added method Uniformity::VisualizeUniformity::storeCanvasGraph2D() for making 2D plots from TGraph's of each SectorEta in DetectorMPGD
+->Uniformity::InterfaceAnalysis::storeResults() now calls VisualizeUniformity::storeCanvasGraph2D()
 
 Update: May 10th 2016
 ==================================================
