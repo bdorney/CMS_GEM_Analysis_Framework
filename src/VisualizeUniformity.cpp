@@ -76,15 +76,15 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     SectorEta etaSector;
     
-    std::vector<shared_ptr<TGraphErrors> > vec_gObs;
-    
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
-    
+
     TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
     
+    vector<shared_ptr<TGraphErrors> > vec_gObs;
+
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canvDetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -135,7 +135,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     //Draw mgraph_Obs
     //------------------------------------------------------
-    canv_DetSum.cd();
+    canvDetSum.cd();
     mgraph_Obs->Draw( strDrawOption.c_str() );
     
     //Setup the TLatex for "CMS Preliminary"
@@ -150,7 +150,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the canvas is the active canvas (it should be already but who knows...)
-            canv_DetSum.cd();
+            canvDetSum.cd();
             
             //Declare the TLatex
             TLatex latex_PhiSector;
@@ -183,7 +183,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
-    canv_DetSum.Write();
+    canvDetSum.Write();
     mgraph_Obs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
