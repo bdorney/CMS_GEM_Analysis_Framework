@@ -13,6 +13,7 @@ using std::cout;
 using std::endl;
 using std::shared_ptr;
 using std::string;
+using std::tuple;
 using std::vector;
 
 using Timing::getString;
@@ -235,15 +236,20 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     SectorEta etaSector;
     
     //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
-    
-    TGraph2D *g2DObs;   //Two dimmensional graph
-    
+	vector<tuple<double,double,double> > vec_tup3DPt;
+
+    TGraph2D *g2DObs = new TGraph2D();   //Two dimmensional graph
+
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    
+
+    //Set the name of the g2DObs
+    //------------------------------------------------------
+    g2DObs->SetName( ("g2D_" + strObsName + "_AllEta").c_str() );
+
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -265,32 +271,37 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
     
-    //Loop Over the detector's Eta Sectors
+    //Loop Over the detector's Eta Sectors to fill vec_tup3DPt
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
         gObs = getObsGraph(strObsName, etaSector);
         
-        //Debugging
-        //cout<<"gObs = " << gObs << endl;
-        
-        //vec_gObs.push_back(gObs);			//Need to keep this pointer alive outside of Loop?
-        
-        //Setup the 2D graph
-        if (iEta == 1) { //Case: First Sector, Setup g2DObs
-            g2DObs = new TGraph2D( gObs->GetN() * iNumEta );
-        } //End Case: First Sector, Setup g2DObs
-        
         //Fill the points of the 2D graph
-        double fPx=0, fPy=etaSector.fPos_Y, fObs=0;
-        for (int i=0; i<gObs->GetN(); ++i) { //Loop Over Points of gObs
-            gObs->GetPoint(i,fPx, fObs);
+	//cout<<"iEta\ti\tL.B.\tU.B.\tPx\tPy\tPz\n";
+        double dPx=0, dPy=etaSector.fPos_Y, dObs=0;
+        for (int i = ( (iEta-1) * gObs->GetN() ); i < (iEta * gObs->GetN() ); ++i) { //Loop Over Points of gObs
+            gObs->GetPoint( (iEta * gObs->GetN() ) - i,dPx, dObs);
             
-            g2DObs->SetPoint(i,fPx, fPy, fObs);
+		//Debugging
+		//cout<<iEta<<"\t"<<i<<"\t"<<( (iEta-1) * gObs->GetN() )<<"\t"<<(iEta * gObs->GetN() )<<"\t"<<dPx<<"\t"<<dPy<<"\t"<<dObs<<endl;
+
+            //if(fabs(dObs) > 0) g2DObs->SetPoint(i,dPx, dPy, dObs);
+	    //if( !(dPx == dObs) ) g2DObs->SetPoint(i,dPx, dPy, dObs);
+	    
+	    //Need to prevent (0,Y,0)'s from being drawn (causes coincidence points in drawing, bad)
+	    //First we store all non (0,Y,0) points then in another loop we fill g2DObs
+	    if( !(dPx == dObs ) ) vec_tup3DPt.push_back( std::make_tuple(dPx, dPy, dObs) );
         } //End Loop Over Points of gObs
     } //End Loop Over Detector's Eta Sector
     
+	//Loop Over vec_tup3DPt and set members to g2DObs
+    //------------------------------------------------------
+    for( int i=0; i < vec_tup3DPt.size(); ++i){ //Loop over vec_tup3DPt
+	g2DObs->SetPoint(i,std::get<0>(vec_tup3DPt[i]), std::get<1>(vec_tup3DPt[i]), std::get<2>(vec_tup3DPt[i]));
+    } //End Loop over vec_tup3DPt
+
     //Make the color Palette
     //------------------------------------------------------
     const Int_t NRGBs = 5;
@@ -305,17 +316,34 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Draw the g2DObs
     //------------------------------------------------------
     canv_DetSum.cd();
-    g2DObs->GetXaxis()->SetTitle( g2DObs->GetXaxis()->GetTitle() );
+	g2DObs->SetTitle("");    
+	g2DObs->GetXaxis()->SetTitle( g2DObs->GetXaxis()->GetTitle() );
     g2DObs->GetYaxis()->SetTitle( "Position Y #left(mm#right)" );
     g2DObs->GetZaxis()->SetTitle( g2DObs->GetYaxis()->GetTitle() );
+    g2DObs->UseCurrentStyle();
+	//g2DObs->SetNpx(200);
+	//g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
+    //g2DObs->Draw( "TRI1" );
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
     TLatex latex_CMSPrelim;
     latex_CMSPrelim.SetTextSize(0.05);
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    
+    	
+	/*cout<<"Points Stored In 2D Graph\n";
+	cout<<"====================================================\n";
+	cout<<"i\tPx\tPy\tPz\n";
+	Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
+	for(int i=0; i<g2DObs->GetN(); ++i){
+		//double Px, Py, Pz;
+
+		//g2DObs->GetPoint(i,Px,Py,Pz);
+
+		cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
+	}*/
+
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
@@ -878,7 +906,8 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strO
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
-	cout<<"ret_graph = " << ret_graph << endl;
+	//Debugging
+    //cout<<"ret_graph = " << ret_graph << endl;
 
     return ret_graph;
 } //End VisualizeUniformity::getObsGraph()
@@ -925,4 +954,5 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string &strObsName, 
     
     return ret_histo;
 } //End VisualizeUniformity::getObsHisto()
+
 
