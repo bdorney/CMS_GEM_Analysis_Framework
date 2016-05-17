@@ -11,7 +11,9 @@ Update: May 17th 2016
 ==================================================
 ->Disabled Uniformity::VisualizeUniformity::storeCanvasHisto2D() for now, doesn't seem to draw the detector properly
 ->Run config file now asks the user for which detector they are processing.  The detector name now starts all TName's in the output TFile.
+->Added data member for storing detector name in Uniformity::RunSetup called  strDetName
 ->Added data members and methods to Uniformity::DetectorMPGD for detector name (DetectorMPGD::strDetName), getting the name ( DetectorMPGD::getName() ), and setting the name ( DetectorMPGD::setName() )
+->Added method AnalyzeResponseUniformity::getHistogram2D(), now 2D histograms that plot 1D observables defined by the user will follow user input for parameters (e.g. binning, names, etc...);
 
 Update: May 13th 2016
 ==================================================

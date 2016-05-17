@@ -32,7 +32,7 @@
 //#include "TSpectrum.h"
 //#include "TTree.h"
 
-using namespace ROOT;
+//using namespace ROOT;
 
 namespace Uniformity {
     //Storage container for cluster selection parameters
@@ -117,6 +117,8 @@ namespace Uniformity {
         std::string strFile_Output_Name;     //Name of output TFile to be created
         std::string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
         
+        std::string strDetName;              //Name of the detector
+        
         //Default constructor
         RunSetup(){
             bAnaStep_Reco = false;
@@ -135,6 +137,8 @@ namespace Uniformity {
             
             strFile_Output_Name = "FrameworkOutput.root";
             strFile_Output_Option = "RECREATE";
+            
+            strDetName = "Detector";
         } //End Default constructor
     }; //End RunSetup
     

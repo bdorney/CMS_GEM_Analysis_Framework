@@ -67,24 +67,6 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Filling*****************
-        //Loops over all stored clusters and hits in detMPGD and books histograms for the full detector
-        /*void fillHistos(){
-            fillHistosCluster();
-            fillHistosHits();
-            return;
-        };*/
-        
-        //Loops over all stored clusters in detMPGD and Book histograms for the full detector
-        //void fillHistosCluster();
-        
-        //Loops over all stored clusters in detMPGD and Book histograms for the full detector
-        //void fillHistosHits();
-        
-        //Fitting*****************
-        //Loops over all slices in detMPGD and fits Booked histograms for the full detector
-        //void fitHistosClusters();
-        
         //Loading*****************
         //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
         //Loads all TObjects found in the input ROOT file into detMPGD;
@@ -95,33 +77,6 @@ namespace Uniformity {
         //Checks to see if the detector's uniformity is within requested amount
         virtual void checkUniformity();
         //bool checkUniformity(bool &bInput);
-        
-        //Storing*****************
-        //Stores booked cluster & hit histograms (for those histograms that are non-null)
-        /*void storeHistos(std::string & strOutputROOTFileName, std::string strOption){
-            storeHistosClusters(strOutputROOTFileName, strOption);
-            storeHistosHits(strOutputROOTFileName, strOption);
-            return;
-        };*/
-        
-        //Stores booked cluster histograms (for those histograms that are non-null)
-        //void storeHistosClusters(std::string & strOutputROOTFileName, std::string strOption);
-        
-        //Stores booked hit histograms (for those histograms that are non-null)
-        //void storeHistosHits(std::string & strOutputROOTFileName, std::string strOption);
-        
-        //Stores booked cluster fits (for those fits that are non-null)
-        //void storeFits(std::string & strOutputROOTFileName, std::string strOption);
-        
-        //Stores TObjects created in createResponseMap() in the requested output file
-        //Placeholder
-        //void storeResponseMap(std::string strOutputROOTFileName, std::string strOption);
-        
-        //Visualizing*************
-        //Displays the results of the analysis in a user friendly manner
-        //Placeholder
-        //void visualizeResponseMap(std::string strOutputROOTFileName, std::string strOption);
-        //Actually it's better to put this in a separate file
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -145,8 +100,6 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //template<class TFileStructure>
-        //TDirectory * getDirectory(int iIdentifier, std::string strName, TFileStructure *inputStructure);
         
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
         TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
@@ -159,7 +112,9 @@ namespace Uniformity {
         
         //Returns a histogram whose parmeters match those defined in the input HistoSetup object
         TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
-        //TH2F getHistogram2D( Timing::HistoSetup &setupHisto );
+        
+        //Returns a histogram whose parmeters match those defined in the input HistoSetup object
+        TH2F getHistogram2D(int iEta, int iPhi, Timing::HistoSetup &setupHisto_X, Timing::HistoSetup &setupHisto_Y);
         
         //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName);
@@ -186,6 +141,5 @@ namespace Uniformity {
         
     }; //End class AnalyzeResponseUniformity
 } //End namespace Uniformity
-
 
 #endif /* defined(____AnalyzeResponseUniformity__) */

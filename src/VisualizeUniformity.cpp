@@ -79,13 +79,13 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
 
-    TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strObsName + "_AllEta" ).c_str(), "");
+    TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), "");
     
     vector<shared_ptr<TGraphErrors> > vec_gObs;
 
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canvDetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canvDetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -158,11 +158,9 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
             
             //Determine the iPhi index
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-	    //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);            
 
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
             latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             
             //Segment the Plot with lines
@@ -242,11 +240,11 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
 
     //Set the name of the g2DObs
     //------------------------------------------------------
-    g2DObs->SetName( ("g2D_" + strObsName + "_AllEta").c_str() );
+    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -364,7 +362,7 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -407,7 +405,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -477,11 +475,9 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
             
             //Determine the iPhi index
             int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-            //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
 
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
             latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             
             //Segment the Plot with lines
@@ -559,11 +555,11 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Set the name of the g2DObs
     //------------------------------------------------------
-    g2DObs->SetName( ("g2D_" + strObsName + "_AllEta").c_str() );
+    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -681,10 +677,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     //Variable Declaration
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    //Make the Canvas
-    //------------------------------------------------------
-    //TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
-
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
@@ -738,7 +730,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -812,18 +804,15 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
             for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
                 //Ensure the pad is the active pad (it should be already but who knows...)
                 vec_padSectorObs[iEta-1]->cd();
-                //pad_SectorObs->cd();
                 
                 //Declare the TLatex
                 TLatex latex_PhiSector;
                 
                 //Determine the iPhi index
                 int iPhiPos = std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
-                //int iPhiPos = 3 - std::distance( etaSector.map_sectorsPhi.begin(), iterPhi);
 
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);
-                //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
                 latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
                 
                 //Segment the Plot with lines

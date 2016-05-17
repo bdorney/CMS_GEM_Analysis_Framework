@@ -43,7 +43,7 @@
 #include "TROOT.h"
 #include "TStyle.h"
 
-using namespace ROOT;
+//using namespace ROOT;
 
 #endif /* defined(____VisualizeUniformity__) */
 

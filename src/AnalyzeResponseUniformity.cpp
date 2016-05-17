@@ -78,114 +78,9 @@ void AnalyzeResponseUniformity::checkUniformity(){
 //Loads all TObjects found in the input ROOT file into detMPGD;
 //Any previously stored information in detMPGD is lost.
 /*void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
-    //Variable Declaration
-    TFile *ptr_fileInput = nullptr;
-    
-    //This method will be called when the user wants to re-run the fitting on a previously created batch of histograms
-    //The user will directly supply an AMORE mapping file, this will make the DetectorMPGD structure so that it matches the one created when the histograms where first booked
-    //The user will indirectly supply an analysis config file because they want to re-run the fits and need to give new information
-    //Use previously existing framework code to setup the detector MPGD, then this method behaves as the reverse of storeHistos()
-    
-    //Setup the MPGD object
-    //------------------------------------------------------
-    ParameterLoaderAmoreSRS amoreLoader;
-    amoreLoader.loadAmoreMapping(strInputMappingFileName);
-    detMPGD = amoreLoader.getDetector();
-    
-    //Open the requested ROOT file
-    //------------------------------------------------------
-    ptr_fileInput = new TFile(strInputROOTFileName.c_str(),"READ","",1);
-    
-    //Check to see if data file opened successfully, if so load the tree
-    //------------------------------------------------------
-    if ( !ptr_fileInput->IsOpen() || ptr_fileInput->IsZombie() ) { //Case: failed to load ROOT file
-        perror( ("Uniformity::AnalyzeResponseUniformity::loadHistosFromFile() - error while opening file: " + strInputROOTFileName ).c_str() );
-        Timing::printROOTFileStatus(ptr_fileInput);
-        std::cout << "Exiting!!!\n";
-        
-        return;
-    } //End Case: failed to load ROOT file
-    
-    //Loop Through the file and load all stored TObjects
-    //------------------------------------------------------
-    //Loop Over Stored iEta Sectors
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Get Directory
-        //-------------------------------------
-        //Check to see if the directory exists already
-        TDirectory *dir_SectorEta = ptr_fileInput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
-        
-        //If the above pointer is null the directory does NOT exist, skip this Eta Sector
-        if (dir_SectorEta == nullptr) continue;
-        
-        //Debugging
-        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
-        
-        //Load Histograms - SectorEta Level
-        //-------------------------------------
-        dir_SectorEta->cd();
-        //Placeholder No fits performed on these histos for now
-        
-        //Loop Over Stored iPhi Sectors within this iEta Sector
-        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
-            //Get Directory
-            //-------------------------------------
-            //Check to see if the directory exists already
-            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
-            
-            //If the above pointer is null the directory does NOT exist, skip this Phi Sector
-            if (dir_SectorPhi == nullptr) continue;
-            
-            //Debugging
-            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
-            
-            //Load Histograms - SectorPhi Level
-            //-------------------------------------
-            dir_SectorPhi->cd();
-            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
-            
-            //Check to see if 2D histo retrieved successfully
-            if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr) continue;
-            
-            //Set to Global Directory - SectorPhi Level
-            //-------------------------------------
-            //Prevents seg faulting when closing ptr_fileInput
-            (*iterPhi).second.clustHistos.hADC_v_Pos->SetDirectory(gROOT);
-            
-            //Slices
-            //Trickery, detMPGD now has eta and phi sectors setup.
-            //Slices are NOT setup
-            //Here loop from 1 to aSetup.iUniformityGranularity and either:
-            //      Option 1: Load slices from the file (slower?)
-            //      Option 2: project out from SectorPhi::clustHistos::hADC_v_Pos
-            //Implemented Option 2; faster many large number of I/O operations??
-            for (int i=1; i <= aSetup.iUniformityGranularity; ++i ) { //Loop Over Slices
-                //Set Histograms - Slice Level
-                //-------------------------------------
-                //Creat the slice
-                SectorSlice slice;
-                
-                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
-                
-                //Make sure to set this histo to the global directory
-                slice.hSlice_ClustADC->SetDirectory(gROOT);
-                
-                //Store position information for this slice
-                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
-                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
-                
-                //Store the slice
-                (*iterPhi).second.map_slices[i] = slice;
-            } //End Loop Over Slices
-        } //End Loop Over Stored iPhi Sectors
-    } //End Loop Over Stored iEta Sectors
 
-    //Close the file
-    //------------------------------------------------------
-    ptr_fileInput->Close();
-    
-    return;
+    //Placeholder, this is done right now in the inherited classes
+ 
 }*/ //End AnalyzeResponseUniformity::loadHistosFromFile()
 
 void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs){
@@ -205,10 +100,6 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     std::advance(iterQ1, (int)std::ceil( mset_fInputObs.size() * 0.25 ) );  inputStatObs.fQ1 = *iterQ1;
     std::advance(iterQ2, (int)std::ceil( mset_fInputObs.size() * 0.50 ) );  inputStatObs.fQ2 = *iterQ2;
     std::advance(iterQ3, (int)std::ceil( mset_fInputObs.size() * 0.75 ) );  inputStatObs.fQ3 = *iterQ3;
-    
-    //if (iterQ1 != nullptr && iterQ1 != mset_fInputObs.end() )
-    //if (iterQ2 != nullptr && iterQ2 != mset_fInputObs.end() )
-    //if (iterQ3 != nullptr && iterQ3 != mset_fInputObs.end() )
     
     //Determine IQR
     inputStatObs.fIQR = inputStatObs.fQ3 - inputStatObs.fQ1;
@@ -381,22 +272,43 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
     return ret_Histo;
 } //End AnalyzeResponseUniformity::getHistogram()
 
+TH2F AnalyzeResponseUniformity::getHistogram2D(int iEta, int iPhi, HistoSetup &setupHisto_X, HistoSetup &setupHisto_Y){
+    //Variable Declaration
+    string strPrefix = "h";
+    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto_Y.strHisto_Name + "_" + setupHisto_X.strHisto_Name );
+    
+    //Histo Declaration
+    TH2F ret_Histo(strName.c_str(), "", setupHisto_X.iHisto_nBins, setupHisto_X.fHisto_xLower, setupHisto_X.fHisto_xUpper, setupHisto_Y.iHisto_nBins, setupHisto_Y.fHisto_xLower, setupHisto_Y.fHisto_xUpper);
+    
+    //Set Histo Data Members
+    ret_Histo.SetXTitle( setupHisto_X.strHisto_Title_X.c_str() );
+    ret_Histo.SetYTitle( setupHisto_Y.strHisto_Title_X.c_str() );
+    
+    ret_Histo.Sumw2();
+    
+    //Set Directory to the global directory
+    ret_Histo.SetDirectory(gROOT);
+    
+    //Return Histogram
+    return ret_Histo;
+} //End AnalyzeResponseUniformity::getHistogram2D
+
 //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
 string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName){
     //Variable Declaration
     string ret_Name = "";
     
     if (iSlice > -1) {
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
     else if (iEta > -1){
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
     }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        ret_Name = strInputPrefix + "_Summary_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;
@@ -409,15 +321,18 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     string ret_Name = "";
     
     if (iSlice > -1) {
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
+    else if (iEta > -1){
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
+    }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
-
+    
     return ret_Name;
 } //End AnalyzeResponseUniformity::getNameByIndex()
 
@@ -487,9 +402,21 @@ float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, Hist
 float AnalyzeResponseUniformity::getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput){
     
     //Try to automatically assign a value
-    if (0 == strInputKeyword.compare("AMPLITUDE") ) { //Case: Histo Amplitude
+    if ( 0 == strInputKeyword.compare("AMPLITUDE") ) { //Case: Histo Amplitude
         return hInput->GetBinContent( hInput->GetMaximumBin() );
     } //End Case: Histo Amplitude
+    else if( 0 == strInputKeyword.compare("FWHM") ){ //Case: Full Width Half Max
+        
+        //Placeholder
+        
+        return -1e12;
+    } //End Case: Full Width Half Max
+    else if( 0 == strInputKeyword.compare("HWHM") ){ //Case: Half Width Half Max
+        
+        //Placeholder
+        
+        return -1e12;
+    } //End Case: Half Width Half Max
     else if (0 == strInputKeyword.compare("MEAN") ) { //Case: Histo Mean
         return hInput->GetMean();
     } //End Case: Histo Mean

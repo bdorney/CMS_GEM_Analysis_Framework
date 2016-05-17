@@ -247,6 +247,7 @@ int main( int argc_, char * argv_[] ){
     //------------------------------------------------------
     loaderAmore.loadAmoreMapping( rSetup.strFile_Config_Map  );
     detMPGD = loaderAmore.getDetector();
+    detMPGD.setName( rSetup.strDetName );
     
     //Load the requested analysis parameters
     //------------------------------------------------------

@@ -31,7 +31,7 @@
 #include "TROOT.h"
 #include "TFile.h"
 
-using namespace ROOT;
+//using namespace ROOT;
 
 namespace Uniformity {
     class InterfaceAnalysis {

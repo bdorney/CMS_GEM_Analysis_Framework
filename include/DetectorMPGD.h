@@ -10,8 +10,10 @@
 #define ____DetectorMPGD__
 
 //C++ Includes
+#include <algorithm>
 #include <map>
 #include <stdio.h>
+#include <string>
 #include <vector>
 
 //Framework Includes
@@ -23,7 +25,7 @@
 #include "TH2F.h"
 #include "TROOT.h"
 
-using namespace ROOT;
+//using namespace ROOT;
 
 namespace Uniformity {
     class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
@@ -115,6 +117,9 @@ namespace Uniformity {
         //returns the name of the detector
         virtual std::string getName(){ return strDetName; };
         
+        //returns the name of the detector, omitting special characters
+        virtual std::string getNameNoSpecial(){ return strDetNameNoSpecChar; };
+        
         //returns the number of eta sectors
         virtual int getNumEtaSectors(){ return map_sectorsEta.size(); };
 
@@ -175,12 +180,26 @@ namespace Uniformity {
         };
         
         //Sets the name of the detector
-        virtual void setName(std::string & strInput){ strDetName = strInput; return; };
+        virtual void setName(std::string & strInput){
+            strDetName = strInput;
+            setNameNoSpecChar(strInput);
+            return;
+        };
         
     private:
+        //Setters - Methods that Set Something
+        //------------------------------------------------------------------------------------------------------------------------------------------
+        //Sets a version of the detector name without special characters
+        virtual void setNameNoSpecChar(std::string & strInput){
+            strDetNameNoSpecChar = strInput;
+            strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
+            return;
+        }
+        
         std::map<int, SectorEta> map_sectorsEta;
         
-        std::string strDetName; //Name of the detector
+        std::string strDetName;             //Name of the detector
+        std::string strDetNameNoSpecChar;   //Name of the detector omitting special characters (e.g. '/' )
         
         std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD

@@ -82,6 +82,7 @@ void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMo
                     
                     pair_strParam.first = strTmp;
                     
+                    //Below is alphabetized by order in Uniformity::RunSetup
                     if ( pair_strParam.first.compare("ANA_CLUSTERS") == 0 ) {
                         inputRunSetup.bAnaStep_Clusters = convert2bool(pair_strParam.second, bExitSuccess);
                     }
@@ -117,6 +118,9 @@ void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMo
                     }
                     else if ( pair_strParam.first.compare("OUTPUT_FILE_OPTION") == 0 ) {
                         inputRunSetup.strFile_Output_Option = pair_strParam.second;
+                    }
+                    else if ( pair_strParam.first.compare("DETECTOR_NAME") == 0 ){
+                        inputRunSetup.strDetName = pair_strParam.second;
                     }
                     else{ //Case: Parameter Not Recognized
                         cout<<"ParameterLoaderRun::loadRunParameters(): input field name:\n";
