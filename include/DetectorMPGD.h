@@ -93,15 +93,6 @@ namespace Uniformity {
         //Returns clusters for a given (iEta,iPhi value)
         virtual std::vector<Cluster> getClusters(int iEta, int iPhi);
         
-        //Returns all hits
-        virtual std::vector<Hit> getHits();
-        
-        //Returns clusters for a given iEta value (all iPhi)
-        virtual std::vector<Hit> getHits(int iEta);
-        
-        //Returns clusters for a given (iEta,iPhi value)
-        virtual std::vector<Hit> getHits(int iEta, int iPhi);
-        
         //returns the position of an iEta sector
         virtual float getEtaPos(int iEta);
         
@@ -111,6 +102,18 @@ namespace Uniformity {
         
         //returns the width of an iEta sector
         virtual float getEtaWidth(int iEta);
+        
+        //Returns all hits
+        virtual std::vector<Hit> getHits();
+        
+        //Returns clusters for a given iEta value (all iPhi)
+        virtual std::vector<Hit> getHits(int iEta);
+        
+        //Returns clusters for a given (iEta,iPhi value)
+        virtual std::vector<Hit> getHits(int iEta, int iPhi);
+        
+        //returns the name of the detector
+        virtual std::string getName(){ return strDetName; };
         
         //returns the number of eta sectors
         virtual int getNumEtaSectors(){ return map_sectorsEta.size(); };
@@ -142,6 +145,23 @@ namespace Uniformity {
             return;
         };
         
+        //Defines an eta sector; will NOT over-write what is currently stored
+        virtual void setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector);
+        
+        //Sets a single eta sector; over-writes what is currently stored (if any)
+        virtual void setEtaSector(int iEta, SectorEta inputEtaSector){
+            map_sectorsEta[iEta] = inputEtaSector;
+            /*if ( inputEtaSector.fWidth > fMaxSectorWidth) {
+             fMaxSectorWidth = inputEtaSector.fWidth;
+             }*/
+            return;
+        };
+        
+        //Sets all eta sectors; over-writes what is currently stored (if any)
+        virtual void setEtaSector(std::map<int, SectorEta> map_inputSectors){
+            map_sectorsEta = map_inputSectors; return;
+        };
+        
         //Sets a hit
         virtual void setHit(Hit &inputHit);
         
@@ -154,29 +174,13 @@ namespace Uniformity {
             return;
         };
         
-        //Defines an eta sector; will NOT over-write what is currently stored
-        virtual void setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector);
-        
-        //Sets a single eta sector; over-writes what is currently stored (if any)
-        virtual void setEtaSector(int iEta, SectorEta inputEtaSector){
-            map_sectorsEta[iEta] = inputEtaSector;
-            /*if ( inputEtaSector.fWidth > fMaxSectorWidth) {
-                fMaxSectorWidth = inputEtaSector.fWidth;
-            }*/
-            return;
-        };
-        
-        //Sets all eta sectors; over-writes what is currently stored (if any)
-        virtual void setEtaSector(std::map<int, SectorEta> map_inputSectors){
-            map_sectorsEta = map_inputSectors; return;
-        };
+        //Sets the name of the detector
+        virtual void setName(std::string & strInput){ strDetName = strInput; return; };
         
     private:
-        //bool bAnaSetup;
-        
         std::map<int, SectorEta> map_sectorsEta;
         
-        //Uniformity::AnalysisSetupUniformity aSetup;
+        std::string strDetName; //Name of the detector
         
         std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD
