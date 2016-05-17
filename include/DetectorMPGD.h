@@ -192,7 +192,15 @@ namespace Uniformity {
         //Sets a version of the detector name without special characters
         virtual void setNameNoSpecChar(std::string & strInput){
             strDetNameNoSpecChar = strInput;
+            
+            //Debugging
+            std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
+            
             strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
+            
+            //Debugging
+            std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
+            
             return;
         }
         

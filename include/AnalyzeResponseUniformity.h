@@ -133,7 +133,7 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;
         
-        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "MEAN","PEAK","SIGMA"}; //Supported Keywords for fit setup
+        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "FWHM", "HWHM" "MEAN","PEAK","SIGMA"}; //Supported Keywords for fit setup
         
         Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         
