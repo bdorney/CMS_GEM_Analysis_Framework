@@ -470,118 +470,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
         return;
     } //End Check if File Failed to Open Correctly
     
-    //Simplied to just call the method below
-    /*
-     //Loop over ieta's
-     //Create/Load file structure
-     //Store ieta level histograms
-     //Loop over iphi's within ieta's
-     //Create/Load file structure
-     //Store iphi level histograms
-     //Loop over slices
-     //Create/Load file structure
-     //store slice level histograms
-     //Close File
-     
-     //Setup the summary histograms
-     TH1F hclustADC_All( getHistogram(-1, -1, aSetup.histoSetup_clustADC) );
-     TH1F hclustPos_All( getHistogram(-1, -1, aSetup.histoSetup_clustPos) );
-     TH1F hclustSize_All( getHistogram(-1, -1, aSetup.histoSetup_clustSize) );
-     TH1F hclustTime_All( getHistogram(-1, -1, aSetup.histoSetup_clustTime) );
-     
-     //Get/Make the Summary Directory
-     //Check to see if the directory exists already
-     TDirectory *dir_Summary = ptr_fileOutput->GetDirectory("Summary", false, "GetDirectory" );
-     
-     //If the above pointer is null the directory does NOT exist, create it
-     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-     dir_Summary = ptr_fileOutput->mkdir("Summary");
-     } //End Case: Directory did not exist in file, CREATE
-     
-     //Loop Over Stored iEta Sectors
-     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-     
-     //Get Directory
-     //-------------------------------------
-     //Check to see if the directory exists already
-     TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
-     
-     //If the above pointer is null the directory does NOT exist, create it
-     if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
-     dir_SectorEta = ptr_fileOutput->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
-     } //End Case: Directory did not exist in file, CREATE
-     
-     //Debugging
-     //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
-     
-     //Add this sector to the summary histogram
-     hclustADC_All.Add((*iterEta).second.clustHistos.hADC.get() );
-     hclustPos_All.Add((*iterEta).second.clustHistos.hPos.get() );
-     hclustSize_All.Add((*iterEta).second.clustHistos.hSize.get() );
-     hclustTime_All.Add((*iterEta).second.clustHistos.hTime.get() );
-     
-     //Store Histograms - SectorEta Level
-     //-------------------------------------
-     dir_SectorEta->cd();
-     (*iterEta).second.clustHistos.hADC->Write();
-     (*iterEta).second.clustHistos.hPos->Write();
-     (*iterEta).second.clustHistos.hSize->Write();
-     (*iterEta).second.clustHistos.hTime->Write();
-     (*iterEta).second.clustHistos.hADC_v_Pos->Write();
-     
-     //Loop Over Stored iPhi Sectors within this iEta Sector
-     for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
-     //Get Directory
-     //-------------------------------------
-     //Check to see if the directory exists already
-     TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
-     
-     //If the above pointer is null the directory does NOT exist, create it
-     if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
-     dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
-     } //End Case: Directory did not exist in file, CREATE
-     
-     //Debugging
-     //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
-     
-     //Store Histograms - SectorPhi Level
-     //-------------------------------------
-     dir_SectorPhi->cd();
-     (*iterPhi).second.clustHistos.hADC->Write();
-     (*iterPhi).second.clustHistos.hSize->Write();
-     (*iterPhi).second.clustHistos.hTime->Write();
-     (*iterPhi).second.clustHistos.hADC_v_Pos->Write();
-     
-     //Slices
-     //Now that all clusters have been analyzed we extract the slices
-     for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
-     
-     //Get Directory
-     //-------------------------------------
-     //Check to see if the directory exists already
-     TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( (*iterSlice).first ) ).c_str(), false, "GetDirectory"  );
-     
-     //If the above pointer is null the directory does NOT exist, create it
-     if (dir_Slice == nullptr) { //Case: Directory did not exist in file, CREATE
-     dir_Slice = dir_SectorPhi->mkdir( ( "Slice" + getString( (*iterSlice).first ) ).c_str() );
-     } //End Case: Directory did not exist in file, CREATE
-     
-     //Store Histograms - Slice Level
-     //-------------------------------------
-     dir_Slice->cd();
-     (*iterSlice).second.hSlice_ClustADC->Write();
-     } //End Loop Over Slices
-     } //End Loop Over Stored iPhi Sectors
-     } //End Loop Over Stored iEta Sectors
-     
-     //Store the Summary Histograms
-     dir_Summary->cd();
-     hclustADC_All.Write();
-     hclustPos_All.Write();
-     hclustSize_All.Write();
-     hclustTime_All.Write();
-     */
-    
     //Call the store histos sequence
     storeHistos(ptr_fileOutput);
     
@@ -596,7 +484,7 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
 void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile){
     //Variable Declaration
     
-	cout<<"AnalyzeResponseUniformityClusters::storeHistos() - file_InputRootFile = " << file_InputRootFile << endl;
+	//cout<<"AnalyzeResponseUniformityClusters::storeHistos() - file_InputRootFile = " << file_InputRootFile << endl;
 
     //Check if File Failed to Open Correctly
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {

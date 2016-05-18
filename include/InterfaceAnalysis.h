@@ -75,7 +75,9 @@ namespace Uniformity {
         virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
-        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
+        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet;
+		//std::cout<<"InterfaceAnalysis::setDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
+		 return; };
         
         //Sets the Run Setup
         virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };

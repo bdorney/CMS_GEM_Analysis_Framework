@@ -7,14 +7,20 @@
 *                                                *
 **************************************************
 
+Update: May 18th 2016
+==================================================
+->Fixed a bug where the copy ctor and assignment operators of Uniformity::DetectorMPGD were not correctly setting the strDetName and strDetNameNoSpecChar data members
+->Updated config/configRun_Template_Series.cfg and scripts/runMode_Series.sh to take a detector name as user input
+
 Update: May 17th 2016
 ==================================================
 ->Disabled Uniformity::VisualizeUniformity::storeCanvasHisto2D() for now, doesn't seem to draw the detector properly
-->Run config file now asks the user for which detector they are processing.  The detector name now starts all TName's in the output TFile.
-->Added data member for storing detector name in Uniformity::RunSetup called  strDetName
-->Added data members and methods to Uniformity::DetectorMPGD for detector name (DetectorMPGD::strDetName), getting the name ( DetectorMPGD::getName() ), and setting the name ( DetectorMPGD::setName() )
+->Run config file now asks the user for which detector they are processing.  The detector name is now included in the TName's of all TCanvas objects in the output TFile.
+->Added data member for storing detector name in Uniformity::RunSetup called strDetName
+->Added data members and methods to Uniformity::DetectorMPGD for detector name (DetectorMPGD::strDetName), getting the name ( DetectorMPGD::getName(), DetectorMPGF::getNameNoSpecial() ), and setting the name ( DetectorMPGD::setName() )
 ->Added method AnalyzeResponseUniformity::getHistogram2D(), now 2D histograms that plot 1D observables defined by the user will follow user input for parameters (e.g. binning, names, etc...);
 ->Fixed a bug where the number of bins in the cluster position histogram (or axis representing this in 2D histograms) was not following the requested granularity of the user
+->Fixed a bug where Uniformity::DetectorMPGD::strDetName and strDetNameNoSpecChar were not copied on assignment
 
 Update: May 13th 2016
 ==================================================

@@ -19,11 +19,15 @@ using namespace Uniformity;
 
 //Default constructor
 DetectorMPGD::DetectorMPGD(){
+    strDetName = "Detector";
+    strDetNameNoSpecChar	= "Detector";
     //bAnaSetup = false;
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
 DetectorMPGD::DetectorMPGD(vector<Cluster> vec_inputClusters){
+    strDetName = "Detector";
+    strDetNameNoSpecChar	= "Detector";
     //bAnaSetup = false;
     setCluster(vec_inputClusters);
 }

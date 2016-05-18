@@ -1,6 +1,6 @@
 #!bin/zsh
 #Usage:
-#	source runMode_Series.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+#	source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
 
 #store the original directory
 DIR_ORIG=$PWD
@@ -11,10 +11,14 @@ FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Series.cfg
 cp $FILE_RUN_TEMP $FILE_RUN
 
 #setup input variables
-DIR_DATA=$1
-FILE_ANA=$2
-FILE_MAP=$3
-FILE_OUT=$4
+NAME_DET=$1
+DIR_DATA=$2
+FILE_ANA=$3
+FILE_MAP=$4
+FILE_OUT=$5
+
+#Replace Detector Name
+sed -i -- "s@DETECTORNAME@$NAME_DET@g" $FILE_RUN
 
 #Move to the data directory
 cd $DIR_DATA
@@ -44,4 +48,5 @@ echo "To view this file execute:"
 echo "gedit $FILE_RUN &"
 echo ""
 echo "To launch the analysis execute:"
-echo ".$GEM_BASE/analyzeUniformity $FILE_RUN true"
+echo "cd $GEM_BASE"
+echo "./analyzeUniformity $FILE_RUN true"

@@ -80,7 +80,9 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        virtual Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
+        virtual Uniformity::DetectorMPGD getDetector(){ 
+		//std::cout<<"AnalyzeResponseUniformity::getDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
+		return detMPGD; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +93,10 @@ namespace Uniformity {
         virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
-        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
+        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ 
+		detMPGD = inputDet; 
+		//std::cout<<"AnalyzeResponseUniformity::setDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
+		return; };
         
     protected:
         //Actions - Methods that Do Something

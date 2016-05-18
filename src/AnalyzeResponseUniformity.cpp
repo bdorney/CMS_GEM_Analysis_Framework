@@ -299,16 +299,20 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     string ret_Name = "";
     
     if (iSlice > -1) {
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
     else if (iEta > -1){
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
     }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
+	ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;
@@ -321,16 +325,20 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     string ret_Name = "";
     
     if (iSlice > -1) {
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
     else if (iEta > -1){
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
+	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
     }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
+        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
+	ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;

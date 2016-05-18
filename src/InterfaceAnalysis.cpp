@@ -49,6 +49,9 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     
     TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
+	//Debugging
+	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;
+
     //Print the detector info & analysis parameters to the user
     //------------------------------------------------------
     if (bVerboseMode) { //Case: Verbose Printing
@@ -85,6 +88,9 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         cout<<"Clust Time, Max = " << aSetup.selClust.iCut_TimeMax << endl;
     } //End Case: Verbose Printing
 
+	//Debugging
+	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;
+
     //Loop over input files
     //------------------------------------------------------
     for (int i=0; i < vec_strRunList.size(); ++i) { //Loop over vec_strRunList
@@ -103,6 +109,9 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             continue;
         } //End Case: failed to load ROOT file
         
+	//Debugging
+	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Hit Ana detMPGD.getName() = " << detMPGD.getName() << endl;
+
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
@@ -125,7 +134,10 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             hitAnalyzer.fillHistos();
             
             //Update the Detector!
+		//cout<<"Hit Ana Pre Update detMPGD.getName() = " << detMPGD.getName() << endl;
+		//cout<<"Hit Ana Pre Update (hitAnalyzer.getDetector()).getName() = " << (hitAnalyzer.getDetector()).getName() << endl;
             detMPGD = hitAnalyzer.getDetector();
+		//cout<<"Hit Ana Post Update detMPGD.getName() = " << detMPGD.getName() << endl;
         } //End Case: Hit Analysis
         
         //Cluster Reconstruction
@@ -136,6 +148,9 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
         } //End Case: Cluster Reconstruction
         
+	//Debugging
+	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Cluster Ana detMPGD.getName() = " << detMPGD.getName() << endl;
+
         //Cluster Analysis
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
@@ -204,6 +219,9 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         delete file_ROOTInput;
     } //End Loop over vec_strRunList
     
+	//Debugging
+	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Storing detMPGD.getName() = " << detMPGD.getName() << endl;
+
     //Create the summary TFile (only if multi file output is NOT requested)
     //------------------------------------------------------
     if(!rSetup.bMultiOutput){ //Case: Create Summary TFile
@@ -308,7 +326,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         } //End Case: failed to load ROOT file
         
         //Store the results
-        cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
+        //cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
         storeResults(file_ROOTOutput_Single);
         
         //Close the files & delete pointers before the next iter
@@ -329,7 +347,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
     map<string,string> map_hit_ObsAndDrawOpt;   //as above but for hits
     map<string,string> map_res_ObsAndDrawOpt;   //as above but for results (e.g. fits)
     
-	cout<<"InterfaceAnalysis::storeResults(): file_Results = " << file_Results << endl;
+	//cout<<"InterfaceAnalysis::storeResults(): file_Results = " << file_Results << endl;
+	//cout<<"InterfaceAnalysis::storeResults(): detMPGD.getName() = " << detMPGD.getName() << endl;
 
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
@@ -354,6 +373,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
     if ( rSetup.bAnaStep_Visualize ) { //Case: Visualize Output
         visualizeUni.setAnalysisParameters(aSetup);
         visualizeUni.setDetector(detMPGD);
+	//visualizeUni.setCanvasIdent(rSetup.strDetName);
         
         if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
             map_hit_ObsAndDrawOpt["HitADC"]="E1";

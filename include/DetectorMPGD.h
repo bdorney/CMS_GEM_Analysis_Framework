@@ -46,6 +46,8 @@ namespace Uniformity {
         //Copy Constructor
         DetectorMPGD(const DetectorMPGD& other){
             map_sectorsEta  = other.map_sectorsEta;
+		strDetName = other.strDetName;
+		strDetNameNoSpecChar = other.strDetNameNoSpecChar;
             vec_allADCPeaks = other.vec_allADCPeaks;
         };
         
@@ -58,12 +60,30 @@ namespace Uniformity {
         //Operators
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Overloaded Assignment Operator
-        DetectorMPGD & operator=(const DetectorMPGD & other){
+        //DetectorMPGD & operator=(const DetectorMPGD & other){
+	DetectorMPGD & operator=(DetectorMPGD other){
+		//std::cout<<"DetectorMPGD & operator = | this = " << this << std::endl;
+		//std::cout<<"DetectorMPGD & operator = | &other = " << &other << std::endl;
+
+		//std::cout<<"DetectorMPGD & operator = | Pre Assignment this->strDetName = " << this->strDetName << std::endl;
+		//std::cout<<"DetectorMPGD & operator = | Pre Assignment other.strDetName = " << other.strDetName << std::endl;
+		//std::cout<<"DetectorMPGD & operator = | Pre Assignment other.map_sectorsEta.size() = " << other.map_sectorsEta.size() << std::endl;
+	
+		//(this != &other) ? std::cout<<"they are not the same"<<std::endl : std::cout<<"they are the same"<< std::endl;
+
             if (this != &other) { //Protects against invalid self-assignment
-                map_sectorsEta  = other.map_sectorsEta;
-                vec_allADCPeaks = other.vec_allADCPeaks;
+                this->map_sectorsEta  		= other.map_sectorsEta;
+		this->strDetName		= other.strDetName;
+
+		//std::cout<<"DetectorMPGD & operator = | Assignment this->strDetName = " << this->strDetName << std::endl;
+
+
+	        this->strDetNameNoSpecChar	= other.strDetNameNoSpecChar;
+                this->vec_allADCPeaks 		= other.vec_allADCPeaks;
             } //Protects against invalid self-assignment
             
+		//std::cout<<"DetectorMPGD & operator = | Post Assignment this->strDetName = " << this->strDetName << std::endl;
+
             return *this;
         } //End Overloaded Assignment Operator
         
@@ -180,9 +200,18 @@ namespace Uniformity {
         };
         
         //Sets the name of the detector
-        virtual void setName(std::string & strInput){
-            strDetName = strInput;
-            setNameNoSpecChar(strInput);
+        virtual void setName(std::string strInput){
+            strDetName = strDetNameNoSpecChar = strInput;
+	
+		//Debugging
+            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
+            		
+            //setNameNoSpecChar(strInput);
+		strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
+            
+		//Debugging
+            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
+            
             return;
         };
         
@@ -190,16 +219,16 @@ namespace Uniformity {
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Sets a version of the detector name without special characters
-        virtual void setNameNoSpecChar(std::string & strInput){
+        virtual void setNameNoSpecChar(std::string strInput){
             strDetNameNoSpecChar = strInput;
             
             //Debugging
-            std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
+            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
             
             strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
             
             //Debugging
-            std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
+            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
             
             return;
         }

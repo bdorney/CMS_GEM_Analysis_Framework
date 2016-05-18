@@ -23,15 +23,14 @@ using namespace Uniformity;
 
 //Default Constructor
 VisualizeUniformity::VisualizeUniformity(){
-    
-    //Place holder
-    
+    //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Default Constructor
 
 //Constructor with Setup & Detector inputs
 VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet){
     aSetup  = inputSetup;
     detMPGD = inputDet;
+    //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Constructor with Setup & Detector inputs
 
 //Draws a given observable onto a single pad off canvas
@@ -80,13 +79,15 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
 
     TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), "");
+	//TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), "");
     
     vector<shared_ptr<TGraphErrors> > vec_gObs;
 
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canvDetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    
+    //TCanvas canvDetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -241,10 +242,12 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+	//TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
 
     //Set the name of the g2DObs
     //------------------------------------------------------
     g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
+	//g2DObs->SetName( ("g2D_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta").c_str() );
 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -360,10 +363,6 @@ void VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, 
     //Variable Declaration
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
-    //Make the Canvas
-    //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
@@ -405,8 +404,10 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     //Make the Canvas
     //------------------------------------------------------
+	//cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getNameNoSpecial() = " << detMPGD.getNameNoSpecial() << endl;
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    
+    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -556,10 +557,12 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    
+    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+
     //Set the name of the g2DObs
     //------------------------------------------------------
     g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
+    //g2DObs->SetName( ("g2D_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta").c_str() );
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -730,7 +733,10 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     //Make the Canvas
     //------------------------------------------------------
+	//cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getName() = " << detMPGD.getName() << endl;
+    //cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getNameNoSpecial() = " << detMPGD.getNameNoSpecial() << endl;
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------

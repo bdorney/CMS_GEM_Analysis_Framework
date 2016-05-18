@@ -157,6 +157,13 @@ namespace Uniformity {
         //Sets the Analysis Setup
         void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
+	//Sets unique identifier for output TCanvas objects
+	/*void setCanvasIdent(std::string & strInput){ 
+		strCanvIdent = strCanvIdentNoSpec = strInput; 
+		strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
+		return; 
+	};*/
+
         //Sets the Detector
         void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
         
@@ -183,5 +190,8 @@ namespace Uniformity {
         Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         
         Uniformity::DetectorMPGD detMPGD;
+
+	//std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
+	//std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
     }; //End class VisualizeUniformity
 } //End namespace Uniformity
