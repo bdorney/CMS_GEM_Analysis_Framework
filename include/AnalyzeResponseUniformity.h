@@ -125,11 +125,15 @@ namespace Uniformity {
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName);
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName);
         
-        //Searchs the input fit for the given variable; returns it
-        float getPeakPos( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        //Searchs the input fit for the given variable (strParam); returns it
+        //float getPeakPos( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        float getParam( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
+        //float getParam( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string & strParam );
         
-        //Searchs the input fit for the given variable; returns it
-        float getPeakPosError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        //Searchs the input fit for the error on the given variable (strParam); returns it
+        //float getPeakPosError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
+        float getParamError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
+        //float getParamError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string & strParam );
         
         //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
         float getValByKeyword(std::string strInputKeyword, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);

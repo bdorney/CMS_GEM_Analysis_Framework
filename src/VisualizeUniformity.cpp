@@ -1049,6 +1049,9 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strO
     else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
         ret_graph = inputEta.gEta_ClustADC_Fit_PkPos;
     } //End Case: Fit Pk Pos
+    else if (0 == strObsName.compare("RESPONSEFITPKRES") ) { //Case: Fit Pk Resolution
+        ret_graph = inputEta.gEta_ClustADC_Fit_PkRes;
+    } //End Case: Fit Pk Resolution
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
         cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";

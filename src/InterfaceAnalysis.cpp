@@ -165,7 +165,10 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             clustAnalyzer.setDetector(detMPGD);
             
             //Initialize the cluster histograms if this is the first run
-            if (i == 0 || rSetup.bMultiOutput) { clustAnalyzer.initHistosClusters(); }
+            if (i == 0 || rSetup.bMultiOutput) {
+                clustAnalyzer.initGraphsClusters();
+                clustAnalyzer.initHistosClusters();
+            }
             
             //Cluster Analysis
             clustAnalyzer.fillHistos();
@@ -396,10 +399,12 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
+                map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";
                 
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2");
-                //visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","colz");		
+                //visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","colz");
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkRes","TRI2");
             } //End Case: Fitting
         } //End Case: Cluster Analysis
     } //End Case: Visualize Output

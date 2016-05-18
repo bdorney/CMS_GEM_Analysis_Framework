@@ -2,8 +2,8 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.9                               *
-*	LAST UPDATE: May 13 2016                     *
+*	VERSION: 1.0.10                              *
+*	LAST UPDATE: May 18 2016                     *
 *                                                *
 **************************************************
 
@@ -11,6 +11,15 @@ Update: May 18th 2016
 ==================================================
 ->Fixed a bug where the copy ctor and assignment operators of Uniformity::DetectorMPGD were not correctly setting the strDetName and strDetNameNoSpecChar data members
 ->Updated config/configRun_Template_Series.cfg and scripts/runMode_Series.sh to take a detector name as user input
+->Changed Uniformity::AnalyzeResponseUniformity::vec_strSupportedKeywords to also include "FWHM" and "HWHM"
+->Changing Uniformity::AnalyzeResponseUniformity::getValByKeyword() to try provide an initial fit guess for the (HWHM) FWHM based on (1/2) the rms of the input histogram
+->Changing Uniformity::AnalyzeResponseUniformity::getPeakPos() and getPeakPosError() to getParam() and getParamError() for any input string to be compared with AnalyzeResponseUniformity::vec_strSupportedKeywords
+->Adding method Uniformity::AnalyzerResponseUniformityClusters::initGraphsClusters() for initializing TGraph objects (and inherited objects) used in the cluster analysis
+->Uniformity::InterfaceAnalysis now calls AnalyzerResponseUniformityClusters::initGraphsClusters()
+->Added shared_ptr<TGraphErrors> data member Uniformity::SectorEta::gEta_ClustADC_Fit_PkRes for storing peak resolution
+->The Peak resolution (PkWidth / PkPos) is now calculated by Uniformity::AnalyzerResponseUniformityClusters::fitHistos()
+->Uniformity::VisualizeUniformity::getObsGraph now supports getting Uniformity::SectorEta::gEta_ClustADC_Fit_PkRes
+->Summary TCanvas objects are now prepared in Uniformity::InterfaceAnalysis::storeResults()
 
 Update: May 17th 2016
 ==================================================

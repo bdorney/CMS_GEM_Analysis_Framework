@@ -74,6 +74,9 @@ namespace Uniformity {
         virtual void fitHistos();
         
         //Initialize**************
+        //Loops through the detector and initializes all cluster graphs
+        virtual void initGraphsClusters();
+
         //Loops through the detector and initalizes all cluster histograms
         virtual void initHistosClusters();
         

@@ -154,7 +154,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     
     //Set Fit Parameters - Initial Value
     //------------------------------------------------------
-    //Keywords are AMPLITUDE, MEAN, PEAK, SIGMA
+    //Keywords are defined in vec_strSupportedKeywords
     for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
         iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
         
@@ -344,7 +344,7 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     return ret_Name;
 } //End AnalyzeResponseUniformity::getNameByIndex()
 
-float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
+/*float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
     //Search the peak parameter meaning vector for "PEAK"
     //If found return this parameter
     
@@ -373,9 +373,36 @@ float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetu
     } //End Case: Parameter NOT Foun
     
     return ret_Val;
-} //End AnalyzeResponseUniformity::getPeakPos
+}*/ //End AnalyzeResponseUniformity::getPeakPos
 
-float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
+//Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
+//This parameter is then returned to the user
+float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
+    //Variable Declaration
+    int iParamPos = -1;
+    
+    float ret_Val = -1;
+    
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
+    
+    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+        
+        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        
+        ret_Val = fitInput->GetParameter(iParamPos);
+    } //End Case: Parameter Found!!!
+    else{ //Case: Parameter NOT Found
+        printClassMethodMsg("AnalyzeResponseUniformity","getParam",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
+    } //End Case: Parameter NOT Foun
+    
+    return ret_Val;
+} //End AnalyzeResponseUniformity::getParam
+
+/*float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
     //Search the peak parameter meaning vector for "PEAK"
     //If found return this parameter
     
@@ -404,7 +431,34 @@ float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, Hist
     } //End Case: Parameter NOT Foun
     
     return ret_Val;
-} //End AnalyzeResponseUniformity::getPeakPosError
+}*/ //End AnalyzeResponseUniformity::getPeakPosError
+
+//Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
+//The error on this parameter is then returned to the user
+float AnalyzeResponseUniformity::getParamError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
+    //Variable Declaration
+    int iParamPos = -1;
+    
+    float ret_Val = -1;
+    
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
+    
+    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+        
+        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        
+        ret_Val = fitInput->GetParError(iParamPos);
+    } //End Case: Parameter Found!!!
+    else{ //Case: Parameter NOT Found
+        printClassMethodMsg("AnalyzeResponseUniformity","getParamError",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getParamError","\tPlease Cross-check input analysis config file.\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
+        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
+    } //End Case: Parameter NOT Foun
+    
+    return ret_Val;
+} //End AnalyzeResponseUniformity::getParamError
 
 //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
 float AnalyzeResponseUniformity::getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput){
@@ -414,16 +468,12 @@ float AnalyzeResponseUniformity::getValByKeyword(string strInputKeyword, shared_
         return hInput->GetBinContent( hInput->GetMaximumBin() );
     } //End Case: Histo Amplitude
     else if( 0 == strInputKeyword.compare("FWHM") ){ //Case: Full Width Half Max
-        
-        //Placeholder
-        
-        return -1e12;
+        //Right now as estimate we just use the histo RMS
+        return hInput->GetRMS();
     } //End Case: Full Width Half Max
     else if( 0 == strInputKeyword.compare("HWHM") ){ //Case: Half Width Half Max
-        
-        //Placeholder
-        
-        return -1e12;
+        //Right now as estimate we just use half the histo RMS
+        return 0.5 * hInput->GetRMS();
     } //End Case: Half Width Half Max
     else if (0 == strInputKeyword.compare("MEAN") ) { //Case: Histo Mean
         return hInput->GetMean();

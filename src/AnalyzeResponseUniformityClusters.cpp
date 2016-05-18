@@ -104,6 +104,10 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
     TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
     
     float fMin = -1e12, fMax = 1e12;
+    float fPkPos = 0, fPkPosErr = 0;        //Peak Position
+    //float fPkRes = 0, fPkResErr = 0;        //Peak Error
+    float fPkWidth = 0, fPkWidthErr = 0;    //Peak Width
+    
     vector<float> vec_fFitRange;
     
     //Clear Information from any previous analysis
@@ -111,26 +115,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Initialize Response uniformity graphs - Fit norm Chi2
-        (*iterEta).second.gEta_ClustADC_Fit_NormChi2 = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_NormChi2" ) ).c_str() );
-
-        //Initialize Response uniformity graphs - Fit peak pos
-        (*iterEta).second.gEta_ClustADC_Fit_PkPos = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_PkPos" ) ).c_str() );
-
-        //Initialize Response uniformity graphs - Positions Were Fit Fails
-        (*iterEta).second.gEta_ClustADC_Fit_Failures = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        (*iterEta).second.gEta_ClustADC_Fit_Failures->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_Failures" ) ).c_str() );
-        
-        //Initialize Response uniformity graphs - Spec Number of Peaks
-        (*iterEta).second.gEta_ClustADC_Spec_NumPks = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        (*iterEta).second.gEta_ClustADC_Spec_NumPks->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Spec_NumPks" ) ).c_str() );
-        
-        //Initialize Response uniformity graphs - Spec Peak Pos
-        (*iterEta).second.gEta_ClustADC_Spec_PkPos = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
-        (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Spec_PkPos" ) ).c_str() );
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
@@ -187,25 +171,45 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
                 if ( fitRes_ADC.IsValid() ) { //Case: Valid Fit!!!
-                    //Store the Peak Position in the Detector
-                    //Used for checking the uniformity
-                    //detMPGD.vec_allADCPeaks.push_back( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                    (*iterEta).second.mset_fClustADC_Fit_PkPos.insert( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    //Get the Peak Position
+                    fPkPos      = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
+                    fPkPosErr   = getParamError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
+                    
+                    //Get the Peak Width
+                    auto iterParamHWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "HWHM");
+                    auto iterParamFWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "FWHM");
+                    
+                    if ( iterParamHWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning HWHM
+                        fPkWidth = 2. * getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "HWHM" );
+                    } //End Case: Fit Parameter List Has Meaning HWHM
+                    else if( iterParamFWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
+                        fPkWidth = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "FWHM" );
+                    } //End Case: Fit Parameter List Has Meaning FWHM
+                    
+                    //Record the PkPos for the summary stat (Used for checking uniformity)
+                    //(*iterEta).second.mset_fClustADC_Fit_PkPos.insert( getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.mset_fClustADC_Fit_PkPos.insert( fPkPos );
                     
                     //Store Fit parameters - NormChi2
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
                     
                     //Store Fit parameters - Peak Position (from fit)
-                    (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                    (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    //(*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, fPkPos );
+                    //(*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, fPkPosErr );
                     
-                    
+                    //Store Fit parameters - Peak Resolution (from fit)
+                    (*iterEta).second.gEta_ClustADC_Fit_PkRes->SetPoint(iPoint, (*iterSlice).second.fPos_Center, fPkWidth / fPkPos );
+                    (*iterEta).second.gEta_ClustADC_Fit_PkRes->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, sqrt( pow( fPkWidthErr / fPkPos, 2) + pow( ( fPkPosErr * fPkWidth ) / ( fPkPos * fPkPos), 2 ) ) );
                 } //End Case: Valid Fit!!!
                 else{ //Case: Invalid Fit (minimizer did not find minumum)
                     //Store Fit parameters - Peak Position (from fit); when failing
-                    (*iterEta).second.gEta_ClustADC_Fit_Failures->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
-                    (*iterEta).second.gEta_ClustADC_Fit_Failures->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    //(*iterEta).second.gEta_ClustADC_Fit_Failures->SetPoint(iPoint, (*iterSlice).second.fPos_Center, getPeakPos( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.gEta_ClustADC_Fit_Failures->SetPoint(iPoint, (*iterSlice).second.fPos_Center, fPkPos );
+                    //(*iterEta).second.gEta_ClustADC_Fit_Failures->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, getPeakPosError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC ) );
+                    (*iterEta).second.gEta_ClustADC_Fit_Failures->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, fPkPosErr );
                 } //End Case: Invalid Fit (minimizer did not find minum)
             } //End Loop Over Slices
             
@@ -226,6 +230,40 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
     
     return;
 } //End AnalyzeResponseUniformityClusters::fitHistos()
+
+//Loops through the detector and initializes all cluster graphs
+void AnalyzeResponseUniformityClusters::initGraphsClusters(){
+    //Variable Declaration
+    
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        //Initialize Response uniformity graphs - Fit norm Chi2
+        (*iterEta).second.gEta_ClustADC_Fit_NormChi2 = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_NormChi2" ) ).c_str() );
+        
+        //Initialize Response uniformity graphs - Fit peak pos
+        (*iterEta).second.gEta_ClustADC_Fit_PkPos = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Fit_PkPos->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_PkPos" ) ).c_str() );
+        
+        //Initialize Response uniformity graphs - Fit peak resolution
+        (*iterEta).second.gEta_ClustADC_Fit_PkRes = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Fit_PkRes->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_PkRes" ) ).c_str() );
+        
+        //Initialize Response uniformity graphs - Positions Were Fit Fails
+        (*iterEta).second.gEta_ClustADC_Fit_Failures = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Fit_Failures->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Fit_Failures" ) ).c_str() );
+        
+        //Initialize Response uniformity graphs - Spec Number of Peaks
+        (*iterEta).second.gEta_ClustADC_Spec_NumPks = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Spec_NumPks->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Spec_NumPks" ) ).c_str() );
+        
+        //Initialize Response uniformity graphs - Spec Peak Pos
+        (*iterEta).second.gEta_ClustADC_Spec_PkPos = make_shared<TGraphErrors>( TGraphErrors( aSetup.iUniformityGranularity * (*iterEta).second.map_sectorsPhi.size() ) );
+        (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetName( ( getNameByIndex( (*iterEta).first, -1, -1, "g", "clustADC_Spec_PkPos" ) ).c_str() );
+    } //End Loop Over iEta Sectors
+    
+    return;
+} //End AnalyzeResponseUniformityClusters::initGraphsClusters()
 
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityClusters::initHistosClusters(){
@@ -627,78 +665,6 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
         return;
     } //End Check if File Failed to Open Correctly
     
-    //Simplied to just call the method below
-    /*
-    //Loop Over Stored iEta Sectors
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Get Directory
-        //-------------------------------------
-        //Check to see if the directory exists already
-        TDirectory *dir_SectorEta = ptr_fileOutput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
-        
-        //If the above pointer is null the directory does NOT exist, create it
-        if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
-            dir_SectorEta = ptr_fileOutput->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
-        } //End Case: Directory did not exist in file, CREATE
-        
-        //Debugging
-        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
-        
-        //Store Fits - SectorEta Level
-        //-------------------------------------
-        dir_SectorEta->cd();
-        (*iterEta).second.gEta_ClustADC_Fit_NormChi2->Write();
-        (*iterEta).second.gEta_ClustADC_Fit_PkPos->Write();
-        (*iterEta).second.gEta_ClustADC_Fit_Failures->Write();
-        
-        (*iterEta).second.gEta_ClustADC_Spec_NumPks->Write();
-        (*iterEta).second.gEta_ClustADC_Spec_PkPos->Write();
-        
-        //Loop Over Stored iPhi Sectors within this iEta Sector
-        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
-            //Get Directory
-            //-------------------------------------
-            //Check to see if the directory exists already
-            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
-            
-            //If the above pointer is null the directory does NOT exist, create it
-            if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
-                dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
-            } //End Case: Directory did not exist in file, CREATE
-            
-            //Debugging
-            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
-            
-            //Store Fits - SectorPhi Level
-            //-------------------------------------
-            dir_SectorPhi->cd();
-            
-            //No Fits defined at this level - yet
-            
-            //Slices
-            //Now that all clusters have been analyzed we extract the slices
-            for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
-                
-                //Get Directory
-                //-------------------------------------
-                //Check to see if the directory exists already
-                TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( (*iterSlice).first ) ).c_str(), false, "GetDirectory"  );
-                
-                //If the above pointer is null the directory does NOT exist, create it
-                if (dir_Slice == nullptr) { //Case: Directory did not exist in file, CREATE
-                    dir_Slice = dir_SectorPhi->mkdir( ( "Slice" + getString( (*iterSlice).first ) ).c_str() );
-                } //End Case: Directory did not exist in file, CREATE
-                
-                //Store Fits - Slice Level
-                //-------------------------------------
-                dir_Slice->cd();
-                (*iterSlice).second.fitSlice_ClustADC->Write();
-            } //End Loop Over Slices
-        } //End Loop Over Stored iPhi Sectors
-    } //End Loop Over Stored iEta Sectors
-    */
-    
     //Call the store fits sequence
     storeFits(ptr_fileOutput);
     
@@ -744,6 +710,7 @@ void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile){
         dir_SectorEta->cd();
         (*iterEta).second.gEta_ClustADC_Fit_NormChi2->Write();
         (*iterEta).second.gEta_ClustADC_Fit_PkPos->Write();
+        (*iterEta).second.gEta_ClustADC_Fit_PkRes->Write();
         (*iterEta).second.gEta_ClustADC_Fit_Failures->Write();
         
         (*iterEta).second.gEta_ClustADC_Spec_NumPks->Write();
