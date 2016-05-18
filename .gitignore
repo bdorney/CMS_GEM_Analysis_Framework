@@ -6,6 +6,16 @@
 ################
 .DS_Store
 
+# Cluster Computing #
+#####################
+stderr/
+stderr/*
+stdlog/
+stdlog/*
+stdout/
+stdout/*
+scripts/submitFrameworkJob_*.sh
+
 # Compiled source #
 ###################
 *.o
