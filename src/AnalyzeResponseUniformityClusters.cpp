@@ -296,6 +296,12 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
+		//Special case for Cluster Position, the number of bins here should be factor 3 less than requested (eta case)
+		Timing::HistoSetup setupClustPosPhi	= aSetup.histoSetup_clustPos;
+		setupClustPosPhi.iHisto_nBins		= aSetup.iUniformityGranularity;
+		setupClustPosPhi.fHisto_xLower		= (*iterPhi).second.fPos_Xlow;
+		setupClustPosPhi.fHisto_xUpper 		= (*iterPhi).second.fPos_Xhigh;
+
             //Initialize iPhi Histograms - 1D
             (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
             (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
@@ -305,7 +311,8 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
             //Initialize iPhi Histograms - 2D
             //(*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( TH2F( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustADC_v_clustPos").c_str(),"Response Uniformity", aSetup.iUniformityGranularity, (*iterPhi).second.fPos_Xlow, (*iterPhi).second.fPos_Xhigh,300,0,15000) );
             //(*iterPhi).second.clustHistos.hADC_v_Pos->Sumw2();
-            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( getHistogram2D( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustPos, aSetup.histoSetup_clustADC ) );
+            //(*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( getHistogram2D( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustPos, aSetup.histoSetup_clustADC ) );
+            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( getHistogram2D( (*iterEta).first, (*iterPhi).first, setupClustPosPhi, aSetup.histoSetup_clustADC ) );
             
             //(*iterPhi).second.clustHistos.hADC_v_Size = make_shared<TH2F>( TH2F( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustADC_v_clustSize").c_str(),"Response by Strip Size", 20, 0, 20,300,0,15000) );
             //(*iterPhi).second.clustHistos.hADC_v_Size->Sumw2();
