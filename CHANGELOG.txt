@@ -20,6 +20,11 @@ Update: May 18th 2016
 ->The Peak resolution (PkWidth / PkPos) is now calculated by Uniformity::AnalyzerResponseUniformityClusters::fitHistos()
 ->Uniformity::VisualizeUniformity::getObsGraph now supports getting Uniformity::SectorEta::gEta_ClustADC_Fit_PkRes
 ->Summary TCanvas objects are now prepared in Uniformity::InterfaceAnalysis::storeResults()
+->Fixed a bug where the computing environment was not set correctly for the "hadd" command in root
+->Added two new template files config/configRun_Template_Grid.cfg and config/config_Template_Rerun.cfg for run modes Grid and Rerun (see README.txt)
+->Added two new run mode scripts at scripts/runMode_Grid.sh and scripts/runMode_Rerun.sh for Grid and Rerun modes, respectively (see README.txt)
+->Added one script for cleaning up Grid mode output at scripts/cleanGridFiles.sh
+->Fixed a bug in Uniformity::AnalyzeResponseUniformity::getHistogram2D() in which the TName of the output TH2F was not set correctly and causing AnalyzeResponseUniformityClusters::loadHistosFromFile() to seg fault
 
 Update: May 17th 2016
 ==================================================

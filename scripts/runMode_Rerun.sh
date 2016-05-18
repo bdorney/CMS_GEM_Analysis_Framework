@@ -1,6 +1,6 @@
 #!bin/zsh
 #Usage:
-#	source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+#	source runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
 
 #store the original directory
 DIR_ORIG=$PWD

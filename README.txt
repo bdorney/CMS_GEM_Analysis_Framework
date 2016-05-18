@@ -1259,7 +1259,7 @@
                 Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
                 #Input Config
                 ####################################
-                Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the
+                Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the framework
                 #Output Config
                 ####################################
                 Output_File_Option = 'RECREATE';

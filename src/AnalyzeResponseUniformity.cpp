@@ -275,7 +275,7 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
 TH2F AnalyzeResponseUniformity::getHistogram2D(int iEta, int iPhi, HistoSetup &setupHisto_X, HistoSetup &setupHisto_Y){
     //Variable Declaration
     string strPrefix = "h";
-    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto_Y.strHisto_Name + "_" + setupHisto_X.strHisto_Name );
+    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto_Y.strHisto_Name + "_v_" + setupHisto_X.strHisto_Name );
     
     //Histo Declaration
     TH2F ret_Histo(strName.c_str(), "", setupHisto_X.iHisto_nBins, setupHisto_X.fHisto_xLower, setupHisto_X.fHisto_xUpper, setupHisto_Y.iHisto_nBins, setupHisto_Y.fHisto_xLower, setupHisto_Y.fHisto_xUpper);

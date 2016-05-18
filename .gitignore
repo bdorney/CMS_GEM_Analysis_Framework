@@ -8,13 +8,14 @@
 
 # Cluster Computing #
 #####################
+config/configRun_RunNo*.cfg
 stderr/
 stderr/*
 stdlog/
 stdlog/*
 stdout/
 stdout/*
-scripts/submitFrameworkJob_*.sh
+scripts/submitFrameworkJob_RunNo*.sh
 
 # Compiled source #
 ###################
