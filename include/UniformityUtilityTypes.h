@@ -199,7 +199,7 @@ namespace Uniformity {
         //Two dimensional histograms
         std::shared_ptr<TH2F> hADC_v_Pos;       //ADC vs Position for all physics objects
         std::shared_ptr<TH2F> hADC_v_Size;      //ADC vs Size for all physics objects
-        //std::shared_ptr<TH2F> hPos_v_Sector;  //Position vs. Sector No. for all physics objects
+        std::shared_ptr<TH2F> hADC_v_Time;      //ADC vs Time for all physics objects
         
         //Three dimensional histograms
         
@@ -218,7 +218,8 @@ namespace Uniformity {
             if( other.hTime != NULL )   hTime   = std::make_shared<TH1F>( *other.hTime.get() );
             
             if( other.hADC_v_Pos != NULL ) hADC_v_Pos = std::make_shared<TH2F>( *other.hADC_v_Pos.get() );
-	    if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
+            if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
+            if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
         } //End Copy Constructor
         
         //Assignment operator
@@ -232,7 +233,8 @@ namespace Uniformity {
                 if( other.hTime != NULL )   hTime   = std::make_shared<TH1F>( *other.hTime.get() );
                 
                 if( other.hADC_v_Pos != NULL ) hADC_v_Pos = std::make_shared<TH2F>( *other.hADC_v_Pos.get() );
-		if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
+                if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
+                if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
             } //Protects against invalid self-assignment
             
             return *this;

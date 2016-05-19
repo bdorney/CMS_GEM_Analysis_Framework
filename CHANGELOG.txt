@@ -13,6 +13,11 @@ Update: May 19th 2016
 ->Added new utility function Uniformity::ceilPowerTen for recursively determining the smallest power of 10 larger than an input variable
 ->Uniformity::VisualizeUniformity::storeCanvasHistoSegmented() will now create a TCanvas where the y-axis is the same for every pad using the range [1e-1, Uniformity::ceilPowerTen]
 ->Fixed a bug where Uniformity::InterfaceAnalysis::analyzeInputFrmwrk() was not initializing the TGraphError objects used in a cluster fitting
+->Fixed two bugs in config/configRun_Template_Rerun.cfg and config/configRun_Template_Series.cfg
+->Added data member Uniformity::HistosPhysObj::hADC_v_Time showing ADC vs time bin for an input physics object
+->Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() now initializes SectorEta(Phi)::clustHistos::hADC_v_Time
+->Uniformity::AnalyzeResponseUniformityClusters::fillHistos() now fills SectorEta(Phi)::clustHistos::hADC_v_Time
+->Uniformity::AnalyzeResponseUniformityClusters::storeHistos() now writes SectorEta(Phi)::clustHistos::hADC_v_Time to output TFile
 
 Update: May 18th 2016
 ==================================================
