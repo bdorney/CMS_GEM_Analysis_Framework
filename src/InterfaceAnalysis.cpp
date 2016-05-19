@@ -295,7 +295,10 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
             
             //Load previous cluster histograms
             clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
-            
+
+		//Initialize Graphs
+		clustAnalyzer.initGraphsClusters();
+
             //Update the Detector!
             detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
