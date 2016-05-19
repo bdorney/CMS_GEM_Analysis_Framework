@@ -103,7 +103,10 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
     
     TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
     
+    //float fChi2 = -1;
     float fMin = -1e12, fMax = 1e12;
+    //float fNDF = -1;
+    float fNormChi2;
     float fPkPos = 0, fPkPosErr = 0;        //Peak Position
     //float fPkRes = 0, fPkResErr = 0;        //Peak Error
     float fPkWidth = 0, fPkWidthErr = 0;    //Peak Width
@@ -191,7 +194,10 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
                     (*iterEta).second.mset_fClustADC_Fit_PkPos.insert( fPkPos );
                     
                     //Store Fit parameters - NormChi2
-                    (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center, (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF() );
+                    fNormChi2 = (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF();
+                    if ( std::isinf(fNormChi2) ){ fNormChi2 = -1; }
+                    if ( std::isnan(fNormChi2) ){ fNormChi2 = -1; }
+                    (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center,  fNormChi2  );
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
                     
                     //Store Fit parameters - Peak Position (from fit)

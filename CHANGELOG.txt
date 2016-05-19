@@ -7,6 +7,10 @@
 *                                                *
 **************************************************
 
+Update: May 19th 2016
+==================================================
+->Observed a few cases where the normalized chi^2 (normchi2) value of a slice fit was INF or NaN, now code checks for this and sets normchi2 = -1 if this occurs.  This ensures the normchi2 distribution can always be drawn in ROOT.
+
 Update: May 18th 2016
 ==================================================
 ->Fixed a bug where the copy ctor and assignment operators of Uniformity::DetectorMPGD were not correctly setting the strDetName and strDetNameNoSpecChar data members
