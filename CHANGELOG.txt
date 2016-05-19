@@ -12,6 +12,10 @@ Update: May 19th 2016
 ->Observed a few cases where the normalized chi^2 (normchi2) value of a slice fit was INF or NaN, now code checks for this and sets normchi2 = -1 if this occurs.  This ensures the normchi2 distribution can always be drawn in ROOT.
 ->Added new utility function Uniformity::ceilPowerTen for recursively determining the smallest power of 10 larger than an input variable
 ->Uniformity::VisualizeUniformity::storeCanvasHistoSegmented() will now create a TCanvas where the y-axis is the same for every pad using the range [1e-1, Uniformity::ceilPowerTen]
+->Fixed two bugs in config/configRun_Template_Rerun.cfg and config/configRun_Template_Series.cfg
+->Added data member Uniformity::HistosPhysObj::hADC_v_Time showing ADC vs time bin for an input physics object
+->Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() now initializes SectorEta(Phi)::clustHistos::hADC_v_Time
+->Uniformity::AnalyzeResponseUniformityClusters::fillHistos() now fills SectorEta(Phi)::clustHistos::hADC_v_Time
 
 Update: May 18th 2016
 ==================================================
