@@ -715,6 +715,8 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
+    float fMaxBinVal = -1;
+    
     float fXPad_Low;
     float fXPad_High;
     
@@ -759,9 +761,28 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
     
-    //Loop Over the detector's Eta Sectors
+    //Loop Over the detector's Eta sectors to determine the Y-Axis range to be used for all plots
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        hObs = getObsHisto(strObsName, etaSector);
+        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+
+        if ( hObs->GetBinContent( hObs->GetMaximumBin() ) > fMaxBinVal ) { //Case: Check for the Maximum Bin Value
+            fMaxBinVal = hObs->GetBinContent( hObs->GetMaximumBin() );
+        } //End Case: Check for the Maximum Bin Value
+    } //End Loop Over Detector's Eta Sectors
+    
+    //Round fMaxBinVal to the nearest power of ten
+    //------------------------------------------------------
+    fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 0);
+    
+    //Loop Over the detector's Eta Sectors to make the TCanvas
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the SectorEta
+        etaSector = detMPGD.getEtaSector(iEta);
+        
         //Determine the Pad Coordinates
         if (iEta % 2 != 0){ //Case: iEta is Odd
             fXPad_Low   = 0.02;
@@ -787,10 +808,10 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         vec_padSectorObs[iEta-1]->Draw();
         vec_padSectorObs[iEta-1]->cd();
         
-        //Get the histogram & draw it
-        etaSector = detMPGD.getEtaSector(iEta);
-        hObs = getObsHisto(strObsName, etaSector);
-        vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        //Draw the histogram
+        //hObs = getObsHisto(strObsName, etaSector);
+        //vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
+        vec_hObs[iEta-1]->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
         vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         
         //Setup the TLatex for "CMS Preliminary"

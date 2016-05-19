@@ -32,6 +32,12 @@
  */
 
 namespace Uniformity {
+    //Math
+    //Recursive function, like std::ceil but rounds tInput upward, returning the smallest integral power of 10 that is not less than tInput.
+    //T -> type;
+    template<typename T>
+    T ceilPowerTen(T tInput, int iPower);
+    
     //printers
     //void printClassMethodMsg(std::string &strClass, std::string &strMethod, std::string &strMessage);
     void printClassMethodMsg(const char charClass[], const char charMethod[], const char charMsg[]);
@@ -41,6 +47,20 @@ namespace Uniformity {
     
     //Code Begins for TEMPLATED functions
     //========================================================================================
+    
+    //Math
+    //----------------------------------------------------------------------------------------
+    //Recursive function, like std::ceil but rounds tInput upward, returning the smallest integral power of 10 that is not less than tInput.
+    //T -> type;
+    template<typename T>
+    T ceilPowerTen(T tInput, int iPower){
+        if ( tInput > pow(10, iPower) ) {
+            return ceilPowerTen(tInput, ++iPower);
+        }
+        else{
+            return pow(10, iPower);
+        }
+    } //End ceilPowerTen()
     
     //string manipulation
     //----------------------------------------------------------------------------------------
