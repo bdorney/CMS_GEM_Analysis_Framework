@@ -149,6 +149,8 @@ namespace Uniformity {
         
         int iTimeBin;   //Time bin with the maximum ADC value; e.g. hitTimebin from amoreSRS in range [1,30]? Corresponds to tree adcX where X is an integer iTimeBin - 1;
         
+        short sADCIntegral;         //Integral of vec_sADC
+
         //For now ADC is not used
         //float fADC[30];           //ADC value of hit for time bin i; e.g. fADC[iTimeBine] gives the adc value at the assigned time bin
         std::vector<short> vec_sADC;//ADC value of hit for time bin i; e.g. vec_fADC[iTimeBine] gives the adc value at the assigned time bin
@@ -157,6 +159,8 @@ namespace Uniformity {
         Hit(){
             iPos_Y = iStripNum = iTimeBin = -1;
             
+	    sADCIntegral = 0;
+
             vec_sADC.resize(30);
         } //End Initialization
     }; //End Hit
@@ -200,6 +204,7 @@ namespace Uniformity {
         std::shared_ptr<TH2F> hADC_v_Pos;       //ADC vs Position for all physics objects
         std::shared_ptr<TH2F> hADC_v_Size;      //ADC vs Size for all physics objects
         std::shared_ptr<TH2F> hADC_v_Time;      //ADC vs Time for all physics objects
+	std::shared_ptr<TH2F> hADCMax_v_ADCInt;	//Max ADC of an object (from all time bins) vs. Integral of object's ADC (summing all time bins)
         
         //Three dimensional histograms
         
@@ -220,6 +225,7 @@ namespace Uniformity {
             if( other.hADC_v_Pos != NULL ) hADC_v_Pos = std::make_shared<TH2F>( *other.hADC_v_Pos.get() );
             if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
             if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
+            if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
         } //End Copy Constructor
         
         //Assignment operator
@@ -235,6 +241,7 @@ namespace Uniformity {
                 if( other.hADC_v_Pos != NULL ) hADC_v_Pos = std::make_shared<TH2F>( *other.hADC_v_Pos.get() );
                 if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
                 if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
+		if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
             } //Protects against invalid self-assignment
             
             return *this;

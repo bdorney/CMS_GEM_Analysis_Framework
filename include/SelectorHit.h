@@ -10,7 +10,9 @@
 #define ____SelectorHit__
 
 //C++ Includes
+#include <array>
 #include <stdio.h>
+#include <vector>
 
 //Framework Includes
 #include "DetectorMPGD.h"
@@ -24,7 +26,8 @@
 #include "TTree.h"
 
 //#ifdef __MAKECINT__
-#pragma link C++ class vector<short>+;
+//#pragma link C++ class vector<short>+;
+#pragma link C++ class vector<array<Short_t> >+;
 //#endif
 
 namespace Uniformity {

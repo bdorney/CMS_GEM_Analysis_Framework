@@ -3,9 +3,18 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 1.0.10                              *
-*	LAST UPDATE: May 18 2016                     *
+*	LAST UPDATE: May 20 2016                     *
 *                                                *
 **************************************************
+
+Update: May 20th 2016
+==================================================
+->Bug fix implemented in Uniformity::SelectorHit::setHits(); all hits in an event were incorrectly being assigned the ADC values of the 1st hit in the event.  A terrible hack has been implemented to resolve this...hopefully an elegant solution can be found...  Many thanks to M. Maggi for catching this!!!
+->Added short type data member Uniformity::Hit::sADCIntegral to Hit struct to represent the integral of the ADC values
+->Uniformity::SelectorHit::setHits now loads ADC of all time bins not just user requested window;
+->Uniformity::SelectorHit::setHits now integrates ADC from all time bins and sets value to Uniformity::Hit::sADCIntegral;
+->Added new histogram Uniformity::HistosPhysObj::hADCMax_v_ADCInt for tracking peak ADC value (in time) vs. intergarl of adc values (in time) to identify saturated hits
+->Uniformity::AnalyzeResponseUniformityHits() now initializes, fills, and stores SectorEta(Phi)::hitHistos::hADCMax_v_ADCInt
 
 Update: May 19th 2016
 ==================================================
