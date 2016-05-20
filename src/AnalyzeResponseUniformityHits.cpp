@@ -56,12 +56,12 @@ void AnalyzeResponseUniformityHits::fillHistos(){
                 (*iterEta).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
                 (*iterEta).second.hitHistos.hPos->Fill( (*iterHit).iStripNum );
                 (*iterEta).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin );
-		//(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
+		(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
 
                 //Fill iPhi Histograms
                 (*iterPhi).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
                 (*iterPhi).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin);
-		//(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
+		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
             } //End Loop Over Stored Hits
         } //End Loop Over iPhi Sectors
         
@@ -105,7 +105,7 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
         (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
         
         //Initialize iEta Histograms - 2D
-        //(*iterEta).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>(getHistogram2D((*iterEta).first, -1, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
+        (*iterEta).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>( getHistogram2D((*iterEta).first, -1, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
         
         //Debugging
         //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
@@ -117,7 +117,7 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
             (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
             
             //Initialize iPhi Histograms - 2D
-            //(*iterPhi).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>(getHistogram2D((*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
+            (*iterPhi).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>(getHistogram2D((*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
@@ -236,11 +236,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
         (*iterEta).second.hitHistos.hADC->Write();
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
-        //(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Write();
-
-        //(*iterEta).second.hitHistos.hADC->SetDirectory(gROOT);
-        //(*iterEta).second.hitHistos.hPos->SetDirectory(gROOT);
-        //(*iterEta).second.hitHistos.hTime->SetDirectory(gROOT);
+        (*iterEta).second.hitHistos.hADCMax_v_ADCInt->Write();
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -262,7 +258,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
             dir_SectorPhi->cd();
             (*iterPhi).second.hitHistos.hADC->Write();
             (*iterPhi).second.hitHistos.hTime->Write();
-		//(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Write();
+		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Write();
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
     
