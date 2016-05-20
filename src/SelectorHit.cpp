@@ -208,6 +208,10 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     //Initialize Tree Branch Address to retrieve the hit information (ADC values are done separately below)
     //------------------------------------------------------
     for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
+        //NOTE: It looks like this is incorrectly setting the ADC,  sHitADC needs to be some how 2 dimensional
+        //Right now sHitADC is being stored with the first hit of the event, and this being given to ALL hits in the event, then it's being updated on the next event
+        //i.e. it is wrong.
+        
         tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &sHitADC[i]);
     } //End Set Relevant Time Bins
     tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
