@@ -24,7 +24,7 @@
 #include "TTree.h"
 
 //#ifdef __MAKECINT__
-//#pragma link C++ class vector<short>+;
+#pragma link C++ class vector<short>+;
 //#endif
 
 namespace Uniformity {

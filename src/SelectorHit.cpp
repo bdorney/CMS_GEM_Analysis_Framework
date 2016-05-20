@@ -180,7 +180,9 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     Int_t iHitStrip[3072];
     Int_t iHitTimeBin[3072];
     
-    Short_t sHitADC[30] = {0};
+    //Short_t sHitADC[30] = {0};
+    //vector<Short_t> vec_sHitADC;
+    vector<Short_t *> vec_sHitADC;
     
     Hit hitStrip;
     
@@ -207,12 +209,16 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     
     //Initialize Tree Branch Address to retrieve the hit information (ADC values are done separately below)
     //------------------------------------------------------
-    for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
+    //for (int i=aSetupUniformity.selHit.iCut_TimeMin; i<=aSetupUniformity.selHit.iCut_TimeMax; ++i) { //Set Relevant Time Bins
+    for (int i=0; i<= 29; ++i) { //Set Relevant Time Bins
         //NOTE: It looks like this is incorrectly setting the ADC,  sHitADC needs to be some how 2 dimensional
         //Right now sHitADC is being stored with the first hit of the event, and this being given to ALL hits in the event, then it's being updated on the next event
         //i.e. it is wrong.
+        //Short_t sHitADC[3072] = {0};
+        Short_t * sHitADC;
         
-        tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &sHitADC[i]);
+        vec_sHitADC.push_back(sHitADC);
+        tree_Hits->SetBranchAddress( ("adc" + Timing::getString(i) ).c_str(), &vec_sHitADC[i]);
     } //End Set Relevant Time Bins
     tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
@@ -275,9 +281,15 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
             hitStrip.iPos_Y     = iHitPos_Y[j];
             hitStrip.iStripNum  = iHitStrip[j];
             hitStrip.iTimeBin   = iHitTimeBin[j];
-            //hitStrip.vec_sADC   = vec_sHitADC;
             
-            std::copy(std::begin(sHitADC), std::end(sHitADC), hitStrip.vec_sADC.begin() );
+            //Fill the ADC for this Hit
+            //hitStrip.vec_sADC   = vec_sHitADC;
+            //std::copy(std::begin(sHitADC), std::end(sHitADC), hitStrip.vec_sADC.begin() );
+            for (int k=0; k<=29; ++k) { //Loop Over APV Time Bins
+                Short_t * sHitADC = vec_sHitADC[k];
+                
+                hitStrip.vec_sADC.push_back( sHitADC[j] );
+            } //End Loop Over APV Time Bins
             
             //If the hit fails to pass the selection; skip it
             //---------------Hit Selection---------------
