@@ -170,24 +170,6 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //------------------------------------------------------
     //Keywords are defined in vec_strSupportedKeywords
     for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
-        //iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
-	
-        cout<<"j\tSup Keywrd\tInput Keywrd\tGuess\n";
-        for(int j=0; j < vec_strSupportedKeywords.size(); ++j){
-            cout<<j<<"\t"<<vec_strSupportedKeywords[j]<<"\t"<<setupHisto.vec_strFit_ParamIGuess[i]<<"\t"<< getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) <<endl;
-        }
-        
-        //cout << "iterVec_IGuess = " << iterVec_IGuess << endl;
-        //cout<<"iterVec_IGuess = ";
-        //cout<<*iterVec_IGuess<<endl;
-
-        /*if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
-            ret_Func.SetParameter(i, stofSafe( setupHisto.vec_strFit_ParamIGuess[i] ) );
-        } //End Case: No Keyword Found; Try to set a Numeric Value
-        else{ //Case: Keyword Found; Set Value based on Keyword
-            ret_Func.SetParameter(i, getValByKeyword( (*iterVec_IGuess), hInput, specInput ) );
-        }*/ //End Case: Keyword Found; Set Value based on Keyword
-        
         ret_Func.SetParameter(i, getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) );
     } //End Loop over parameters - Initial Guess
     
@@ -200,8 +182,6 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
         for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
             fLimit_Min = getParsedInput(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
             fLimit_Max = getParsedInput(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
-            
-		//cout<<"(fLimit_Min, fLimit_Max) = (" << fLimit_Min << ", " << fLimit_Max << ")\n";
 
             (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimits(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimits(i, fLimit_Max, fLimit_Min );
         } //End Loop over boundary parameters
