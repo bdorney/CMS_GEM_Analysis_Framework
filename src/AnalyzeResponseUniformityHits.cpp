@@ -134,7 +134,6 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
     return;
 } //End AnalyzeResponseUniformityHits::loadHistosFromFile()
 
-
 //Stores booked histograms (for those histograms that are non-null)
 //Takes a std::string which stores the physical filename as input
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){

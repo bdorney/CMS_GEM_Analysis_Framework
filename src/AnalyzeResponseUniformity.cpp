@@ -121,6 +121,20 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
 
+//Looks to see if the input string contains an element of vec_strSupportedKeywords
+bool AnalyzeResponseUniformity::containsKeyword(std::string & strInput){
+    bool bRetVal = false;
+
+    for(int i=0; i < vec_strSupportedKeywords.size(); ++i){
+	if( strInput.find( vec_strSupportedKeywords[i], 0) != std::string::npos ){ //Case: i^th element of vec_strSupportedKeywords found in strInput
+	   bRetVal = true;
+	   break;
+	} //End Case: i^th element of vec_strSupportedKeywords found in strInput
+    } //End Loop Over vec_strSupportedKeywords
+
+    return bRetVal;
+} //End AnalyzeResponseUniformity::containsKeyword()
+
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
     float fLimit_Max = setupHisto.fHisto_xUpper, fLimit_Min = setupHisto.fHisto_xLower;
@@ -156,8 +170,17 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //------------------------------------------------------
     //Keywords are defined in vec_strSupportedKeywords
     for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
-        iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
-        
+        //iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
+	
+	cout<<"j\tSup Keywrd\tInput Keywrd\n";
+	for(int j=0; j < vec_strSupportedKeywords.size(); ++j){
+		cout<<j<<"\t"<<vec_strSupportedKeywords[j]<<"\t"<<setupHisto.vec_strFit_ParamIGuess[i]<<endl;
+	}
+	
+	//cout << "iterVec_IGuess = " << iterVec_IGuess << endl;
+	//cout<<"iterVec_IGuess = ";
+	//cout<<*iterVec_IGuess<<endl;
+
         if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
             ret_Func.SetParameter(i, stofSafe( setupHisto.vec_strFit_ParamIGuess[i] ) );
         } //End Case: No Keyword Found; Try to set a Numeric Value

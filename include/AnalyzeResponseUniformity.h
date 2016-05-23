@@ -12,6 +12,7 @@
 //C++ Includes
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <iterator>
 #include <map>
 #include <memory>
@@ -101,8 +102,12 @@ namespace Uniformity {
     protected:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
+	//Calculates Summary Statistics        
+	void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
         
+	//Looks to see if the input string contains an element of vec_strSupportedKeywords
+	bool containsKeyword(std::string & strInput);
+
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         
@@ -142,12 +147,12 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         std::string strAnalysisName;
         
-        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "FWHM", "HWHM" "MEAN","PEAK","SIGMA"}; //Supported Keywords for fit setup
+        const std::vector<std::string> vec_strSupportedKeywords = {"AMPLITUDE", "FWHM", "HWHM", "MEAN","PEAK","SIGMA"}; //Supported Keywords for fit setup
         
         Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         
         Uniformity::DetectorMPGD detMPGD; //Link to header file in AnalyzeResponseUniformity.cpp; Detector object
-        
+
     }; //End class AnalyzeResponseUniformity
 } //End namespace Uniformity
 
