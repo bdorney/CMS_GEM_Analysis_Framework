@@ -142,7 +142,7 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
                 for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
-                    vec_fFitRange.push_back( getFitBoundary( (*iterRange), (*iterSlice).second.hSlice_ClustADC, specADC ) );
+                    vec_fFitRange.push_back( getParsedInput( (*iterRange), (*iterSlice).second.hSlice_ClustADC, specADC ) );
                 } //End Loop Over Fit Range
                 
                 //Perform Fit & Store the Result

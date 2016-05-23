@@ -102,20 +102,23 @@ namespace Uniformity {
     protected:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-	//Calculates Summary Statistics        
-	void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
+        //Calculates Summary Statistics
+        void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
         
-	//Looks to see if the input string contains an element of vec_strSupportedKeywords
-	bool containsKeyword(std::string & strInput);
-
+        //Looks to see if the input string contains an element of vec_strSupportedKeywords
+        //bool containsKeyword(std::string & strInput);
+        
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         
         //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
         TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
         
-        //Based on an input expression (strInputExp) returns the boundary of a fit parameter
-        float getFitBoundary(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);
+        //strInput is understood to be a number or an algebraic expression
+        //If strInput contains a substr matching to one or more elements of vec_strSupportedKeywords it is treated as an algebraic expression
+        //If so it parses the expression and returns a numeric value
+        //If not it is treated as a number and attempts to convert strInput directly
+        float getParsedInput(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);
         
         //Returns a TGraph Errors whose parameters match those defined in the input HistoSetup object
         TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);

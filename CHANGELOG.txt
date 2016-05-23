@@ -2,10 +2,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.10                              *
-*	LAST UPDATE: May 20 2016                     *
+*	VERSION: 1.0.11                              *
+*	LAST UPDATE: May 23 2016                     *
 *                                                *
 **************************************************
+
+Update: May 23rd 2016
+==================================================
+->Renaming Uniformity::AnalyzeResponseUniformity::getFitBoundary() to getParsedInput() since this method is not explicit to the fit boundary but has multiple use cases
+->Fixed a bug where Uniformity::AnalyzeResponseUniformity::getFit() was not properly setting the intial guess of a fit for the case where the user enters a complex expression
 
 Update: May 20th 2016
 ==================================================

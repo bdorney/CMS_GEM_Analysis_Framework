@@ -122,7 +122,7 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
 } //End AnalyzeResponseUniformity::calcStatistics()
 
 //Looks to see if the input string contains an element of vec_strSupportedKeywords
-bool AnalyzeResponseUniformity::containsKeyword(std::string & strInput){
+/*bool AnalyzeResponseUniformity::containsKeyword(std::string & strInput){
     bool bRetVal = false;
 
     for(int i=0; i < vec_strSupportedKeywords.size(); ++i){
@@ -133,7 +133,7 @@ bool AnalyzeResponseUniformity::containsKeyword(std::string & strInput){
     } //End Loop Over vec_strSupportedKeywords
 
     return bRetVal;
-} //End AnalyzeResponseUniformity::containsKeyword()
+}*/ //End AnalyzeResponseUniformity::containsKeyword()
 
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
@@ -143,7 +143,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     vector<float> vec_fFitRange;
     
     for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
-        vec_fFitRange.push_back( getFitBoundary( (*iterRange), hInput, specInput ) );
+        vec_fFitRange.push_back( getParsedInput( (*iterRange), hInput, specInput ) );
     } //End Loop Over Fit Range
     
     if (vec_fFitRange.size() > 1) {
@@ -172,21 +172,23 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
         //iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
 	
-	cout<<"j\tSup Keywrd\tInput Keywrd\n";
-	for(int j=0; j < vec_strSupportedKeywords.size(); ++j){
-		cout<<j<<"\t"<<vec_strSupportedKeywords[j]<<"\t"<<setupHisto.vec_strFit_ParamIGuess[i]<<endl;
-	}
-	
-	//cout << "iterVec_IGuess = " << iterVec_IGuess << endl;
-	//cout<<"iterVec_IGuess = ";
-	//cout<<*iterVec_IGuess<<endl;
+        cout<<"j\tSup Keywrd\tInput Keywrd\tGuess\n";
+        for(int j=0; j < vec_strSupportedKeywords.size(); ++j){
+            cout<<j<<"\t"<<vec_strSupportedKeywords[j]<<"\t"<<setupHisto.vec_strFit_ParamIGuess[i]<<"\t"<< getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) <<endl;
+        }
+        
+        //cout << "iterVec_IGuess = " << iterVec_IGuess << endl;
+        //cout<<"iterVec_IGuess = ";
+        //cout<<*iterVec_IGuess<<endl;
 
-        if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
+        /*if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
             ret_Func.SetParameter(i, stofSafe( setupHisto.vec_strFit_ParamIGuess[i] ) );
         } //End Case: No Keyword Found; Try to set a Numeric Value
         else{ //Case: Keyword Found; Set Value based on Keyword
             ret_Func.SetParameter(i, getValByKeyword( (*iterVec_IGuess), hInput, specInput ) );
-        } //End Case: Keyword Found; Set Value based on Keyword
+        }*/ //End Case: Keyword Found; Set Value based on Keyword
+        
+        ret_Func.SetParameter(i, getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) );
     } //End Loop over parameters - Initial Guess
     
     //Set Fit Parameters - Boundaries
@@ -196,8 +198,8 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
         //Here we use vec_strFit_ParamLimit_Min but we know it has the same number of parameters as vec_strFit_ParamLimit_Max
         //For each fit parameter, set the boundary
         for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
-            fLimit_Min = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
-            fLimit_Max = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
+            fLimit_Min = getParsedInput(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
+            fLimit_Max = getParsedInput(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
             
 		//cout<<"(fLimit_Min, fLimit_Max) = (" << fLimit_Min << ", " << fLimit_Max << ")\n";
 
@@ -220,7 +222,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     return ret_Func;
 } //End AnalyzeResponseUniformity::getFit()
 
-float AnalyzeResponseUniformity::getFitBoundary(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput){
+float AnalyzeResponseUniformity::getParsedInput(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput){
     //Variable Declaration
     map<string, float> map_key2Val;
     
@@ -257,7 +259,7 @@ float AnalyzeResponseUniformity::getFitBoundary(std::string &strInputExp, std::s
     else{ //Case: Numeric Input
         return stofSafe( strInputExp );
     } //End Case: Numeric Input
-} //End AnalyzeResponseUniformity::getFitBoundary()
+} //End AnalyzeResponseUniformity::getParsedInput()
 
 TGraphErrors AnalyzeResponseUniformity::getGraph(int iEta, int iPhi, HistoSetup & setupHisto){
     //Variable Declaration
