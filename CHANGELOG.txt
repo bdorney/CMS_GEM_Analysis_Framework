@@ -11,6 +11,7 @@ Update: May 23rd 2016
 ==================================================
 ->Renaming Uniformity::AnalyzeResponseUniformity::getFitBoundary() to getParsedInput() since this method is not explicit to the fit boundary but has multiple use cases
 ->Fixed a bug where Uniformity::AnalyzeResponseUniformity::getFit() was not properly setting the intial guess of a fit for the case where the user enters a complex expression
+->Fixed a bug which was causing a crash in re-run mode Uniformity::AnalyzeResponseUniformity::loadHistosFromFile was not loading the SectorEta(Phi)::clustHistos::hADC_v_Time cause a seg fault due to nullptr later on
 
 Update: May 20th 2016
 ==================================================
