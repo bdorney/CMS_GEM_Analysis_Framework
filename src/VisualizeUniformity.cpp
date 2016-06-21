@@ -309,7 +309,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
         
         //Reset name of output TGraph2D & TCanvas
         g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_AllEta").c_str() );
-        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_2D_AllEta" ).c_str() );
+        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized2D_AllEta" ).c_str() );
     } //End Case: User wants normalization
     
 	//Loop Over vec_tup3DPt and set members to g2DObs
