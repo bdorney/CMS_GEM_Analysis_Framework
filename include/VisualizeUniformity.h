@@ -10,9 +10,11 @@
 #define ____VisualizeUniformity__
 
 //C++ Includes
+#include <algorithm>
 #include <cmath>
 #include <iterator>
 #include <map>
+#include <numeric>
 #include <stdio.h>
 #include <string>
 #include <tuple>
@@ -23,6 +25,7 @@
 #include "AnalyzeResponseUniformity.h"
 //#include "DetectorMPGD.h" //Done in source file not header file due to inheritance/friendship
 #include "TimingUtilityFunctions.h"
+#include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -71,11 +74,11 @@ namespace Uniformity {
         
         //Makes a 2D plot of a given observable in the detector's active area
         //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
         
         //Makes a 2D plot of a given observable in the detector's active area
         //Takes a TFile *, which the canvas is writtent to, as input
-        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
         
         //Draws a given observable onto a single pad off canvas
         //Takes a std::string which stores the physical filename as input
@@ -187,6 +190,7 @@ namespace Uniformity {
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
+        
         Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         
         Uniformity::DetectorMPGD detMPGD;

@@ -19,6 +19,11 @@ using std::string;
 
 using namespace Uniformity;
 
+//Math
+//==========================================
+
+std::tuple<double, double, double> Uniformity::addTuple(const std::tuple<double, double, double> & a, const std::tuple<double, double, double> & b) { return a+b; };
+
 //Printers
 //==========================================
 

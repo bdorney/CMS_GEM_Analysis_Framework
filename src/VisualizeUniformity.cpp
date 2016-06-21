@@ -193,7 +193,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a std::string which stores the physical filename as input
-void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -212,7 +212,7 @@ void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName
     } //End Check if File Failed to Open Correctly
     
     //Call the method below
-    storeCanvasGraph2D(ptr_fileOutput, strObsName, strDrawOption);
+    storeCanvasGraph2D(ptr_fileOutput, strObsName, strDrawOption, bNormalize);
     
     //Close the File
     //------------------------------------------------------
@@ -223,11 +223,13 @@ void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a TFile *, which the canvas is writtent to, as input
-void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
     //Variable Declaration
+    double dAvg = 0.;
+    
     int iNumEta = detMPGD.getNumEtaSectors();
     
     shared_ptr<TGraphErrors> gObs; //Observable to be drawn
@@ -247,8 +249,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Set the name of the g2DObs
     //------------------------------------------------------
     g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
-	//g2DObs->SetName( ("g2D_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta").c_str() );
-
+	
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -294,6 +295,22 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
             if( !(dPx == dObs ) ) vec_tup3DPt.push_back( std::make_tuple(dPx, dPy, dObs) );
         } //End Loop Over Points of gObs
     } //End Loop Over Detector's Eta Sector
+    
+    //Normalize elements in vec_tup3DPt to the average of the elements of vec_tup3DPt
+    //------------------------------------------------------
+    if ( bNormalize ) { //Case: User wants normalization
+        //Determine average of strObsName
+        std::tuple<double, double, double> tup_Init = std::make_tuple(0.,0.,0.);
+        tup_Init = std::accumulate(vec_tup3DPt.begin(), vec_tup3DPt.end(), tup_Init, Uniformity::addTuple);
+        dAvg = std::get<2>(tup_Init) / vec_tup3DPt.size();
+        
+        //Normalize elements of vec_tup3DPt to average
+        std::transform(vec_tup3DPt.begin(), vec_tup3DPt.end(), vec_tup3DPt.begin(), Uniformity::divides(dAvg) );
+        
+        //Reset name of output TGraph2D & TCanvas
+        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_AllEta").c_str() );
+        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_2D_AllEta" ).c_str() );
+    } //End Case: User wants normalization
     
 	//Loop Over vec_tup3DPt and set members to g2DObs
     //------------------------------------------------------

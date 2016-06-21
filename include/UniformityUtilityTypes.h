@@ -201,10 +201,11 @@ namespace Uniformity {
         std::shared_ptr<TH1F> hTime;   //Time          "                    "
         
         //Two dimensional histograms
+        std::shared_ptr<TH2F> hADC_v_EvtNum;    //ADC vs Event Number for all physics objects (time series)
         std::shared_ptr<TH2F> hADC_v_Pos;       //ADC vs Position for all physics objects
         std::shared_ptr<TH2F> hADC_v_Size;      //ADC vs Size for all physics objects
         std::shared_ptr<TH2F> hADC_v_Time;      //ADC vs Time for all physics objects
-	std::shared_ptr<TH2F> hADCMax_v_ADCInt;	//Max ADC of an object (from all time bins) vs. Integral of object's ADC (summing all time bins)
+        std::shared_ptr<TH2F> hADCMax_v_ADCInt;	//Max ADC of an object (from all time bins) vs. Integral of object's ADC (summing all time bins)
         
         //Three dimensional histograms
         
