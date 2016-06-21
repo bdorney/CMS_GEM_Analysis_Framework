@@ -244,12 +244,20 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-	//TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
 
+    if (bNormalize) {
+        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized2D_AllEta" ).c_str() );
+    }
+    
     //Set the name of the g2DObs
     //------------------------------------------------------
-    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
-	
+    if (bNormalize) {
+        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_AllEta").c_str() );
+    }
+    else{
+        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
+    }
+    
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -306,10 +314,6 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
         
         //Normalize elements of vec_tup3DPt to average
         std::transform(vec_tup3DPt.begin(), vec_tup3DPt.end(), vec_tup3DPt.begin(), Uniformity::divides(dAvg) );
-        
-        //Reset name of output TGraph2D & TCanvas
-        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_AllEta").c_str() );
-        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized2D_AllEta" ).c_str() );
     } //End Case: User wants normalization
     
 	//Loop Over vec_tup3DPt and set members to g2DObs
