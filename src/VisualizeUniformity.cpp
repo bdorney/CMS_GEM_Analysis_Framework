@@ -1096,8 +1096,8 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     //img->FromPad( inputCanvas.cd() );
     //img->WriteImage( ( strName + ".png" ).c_str() );
     
-    inputCanvas.SaveAs( ( strName + ".pdf" ).c_str(), "" );
-    inputCanvas.SaveAs( ( strName + ".png" ).c_str(), "" );
+    inputCanvas.SaveAs( ( strName + ".pdf" ).c_str(), "RECREATE" );
+    inputCanvas.SaveAs( ( strName + ".png" ).c_str(), "RECREATE" );
     
     return;
 } //End VisualizeUniformity::save2png()

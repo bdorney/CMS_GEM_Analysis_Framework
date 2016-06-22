@@ -10,6 +10,9 @@
 Update: June 22nd 2016
 ==================================================
 ->Added method Uniformity::VisualizeUniformity::save2png() for saving produced TCanvas objects to *.png files
+->Added new data member Uniformity::RunSetup::bVisPlots_AutoSaving for user to toggle call to VisualizeUniformity::save2png() on/off
+->Updated Uniformity::ParameterLoaderRun::loadRunParameters() to search for field Visualize_AutoSaveImages to set RunSetup::bVisPlots_AutoSaving with
+->Updated config/configRun.cfg, config/configRun_Template_Rerun.cfg, and config/configRun_Template_Series.cfg to have the Visualize_AutoSaveImages present
 
 Update: June 21st 2016
 ==================================================
