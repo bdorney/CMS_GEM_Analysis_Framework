@@ -110,6 +110,7 @@ namespace Uniformity {
         
         bool bMultiOutput;              //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
         bool bVisPlots_PhiLines;        //true -> summary plots have phi lines segmenting sectors; false -> they do not
+        bool bVisPlots_AutoSaving;      //true -> automatically save canvases during visualize step; false -> do not
         
         std::string strFile_Config_Ana;      //Name of analysis config file
         std::string strFile_Config_Map;      //Name of mapping file
@@ -131,6 +132,7 @@ namespace Uniformity {
             bMultiOutput = false;
             
             bVisPlots_PhiLines = true;
+            bVisPlots_AutoSaving = false;
             
             strFile_Config_Ana = "config/configAnalysis.cfg";
             strFile_Config_Map = "config/GE7MappingCMScernData2016.cfg";

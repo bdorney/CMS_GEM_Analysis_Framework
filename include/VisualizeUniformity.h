@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iterator>
 #include <map>
+//#include <memory>
 #include <numeric>
 #include <stdio.h>
 #include <string>
@@ -37,6 +38,7 @@
 #include "TGraphErrors.h"
 #include "TH1.h"
 #include "TH1F.h"
+//#include "TImage.h"
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -157,23 +159,31 @@ namespace Uniformity {
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Sets the Analysis Setup
-        void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
+        //Sets the flag for automatically saving canvases
+        virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
         
-	//Sets unique identifier for output TCanvas objects
-	/*void setCanvasIdent(std::string & strInput){ 
-		strCanvIdent = strCanvIdentNoSpec = strInput; 
-		strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
-		return; 
-	};*/
+        //Sets the Analysis Setup
+        //Implemented in parent class
+        //void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
+        
+        //Sets unique identifier for output TCanvas objects
+        /*void setCanvasIdent(std::string & strInput){
+         strCanvIdent = strCanvIdentNoSpec = strInput;
+         strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
+         return;
+         };*/
 
         //Sets the Detector
-        void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
+        //Implemented in parent class
+        //void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
         
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        
+        //Saves inputCanv as a *.png file
+        //The file is placed in the working directory
+        //The name of the file is the TName of the canvas
+        virtual void save2png(TCanvas & inputCanvas);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -190,12 +200,15 @@ namespace Uniformity {
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
+        bool bSaveCanvases;
         
-        Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
+        //std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
+        //std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
         
-        Uniformity::DetectorMPGD detMPGD;
-
-	//std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
-	//std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
+        //Implemented in parent class
+        //Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
+        
+        //Implemented in parent class
+        //Uniformity::DetectorMPGD detMPGD;
     }; //End class VisualizeUniformity
 } //End namespace Uniformity

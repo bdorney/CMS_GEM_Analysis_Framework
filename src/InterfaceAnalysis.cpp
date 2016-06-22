@@ -378,6 +378,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Visualize ) { //Case: Visualize Output
         visualizeUni.setAnalysisParameters(aSetup);
+        visualizeUni.setAutoSaveCanvas( rSetup.bVisPlots_AutoSaving );
         visualizeUni.setDetector(detMPGD);
         //visualizeUni.setCanvasIdent(rSetup.strDetName);
         
