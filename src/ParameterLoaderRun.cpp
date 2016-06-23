@@ -107,6 +107,9 @@ void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMo
                     else if ( pair_strParam.first.compare("VISUALIZE_DRAWPHILINES") == 0 ) {
                         inputRunSetup.bVisPlots_PhiLines = convert2bool(pair_strParam.second, bExitSuccess);
                     }
+                    else if ( pair_strParam.first.compare("VISUALIZE_AUTOSAVEIMAGES") == 0 ) {
+                        inputRunSetup.bVisPlots_AutoSaving = convert2bool(pair_strParam.second, bExitSuccess);
+                    }
                     else if ( pair_strParam.first.compare("CONFIG_ANALYSIS") == 0 ) {
                         inputRunSetup.strFile_Config_Ana = pair_strParam.second;
                     }

@@ -11,6 +11,7 @@
 
 //C++ Includes
 #include <algorithm>
+#include <utility>
 
 //Framework Includes
 
@@ -23,11 +24,32 @@
  */
 
 namespace Uniformity {
+    //std::tuple addition operator
+    template<typename T1, typename T2, typename T3>
+    std::tuple<T1, T2, T3> operator+(const std::tuple<T1, T2, T3> & a,
+                                  const std::tuple<T1, T2, T3> & b)
+    {
+        return std::make_tuple(std::get<0>(a) + std::get<0>(b), std::get<1>(a) + std::get<1>(b), std::get<2>(a) + std::get<2>(b) );
+    }; //End std::tuple addition operator
+    
+    //UnaryPredicate - divides input by a scalar
+    struct divides{
+        double dVal;
+        
+        //Constructor
+        divides(double dInput){ dVal = dInput; }
+        
+        std::tuple<double, double, double> operator()(std::tuple<double, double, double> a){
+            
+            return std::make_tuple( std::get<0>(a) / dVal, std::get<1>(a) / dVal, std::get<2>(a) / dVal );
+        }
+    };
+    
     //UnaryPredicate - returns true if greater than
     struct greaterThan{
         float fVal;
         
-        //Initialization
+        //Constructor
         greaterThan(float fInput){
             fVal = fInput;
         }
@@ -43,7 +65,7 @@ namespace Uniformity {
     struct greaterThanOrEqual{
         float fVal;
         
-        //Initialization
+        //Constructor
         greaterThanOrEqual(float fInput){
             fVal = fInput;
         }
@@ -59,7 +81,7 @@ namespace Uniformity {
     struct lessThan{
         float fVal;
         
-        //Initialization
+        //Constructor
         lessThan(float fInput){
             fVal = fInput;
         }
@@ -75,7 +97,7 @@ namespace Uniformity {
     struct lessThanOrEqual{
         float fVal;
         
-        //Initialization
+        //Constructor
         lessThanOrEqual(float fInput){
             fVal = fInput;
         }
@@ -91,7 +113,7 @@ namespace Uniformity {
     struct outOfRange{
         float fLower, fUpper;
         
-        //Initialization
+        //Constructor
         outOfRange(float f1, float f2){
             fLower = std::min(f1,f2);
             fUpper = std::max(f1,f2);
@@ -108,7 +130,7 @@ namespace Uniformity {
     struct inRange{
         float fLower, fUpper;
         
-        //Initialization
+        //Constructor
         inRange(float f1, float f2){
             fLower = std::min(f1,f2);
             fUpper = std::max(f1,f2);

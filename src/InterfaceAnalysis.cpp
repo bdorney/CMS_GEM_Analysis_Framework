@@ -378,8 +378,9 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Visualize ) { //Case: Visualize Output
         visualizeUni.setAnalysisParameters(aSetup);
+        visualizeUni.setAutoSaveCanvas( rSetup.bVisPlots_AutoSaving );
         visualizeUni.setDetector(detMPGD);
-	//visualizeUni.setCanvasIdent(rSetup.strDetName);
+        //visualizeUni.setCanvasIdent(rSetup.strDetName);
         
         if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
             map_hit_ObsAndDrawOpt["HitADC"]="E1";
@@ -405,9 +406,12 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
                 map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";
                 
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
-                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2");
-                //visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","colz");
-                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkRes","TRI2");
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2",false);
+                //visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","colz",false);
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2",true);
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkRes","TRI2",false);
+                //visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkRes","colz",false);
+                visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkRes","TRI2",true);
             } //End Case: Fitting
         } //End Case: Cluster Analysis
     } //End Case: Visualize Output

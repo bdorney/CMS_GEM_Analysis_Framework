@@ -23,13 +23,15 @@ using namespace Uniformity;
 
 //Default Constructor
 VisualizeUniformity::VisualizeUniformity(){
+    bSaveCanvases = false;
     //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Default Constructor
 
 //Constructor with Setup & Detector inputs
 VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet){
-    aSetup  = inputSetup;
-    detMPGD = inputDet;
+    aSetup          = inputSetup;
+    bSaveCanvases   = false;
+    detMPGD         = inputDet;
     //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Constructor with Setup & Detector inputs
 
@@ -85,8 +87,8 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
 
     //Make the Canvas
     //------------------------------------------------------
-    TCanvas canvDetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    //TCanvas canvDetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
 
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -137,7 +139,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     //Draw mgraph_Obs
     //------------------------------------------------------
-    canvDetSum.cd();
+    canv_DetSum.cd();
     mgraph_Obs->Draw( strDrawOption.c_str() );
     
     //Setup the TLatex for "CMS Preliminary"
@@ -152,7 +154,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
         for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
             //Ensure the canvas is the active canvas (it should be already but who knows...)
-            canvDetSum.cd();
+            canv_DetSum.cd();
             
             //Declare the TLatex
             TLatex latex_PhiSector;
@@ -183,7 +185,8 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
-    canvDetSum.Write();
+    canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
     mgraph_Obs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -193,7 +196,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a std::string which stores the physical filename as input
-void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -212,7 +215,7 @@ void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName
     } //End Check if File Failed to Open Correctly
     
     //Call the method below
-    storeCanvasGraph2D(ptr_fileOutput, strObsName, strDrawOption);
+    storeCanvasGraph2D(ptr_fileOutput, strObsName, strDrawOption, bNormalize);
     
     //Close the File
     //------------------------------------------------------
@@ -223,11 +226,13 @@ void VisualizeUniformity::storeCanvasGraph2D(std::string & strOutputROOTFileName
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a TFile *, which the canvas is writtent to, as input
-void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
     //Variable Declaration
+    double dAvg = 0.;
+    
     int iNumEta = detMPGD.getNumEtaSectors();
     
     shared_ptr<TGraphErrors> gObs; //Observable to be drawn
@@ -242,13 +247,20 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-	//TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
 
+    if (bNormalize) {
+        canv_DetSum.SetName( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized2D_AllEta" ).c_str() );
+    }
+    
     //Set the name of the g2DObs
     //------------------------------------------------------
-    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
-	//g2DObs->SetName( ("g2D_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta").c_str() );
-
+    if (bNormalize) {
+        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Normalized_AllEta").c_str() );
+    }
+    else{
+        g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
+    }
+    
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -294,6 +306,18 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
             if( !(dPx == dObs ) ) vec_tup3DPt.push_back( std::make_tuple(dPx, dPy, dObs) );
         } //End Loop Over Points of gObs
     } //End Loop Over Detector's Eta Sector
+    
+    //Normalize elements in vec_tup3DPt to the average of the elements of vec_tup3DPt
+    //------------------------------------------------------
+    if ( bNormalize ) { //Case: User wants normalization
+        //Determine average of strObsName
+        std::tuple<double, double, double> tup_Init = std::make_tuple(0.,0.,0.);
+        tup_Init = std::accumulate(vec_tup3DPt.begin(), vec_tup3DPt.end(), tup_Init, Uniformity::addTuple);
+        dAvg = std::get<2>(tup_Init) / vec_tup3DPt.size();
+        
+        //Normalize elements of vec_tup3DPt to average
+        std::transform(vec_tup3DPt.begin(), vec_tup3DPt.end(), vec_tup3DPt.begin(), Uniformity::divides(dAvg) );
+    } //End Case: User wants normalization
     
 	//Loop Over vec_tup3DPt and set members to g2DObs
     //------------------------------------------------------
@@ -347,6 +371,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
     g2DObs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -501,6 +526,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
     
     //Do not close file_InputRootFile it is used elsewhere
     
@@ -637,6 +663,7 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
+    canv_DetSum.SetTheta(90);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -656,13 +683,13 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
     g2DObs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
     
     return;
 } //End VisualizeUniformity::storeCanvasHisto2D()
-
 
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
@@ -859,6 +886,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
     
     //Do not close file_InputRootFile it is used elsewhere
     
@@ -1056,6 +1084,24 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
     
     return;
 } //End VisualizeUniformity::storeListOfCanvasesHistoSegmented
+
+//Saves inputCanv as a *.png file
+//The file is placed in the working directory
+//The name of the file is the TName of the canvas
+void VisualizeUniformity::save2png(TCanvas & inputCanvas){
+    //Variable Declaration
+    string strName = inputCanvas.GetName();
+    
+    //std::shared_ptr<TImage> img = std::make_shared<TImage>( &TImage::Create() );
+    
+    //img->FromPad( inputCanvas.cd() );
+    //img->WriteImage( ( strName + ".png" ).c_str() );
+    
+    inputCanvas.SaveAs( ( strName + ".pdf" ).c_str(), "RECREATE" );
+    inputCanvas.SaveAs( ( strName + ".png" ).c_str(), "RECREATE" );
+    
+    return;
+} //End VisualizeUniformity::save2png()
 
 std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration

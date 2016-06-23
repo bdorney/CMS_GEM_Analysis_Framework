@@ -10,9 +10,12 @@
 #define ____VisualizeUniformity__
 
 //C++ Includes
+#include <algorithm>
 #include <cmath>
 #include <iterator>
 #include <map>
+//#include <memory>
+#include <numeric>
 #include <stdio.h>
 #include <string>
 #include <tuple>
@@ -23,6 +26,7 @@
 #include "AnalyzeResponseUniformity.h"
 //#include "DetectorMPGD.h" //Done in source file not header file due to inheritance/friendship
 #include "TimingUtilityFunctions.h"
+#include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -34,6 +38,7 @@
 #include "TGraphErrors.h"
 #include "TH1.h"
 #include "TH1F.h"
+//#include "TImage.h"
 #include "TLatex.h"
 #include "TLegend.h"
 #include "TLine.h"
@@ -71,11 +76,11 @@ namespace Uniformity {
         
         //Makes a 2D plot of a given observable in the detector's active area
         //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
         
         //Makes a 2D plot of a given observable in the detector's active area
         //Takes a TFile *, which the canvas is writtent to, as input
-        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
         
         //Draws a given observable onto a single pad off canvas
         //Takes a std::string which stores the physical filename as input
@@ -154,23 +159,31 @@ namespace Uniformity {
         
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Sets the Analysis Setup
-        void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
+        //Sets the flag for automatically saving canvases
+        virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
         
-	//Sets unique identifier for output TCanvas objects
-	/*void setCanvasIdent(std::string & strInput){ 
-		strCanvIdent = strCanvIdentNoSpec = strInput; 
-		strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
-		return; 
-	};*/
+        //Sets the Analysis Setup
+        //Implemented in parent class
+        //void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
+        
+        //Sets unique identifier for output TCanvas objects
+        /*void setCanvasIdent(std::string & strInput){
+         strCanvIdent = strCanvIdentNoSpec = strInput;
+         strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
+         return;
+         };*/
 
         //Sets the Detector
-        void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
+        //Implemented in parent class
+        //void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
         
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        
+        //Saves inputCanv as a *.png file
+        //The file is placed in the working directory
+        //The name of the file is the TName of the canvas
+        virtual void save2png(TCanvas & inputCanvas);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,11 +200,15 @@ namespace Uniformity {
         
         //Data Members
         //------------------------------------------------------------------------------------------------------------------------------------------
-        Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
+        bool bSaveCanvases;
         
-        Uniformity::DetectorMPGD detMPGD;
-
-	//std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
-	//std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
+        //std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
+        //std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
+        
+        //Implemented in parent class
+        //Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
+        
+        //Implemented in parent class
+        //Uniformity::DetectorMPGD detMPGD;
     }; //End class VisualizeUniformity
 } //End namespace Uniformity

@@ -1,5 +1,5 @@
 //
-//  GainUniformityUtilities.h
+//  UniformityUtilityFunctions.h
 //  
 //
 //  Created by Brian L Dorney on 25/01/16.
@@ -12,12 +12,15 @@
 //C++ Includes
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <iostream>
 #include <stdio.h>
 #include <sstream>
 #include <string>
+#include <utility>
 
 //Framework Includes
+#include "UniformityUtilityOperators.h"
 
 //ROOT Includes
 
@@ -33,6 +36,12 @@
 
 namespace Uniformity {
     //Math
+    //BinaryOperation - Uses the tuple addition operator defined in UniformityUtilityOperators.h for stl algorithms (e.g. std::accumulate)
+    //accumulate is unable to resolve this templated type
+    //template<typename T1, typename T2, typename T3>
+    //std::tuple<T1, T2, T3> addTuple(const std::tuple<T1, T2, T3> & a, const std::tuple<T1, T2, T3> & b) { return a+b; };
+    std::tuple<double, double, double> addTuple(const std::tuple<double, double, double> & a, const std::tuple<double, double, double> & b);
+    
     //Recursive function, like std::ceil but rounds tInput upward, returning the smallest integral power of 10 that is not less than tInput.
     //T -> type;
     template<typename T>
@@ -54,11 +63,11 @@ namespace Uniformity {
     //T -> type;
     template<typename T>
     T ceilPowerTen(T tInput, int iPower){
-        if ( tInput > pow(10, iPower) ) {
+        if ( tInput > std::pow(10, iPower) ) {
             return ceilPowerTen(tInput, ++iPower);
         }
         else{
-            return pow(10, iPower);
+            return std::pow(10, iPower);
         }
     } //End ceilPowerTen()
     
