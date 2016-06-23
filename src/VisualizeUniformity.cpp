@@ -663,6 +663,7 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
+    canv_DetSum.SetTheta(90);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
