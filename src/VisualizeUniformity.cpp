@@ -663,8 +663,9 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
-    canv_DetSum.SetTheta(90);
-    
+    //canv_DetSum.SetTheta(90);
+    //canv_DetSum.SetPhi(0.05);    
+
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
     TLatex latex_CMSPrelim;
@@ -682,6 +683,8 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
+    canv_DetSum.cd()->SetTheta(90);
+    canv_DetSum.cd()->SetPhi(0.05);
     canv_DetSum.Write();
     if (bSaveCanvases) { save2png(canv_DetSum); }
     g2DObs->Write();
