@@ -183,12 +183,16 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
                     //Get the Peak Width
                     auto iterParamHWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "HWHM");
                     auto iterParamFWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "FWHM");
+                    auto iterParamSigma= std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "SIGMA");
                     
                     if ( iterParamHWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning HWHM
                         fPkWidth = 2. * getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "HWHM" );
                     } //End Case: Fit Parameter List Has Meaning HWHM
                     else if( iterParamFWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
                         fPkWidth = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "FWHM" );
+                    } //End Case: Fit Parameter List Has Meaning FWHM
+                    else if( iterParamSigma != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
+                        fPkWidth = 2. * sqrt( 2. * log( 2. ) ) * getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "SIGMA" );
                     } //End Case: Fit Parameter List Has Meaning FWHM
                     
                     //Record the PkPos for the summary stat (Used for checking uniformity)
