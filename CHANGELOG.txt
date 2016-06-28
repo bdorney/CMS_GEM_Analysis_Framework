@@ -15,6 +15,8 @@ Update: June 28th 2016
 ->Changed Uniformity::divides in include/UniformityUtilityOperators.h to only divide the third element of a tuple; this fixes a bug where the normalized trapezoidal maps X & Y axis were also modified (in addition to the z-axis values)
 ->Added private Uniformity::VisualizeUniformity::getObsData() for returning a vector whose elements are the value of an inout strObsName from an input Uniformity::SectorEta
 ->Added overloaded method Uniformity::VisualizeUniformity::storeCanvasData() for plotting an input strObsName as a histogram and saving the canvas
+->Uniformity::InterfaceAnalysis::storeResults() now calls VisualizeUniformity::storeCanvasData() for strObsName = "ResponseFitPkPos"
+->Uniformity::VisualizeUniformity::getObsX for X = {Data, Graph, Histo} changed such that input strObsName is no longer passed by reference (since there is a conversion toupper that is sometimes not desired elsehwere)
 
 Update: June 23rd 2016
 ==================================================

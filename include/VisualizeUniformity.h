@@ -47,7 +47,7 @@
 #include "TPad.h"
 #include "TROOT.h"
 #include "TStyle.h"
-#include "TView.h"
+//#include "TView.h"
 
 //using namespace ROOT;
 
@@ -181,11 +181,11 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        std::vector<float> getObsData(std::string &strObsName, Uniformity::SectorEta &inputEta);
+        std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
         
-        std::shared_ptr<TGraphErrors> getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta);
+        std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta);
 
-        std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
+        std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::SectorEta &inputEta);
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
