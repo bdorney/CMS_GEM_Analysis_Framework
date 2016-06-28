@@ -47,6 +47,7 @@
 #include "TPad.h"
 #include "TROOT.h"
 #include "TStyle.h"
+#include "TView.h"
 
 //using namespace ROOT;
 
