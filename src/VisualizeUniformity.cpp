@@ -806,8 +806,9 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     //Round fMaxBinVal to the nearest power of ten
     //------------------------------------------------------
     //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 0);
-    fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 1, 0);
-    
+    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 1, 0);
+    fMaxBinVal = std::ceil(1.1 * (fMaxBinVal / 1e3) ) * 1e3;
+
     //Loop Over the detector's Eta Sectors to make the TCanvas
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
