@@ -41,7 +41,7 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
 } //End Constructor
 
 //Checks to see if the detector's uniformity is within requested amount
-void AnalyzeResponseUniformity::checkUniformity(){
+/*void AnalyzeResponseUniformity::checkUniformity(){
     //Check to make sure at least one peak exists
     if(detMPGD.vec_allADCPeaks.size() == 0){
 	cout<<"============Analysis Summary============\n";
@@ -72,7 +72,7 @@ void AnalyzeResponseUniformity::checkUniformity(){
     } //End Case: Detector OUTSIDE Tolerance
     
     return;
-} //check AnalyzeResponseUniformity::Uniformity
+}*/ //check AnalyzeResponseUniformity::Uniformity
 
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
 //Loads all TObjects found in the input ROOT file into detMPGD;

@@ -46,8 +46,8 @@ namespace Uniformity {
         //Copy Constructor
         DetectorMPGD(const DetectorMPGD& other){
             map_sectorsEta  = other.map_sectorsEta;
-		strDetName = other.strDetName;
-		strDetNameNoSpecChar = other.strDetNameNoSpecChar;
+            strDetName = other.strDetName;
+            strDetNameNoSpecChar = other.strDetNameNoSpecChar;
             vec_allADCPeaks = other.vec_allADCPeaks;
         };
         
@@ -60,40 +60,19 @@ namespace Uniformity {
         //Operators
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Overloaded Assignment Operator
-        //DetectorMPGD & operator=(const DetectorMPGD & other){
-	DetectorMPGD & operator=(DetectorMPGD other){
-		//std::cout<<"DetectorMPGD & operator = | this = " << this << std::endl;
-		//std::cout<<"DetectorMPGD & operator = | &other = " << &other << std::endl;
-
-		//std::cout<<"DetectorMPGD & operator = | Pre Assignment this->strDetName = " << this->strDetName << std::endl;
-		//std::cout<<"DetectorMPGD & operator = | Pre Assignment other.strDetName = " << other.strDetName << std::endl;
-		//std::cout<<"DetectorMPGD & operator = | Pre Assignment other.map_sectorsEta.size() = " << other.map_sectorsEta.size() << std::endl;
-	
-		//(this != &other) ? std::cout<<"they are not the same"<<std::endl : std::cout<<"they are the same"<< std::endl;
-
-            if (this != &other) { //Protects against invalid self-assignment
+        DetectorMPGD & operator=(DetectorMPGD other){
+		    if (this != &other) { //Protects against invalid self-assignment
                 this->map_sectorsEta  		= other.map_sectorsEta;
-		this->strDetName		= other.strDetName;
-
-		//std::cout<<"DetectorMPGD & operator = | Assignment this->strDetName = " << this->strDetName << std::endl;
-
-
-	        this->strDetNameNoSpecChar	= other.strDetNameNoSpecChar;
+                this->strDetName		= other.strDetName;
+                this->strDetNameNoSpecChar	= other.strDetNameNoSpecChar;
                 this->vec_allADCPeaks 		= other.vec_allADCPeaks;
             } //Protects against invalid self-assignment
             
-		//std::cout<<"DetectorMPGD & operator = | Post Assignment this->strDetName = " << this->strDetName << std::endl;
-
             return *this;
         } //End Overloaded Assignment Operator
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Initializes TObjects for hits, clusters, and graphs
-        //virtual void initializeDistsHits();
-        //virtual void initializeDistsClusters();
-        //virtual void initializeDistsGraphs();
-        
         //wipes all stored information
         virtual void reset(){
             map_sectorsEta.clear();
@@ -151,13 +130,6 @@ namespace Uniformity {
        
         //Setters - Methods that Set Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Sets the Analysis Setup
-        /*virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){
-            aSetup = inputSetup;
-            bAnaSetup = true;
-            return;
-        };*/
-        
         //Sets a cluster
         virtual void setCluster(Cluster &inputCluster);
         
@@ -176,9 +148,6 @@ namespace Uniformity {
         //Sets a single eta sector; over-writes what is currently stored (if any)
         virtual void setEtaSector(int iEta, SectorEta inputEtaSector){
             map_sectorsEta[iEta] = inputEtaSector;
-            /*if ( inputEtaSector.fWidth > fMaxSectorWidth) {
-             fMaxSectorWidth = inputEtaSector.fWidth;
-             }*/
             return;
         };
         
@@ -202,16 +171,7 @@ namespace Uniformity {
         //Sets the name of the detector
         virtual void setName(std::string strInput){
             strDetName = strDetNameNoSpecChar = strInput;
-	
-		//Debugging
-            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
-            		
-            //setNameNoSpecChar(strInput);
-		strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
-            
-		//Debugging
-            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
-            
+	 		strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
             return;
         };
         
@@ -221,15 +181,7 @@ namespace Uniformity {
         //Sets a version of the detector name without special characters
         virtual void setNameNoSpecChar(std::string strInput){
             strDetNameNoSpecChar = strInput;
-            
-            //Debugging
-            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (before) = " << strDetNameNoSpecChar << std::endl;
-            
             strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
-            
-            //Debugging
-            //std::cout<<"DetectorMPGD::setNameNoSpecChar() - strDetNameNoSpecChar (after) = " << strDetNameNoSpecChar << std::endl;
-            
             return;
         }
         

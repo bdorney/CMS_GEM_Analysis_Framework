@@ -67,11 +67,19 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Draws a given observable onto a single pad off canvas
+        //Draws the distribution of an observable onto a single pad of canvas
+        //Takes a std::string which stores the physical filename as input
+        virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+        
+        //Draws the distribution of an observable onto a single pad of canvas
+        //Takes a TFile *, which the canvas is written to, as input
+        virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+        
+        //Draws a given observable onto a single pad of canvas
         //Takes a std::string which stores the physical filename as input
         virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
-        //Draws a given observable onto a single pad off canvas
+        //Draws a given observable onto a single pad of canvas
         //Takes a TFile *, which the canvas is written to, as input
         virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
@@ -83,11 +91,11 @@ namespace Uniformity {
         //Takes a TFile *, which the canvas is writtent to, as input
         virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
         
-        //Draws a given observable onto a single pad off canvas
+        //Draws a given observable onto a single pad of canvas
         //Takes a std::string which stores the physical filename as input
         virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
-        //Draws a given observable onto a single pad off canvas
+        //Draws a given observable onto a single pad of canvas
         //Takes a TFile * which the histograms are written to as input
         virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
         
@@ -163,21 +171,6 @@ namespace Uniformity {
         //Sets the flag for automatically saving canvases
         virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
         
-        //Sets the Analysis Setup
-        //Implemented in parent class
-        //void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
-        
-        //Sets unique identifier for output TCanvas objects
-        /*void setCanvasIdent(std::string & strInput){
-         strCanvIdent = strCanvIdentNoSpec = strInput;
-         strCanvIdentNoSpec.erase( std::remove(strCanvIdentNoSpec.begin(), strCanvIdentNoSpec.end(), '/' ), strCanvIdentNoSpec.end() );
-         return;
-         };*/
-
-        //Sets the Detector
-        //Implemented in parent class
-        //void setDetector(Uniformity::DetectorMPGD inputDet){ detMPGD = inputDet; return; };
-        
     private:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -188,7 +181,8 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        //Could not make the below method work with the TGraphErrors Easily
+        std::vector<float> getObsData(std::string &strObsName, Uniformity::SectorEta &inputEta);
+        
         std::shared_ptr<TGraphErrors> getObsGraph(std::string &strObsName, Uniformity::SectorEta &inputEta);
 
         std::shared_ptr<TH1F> getObsHisto(std::string &strObsName, Uniformity::SectorEta &inputEta);
@@ -203,13 +197,5 @@ namespace Uniformity {
         //------------------------------------------------------------------------------------------------------------------------------------------
         bool bSaveCanvases;
         
-        //std::string strCanvIdent;	//Input CanvIdentifier for a given analysis run
-        //std::string strCanvIdentNoSpec;	//the above stripped of special characters (e.g. /) for use in filenames/paths
-        
-        //Implemented in parent class
-        //Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
-        
-        //Implemented in parent class
-        //Uniformity::DetectorMPGD detMPGD;
     }; //End class VisualizeUniformity
 } //End namespace Uniformity

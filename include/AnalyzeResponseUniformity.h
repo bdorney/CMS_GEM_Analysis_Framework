@@ -76,7 +76,7 @@ namespace Uniformity {
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
-        virtual void checkUniformity();
+        //virtual void checkUniformity();
         //bool checkUniformity(bool &bInput);
         
         //Getters - Methods that Get (i.e. Return) Something
