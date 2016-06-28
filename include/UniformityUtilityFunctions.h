@@ -46,6 +46,8 @@ namespace Uniformity {
     //T -> type;
     template<typename T>
     T ceilPowerTen(T tInput, int iPower);
+    template<typename T>
+    T ceilPowerTen(T tInput, int iScalar, int iPower);
     
     //printers
     //void printClassMethodMsg(std::string &strClass, std::string &strMethod, std::string &strMessage);
@@ -69,6 +71,21 @@ namespace Uniformity {
         else{
             return std::pow(10, iPower);
         }
+    } //End ceilPowerTen()
+    
+    template<typename T>
+    T ceilPowerTen(T tInput, int iScalar, int iPower){
+        if ( tInput > (iScalar * std::pow(10, iPower) ) ) { //Case: recursion
+            if ( iScalar >= 9 ) { //Case: Increment Exponent
+                return ceilPowerTen(tInput, 1, ++iPower);
+            } //End Case: Increment Exponent
+            else{ //Case: Increment Scalar
+                return ceilPowerTen(tInput, ++iScalar, iPower);
+            } //End Case: Increment Scalar
+        } //End Case: recursion
+        else{ //Case: value
+            return iScalar * std::pow(10, iPower);
+        } //End Case: value
     } //End ceilPowerTen()
     
     //string manipulation

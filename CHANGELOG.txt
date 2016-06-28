@@ -10,6 +10,7 @@
 Update: June 28th 2016
 ==================================================
 ->Added functionality for energy resolution to be determined when the user has given the "SIGMA" meaning to a parameter instead of FWHM (gaussian relation used)
+->Overloaded Uniformity::ceilPowerTen() in include/UniformityFunctions.h to increment by scalar multiples of powers of 10; also just powers of 10 still avaliable
 
 Update: June 23rd 2016
 ==================================================
