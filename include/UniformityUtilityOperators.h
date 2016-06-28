@@ -40,8 +40,8 @@ namespace Uniformity {
         divides(double dInput){ dVal = dInput; }
         
         std::tuple<double, double, double> operator()(std::tuple<double, double, double> a){
-            
-            return std::make_tuple( std::get<0>(a) / dVal, std::get<1>(a) / dVal, std::get<2>(a) / dVal );
+            //return std::make_tuple( std::get<0>(a) / dVal, std::get<1>(a) / dVal, std::get<2>(a) / dVal );
+            return std::make_tuple( std::get<0>(a), std::get<1>(a), std::get<2>(a) / dVal );
         }
     };
     
