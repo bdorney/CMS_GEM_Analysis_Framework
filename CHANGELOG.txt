@@ -9,6 +9,12 @@
 
 Update: June 28th 2016
 ==================================================
+->Updates to README.txt
+->Updated configRun_Template_Rerun.cfg files to have the "Detector_Name" name field by default
+->Adding config/Mapping_GE11-VII-L.cfg and config/Mapping_GE11-VII-S.cfg to the repository to serve as the geometry for the long and short generation VII detectors, respectively.
+
+Update: June 28th 2016
+==================================================
 ->Added functionality for energy resolution to be determined when the user has given the "SIGMA" meaning to a parameter instead of FWHM (gaussian relation used)
 ->Overloaded Uniformity::ceilPowerTen() in include/UniformityFunctions.h to increment by scalar multiples of powers of 10; also just powers of 10 still avaliable
 ->Segmented summary TCanvas objects prepared by Uniformity::VisualizeUniformity::storeCanvasHistoSegmented() no longer use Uniformity::ceilPowerTen() to set the Y-axis range.

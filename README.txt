@@ -26,6 +26,9 @@
     2. Installation Instructions
     3. Usage
         3.a. analyzeUniformity
+            3.a.i           Helper Script - Run Mode: Grid
+            3.a.ii          Helper Script - Run Mode: Rerun
+            3.a.iii         Helper Script - Run Mode: Series
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
@@ -77,6 +80,10 @@
                 4.e.iii.V   Example Config File - Mode: Grid
                 4.e.iii.VI  Example Config File - Mode: Re-Run
         4.f. Output ROOT File
+                4.f.i.      "Segmented" Plots Stored in "Summary" folder
+                4.f.ii.     "Dataset" Plots Stored in "Summary" folder
+                4.f.iii.    1D Fit Summary Plots Stored in "Summary" folder
+                4.f.iv.     2D Fit Trapezoidal Map Plots Stored in "Summary" folder
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -188,6 +195,52 @@
 
         ./analyzeUniformity config/configRun.cfg true
 
+            # 3.a.i Helper Script - Run Mode: Grid
+            # --------------------------------------------------------
+
+            The script:
+
+                scripts/runMode_Grid.sh
+
+            is for running the framework the lxplus batch submission system using the scheduler bsub.
+            However this script could be easily re-tooled for other computing systems/schedulers (e.g.
+            condor at FNAL CAF).  The expected synatx is:
+
+                source runMode_Grid.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Queue Names>
+
+            Where: "Data File Directory" is the PFP where the input data files to be analyzed are located,
+            "Config File - Analysis" is the PFN of the input analysis config file, "Config File - Mapping"
+            is the input mapping config file, and "Queue Names" are the requested submission queue on the
+            lxplus batch submmission system.  The available queues on lxplus are {8nm, 1nh, 8nh, 1nd} for
+            8 natural minutes, 1 natural hour, 8 natural hours, and 1 natural day, respectively.  Note on
+            lxplus "natural time" (e.g. 8 natural minutes) is the time on the wall clock that your job is
+            allocated.  This is not the CPU time that will spent processing your job.  Keep this in mind,
+            natural time != cpu time (generally natural time is longer).
+
+            Calling this script will create: 1) a run config file (described in Section 4.e.iii.V) for each
+            input data file found in the "Data File Directory;"
+
+            More coming "soon"
+
+
+            # 3.a.ii Helper Script - Run Mode: Rerun
+            # --------------------------------------------------------
+
+            Calling:
+
+                source runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+
+            More coming "soon"
+
+            # 3.a.iii Helper Script - Run Mode: Series
+            # --------------------------------------------------------
+
+            Calling:
+
+                source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+
+            More coming "soon"
+
 # 4. Documentation
 # ========================================================
 
@@ -228,6 +281,7 @@
         The ParameterLoaderAnalysis class interacts with objects who inherit from Selector and
         AnalyzResponseUniformity classes.
 
+        InterfaceAnalysis -> interface between main() and the framework; runs the analysis for loaded case.
         ParameterLoaderAmoreSRS -> creates a DetectorMPGD object
         ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
         ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
@@ -469,12 +523,17 @@
             SectorPhi, etc...).  Each data member of Uniformity::HistosPhysObj is a std::shared_ptr of a ROOT object,
             they are given specifically as:
 
-                HistosPhysObj::hADC         //ADC Spectrum for some physics object (e.g. clusters, hits, etc...)
-                HistosPhysObj::hMulti       //Multiplicity "                                                    "
-                HistosPhysObj::hPos         //Position     "                                                    "
-                HistosPhysObj::hSize        //Size         "                                                    "
-                HistosPhysObj::hTime        //Time bin (e.g. latency) "                                         "
-                HistosPhysObj::hADC_v_Pos   //ADC vs Position "                                                 "
+                HistosPhysObj::hADC             //ADC Spectrum for some physics object (e.g. clusters, hits, etc...)
+                HistosPhysObj::hMulti           //Multiplicity "                                                    "
+                HistosPhysObj::hPos             //Position     "                                                    "
+                HistosPhysObj::hSize            //Size         "                                                    "
+                HistosPhysObj::hTime            //Time bin (e.g. latency) "                                         "
+                HistosPhysObj::hADC_v_EvtNum    //PENDING IMPLEMENTATION ADC vs event number "                                             "
+                HistosPhysObj::hADC_v_Pos       //ADC vs Position "                                                 "
+                HistosPhysObj::hADC_v_Size      //ADC vs Size "                                                     "
+                HistosPhysObj::hADC_v_Time      //ADC vs Latency "                                                  "
+
+                HistosPhysObj::hADCMax_v_ADCInt //Max ADC (from all latency bins) of an object vs Integral of object's ADC (sum of all latency bins)
 
             For clusters hPos is the position along the detector trapezoid in mm with the detector axis being 0 mm in
             the iPhi=2 sector, negative (positive) position values occur in iPhi = 1 (3).  For hits the position is
@@ -492,6 +551,7 @@
                 Hit::iPos_Y         //Distance in mm from wide base of trapezoid to hit (e.g. vertical midpoint of iEta sector)
                 Hit::iStripNum      //Strip number of the hit, this ranges from 0 to 383?
                 Hit::iTimeBin       //Time bin, e.g. latency value, of the hit
+                Hit::sADCIntegral   //Integral of ADC values from all time bins
                 Hit::vec_sADC       //Vector of ADC values, each element of the vector represents ADC value at that time bin; e.g. vec_sADC[Hit::iTimeBin] gives the ADV value at the defined time bin
 
             Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
@@ -519,12 +579,15 @@
                 RunSetup::bMultiOutput          //True: one output file is made which represents the sum of all input files; false: one output file is made for each input file.  Note when bInputFromFrmwrk is true bMultiOutput must also be true.
 
                 RunSetup::bVisPlots_PhiLines    //True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
+                RunSetup::bVisPlots_AutoSaving  //True: automatically save TCanvas objects stored in the Summary folder of the output TFile as *.png and *.pdf files; false: do not.
 
                 RunSetup::strFile_Config_Ana    //PFN of input analysis config file
                 RunSetup::strFile_Config_Map    //PFN of input mapping config file
 
                 RunSetup::strFile_Output_Name   //PFN of output TFile to be created when bMultiOutput is false
                 RunSetup::strFile_Output_Option //Option for TFile, e.g. CREATE, RECRATE, UPDATE, etc...
+
+                RunSetup::strDetName            //Stores a string acting as the unique detector serial number.  Resolves ambiguity in TObject TName data members when opening multiple output TFiles.
 
             # 4.d.ii.VI SectorEta
             # --------------------------------------------------------
@@ -543,10 +606,10 @@
                 SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
                 SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
                 SectorEta::mset_fClustADC_Fit_PkPos     //Container storing peak position from Clust ADC Fit
-                SectorEta::vec_fClustADC_Fit_PkWidth    //Container storing peak width from Clust ADC Fit (not yet implemented)
                 SectorEta::mset_fClustADC_Spec_PkPos    //Container storing peak position from TSpectrum::Search() & TSpectrum::GetPositionX()
                 SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
                 SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
+                SectorEta::gEta_ClustADC_Fit_PkRes      //std::shared_ptr of a TGraphErrors storing ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC
                 SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
                 SectorEta::gEta_ClustADC_Spec_NumPks    //std::shared_ptr of a TGraphErrors storing number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
                 SectorEta::gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
@@ -1011,53 +1074,64 @@
             The following parameters are supported:
             #		<FIELD>             <DATA TYPE, DESCRIPTION>
 
-                Config_Analysis         string, PFN of the input analysis configuration file.
+                Config_Analysis             string, PFN of the input analysis configuration file.
 
-                Config_Mapping          string, PFN of the input mapping configuration file.
+                Config_Mapping              string, PFN of the input mapping configuration file.
 
-                Input_Is_Frmwrk_Output  boolean, set to true (false) if the input file/files is/are created
-                                        by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
-                                        option is set to true then Output_Individual must also be set to true.
+                Detector_Name               string, the serial number of the detector (do not include special
+                                            characters such as '/' but dashes '-' are allowed)
 
-                Output_File_Name        string, PFN of the output TFile.  Note that if Output_Individual is
-                                        set to true and Input_Is_Frmwrk_Output is set to false then the PFN
-                                        defined here is not used.  Instead the PFN of the input TFile, created
-                                        by amoreSRS, is used but the "dataTree.root" ending of the file name is
-                                        removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
-                                        to true then the PFN defined here is again not used.  Instead the PFN of
-                                        the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
-                                        filename is appended with "NewAna.root".  This could be potentially
-                                        improved in the future.
+                Input_Is_Frmwrk_Output      boolean, set to true (false) if the input file/files is/are created
+                                            by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
+                                            option is set to true then Output_Individual must also be set to true.
 
-                Output_File_Option      string, the option for the output TFile taken from the standard set
-                                        defined in the TFile documentation, e.g. "CREATE, NEW, READ, RECREATE, UPDATE"
+                Output_File_Name            string, PFN of the output TFile.  Note that if Output_Individual is
+                                            set to true and Input_Is_Frmwrk_Output is set to false then the PFN
+                                            defined here is not used.  Instead the PFN of the input TFile, created
+                                            by amoreSRS, is used but the "dataTree.root" ending of the file name is
+                                            removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
+                                            to true then the PFN defined here is again not used.  Instead the PFN of
+                                            the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
+                                            filename is appended with "NewAna.root".  This could be potentially
+                                            improved in the future.
 
-                Output_Individual       boolean, setting to true produces one output file for each input file.
-                                        Setting to false produces one output file that represents the entirity
-                                        of the analysis of all input files.  Note that this should only be set
-                                        to false if Input_Is_Frmwrk_Output is also set to false.
+                Output_File_Option          string, the option for the output TFile taken from the standard set
+                                            defined in the TFile documentation, e.g. "CREATE, NEW, READ,
+                                            RECREATE, UPDATE"
 
-                Ana_Reco_Clusters       boolean, set to true if you would like to the framework to reconstruct
-                                        clusters from input hits found in the amoreSRS input TFile. Setting to
-                                        false takes the clusters from the input amoreSRS TFile.  Right now this
-                                        field does nothing and is only a placeholder.
+                Output_Individual           boolean, setting to true produces one output file for each input file.
+                                            Setting to false produces one output file that represents the entirity
+                                            of the analysis of all input files.  Note that this should only be set
+                                            to false if Input_Is_Frmwrk_Output is also set to false.
 
-                Ana_Hits                boolean, setting to true will tell the framework to perform the analysis
-                                        of the input hits.
+                Ana_Reco_Clusters           boolean, set to true if you would like to the framework to reconstruct
+                                            clusters from input hits found in the amoreSRS input TFile. Setting to
+                                            false takes the clusters from the input amoreSRS TFile.  Right now this
+                                            field does nothing and is only a placeholder.
 
-                Ana_Clusters            boolean, setting to true will tell the framework to perform the analysis
-                                        of the input clusters.
+                Ana_Hits                    boolean, setting to true will tell the framework to perform the analysis
+                                            of the input hits.
 
-                Ana_Fitting             boolean, setting to true will tell the framework to fit the obtained
-                                        distributions.  Note that Ana_Clusters must also be true for those
-                                        distributions to be fitted.
+                Ana_Clusters                boolean, setting to true will tell the framework to perform the analysis
+                                            of the input clusters.
 
-                Visualize_Plots         boolean, setting to true will tell the framework to prepare several
-                                        TCanvases after analyzing all input files (Output_Individual = false)
-                                        or each input file (Output_Individual = true).
+                Ana_Fitting                 boolean, setting to true will tell the framework to fit the obtained
+                                            distributions.  Note that Ana_Clusters must also be true for those
+                                            distributions to be fitted.
 
-                Visualize_DrawPhiLines  boolean, setting to true will tell the framework to draw lines on the
-                                        summary TCanvases that show the iPhi segmentation.
+                Visualize_Plots             boolean, setting to true will tell the framework to prepare several
+                                            TCanvases after analyzing all input files (Output_Individual = false)
+                                            or each input file (Output_Individual = true).
+
+                Visualize_AutoSaveImages    boolean, setting to true will tell the framework to automatically create
+                                            *.png and *.pdf files of all TCanvases stored in the "Summary" folder.
+                                            The name of these files will match the TName of the corresponding TCanvas.
+                                            They will be found in the working directory (the directory you execute
+                                            the framework executable from).  If these files already exist they will
+                                            be over-written.
+
+                Visualize_DrawPhiLines      boolean, setting to true will tell the framework to draw lines on the
+                                            summary TCanvases that show the iPhi segmentation.
 
 
         # 4.e.iii.II  HEADER PARAMETERS - RUN_LIST
@@ -1126,6 +1200,9 @@
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
                 Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Detector
+                ####################################
+                Detector_Name = 'DETECTORNAME';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
@@ -1143,6 +1220,7 @@
                 #Visualizer Config
                 ####################################
                 Visualize_Plots = 'true';
+                Visualize_AutoSaveImages = 'true';
                 Visualize_DrawPhiLines = 'true';
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
@@ -1165,6 +1243,9 @@
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
                 Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Detector
+                ####################################
+                Detector_Name = 'GE1/1-VII-L-CERN-0001';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'true';    #indicates we are running on input created by the CMS_GEM_Analysis_Framework
@@ -1211,8 +1292,8 @@
         but the increase in analysis speed would be small in comparison since usually you are only interested
         in checking a new set of fit parameters on the previously obtained data.
 
-        Ideally you should submit this with a script/scheduler (not yet included in the repository but under
-        development) to a fast queue such as the 8 natural minute or 1 natural hour queues available on lxplus.
+        Ideally you should submit this with the provided script/runMode_Grid.sh script, included in the
+        repository, to a fast queue such as the 8 natural minute (8nm) or 1 natural hour (1nh) queue.
         The example config file is shown as:
 
             [BEGIN_RUN_INFO]
@@ -1257,6 +1338,9 @@
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
                 Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                #Detector
+                ####################################
+                Detector_Name = 'DETECTORNAME';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the framework
@@ -1273,6 +1357,7 @@
                 #Visualizer Config
                 ####################################
                 Visualize_Plots = 'true'; #true -> make summary canvas plots; false -> do not make summary canvas plots
+                Visualize_AutoSaveImages = 'false';
                 Visualize_DrawPhiLines = 'true'; #true -> draw iPhi lines; false -> do not draw iPhi lines
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
@@ -1316,10 +1401,89 @@
 
     One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
     for each cluster/hit observable.  The contents of these histograms is simply the sum of the
-    corresponding SectorEtaX histograms.
+    corresponding SectorEtaX histograms (e.g. TH1::Add() method).
 
-    The VisualizeUniformity class will offer additional TObjects (e.g. TCanvas, TH2F, etc...) to assist
-    the analyst in making the "pass/fail" statement.
+    Additionally the VisualizeUniformity class places additional TObjects (e.g. TCanvas, TMultiGraph, etc...)
+    to assist the analyst in making the "pass/fail" statement.  These are desribed below.
+
+        # 4.f.i. "Segmented" Plots Stored in "Summary" folder
+        # --------------------------------------------------------
+
+        Several TCanvas objects with TNames of the form:
+
+            canv_<Detector_Name>_<Observable>_AllEta_Segmented
+
+        will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
+        configRun.cfg file and "Observable" comes from the set {ClustPos, ClustADC, ClustSize, ClustTime}.
+
+        These will show a TCanvas with an array of TPads placed in a 2x4 grid (columns-by-rows).  Each TPad
+        will have ieta index written in the upper left corner of the pad and have the corresponding TObject
+        from this iEta value drawn on the pad.
+
+        # 4.f.ii. "Dataset" Plots Stored in "Summary" folder
+        # --------------------------------------------------------
+
+        Several TCanvas objects with TNames of the form:
+
+            canv_<Detector_Name>_<Observable>Dataset_AllEta
+
+        will be stored in the folder along with matching TH1F objects for each TCanvas with the
+        TName of the form:
+
+            h_Summary_<Observable>Dataset
+
+        Here the "Detector_Name" is the parameter defined in the given
+        configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos}, to be expanded at a later date.
+
+        The x-axis will be the <Observable> in question (e.g. for ResponseFitPkPos this will be the cluster ADC
+        of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution
+        of the observable in questin over the entire detector.  The TH1F in question will always have the bin
+        range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
+        of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
+        fit with a Gaussian whose mean and sigma parameters will be written on the TPad.  The percent error of
+        the dataset, defined as sigma / mean from the Gaussian, will also be displayed on the TPad.  This offers
+        an "at a glance" look at the total distribution for a given observable and may help understand an immediate
+        pass/fail condition.
+
+        # 4.f.iii. 1D Fit Summary Plots Stored in "Summary" folder
+        # --------------------------------------------------------
+
+        Several TCanvas objects with TNames of the form:
+
+            canv_<Detector_Name>_<FitObservable>_AllEta
+
+        will be stored in the folder along with matching TMultiGraph objects for each TCanvas with the
+        TName of the form:
+
+            mgraph_<Detector_Name>_<FitObservable>_AllEta
+
+        Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
+        is from the set {ResponseFitChi2, ResponseFitPkPos, ResponseFitPkRes} for the normalized Chi2 value
+        of the fit, determined peak position, and determined peak resolution (resolution = FWHM / position),
+        respectively.
+
+        # 4.f.iv. 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+        # --------------------------------------------------------
+
+        Several TCanvas objects with TNames of the form:
+
+            canv_<Detector_Name>_<FitObservable>2D_AllEta
+
+        will be stored in the folder along with matching TGraph2D objects for each TCanvas with the
+        TName of the form:
+
+            g2D_<Detector_Name>_<FitObservable>_AllEta
+
+        Note in the case of the TCanvas a "2D" is placed in the TName to distinguish it from the 1D case.
+        Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
+        is from the set {ResponseFitPkPos, ResponseFitPkPosNormalized, ResponseFitPkRes,
+        ResponseFitPkResNormalized}.  For the "Normalized" cases the z-axis at every point will be the point
+        divided by the mean of the dataset formed by all points of the FitObservable (e.g. z / z_avg);
+
+        These plots may take some time to load.  This is due to the rendering that is done by ROOT; be
+        patient.  Consider transfering the file to your local machine if it is not already.  Once they load
+        the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
+        of the detector and the Z-axis will be hte FitObservable.
 
     # 4.g. Source Code Name Conventions
     # --------------------------------------------------------
@@ -1357,7 +1521,7 @@
 
                     shared_ptr          For std::shared_ptr<T> follow the convention for type T.
 
-		    short		The sequence 's' should start the object name, e.g. sADC
+                    short               The sequence 's' should start the object name, e.g. sADC
 
                     string              The sequence 'str' should start the object name, e.g. "strName"
 
