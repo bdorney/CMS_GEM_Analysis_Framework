@@ -92,9 +92,9 @@
 # 1. Contributors & License
 # ========================================================
 
-    Contributors: S. Colafranceschi, B. Dorney, and J. Merlin
+    Contributors: B. Dorney
 
-    This package has been designed by B. Dorney with the help of J. Merlin & S. Colafranceschi.
+    This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi.
     The original selection & analysis algorithms are based off work done by J. Merlin.  This
     package makes use of several features from the CMS_GEM_TB_Timing repository (also by B. Dorney).
     Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this repository.
@@ -203,43 +203,106 @@
                 scripts/runMode_Grid.sh
 
             is for running the framework the lxplus batch submission system using the scheduler bsub.
-            However this script could be easily re-tooled for other computing systems/schedulers (e.g.
-            condor at FNAL CAF).  The expected synatx is:
+            This script will setup the run config file and launch one job for each input file in the
+            data file directory below.  The expected synatx is:
 
-                source runMode_Grid.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Queue Names>
+                source scripts/runMode_Grid.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Queue Names>
 
-            Where: "Data File Directory" is the PFP where the input data files to be analyzed are located,
-            "Config File - Analysis" is the PFN of the input analysis config file, "Config File - Mapping"
-            is the input mapping config file, and "Queue Names" are the requested submission queue on the
-            lxplus batch submmission system.  The available queues on lxplus are {8nm, 1nh, 8nh, 1nd} for
-            8 natural minutes, 1 natural hour, 8 natural hours, and 1 natural day, respectively.  Note on
-            lxplus "natural time" (e.g. 8 natural minutes) is the time on the wall clock that your job is
-            allocated.  This is not the CPU time that will spent processing your job.  Keep this in mind,
-            natural time != cpu time (generally natural time is longer).
+            Where: "Data File Directory" is the physical file path (PFP) where the input data files to
+            be analyzed are located, "Config File - Analysis" is the PFN of the input analysis config
+            file, "Config File - Mapping" is the input mapping config file, and "Queue Names" are the
+            requested submission queue on the lxplus batch submmission system.  The available queues
+            on lxplus are {8nm, 1nh, 8nh, 1nd} for 8 natural minutes, 1 natural hour, 8 natural hours,
+            and 1 natural day, respectively.
 
-            Calling this script will create: 1) a run config file (described in Section 4.e.iii.V) for each
-            input data file found in the "Data File Directory;"
+            Additionally for each job a run config file (described in Section 4.e.iii.V), named
+            config/configRun_RunNoX.cfg where X is the job number, will be created.  One script per job, named
+            scripts/submitFrameworkJob_RunNoX.sh, will created; this script will be what the job executes when
+            it runs.  Three directories will also be created, if they do not already exist, called $GEM_BASE/stderr,
+            $GEM_BASE/stdlog, and $GEM_BASE/stdout.  Each of these directories will respectively store the
+            stderr (stderr/frameworkErr_RunNoX.txt), stdlog (stdlog/frameworkLog_RunNoX.txt), and stdout
+            (stdout/frameworkOut_RunNoX.txt) files produced for each job.  The stderr file for a job should be
+            checked if a job fails to produce an output TFile.  The stdlog file for a job shows any output to
+            terminal that would be created if the executable was run locally.  The stdout file shows a summary
+            of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
 
-            More coming "soon"
+            After scripts/runMode_Grid.sh has submitted all your jobs it will dump some useful information for
+            how to check running jobs and kill running jobs if necessary.  The scripts/runMode_Grid.sh will also
+            show how to add all output TFiles together from command line using the "hadd" command.  After you have
+            added all TFiles together you should run the framework over this summary TFile in re-run mode to
+            perform the fitting and uniformity analysis.
 
+            After you have had a chance to investigate the created run config files, submission scripts, stderr,
+            stdlog, and stdout files you can safely remove them by calling:
+
+                source scripts/cleanGridFiles.sh
+
+            Eample:
+
+                source scripts/runMode_Grid.sh $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh
+                cd $DATA_QC5/GE11-VII-L-CERN-0001
+                hadd summaryFile_Ana.root *Ana.root
+                cd $GEM_BASE
+                source scripts/cleanGridFiles.sh
+                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+
+            NOTE: Modications to config/configRun_Template_Grid.cfg may lead to undefined behavior or failures;
+            it is recommended to not modify the template config file.
 
             # 3.a.ii Helper Script - Run Mode: Rerun
             # --------------------------------------------------------
 
-            Calling:
+            The script:
 
-                source runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+                scripts/runMode_Rerun.sh
 
-            More coming "soon"
+            is for running the framework over a previously produced framework output TFile. This script will
+            setup the run config file to re-run over each input file found in the data file directory below.
+            One output TFile will be produced for each input file.  The expected synatx is:
+
+                source scripts/runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+
+            Where: "Detector Name" is the detector serial number; and "Data File Directory," "Config File - Analysis,"
+            and "Config File - Mapping" are as described in Section 3.a.i.
+
+            After calling this script it is recommended to cross-check the created config/configRun.cfg file
+            before executing the framework.  This will let you ensure the correct set of input files will be
+            re-analyzed.
+
+            Example:
+
+                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+                ./analyzeUniformity config/configRun.cfg true
+
+            NOTE: Modications to config/configRun_Template_Rerun.cfg may lead to undefined behavior or failures;
+            it is recommended to not modify the template config file.
 
             # 3.a.iii Helper Script - Run Mode: Series
             # --------------------------------------------------------
 
-            Calling:
+            The script:
 
-                source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+                scripts/configRun_Template_Series.cfg
 
-            More coming "soon"
+            is for running the framework over a set of input files in series, i.e. one after the other, and
+            creating a single output TFile.  The expected syntax is:
+
+                            source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+
+            Where: "Detector Name," "Data File Directory," "Config File - Analysis," and "Config File - Mapping"
+            are as described in Sections 3.a.i and 3.a.ii; and "Output Data Filename" is the desired name of
+            the output TFile to be created.
+
+            After calling this script it is recommended to cross-check the created config/configRun.cfg file
+            before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
+
+            Example:
+
+                source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
+                ./analyzeUniformity config/configRun.cfg true
+
+            NOTE: Modications to config/configRun_Template_Series.cfg may lead to undefined behavior or failures;
+            it is recommended to not modify the template config file.
 
 # 4. Documentation
 # ========================================================
