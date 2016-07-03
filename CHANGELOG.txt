@@ -13,7 +13,15 @@ Update: July 3rd 2016
 ->White space and depreciated commented items clean-up on include/AnalyzeResponseUniformity.h and src/AnalyzeResponseUniformity.cpp
 ->Changed AnalyzeResponseUniformity::calcStatistics() to take 3 arguments instead of 2, e.g. calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, std::string strObsName);
 ->AnalyzeResponseUniformity::calcStatistics() will now fill inputStatObs::hDist from the input mset_fInputObs
-->VisualizeUniformity::storeCanvasData will no longer create a histogram for the requested str
+->Removed mset_fClustADC_Fit_PkPos, mset_fClustADC_Spec_PkPos, statClustADC_Fit_PkPos, and statClustADC_Spec_PkPos attributes from Uniformity::SectorEta
+->Added attribute fitDist to Uniformity::SummaryStatistics
+->Added method Uniformity::SummaryStatistics::clear() for wiping stored data (numbers set to -1, stl containers cleared, pointers deleted)
+->Added private attributes mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes to Uniformity::DetectorMPGD; these represent the sum over the PkPos & PkRes observables over all stored SectorEta objects
+->Added method DetectorMPGD::resetResults() for clearing mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->Added method DetectorMPGD::reset() now also clears mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->Added method DetectorMPGD::getStatPkPos() and DetectorMPGD::getStatPkRes() for accessing private attributes statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->VisualizeUniformity::storeCanvasData will no longer create a TH1F or TF1 for the requested strObsName; nor perform the fitting.  Instead this is done in AnalyzeResponseUniformity::calcStatistics()
+->VisualizeUniformity::storeCanvasData still makes the same TCanvas as before, now stores the TF1 in addition to the TH1F stored on this TCanvas
 
 Update: June 30th 2016
 ==================================================
