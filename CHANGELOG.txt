@@ -10,6 +10,10 @@
 Update: July 3rd 2016
 ==================================================
 ->Updates to README.txt
+->White space and depreciated commented items clean-up on include/AnalyzeResponseUniformity.h and src/AnalyzeResponseUniformity.cpp
+->Changed AnalyzeResponseUniformity::calcStatistics() to take 3 arguments instead of 2, e.g. calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, std::string strObsName);
+->AnalyzeResponseUniformity::calcStatistics() will now fill inputStatObs::hDist from the input mset_fInputObs
+->VisualizeUniformity::storeCanvasData will no longer create a histogram for the requested str
 
 Update: June 30th 2016
 ==================================================

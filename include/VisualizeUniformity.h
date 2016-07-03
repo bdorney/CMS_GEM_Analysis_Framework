@@ -181,7 +181,8 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
+        //std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
+        Uniformity::SummaryStatistics getObsData(std::string strObsName);
         
         std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta);
 

@@ -60,19 +60,12 @@ namespace Uniformity {
         //Default
         AnalyzeResponseUniformity();
         
-        //Declare the detector and the requested granularity
-        //AnalyzeResponseUniformity(int iNSlices, Uniformity::DetectorMPGD inputDet);
-        
         //Set the detector and anlysis parameters at construction
         AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Loading*****************
-        //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
-        //Loads all TObjects found in the input ROOT file into detMPGD;
-        //Any previously stored information in detMPGD is lost.
-        //virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
         
         //Pass/Fail***************
         //Checks to see if the detector's uniformity is within requested amount
@@ -81,9 +74,7 @@ namespace Uniformity {
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
-        virtual Uniformity::DetectorMPGD getDetector(){ 
-		//std::cout<<"AnalyzeResponseUniformity::getDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
-		return detMPGD; };
+        virtual Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,19 +85,13 @@ namespace Uniformity {
         virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
         
         //Sets the Detector
-        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ 
-		detMPGD = inputDet; 
-		//std::cout<<"AnalyzeResponseUniformity::setDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
-		return; };
+        virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
         
     protected:
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         //Calculates Summary Statistics
-        void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs);
-        
-        //Looks to see if the input string contains an element of vec_strSupportedKeywords
-        //bool containsKeyword(std::string & strInput);
+        void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, std::string strObsName);
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,14 +119,10 @@ namespace Uniformity {
         std::string getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName);
         
         //Searchs the input fit for the given variable (strParam); returns it
-        //float getPeakPos( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
         float getParam( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
-        //float getParam( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string & strParam );
         
         //Searchs the input fit for the error on the given variable (strParam); returns it
-        //float getPeakPosError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto );
         float getParamError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
-        //float getParamError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string & strParam );
         
         //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
         float getValByKeyword(std::string strInputKeyword, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);

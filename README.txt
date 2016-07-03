@@ -364,6 +364,40 @@
 
             Coming "soon"
 
+            Classes
+                struct Uniformity::AnalysisSetupUniformity aSetup
+                class Uniformity::DetectorMPGD detMPGD
+
+            Public Types
+                typedef exprtk::symbol_table<float> symbol_table_t;
+                typedef exprtk::expression<float> expression_t;
+                typedef exprtk::parser<float> parser_t;
+
+            Public Member Functions
+                AnalyzeResponseUniformity()
+                AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
+
+                virtual Uniformity::DetectorMPGD getDetector();
+                virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup);
+                virtual void setDetector(Uniformity::DetectorMPGD & inputDet);
+
+            Protected Member Functions
+                void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, multiset<float> &mset_fInputObs, std::string strObsName);
+                TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput );
+                float getParsedInput(string &strInputExp, shared_ptr<TH1F> hInput, TSpectrum &specInput);
+                TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+                TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+                TH2F getHistogram2D(int iEta, int iPhi, Timing::HistoSetup &setupHisto_X, Timing::HistoSetup &setupHisto_Y);
+                string getNameByIndex(int iEta, int iPhi, int iSlice, string & strInputPrefix, string & strInputName);
+                string getNameByIndex(int iEta, int iPhi, int iSlice, const string & strInputPrefix, const string & strInputName);
+                float getParam( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
+                float getParamError( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
+                float getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput);
+
+            Protected Attributes
+                string strAnalysisName;
+                vector<string> vec_strSupportedKeywords;
+
             # 4.b.i.II AnalyzeResponseUniformityClusters
             # --------------------------------------------------------
 

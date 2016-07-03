@@ -72,13 +72,14 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
+    SummaryStatistics statObs;
     //shared_ptr<TGraphErrors> gObs; //Observable to be drawn
-    std::vector<float> vec_fObs;
-    std::vector<float> vec_fObsVariance;
+    //std::vector<float> vec_fObs;
+    //std::vector<float> vec_fObsVariance;
     
-    SectorEta etaSector;
+    //SectorEta etaSector;
     
-    TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
+    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
     //Make the Canvas
     //------------------------------------------------------
@@ -107,69 +108,75 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     
     //Setup the Legend
     //------------------------------------------------------
-    legObs->SetNColumns(2);
-    legObs->SetFillColor(kWhite);
-    legObs->SetLineColor(kBlack);
+    //legObs->SetNColumns(2);
+    //legObs->SetFillColor(kWhite);
+    //legObs->SetLineColor(kBlack);
     
     //Loop Over the detector's Eta Sectors
     //------------------------------------------------------
-    for (int iEta=1; iEta <= iNumEta; ++iEta) {
-	//cout<<"=====NEXT ITERATION=====\n";
+    /*for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //cout<<"=====NEXT ITERATION=====\n";
 
-	int iOrigSize = vec_fObs.size();
+        int iOrigSize = vec_fObs.size();
 
         etaSector = detMPGD.getEtaSector(iEta);
         
         std::vector<float> vec_fObsThisEta = getObsData(strObsName, etaSector); //Temporary container for valid r-value
         
-	vec_fObs.resize( vec_fObs.size() + vec_fObsThisEta.size() );
+        vec_fObs.resize( vec_fObs.size() + vec_fObsThisEta.size() );
 
-	//cout<<"BEFORE COPY\n";
-	//cout<<"vec_fObs.size() = " << vec_fObs.size() << endl;
-	//cout<<"vec_fObsThisEta.size() = " << vec_fObsThisEta.size() << endl;
+        //cout<<"BEFORE COPY\n";
+        //cout<<"vec_fObs.size() = " << vec_fObs.size() << endl;
+        //cout<<"vec_fObsThisEta.size() = " << vec_fObsThisEta.size() << endl;
 
-	auto iterObs = std::next(vec_fObs.begin(), iOrigSize );
-	std::copy(vec_fObsThisEta.begin(),vec_fObsThisEta.end(), iterObs );
+        auto iterObs = std::next(vec_fObs.begin(), iOrigSize );
+        std::copy(vec_fObsThisEta.begin(),vec_fObsThisEta.end(), iterObs );
         
-	//cout<<"AFTER COPY\n";
+        //cout<<"AFTER COPY\n";
         //cout<<"VisualizeUniformity::storeCanvasData() - vec_fObsThisEta.size() = " << vec_fObsThisEta.size() << endl;
         //cout<<"VisualizeUniformity::storeCanvasData() - vec_fObs.size() = " << vec_fObs.size() << endl;
-    } //End Loop Over Detector's Eta Sector
+    }*/ //End Loop Over Detector's Eta Sector
     
     //Determine the average of the dataset
     //------------------------------------------------------
-    float fAvg = std::accumulate(vec_fObs.begin(), vec_fObs.end(), 0. ) / vec_fObs.size();
+    //float fAvg = std::accumulate(vec_fObs.begin(), vec_fObs.end(), 0. ) / vec_fObs.size();
 
-    vec_fObsVariance.resize( vec_fObs.size() );
-    std::transform(vec_fObs.begin(), vec_fObs.end(), vec_fObsVariance.begin(), [fAvg](float x) { return x - fAvg; });
+    //vec_fObsVariance.resize( vec_fObs.size() );
+    //std::transform(vec_fObs.begin(), vec_fObs.end(), vec_fObsVariance.begin(), [fAvg](float x) { return x - fAvg; });
 
-    float fStdDev = std::sqrt( std::inner_product(vec_fObsVariance.begin(), vec_fObsVariance.end(), vec_fObsVariance.begin(), 0.0) /  vec_fObsVariance.size() );
+    //float fStdDev = std::sqrt( std::inner_product(vec_fObsVariance.begin(), vec_fObsVariance.end(), vec_fObsVariance.begin(), 0.0) /  vec_fObsVariance.size() );
 
     //Create Distribution
     //------------------------------------------------------
-    std::shared_ptr<TH1F> hObs = std::make_shared<TH1F>( TH1F( getNameByIndex(-1, -1, -1, "h", strObsName + "Dataset" ).c_str(), "", 40, fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
+    /*std::shared_ptr<TH1F> hObs = std::make_shared<TH1F>( TH1F( getNameByIndex(-1, -1, -1, "h", strObsName + "Dataset" ).c_str(), "", 40, fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
     hObs->Sumw2();
     hObs->GetXaxis()->SetTitle( strObsName.c_str() );
     hObs->GetYaxis()->SetTitle( "N" );
 
     for(int i=0; i < vec_fObs.size(); ++i){
-	hObs->Fill(vec_fObs[i]);
-    }
+        hObs->Fill(vec_fObs[i]);
+    }*/
 
+    //Get the requested dataset
+    //------------------------------------------------------
+    statObs = getObsData(strObsName);
+    
     //Fit hObs
     //------------------------------------------------------
-    std::shared_ptr<TF1> funcObs = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "func", strObsName + "Dataset" ).c_str(), "gaus(0)", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
+    /*std::shared_ptr<TF1> funcObs = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "func", strObsName + "Dataset" ).c_str(), "gaus(0)", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
     funcObs->SetParameter(0, hObs->GetBinContent( hObs->GetMaximumBin() ) );
     funcObs->SetParameter(1, hObs->GetMean() );
     funcObs->SetParameter(2, hObs->GetRMS() );
 
-    hObs->Fit(funcObs.get(),"QM","", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev );
+    hObs->Fit(funcObs.get(),"QM","", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev );*/
 
     //Draw hObs
     //------------------------------------------------------
     canv_DetSum.cd();
-    hObs->Draw( strDrawOption.c_str() );    
-    funcObs->Draw("same");
+    //hObs->Draw( strDrawOption.c_str() );
+    statObs.hDist->Draw( strDrawOption.c_str() );
+    //funcObs->Draw("same");
+    statObs.fitDist->Draw("same");
 
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -178,13 +185,13 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
     
     latex_Obs_Mean.SetTextSize(0.03);
-    latex_Obs_Mean.DrawLatexNDC(0.15, 0.8, ("#mu = " + getString( funcObs->GetParameter(1) ) ).c_str() );
+    latex_Obs_Mean.DrawLatexNDC(0.15, 0.8, ("#mu = " + getString( statObs.fitDist->GetParameter(1) ) ).c_str() );
     
     latex_Obs_StdDev.SetTextSize(0.03);
-    latex_Obs_StdDev.DrawLatexNDC(0.15, 0.75, ("#sigma = " + getString( funcObs->GetParameter(2) ) ).c_str() );
+    latex_Obs_StdDev.DrawLatexNDC(0.15, 0.75, ("#sigma = " + getString( statObs.fitDist->GetParameter(2) ) ).c_str() );
     
     latex_Obs_PerErr.SetTextSize(0.03);
-    latex_Obs_PerErr.DrawLatexNDC(0.15, 0.7, ("#frac{#sigma}{#mu} = " + getString( funcObs->GetParameter(2) / funcObs->GetParameter(1) ) ).c_str() );
+    latex_Obs_PerErr.DrawLatexNDC(0.15, 0.7, ("#frac{#sigma}{#mu} = " + getString( statObs.fitDist->GetParameter(2) / statObs.fitDist->GetParameter(1) ) ).c_str() );
     
     //Draw the Legend
     //------------------------------------------------------
@@ -195,8 +202,9 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     dir_Summary->cd();
     canv_DetSum.Write();
     if (bSaveCanvases) { save2png(canv_DetSum); }
-    hObs->Write();
-
+    statObs.hDist->Write();
+    statObs.fitDist->Write();
+    
     //Do not close file_InputRootFile it is used elsewhere
     
     return;
@@ -478,9 +486,11 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //------------------------------------------------------
     if ( bNormalize ) { //Case: User wants normalization
         //Determine average of strObsName
-        std::tuple<double, double, double> tup_Init = std::make_tuple(0.,0.,0.);
-        tup_Init = std::accumulate(vec_tup3DPt.begin(), vec_tup3DPt.end(), tup_Init, Uniformity::addTuple);
-        dAvg = std::get<2>(tup_Init) / vec_tup3DPt.size();
+        //std::tuple<double, double, double> tup_Init = std::make_tuple(0.,0.,0.);
+        //tup_Init = std::accumulate(vec_tup3DPt.begin(), vec_tup3DPt.end(), tup_Init, Uniformity::addTuple);
+        //dAvg = std::get<2>(tup_Init) / vec_tup3DPt.size();
+        
+        dAvg = getObsData(strObsName).fMean;
         
         //Normalize elements of vec_tup3DPt to average
         std::transform(vec_tup3DPt.begin(), vec_tup3DPt.end(), vec_tup3DPt.begin(), Uniformity::divides(dAvg) );
@@ -1272,7 +1282,7 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     return;
 } //End VisualizeUniformity::save2png()
 
-std::vector<float> VisualizeUniformity::getObsData(std::string strObsName, Uniformity::SectorEta &inputEta){
+/*std::vector<float> VisualizeUniformity::getObsData(std::string strObsName, Uniformity::SectorEta &inputEta){
     //Variable Declaration
     std::vector<float> ret_vec;
     
@@ -1281,7 +1291,7 @@ std::vector<float> VisualizeUniformity::getObsData(std::string strObsName, Unifo
     //=======================Fit Result Parameters=======================
     if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
         //ret_mset = inputEta.mset_fClustADC_Fit_PkPos;
-	ret_vec.resize( inputEta.mset_fClustADC_Fit_PkPos.size() );
+        ret_vec.resize( inputEta.mset_fClustADC_Fit_PkPos.size() );
         std::copy(inputEta.mset_fClustADC_Fit_PkPos.begin(), inputEta.mset_fClustADC_Fit_PkPos.end(), ret_vec.begin() );
     } //End Case: Fit Pk Pos
     //=======================Unrecognized Parameters=======================
@@ -1293,6 +1303,31 @@ std::vector<float> VisualizeUniformity::getObsData(std::string strObsName, Unifo
     //cout<<"ret_graph = " << ret_graph << endl;
     
     return ret_vec;
+}*/ //End VisualizeUniformity::getObsGraph()
+
+SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
+    //Variable Declaration
+    SummaryStatistics ret_stat;
+    
+    std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
+    
+    //=======================Fit Result Parameters=======================
+    if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
+        //ret_mset = inputEta.mset_fClustADC_Fit_PkPos;
+        ret_stat = detMPGD.getStatPkPos();
+    } //End Case: Fit Pk Pos
+    else if (0 == strObsName.compare("RESPONSEFITPKRES") ) { //Case: Fit Pk Resolution
+        ret_stat = detMPGD.getStatPkRes();
+    } //End Case: Fit Pk Resolution
+    //=======================Unrecognized Parameters=======================
+    else{ //Case: Unrecognized Parameter
+        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+    } //End Case: Unrecognized Parameter
+    
+    //Debugging
+    //cout<<"ret_graph = " << ret_graph << endl;
+    
+    return ret_stat;
 } //End VisualizeUniformity::getObsGraph()
 
 std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta){

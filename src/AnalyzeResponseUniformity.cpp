@@ -74,27 +74,24 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
     return;
 }*/ //check AnalyzeResponseUniformity::Uniformity
 
-//Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
-//Loads all TObjects found in the input ROOT file into detMPGD;
-//Any previously stored information in detMPGD is lost.
-/*void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
-
-    //Placeholder, this is done right now in the inherited classes
- 
-}*/ //End AnalyzeResponseUniformity::loadHistosFromFile()
-
-void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs){
+void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, string strObsName){
     //Variable Declaration;
+    std::vector<float> vec_fInputObsVariance;
+    
     std::multiset<float>::iterator iterQ1 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ2 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ3 = mset_fInputObs.begin();
 
-	cout<<"mset_fInputObs.size() = " << mset_fInputObs.size() << endl;
-    
     //Determine max, min, & mean
     inputStatObs.fMax   = *mset_fInputObs.rbegin();   //Last member of the multiset
     inputStatObs.fMin   = *mset_fInputObs.begin();    //First member of the multiset
     inputStatObs.fMean  = std::accumulate( mset_fInputObs.begin(), mset_fInputObs.end(), 0. ) / mset_fInputObs.size();
+    
+    //Determine standard deviation
+    float fAvg = inputStatObs.fMean;
+    vec_fInputObsVariance.resize( mset_fInputObs.size() );
+    std::transform(mset_fInputObs.begin(), mset_fInputObs.end(), vec_fInputObsVariance.begin(), [fAvg](float x) { return x - fAvg; });
+    inputStatObs.fStdDev = std::sqrt( std::inner_product(vec_fInputObsVariance.begin(), vec_fInputObsVariance.end(), vec_fInputObsVariance.begin(), 0.0) / vec_fInputObsVariance.size() );
     
     //Determine Q1, Q2, & Q3
     std::advance(iterQ1, (int)std::ceil( mset_fInputObs.size() * 0.25 ) );  inputStatObs.fQ1 = *iterQ1;
@@ -104,36 +101,36 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     //Determine IQR
     inputStatObs.fIQR = inputStatObs.fQ3 - inputStatObs.fQ1;
     
-    //Determine all outliers
+    //Make distribution
+    inputStatObs.hDist = std::make_shared<TH1F>( TH1F( getNameByIndex(-1, -1, -1, "h", strObsName + "Dataset" ).c_str(), "", 40, inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    inputStatObs.hDist->Sumw2();
+    inputStatObs.hDist->GetXaxis()->SetTitle( strObsName.c_str() );
+    inputStatObs.hDist->GetYaxis()->SetTitle( "N" );
+    
+    //Fill distribution & determine all outliers
     float fLowerBound = inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR;
     float fUpperBound = inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR;
     inRange inDataRange(fLowerBound, fUpperBound);
     
     inputStatObs.mset_fOutliers = mset_fInputObs;
     for (auto iterSet = inputStatObs.mset_fOutliers.begin(); iterSet != inputStatObs.mset_fOutliers.end(); ++iterSet) { //Loop Over input multiset
+        inputStatObs.hDist->Fill( (*iterSet) );
         
         if (inDataRange( (*iterSet) ) ) {
             iterSet = inputStatObs.mset_fOutliers.erase(iterSet);
         }
-        
     } //End Loop Over input multiset
     
+    //Fit distribution
+    inputStatObs.fitDist = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    inputStatObs.fitDist->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    inputStatObs.fitDist->SetParameter(1, inputStatObs.hDist->GetMean() );
+    inputStatObs.fitDist->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    inputStatObs.hDist->Fit(inputStatObs.fitDist.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
-
-//Looks to see if the input string contains an element of vec_strSupportedKeywords
-/*bool AnalyzeResponseUniformity::containsKeyword(std::string & strInput){
-    bool bRetVal = false;
-
-    for(int i=0; i < vec_strSupportedKeywords.size(); ++i){
-	if( strInput.find( vec_strSupportedKeywords[i], 0) != std::string::npos ){ //Case: i^th element of vec_strSupportedKeywords found in strInput
-	   bRetVal = true;
-	   break;
-	} //End Case: i^th element of vec_strSupportedKeywords found in strInput
-    } //End Loop Over vec_strSupportedKeywords
-
-    return bRetVal;
-}*/ //End AnalyzeResponseUniformity::containsKeyword()
 
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
@@ -155,7 +152,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     
     //Check to see if the number of parameters in the TF1 meets the expectation
     if ( ret_Func.GetNpar() < setupHisto.vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
-        
+
         printClassMethodMsg("AnalyzeResponseUniformity","getFit","Error! Number of Parameters in Function Less Than Requested Initial Guess Parameters!");
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Parameter: " + getString( ret_Func.GetNpar() ) ).c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guesses: " + getString( setupHisto.vec_strFit_ParamIGuess.size() ) ).c_str() );
@@ -304,20 +301,16 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     string ret_Name = "";
     
     if (iSlice > -1) {
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
     else if (iEta > -1){
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
     }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
-	ret_Name = strInputPrefix + "_Summary_" + strInputName;
+        ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;
@@ -330,55 +323,20 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     string ret_Name = "";
     
     if (iSlice > -1) {
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "Slice" + getString(iSlice) + "_" + strInputName;
     }
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
     else if (iEta > -1){
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_iEta" + getString(iEta) + "_" + strInputName;
-	ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+        ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
     }
     else{ //Case: iEta Sector, sum over sector's iPhi
-        //ret_Name = strInputPrefix + detMPGD.getNameNoSpecial() + "_" + "_Summary_" + strInputName;
-	ret_Name = strInputPrefix + "_Summary_" + strInputName;
+        ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;
 } //End AnalyzeResponseUniformity::getNameByIndex()
-
-/*float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    //Search the peak parameter meaning vector for "PEAK"
-    //If found return this parameter
-    
-    //If not found, return -1;
-    //warn the user
-    
-    //Variable Declaration
-    int iParamPos = -1;
-    
-    float ret_Val = -1;
-    
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
-    
-    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
-        
-        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
-        
-        ret_Val = fitInput->GetParameter(iParamPos);
-    } //End Case: Parameter Found!!!
-    else{ //Case: Parameter NOT Found
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
-    } //End Case: Parameter NOT Foun
-    
-    return ret_Val;
-}*/ //End AnalyzeResponseUniformity::getPeakPos
 
 //Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
 //This parameter is then returned to the user
@@ -399,44 +357,10 @@ float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, HistoSetup 
     else{ //Case: Parameter NOT Found
         printClassMethodMsg("AnalyzeResponseUniformity","getParam",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
     } //End Case: Parameter NOT Foun
     
     return ret_Val;
 } //End AnalyzeResponseUniformity::getParam
-
-/*float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    //Search the peak parameter meaning vector for "PEAK"
-    //If found return this parameter
-    
-    //If not found, return -1;
-    //warn the user
-    
-    //Variable Declaration
-    int iParamPos = -1;
-    
-    float ret_Val = -1;
-    
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
-    
-    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
-        
-        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
-        
-        ret_Val = fitInput->GetParError(iParamPos);
-    } //End Case: Parameter Found!!!
-    else{ //Case: Parameter NOT Found
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
-    } //End Case: Parameter NOT Foun
-    
-    return ret_Val;
-}*/ //End AnalyzeResponseUniformity::getPeakPosError
 
 //Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
 //The error on this parameter is then returned to the user
@@ -457,9 +381,6 @@ float AnalyzeResponseUniformity::getParamError( shared_ptr<TF1> fitInput, HistoS
     else{ //Case: Parameter NOT Found
         printClassMethodMsg("AnalyzeResponseUniformity","getParamError",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getParamError","\tPlease Cross-check input analysis config file.\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        //printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
     } //End Case: Parameter NOT Foun
     
     return ret_Val;

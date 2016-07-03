@@ -12,6 +12,7 @@
 //C++ Includes
 #include <algorithm>
 #include <map>
+#include <set>
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -45,10 +46,18 @@ namespace Uniformity {
         
         //Copy Constructor
         DetectorMPGD(const DetectorMPGD& other){
-            map_sectorsEta  = other.map_sectorsEta;
-            strDetName = other.strDetName;
-            strDetNameNoSpecChar = other.strDetNameNoSpecChar;
-            vec_allADCPeaks = other.vec_allADCPeaks;
+            map_sectorsEta              = other.map_sectorsEta;
+            strDetName                  = other.strDetName;
+            strDetNameNoSpecChar        = other.strDetNameNoSpecChar;
+            
+            //vec_allADCPeaks           = other.vec_allADCPeaks;
+            
+            mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
+            mset_fClustADC_Fit_PkRes    = other.mset_fClustADC_Fit_PkRes;
+            //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
+            
+            statClustADC_Fit_PkPos      = other.statClustADC_Fit_PkPos;
+            statClustADC_Fit_PkRes      = other.statClustADC_Fit_PkRes;
         };
         
         //Constructor to use when supplying a vector of clusters
@@ -62,10 +71,18 @@ namespace Uniformity {
         //Overloaded Assignment Operator
         DetectorMPGD & operator=(DetectorMPGD other){
 		    if (this != &other) { //Protects against invalid self-assignment
-                this->map_sectorsEta  		= other.map_sectorsEta;
-                this->strDetName		= other.strDetName;
-                this->strDetNameNoSpecChar	= other.strDetNameNoSpecChar;
-                this->vec_allADCPeaks 		= other.vec_allADCPeaks;
+                this->map_sectorsEta            = other.map_sectorsEta;
+                this->strDetName                = other.strDetName;
+                this->strDetNameNoSpecChar      = other.strDetNameNoSpecChar;
+                
+                //this->vec_allADCPeaks         = other.vec_allADCPeaks;
+                
+                this->mset_fClustADC_Fit_PkPos  = other.mset_fClustADC_Fit_PkPos;
+                this->mset_fClustADC_Fit_PkRes  = other.mset_fClustADC_Fit_PkRes;
+                //this->mset_fClustADC_Spec_PkPos = other.mset_fClustADC_Spec_PkPos;
+                
+                this->statClustADC_Fit_PkPos    = other.statClustADC_Fit_PkPos;
+                this->statClustADC_Fit_PkRes    = other.statClustADC_Fit_PkRes;
             } //Protects against invalid self-assignment
             
             return *this;
@@ -76,12 +93,27 @@ namespace Uniformity {
         //wipes all stored information
         virtual void reset(){
             map_sectorsEta.clear();
-            vec_allADCPeaks.clear();
+            //vec_allADCPeaks.clear();
+            mset_fClustADC_Fit_PkPos.clear();
+            mset_fClustADC_Fit_PkRes.clear();
+            //mset_fClustADC_Spec_PkPos.clear();
+            
+            statClustADC_Fit_PkPos.clear();
+            statClustADC_Fit_PkRes.clear();
             return;
         } //End reset()
         virtual void resetClusters();
         virtual void resetHits();
         virtual void resetPhysObj();
+        virtual void resetResults(){
+            mset_fClustADC_Fit_PkPos.clear();
+            mset_fClustADC_Fit_PkRes.clear();
+            //mset_fClustADC_Spec_PkPos.clear();
+            
+            statClustADC_Fit_PkPos.clear();
+            statClustADC_Fit_PkRes.clear();
+            return;
+        };
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -124,6 +156,10 @@ namespace Uniformity {
 
         //returns the phi sector
         virtual SectorPhi getPhiSector(int iEta, int iPhi);
+        
+        //returns the summary statistics
+        virtual Uniformity::SummaryStatistics getStatPkPos(){ return statClustADC_Fit_PkPos; };
+        virtual Uniformity::SummaryStatistics getStatPkRes(){ return statClustADC_Fit_PkRes; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,14 +219,22 @@ namespace Uniformity {
             strDetNameNoSpecChar = strInput;
             strDetNameNoSpecChar.erase( std::remove(strDetNameNoSpecChar.begin(), strDetNameNoSpecChar.end(), '/' ), strDetNameNoSpecChar.end() );
             return;
-        }
+        };
         
         std::map<int, SectorEta> map_sectorsEta;
+        
+        std::multiset<float> mset_fClustADC_Fit_PkPos;
+        std::multiset<float> mset_fClustADC_Fit_PkRes;
+        
+        //std::multiset<float> mset_fClustADC_Spec_PkPos;
+        
+        SummaryStatistics statClustADC_Fit_PkPos;
+        SummaryStatistics statClustADC_Fit_PkRes;
         
         std::string strDetName;             //Name of the detector
         std::string strDetNameNoSpecChar;   //Name of the detector omitting special characters (e.g. '/' )
         
-        std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
+        //std::vector<float> vec_allADCPeaks; //Stores the Peak Position found for all Slices
     }; //End Class DetectorMPGD
 } //End namespace Uniformity
 

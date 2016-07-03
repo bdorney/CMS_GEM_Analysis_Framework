@@ -263,10 +263,10 @@ namespace Uniformity {
         float fQ3;       //Third Quantile (Q3)
         float fStdDev;   //Standard Deviation
         
-        //std::vector<float> vec_fOutliers;
         std::multiset<float> mset_fOutliers;
         
-        std::shared_ptr<TH1F> hDist;  //Distribution of Dataset
+        std::shared_ptr<TH1F> hDist;    //Distribution of Dataset
+        std::shared_ptr<TF1> fitDist;  //Fit of dataset
         
         //Default Constructor
         SummaryStatistics(){
@@ -290,6 +290,7 @@ namespace Uniformity {
             
             //Deep Copy
             if( other.hDist != NULL )   hDist   = std::make_shared<TH1F>( *other.hDist.get() );
+            if( other.fitDist != NULL ) fitDist = std::make_shared<TF1>( *other.fitDist.get() );
         } //End Copy Constructor
         
         //Assignment Operator
@@ -308,10 +309,23 @@ namespace Uniformity {
                 
                 //Deep Copy
                 if( other.hDist != NULL )   hDist   = std::make_shared<TH1F>( *other.hDist.get() );
+                if( other.fitDist != NULL ) fitDist = std::make_shared<TF1>( *other.fitDist.get() );
             } //Protects against invalid self-assignment
             
             return *this;
         } //End Assignment Operator
+        
+        //Clear stored information
+        void clear(){
+            fIQR = fMax = fMean = fMin = -1;
+            fQ1 = fQ2 = fQ3 = -1;
+            fStdDev = -1;
+            
+            hDist.reset();
+            fitDist.reset();
+            
+            mset_fOutliers.clear();
+        }
     }; //End SummaryStatistics
     
     //Defines a slice of a phi sector within the detector
@@ -434,8 +448,8 @@ namespace Uniformity {
         
         std::map<int, SectorPhi> map_sectorsPhi;
         
-        std::multiset<float> mset_fClustADC_Fit_PkPos;
-        std::multiset<float> mset_fClustADC_Spec_PkPos;
+        //std::multiset<float> mset_fClustADC_Fit_PkPos;
+        //std::multiset<float> mset_fClustADC_Spec_PkPos;
         
         //One dimensional graphs
         std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
@@ -451,8 +465,8 @@ namespace Uniformity {
         HistosPhysObj hitHistos;
         
         //Summary Statistics
-        SummaryStatistics statClustADC_Fit_PkPos;
-        SummaryStatistics statClustADC_Spec_PkPos;
+        //SummaryStatistics statClustADC_Fit_PkPos;
+        //SummaryStatistics statClustADC_Spec_PkPos;
         
         //Default Constructor
         SectorEta(){
@@ -466,16 +480,16 @@ namespace Uniformity {
             
             map_sectorsPhi = other.map_sectorsPhi;
             
-            mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
-            mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
+            //mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
+            //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
             
             //histograms
             clustHistos = other.clustHistos;
             hitHistos = other.hitHistos;
             
             //Summary Statistics
-            statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
-            statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
+            //statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
+            //statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
             
             //Deep Copy
             if( other.gEta_ClustADC_Fit_NormChi2 != NULL )  gEta_ClustADC_Fit_NormChi2  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_NormChi2.get() );
@@ -495,16 +509,16 @@ namespace Uniformity {
                 
                 map_sectorsPhi = other.map_sectorsPhi;
                 
-                mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
-                mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
+                //mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
+                //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
                 
                 //histograms
                 clustHistos = other.clustHistos;
                 hitHistos = other.hitHistos;
                 
                 //Summary Statistics
-                statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
-                statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
+                //statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
+                //statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
                 
                 //Deep Copy
                 if( other.gEta_ClustADC_Fit_NormChi2 != NULL )  gEta_ClustADC_Fit_NormChi2  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_NormChi2.get() );
