@@ -183,7 +183,7 @@ void AnalyzeResponseUniformityClusters::fitHistos(){
                     //Record observables for the summary stat (Used for checking uniformity)
                     //(*iterEta).second.mset_fClustADC_Fit_PkPos.insert( fPkPos );
                     detMPGD.mset_fClustADC_Fit_PkPos.insert( fPkPos );
-                    detMPGD.mset_fClustADC_Fit_PkRes.insert( fPkWidth );
+                    detMPGD.mset_fClustADC_Fit_PkRes.insert( fPkWidth / fPkPos );
                     
                     //Store Fit parameters - NormChi2
                     fNormChi2 = (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF();
