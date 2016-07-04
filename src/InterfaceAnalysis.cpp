@@ -406,6 +406,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
                 map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";
                 
 		visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1");
+		visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1");
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",false);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",true);	//Normalized version

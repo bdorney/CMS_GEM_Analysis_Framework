@@ -22,6 +22,7 @@ Update: July 3rd 2016
 ->Added method DetectorMPGD::getStatPkPos() and DetectorMPGD::getStatPkRes() for accessing private attributes statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
 ->VisualizeUniformity::storeCanvasData will no longer create a TH1F or TF1 for the requested strObsName; nor perform the fitting.  Instead this is done in AnalyzeResponseUniformity::calcStatistics()
 ->VisualizeUniformity::storeCanvasData still makes the same TCanvas as before, now stores the TF1 in addition to the TH1F stored on this TCanvas
+->InterfaceAnalysis will now make dataset distributions for both PkPos and PkRes (before was only PkPos)
 
 Update: June 30th 2016
 ==================================================
