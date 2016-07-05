@@ -358,8 +358,6 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
 
 void DetectorMPGD::setEvent(Event &inputEvt){
     //Fill event level distributions
-	cout<<"hMulti_Clust = " << hMulti_Clust << endl;
-
     hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
     hMulti_Hit->Fill( inputEvt.vec_hits.size() );
     
@@ -370,6 +368,24 @@ void DetectorMPGD::setEvent(Event &inputEvt){
     return;
 } //End DetectorMPGD::setEvent()
 
+void DetectorMPGD::setEventOnlyClusters(Event &inputEvt){
+    //Fill event level distributions
+    hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
+    
+    //Set Physics Objects
+    setClusters( inputEvt.vec_clusters );
+    
+    return;
+} //End DetectorMPGD::setEvent()
 
+void DetectorMPGD::setEventOnlyHits(Event &inputEvt){
+    //Fill event level distributions
+    hMulti_Hit->Fill( inputEvt.vec_hits.size() );
+    
+    //Set Physics Objects
+    setHits( inputEvt.vec_hits );
+    
+    return;
+} //End DetectorMPGD::setEventOnlyHits()
 
 

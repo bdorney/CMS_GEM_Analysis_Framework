@@ -83,7 +83,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     SectorEta etaSector;
     
     //TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
-    TFile file_ROOTOutput_All, *file_ROOTOutput_Single;
+    TFile *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
 	//Debugging
 	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;

@@ -124,6 +124,8 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
     //Initialize histograms over the entire detector
     detMPGD.hMulti_Hit = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_hitMulti ) );
     
+	//cout<<"detMPGD.hMulti_Hit = " << detMPGD.hMulti_Hit << endl;
+
     return;
 } //End AnalyzeResponseUniformityHits::initHistosHits()
 

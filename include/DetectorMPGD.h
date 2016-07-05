@@ -59,6 +59,9 @@ namespace QualityControl {
                 
                 statClustADC_Fit_PkPos      = other.statClustADC_Fit_PkPos;
                 statClustADC_Fit_PkRes      = other.statClustADC_Fit_PkRes;
+
+		if( other.hMulti_Clust != NULL ){	hMulti_Clust = std::make_shared<TH1F>( *other.hMulti_Clust.get() ); }
+                if( other.hMulti_Hit != NULL ){		hMulti_Hit   = std::make_shared<TH1F>( *other.hMulti_Hit.get() ); }
             };
             
             //Constructor to use when supplying a vector of clusters
@@ -84,6 +87,9 @@ namespace QualityControl {
                     
                     this->statClustADC_Fit_PkPos    = other.statClustADC_Fit_PkPos;
                     this->statClustADC_Fit_PkRes    = other.statClustADC_Fit_PkRes;
+
+		    if( other.hMulti_Clust != NULL ){	this->hMulti_Clust = std::make_shared<TH1F>( *other.hMulti_Clust.get() ); }
+                    if( other.hMulti_Hit != NULL ){	this->hMulti_Hit   = std::make_shared<TH1F>( *other.hMulti_Hit.get() ); }
                 } //Protects against invalid self-assignment
                 
                 return *this;
@@ -197,7 +203,13 @@ namespace QualityControl {
             
             //Given an input event sets the hits & clusters in this event
             virtual void setEvent(Event &inputEvt);
-            
+
+            //Given an input event sets the hits & clusters in this event
+            virtual void setEventOnlyClusters(Event &inputEvt);
+
+            //Given an input event sets the hits & clusters in this event
+            virtual void setEventOnlyHits(Event &inputEvt);
+
             //Given an input event sets the hits & clusters in this event
             virtual void setEvents(std::vector<Event> & vec_inputEvts){
                 for (int i=0; i < vec_inputEvts.size(); ++i) {

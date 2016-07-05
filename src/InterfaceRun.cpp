@@ -166,7 +166,7 @@ void InterfaceRun::analyzeAmoreSRSRunClustersOnly(string strInputRun){
         
         //Give the Event to detMPG to store the Physics Objects
         //------------------------------------------------------
-        detMPGD.setEvent(evt);
+        detMPGD.setEventOnlyClusters(evt);
         
         //Fill Distributions & Update Detector - Clusters
         //------------------------------------------------------
@@ -393,7 +393,7 @@ void InterfaceRun::analyzeAmoreSRSRunHitsOnly(string strInputRun){
         
         //Give the Event to detMPG to store the Physics Objects
         //------------------------------------------------------
-        detMPGD.setEvent(evt);
+        detMPGD.setEventOnlyHits(evt);
         
         //Fill Distributions & Update Detector - Hits
         //------------------------------------------------------

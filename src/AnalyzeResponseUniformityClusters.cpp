@@ -326,7 +326,7 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
     //Initialize histograms over the entire detector
     detMPGD.hMulti_Clust = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_clustMulti ) );
     
-	cout<<"detMPGD.hMulti_Clust = " << detMPGD.hMulti_Clust << endl;
+	//cout<<"detMPGD.hMulti_Clust = " << detMPGD.hMulti_Clust << endl;
 
     return;
 } //End AnalyzeResponseUniformityClusters::initHistosClusters()
