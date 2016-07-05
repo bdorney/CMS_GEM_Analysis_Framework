@@ -358,6 +358,8 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
 
 void DetectorMPGD::setEvent(Event &inputEvt){
     //Fill event level distributions
+	cout<<"hMulti_Clust = " << hMulti_Clust << endl;
+
     hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
     hMulti_Hit->Fill( inputEvt.vec_hits.size() );
     

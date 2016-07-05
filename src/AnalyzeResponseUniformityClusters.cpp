@@ -296,7 +296,7 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
 
             //Initialize iPhi Histograms - 1D
             (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustADC ) );
-            (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
+            //(*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustMulti ) );
             (*iterPhi).second.clustHistos.hSize = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustSize ) );
             (*iterPhi).second.clustHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_clustTime ) );
             
@@ -326,6 +326,8 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
     //Initialize histograms over the entire detector
     detMPGD.hMulti_Clust = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_clustMulti ) );
     
+	cout<<"detMPGD.hMulti_Clust = " << detMPGD.hMulti_Clust << endl;
+
     return;
 } //End AnalyzeResponseUniformityClusters::initHistosClusters()
 
