@@ -38,7 +38,7 @@ void InterfaceAnalysis::analyzeInput(){
     return;
 } //End InterfaceAnalysis::analyzeInput()
 
-void InterfaceAnalysis::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
+/*void InterfaceAnalysis::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
     
     aSetup = inputAnaSetup;
     rSetup = inputRunSetup;
@@ -70,7 +70,7 @@ void InterfaceAnalysis::initialize(AnalysisSetupUniformity inputAnaSetup, RunSet
     runInterface.initialize(inputAnaSetup, inputRunSetup);
     
     return;
-} //End InterfaceAnalysis::initialize()
+}*/ //End InterfaceAnalysis::initialize()
 
 //Runs the analysis framework on input created by amoreSRS
 void InterfaceAnalysis::analyzeInputAmoreSRS(){
@@ -82,7 +82,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     
     SectorEta etaSector;
     
-    TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
+    //TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
+    TFile file_ROOTOutput_All, *file_ROOTOutput_Single;
     
 	//Debugging
 	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;
