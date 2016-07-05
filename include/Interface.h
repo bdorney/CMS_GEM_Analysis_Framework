@@ -1,36 +1,60 @@
 //
-//  Selector.h
+//  Interface.h
 //  
 //
-//  Created by Brian L Dorney on 14/03/16.
+//  Created by Brian L Dorney on 05/07/16.
 //
 //
 
-#ifndef ____Selector__
-#define ____Selector__
+#ifndef ____Interface__
+#define ____Interface__
 
 //C++ Includes
 #include <stdio.h>
 
 //Framework Includes
-#include "FrameworkBase.h"
+#include "SelectorCluster.h"
+#include "SelectorHit.h"
+#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h
+#include "AnalyzeResponseUniformityClusters.h"
+#include "AnalyzeResponseUniformityHits.h"
 #include "UniformityUtilityTypes.h"
+#include "VisualizeUniformity.h"
 
 //ROOT Includes
 
 namespace QualityControl {
-    namespace Uniformity {
-        class Selector : public FrameworkBase {
+    namespace Uniformity{
+        class Interface : public FrameworkBase {
             
         public:
+            //Constructors
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Actions - Methods that Do Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Sets the analysis setup in all classes
+            virtual void initialize(QualityControl::Uniformity::AnalysisSetupUniformity inputAnaSetup, QualityControl::Uniformity::RunSetup inputRunSetup);
+            
+            //Sets the analysis setup in all classes
+            //Initializes all histograms
+            virtual void initialize(QualityControl::Uniformity::AnalysisSetupUniformity inputAnaSetup, QualityControl::Uniformity::RunSetup inputRunSetup, QualityControl::Uniformity::DetectorMPGD & inputDet);
+            
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Printers - Methods that Print Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Setters - Methods that Set Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
+            
+        protected:
             
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Default
-            Selector();
-            
-            //With Analysis Setup File Given at time of construction
-            Selector(Uniformity::AnalysisSetupUniformity &inputSetup);
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,31 +67,27 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets the analysis parameters
-            /*virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity &inputSetup){
-             aSetupUniformity = inputSetup;
-             return;
-             };*/
             
-        protected:
-            //Actions - Methods that Do Something
+            //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
+            //bool bInitialized;
             
-            //Getters - Methods that Get (i.e. Return) Something
-            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Analyzers
+            AnalyzeResponseUniformityClusters clustAnalyzer;
+            AnalyzeResponseUniformityHits hitAnalyzer;
             
-            //Printers - Methods that Print Something
-            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Containers
+            RunSetup rSetup;
             
-            //Setters - Methods that Set Something
-            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Selectors
+            SelectorCluster clustSelector;
+            SelectorHit hitSelector;
             
-            //Data Members
-            //Uniformity::AnalysisSetupUniformity aSetupUniformity;
-            
-        }; //End class Selector
-        
+            //Visualizer
+            VisualizeUniformity visualizeUni;
+        }; //End class Interface
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____Selector__) */
+
+#endif /* defined(____Interface__) */

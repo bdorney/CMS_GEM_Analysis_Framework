@@ -15,12 +15,12 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printStreamStatus;
-using Timing::stofSafe;
-using Timing::stoiSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printStreamStatus;
+using QualityControl::Timing::stofSafe;
+using QualityControl::Timing::stoiSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderAmoreSRS::ParameterLoaderAmoreSRS(){

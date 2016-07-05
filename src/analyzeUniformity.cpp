@@ -42,11 +42,12 @@ using std::map;
 using std::string;
 using std::vector;
 
-using Timing::convert2bool;
+using QualityControl::Timing::convert2bool;
+using QualityControl::Timing::printStreamStatus;
 //using Timing::getlineNoSpaces;
 //using Timing::getParsedLine;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Input Parameters
 //  0 -> Executable
@@ -206,7 +207,7 @@ int main( int argc_, char * argv_[] ){
         //Check to see if the config file opened successfully
         if (!file_Config.is_open()) {
             perror( ("main() - error while opening file: " + vec_strInputArgs[1]).c_str() );
-            Timing::printStreamStatus(file_Config);
+            printStreamStatus(file_Config);
             
             cout<<"Exitting!!!\n";
             
@@ -232,7 +233,7 @@ int main( int argc_, char * argv_[] ){
     
     if (!rSetup.bLoadSuccess) {
         perror( ("main() - error while setting Run Setup config from file: " + vec_strInputArgs[1]).c_str() );
-        Timing::printStreamStatus(file_Config);
+        printStreamStatus(file_Config);
         
         cout<<"Exitting!!!\n";
         
@@ -255,9 +256,10 @@ int main( int argc_, char * argv_[] ){
 
     //Setup the analysis interface
     //------------------------------------------------------
-    anaInterface.setAnalysisParameters(aSetup);
-    anaInterface.setDetector(detMPGD);
-    anaInterface.setRunParameters(rSetup);
+    //anaInterface.setAnalysisParameters(aSetup);
+    //anaInterface.setDetector(detMPGD);
+    //anaInterface.setRunParameters(rSetup);
+    anaInterface.initialize(aSetup, rSetup, detMPGD);
     anaInterface.setVerboseMode(bVerboseMode);
     
     //Perform the user defined analysis interface

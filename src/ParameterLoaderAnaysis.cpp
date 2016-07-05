@@ -17,17 +17,17 @@ using std::transform;
 using std::vector;
 
 //using namespace Timing;
-using Timing::convert2bool;
-using Timing::getCharSeparatedList;
-using Timing::getlineNoSpaces;
-using Timing::getParsedLine;
-using Timing::getString;
-using Timing::HistoSetup;
-using Timing::printStreamStatus;
-using Timing::stofSafe;
-using Timing::stoiSafe;
+using QualityControl::Timing::convert2bool;
+using QualityControl::Timing::getCharSeparatedList;
+using QualityControl::Timing::getlineNoSpaces;
+using QualityControl::Timing::getParsedLine;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::printStreamStatus;
+using QualityControl::Timing::stofSafe;
+using QualityControl::Timing::stoiSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
@@ -304,6 +304,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitADC);
         } //End Case: Hit ADC
+        else if (0 == strTmp.compare("HITMULTI") ) { //Case: Cluster Multi
+            aSetupUniformity.histoSetup_hitMulti.strHisto_Name = strName;
+            
+            loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitMulti);
+        } //End Case: Cluster Multi
         else if (0 == strTmp.compare("HITPOS") ) { //Case: Hit Position
             aSetupUniformity.histoSetup_hitPos.strHisto_Name = strName;
             
@@ -572,9 +577,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
     return;
 } //End ParameterLoaderAnaysis::loadAnalysisParametersUniformity()
 
-Uniformity::AnalysisSetupUniformity ParameterLoaderAnaysis::getAnalysisParameters(string & strInputSetupFile){
+QualityControl::Uniformity::AnalysisSetupUniformity ParameterLoaderAnaysis::getAnalysisParameters(string & strInputSetupFile){
     //Variable Declaration
-    Uniformity::AnalysisSetupUniformity aSetupUniformity;
+    QualityControl::Uniformity::AnalysisSetupUniformity aSetupUniformity;
     
     loadAnalysisParameters(strInputSetupFile, aSetupUniformity);
     

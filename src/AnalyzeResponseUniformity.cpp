@@ -17,12 +17,12 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printROOTFileStatus;
-using Timing::HistoSetup;
-using Timing::stofSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printROOTFileStatus;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::stofSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(){

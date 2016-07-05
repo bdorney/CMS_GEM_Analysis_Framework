@@ -13,10 +13,11 @@ using std::endl;
 using std::map;
 using std::string;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 InterfaceAnalysis::InterfaceAnalysis(){
+    //bInitialized = false;
     bVerboseMode = false;
 } //End Default Constructor
 
@@ -36,6 +37,40 @@ void InterfaceAnalysis::analyzeInput(){
     
     return;
 } //End InterfaceAnalysis::analyzeInput()
+
+void InterfaceAnalysis::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
+    
+    aSetup = inputAnaSetup;
+    rSetup = inputRunSetup;
+    detMPGD= inputDet;
+    
+    //initialize Hit Related Items
+    if (rSetup.bAnaStep_Hits) {
+        hitSelector.setAnalysisParameters(aSetup);
+        
+        hitAnalyzer.setAnalysisParameters(aSetup);
+        hitAnalyzer.setDetector(detMPGD);
+        hitAnalyzer.initHistosHits();
+        
+        detMPGD = hitAnalyzer.getDetector();
+    } //End Case: Hits Desired
+    
+    //initialize Cluster Related Items
+    if (rSetup.bAnaStep_Clusters) {
+        clustSelector.setAnalysisParameters(aSetup);
+        
+        clustAnalyzer.setAnalysisParameters(aSetup);
+        clustAnalyzer.setDetector(detMPGD);
+        clustAnalyzer.initGraphsClusters();
+        clustAnalyzer.initHistosClusters();
+        
+        detMPGD = clustAnalyzer.getDetector();
+    }
+    
+    runInterface.initialize(inputAnaSetup, inputRunSetup);
+    
+    return;
+} //End InterfaceAnalysis::initialize()
 
 //Runs the analysis framework on input created by amoreSRS
 void InterfaceAnalysis::analyzeInputAmoreSRS(){
@@ -74,10 +109,10 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Analysis parameters
         cout<<"-----------------Hit Parameters-----------------\n";
-        cout<<"Hit ADC Min = " << aSetup.selHit.iCut_ADCNoise << endl;
-        cout<<"Hit ADC Max = " << aSetup.selHit.iCut_ADCSat << endl;
-        cout<<"Hit Multi Min = " << aSetup.selHit.iCut_MultiMin << endl;
-        cout<<"Hit Multi Max = " << aSetup.selHit.iCut_MultiMax << endl;
+        cout<<"Hit ADC, Min = " << aSetup.selHit.iCut_ADCNoise << endl;
+        cout<<"Hit ADC, Max = " << aSetup.selHit.iCut_ADCSat << endl;
+        cout<<"Hit Multi, Min = " << aSetup.selHit.iCut_MultiMin << endl;
+        cout<<"Hit Multi, Max = " << aSetup.selHit.iCut_MultiMax << endl;
         cout<<"Hit Time, Min = " << aSetup.selHit.iCut_TimeMin << endl;
         cout<<"Hit Time, Max = " << aSetup.selHit.iCut_TimeMax << endl;
         cout<<"-----------------Cluster Parameters-----------------\n";
@@ -99,7 +134,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Open this run's root file & check to see if data file opened successfully
         //------------------------------------------------------
-        file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
+        /*file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
         
         if ( !file_ROOTInput->IsOpen() || file_ROOTInput->IsZombie() ) { //Case: failed to load ROOT file
             perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + vec_strRunList[i] ).c_str() );
@@ -107,15 +142,15 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             std::cout << "Skipping!!!\n";
             
             continue;
-        } //End Case: failed to load ROOT file
+        }*/ //End Case: failed to load ROOT file
         
-	//Debugging
-	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Hit Ana detMPGD.getName() = " << detMPGD.getName() << endl;
+        //Debugging
+        //cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Hit Ana detMPGD.getName() = " << detMPGD.getName() << endl;
 
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
-        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+        /*if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
             //Hit Selection
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
             
@@ -134,10 +169,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             hitAnalyzer.fillHistos();
             
             //Update the Detector!
-		//cout<<"Hit Ana Pre Update detMPGD.getName() = " << detMPGD.getName() << endl;
-		//cout<<"Hit Ana Pre Update (hitAnalyzer.getDetector()).getName() = " << (hitAnalyzer.getDetector()).getName() << endl;
             detMPGD = hitAnalyzer.getDetector();
-		//cout<<"Hit Ana Post Update detMPGD.getName() = " << detMPGD.getName() << endl;
         } //End Case: Hit Analysis
         
         //Cluster Reconstruction
@@ -147,10 +179,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             //Place holder for now
             
         } //End Case: Cluster Reconstruction
-        
-	//Debugging
-	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Cluster Ana detMPGD.getName() = " << detMPGD.getName() << endl;
-
+      
         //Cluster Analysis
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
@@ -162,7 +191,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            clustAnalyzer.setDetector(detMPGD);
+                clustAnalyzer.setDetector(detMPGD);
             
             //Initialize the cluster histograms if this is the first run
             if (i == 0 || rSetup.bMultiOutput) {
@@ -175,7 +204,23 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Update the Detector!
             detMPGD = clustAnalyzer.getDetector();
-        } //End Case: Cluster Analysis
+        }*/ //End Case: Cluster Analysis
+        
+        //Analyze Run
+        //------------------------------------------------------
+        //Setup the runInterface for this run
+        if (!rSetup.bMultiOutput) {
+            runInterface.setDetector(detMPGD);
+            
+            if (i == 0) { runInterface.initialize(aSetup, rSetup); }
+        } //End Case:
+        else{
+            runInterface.initialize(aSetup, rSetup, detMPGD);
+        }
+        
+        //Run analysis and retrive the detector
+        runInterface.analyzeInputAmoreSRS(vec_strRunList[i]);
+        detMPGD = runInterface.getDetector();
         
         //User requests multiple output files?
         //------------------------------------------------------
@@ -201,8 +246,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
                 std::cout << "Skipping!!!\n";
                 
                 //Close the file & delete pointer before the next iter
-                file_ROOTInput->Close();
-                delete file_ROOTInput;
+                //file_ROOTInput->Close();
+                //delete file_ROOTInput;
                 
                 //Move to next iteration
                 continue;
@@ -218,8 +263,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Close the file & delete pointer before the next iter
         //------------------------------------------------------
-        file_ROOTInput->Close();
-        delete file_ROOTInput;
+        //file_ROOTInput->Close();
+        //delete file_ROOTInput;
     } //End Loop over vec_strRunList
     
 	//Debugging
@@ -296,8 +341,8 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
             //Load previous cluster histograms
             clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
 
-		//Initialize Graphs
-		clustAnalyzer.initGraphsClusters();
+            //Initialize Graphs
+            clustAnalyzer.initGraphsClusters();
 
             //Update the Detector!
             detMPGD = clustAnalyzer.getDetector();
@@ -405,8 +450,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";
                 
-		visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1");
-		visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1");
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1");
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1");
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",false);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",true);	//Normalized version

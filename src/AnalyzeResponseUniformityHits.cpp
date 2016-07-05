@@ -17,12 +17,12 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printROOTFileStatus;
-using Timing::HistoSetup;
-using Timing::stofSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printROOTFileStatus;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::stofSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(){
@@ -120,6 +120,9 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
             (*iterPhi).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>(getHistogram2D((*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
+    
+    //Initialize histograms over the entire detector
+    detMPGD.hMulti_Hit = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_hitMulti ) );
     
     return;
 } //End AnalyzeResponseUniformityHits::initHistosHits()
@@ -264,6 +267,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
     //Store the Summary Histograms
     dir_Summary->cd();
     hHitADC_All.Write();
+    detMPGD.hMulti_Hit->Write();
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
 

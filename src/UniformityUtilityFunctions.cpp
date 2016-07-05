@@ -17,18 +17,49 @@ using std::cout;
 using std::endl;
 using std::string;
 
-using namespace Uniformity;
+using QualityControl::Timing::getString;
+
+using namespace QualityControl::Uniformity;
 
 //Math
 //==========================================
 
-std::tuple<double, double, double> Uniformity::addTuple(const std::tuple<double, double, double> & a, const std::tuple<double, double, double> & b) { return a+b; };
+std::tuple<double, double, double> QualityControl::Uniformity::addTuple(const std::tuple<double, double, double> & a, const std::tuple<double, double, double> & b) { return a+b; };
+
+std::pair<int,int> QualityControl::Uniformity::getEventRange(int iFirstEvt, int iNEvt, int iNTreeEntries){
+    //Variable Declaration
+    std::pair<int,int> pair_iRange = std::make_pair(1,0);
+    
+    if ( -1 == iNEvt ) { //Case: All Events
+        iFirstEvt = 0;
+        iNEvt = iNTreeEntries;
+    } //End Case: All Events
+    else{ //Case: Event Range
+        if ( iFirstEvt > iNTreeEntries ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
+            printClassMethodMsg("UniformityUtilityFunctions.cpp","getEventRange", ("Error, First Event Requested as " + getString( iFirstEvt ) + " Greater Thant Total Number of Events " + getString( iNTreeEntries ) ).c_str() );
+            printClassMethodMsg("UniformityUtilityFunctions.cpp","getEventRange", "Exiting!!!");
+            
+            return pair_iRange;
+        } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
+        else if( (iFirstEvt + iNEvt) > iNTreeEntries ){
+            iNEvt = iNTreeEntries - iFirstEvt;
+        }
+        else if( iFirstEvt < 0){
+            iFirstEvt = 0;
+        }
+    } //End Case: Event Range
+    
+    pair_iRange.first = iFirstEvt;
+    pair_iRange.second = iNEvt;
+    
+    return pair_iRange;
+} //End HandlerEvent::getEventRange();
 
 //Printers
 //==========================================
 
 //Prints a message to the user indicating class/method template: "charClass::charMethod() - charMsg"
-void Uniformity::printClassMethodMsg(const char charClass[], const char charMethod[], const char charMsg[]){
+void QualityControl::Uniformity::printClassMethodMsg(const char charClass[], const char charMethod[], const char charMsg[]){
     //cout<< (strClass + "::" + strMethod + "() - " + strMsg ).c_str() << endl;
     cout<< charClass << "::" << charMethod << "() - " << charMsg << endl;
     
@@ -40,7 +71,7 @@ void Uniformity::printClassMethodMsg(const char charClass[], const char charMeth
 
 //strips alphabetical characters from the input string leaving only numbers
 //There has to be a better way to do the below O_o
-string Uniformity::getStringOnlyNumeric(string strInput){
+string QualityControl::Uniformity::getStringOnlyNumeric(string strInput){
     //Variable Declaration
     string strTemp = strInput;  //store the original
     

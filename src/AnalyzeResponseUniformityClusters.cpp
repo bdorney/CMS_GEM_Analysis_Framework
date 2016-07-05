@@ -17,12 +17,12 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printROOTFileStatus;
-using Timing::HistoSetup;
-using Timing::stofSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printROOTFileStatus;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::stofSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(){
@@ -323,6 +323,9 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(){
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
+    //Initialize histograms over the entire detector
+    detMPGD.hMulti_Clust = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_clustMulti ) );
+    
     return;
 } //End AnalyzeResponseUniformityClusters::initHistosClusters()
 
@@ -611,6 +614,7 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile)
     //Store the Summary Histograms
     dir_Summary->cd();
     hclustADC_All.Write();
+    detMPGD.hMulti_Clust->Write();
     hclustPos_All.Write();
     hclustSize_All.Write();
     hclustTime_All.Write();

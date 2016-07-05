@@ -14,11 +14,11 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-using Timing::convert2bool;
-using Timing::getlineNoSpaces;
-using Timing::getParsedLine;
+using QualityControl::Timing::convert2bool;
+using QualityControl::Timing::getlineNoSpaces;
+using QualityControl::Timing::getParsedLine;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderRun::ParameterLoaderRun(){

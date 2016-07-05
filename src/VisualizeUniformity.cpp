@@ -16,10 +16,10 @@ using std::string;
 using std::tuple;
 using std::vector;
 
-using Timing::getString;
-using Timing::printROOTFileStatus;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printROOTFileStatus;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 VisualizeUniformity::VisualizeUniformity(){
@@ -1282,29 +1282,6 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     return;
 } //End VisualizeUniformity::save2png()
 
-/*std::vector<float> VisualizeUniformity::getObsData(std::string strObsName, Uniformity::SectorEta &inputEta){
-    //Variable Declaration
-    std::vector<float> ret_vec;
-    
-    std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
-    
-    //=======================Fit Result Parameters=======================
-    if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-        //ret_mset = inputEta.mset_fClustADC_Fit_PkPos;
-        ret_vec.resize( inputEta.mset_fClustADC_Fit_PkPos.size() );
-        std::copy(inputEta.mset_fClustADC_Fit_PkPos.begin(), inputEta.mset_fClustADC_Fit_PkPos.end(), ret_vec.begin() );
-    } //End Case: Fit Pk Pos
-    //=======================Unrecognized Parameters=======================
-    else{ //Case: Unrecognized Parameter
-        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
-    } //End Case: Unrecognized Parameter
-    
-    //Debugging
-    //cout<<"ret_graph = " << ret_graph << endl;
-    
-    return ret_vec;
-}*/ //End VisualizeUniformity::getObsGraph()
-
 SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     //Variable Declaration
     SummaryStatistics ret_stat;
@@ -1321,7 +1298,7 @@ SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     } //End Case: Fit Pk Resolution
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
-        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+        cout<<"QualityControl::Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
     //Debugging
@@ -1348,7 +1325,7 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strOb
     } //End Case: Fit Pk Resolution
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
-        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+        cout<<"QualityControl::Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
 	//Debugging
@@ -1394,7 +1371,7 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, U
     } //End Case: Hit Time
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
-        cout<<"Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+        cout<<"QualityControl::Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
     return ret_histo;

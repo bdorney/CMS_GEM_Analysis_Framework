@@ -53,150 +53,153 @@
 
 #endif /* defined(____VisualizeUniformity__) */
 
-namespace Uniformity {
-    
-    class VisualizeUniformity : public AnalyzeResponseUniformity {
-    
-    public:
-        //Constructors
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        //Default
-        VisualizeUniformity();
+namespace QualityControl {
+    namespace Uniformity {
         
-        VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
-        
-        //Actions - Methods that Do Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        //Draws the distribution of an observable onto a single pad of canvas
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-        
-        //Draws the distribution of an observable onto a single pad of canvas
-        //Takes a TFile *, which the canvas is written to, as input
-        virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-        
-        //Draws a given observable onto a single pad of canvas
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Draws a given observable onto a single pad of canvas
-        //Takes a TFile *, which the canvas is written to, as input
-        virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Makes a 2D plot of a given observable in the detector's active area
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
-        
-        //Makes a 2D plot of a given observable in the detector's active area
-        //Takes a TFile *, which the canvas is writtent to, as input
-        virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
-        
-        //Draws a given observable onto a single pad of canvas
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Draws a given observable onto a single pad of canvas
-        //Takes a TFile * which the histograms are written to as input
-        virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Makes a 2D plot of a given observable in the detector's active area
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-        
-        //Makes a 2D plot of a given observable in the detector's active area
-        //Takes a TFile *, which the canvas is writtent to, as input
-        virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-        
-        //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
-        //Draws a given observable on each pad
-        //Takes a std::string which stores the physical filename as input
-        virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
-        //Draws a given observable on each pad
-        //Takes a std::string which stores the physical filename as input
-        //Takes a TFile * which the histograms are written to as input
-        virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesGraph is called
-        //Takes a std::string which stores the physical filename as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesGraph is called
-        //Takes a TFile * which the histograms are written to as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesHisto is called
-        //Takes a std::string which stores the physical filename as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesHisto is called
-        //Takes a TFile * which the histograms are written to as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesHistoSegmented is called
-        //Takes a std::string which stores the physical filename as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //For each member of the input map storeListOfCanvasesHistoSegmented is called
-        //Takes a TFile * which the histograms are written to as input
-        //map_strObsNameAndDrawOpt
-        //  first   -> Obs Name
-        //  second  -> Draw option
-        virtual void storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-        
-        //Getters - Methods that Get (i.e. Return) Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        
-        //Printers - Methods that Print Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        
-        //Setters - Methods that Set Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        //Sets the flag for automatically saving canvases
-        virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
-        
-    private:
-        //Actions - Methods that Do Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        //Saves inputCanv as a *.png file
-        //The file is placed in the working directory
-        //The name of the file is the TName of the canvas
-        virtual void save2png(TCanvas & inputCanvas);
-        
-        //Getters - Methods that Get (i.e. Return) Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        //std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
-        Uniformity::SummaryStatistics getObsData(std::string strObsName);
-        
-        std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta);
+        class VisualizeUniformity : public AnalyzeResponseUniformity {
+            
+        public:
+            //Constructors
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Default
+            VisualizeUniformity();
+            
+            VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+            
+            //Actions - Methods that Do Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Draws the distribution of an observable onto a single pad of canvas
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+            
+            //Draws the distribution of an observable onto a single pad of canvas
+            //Takes a TFile *, which the canvas is written to, as input
+            virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+            
+            //Draws a given observable onto a single pad of canvas
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Draws a given observable onto a single pad of canvas
+            //Takes a TFile *, which the canvas is written to, as input
+            virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a TFile *, which the canvas is writtent to, as input
+            virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
+            
+            //Draws a given observable onto a single pad of canvas
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Draws a given observable onto a single pad of canvas
+            //Takes a TFile * which the histograms are written to as input
+            virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a TFile *, which the canvas is writtent to, as input
+            virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+            
+            //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+            //Draws a given observable on each pad
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+            //Draws a given observable on each pad
+            //Takes a std::string which stores the physical filename as input
+            //Takes a TFile * which the histograms are written to as input
+            virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesGraph is called
+            //Takes a std::string which stores the physical filename as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesGraph is called
+            //Takes a TFile * which the histograms are written to as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesHisto is called
+            //Takes a std::string which stores the physical filename as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesHisto is called
+            //Takes a TFile * which the histograms are written to as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesHistoSegmented is called
+            //Takes a std::string which stores the physical filename as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //For each member of the input map storeListOfCanvasesHistoSegmented is called
+            //Takes a TFile * which the histograms are written to as input
+            //map_strObsNameAndDrawOpt
+            //  first   -> Obs Name
+            //  second  -> Draw option
+            virtual void storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+            
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Printers - Methods that Print Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Setters - Methods that Set Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Sets the flag for automatically saving canvases
+            virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
+            
+        private:
+            //Actions - Methods that Do Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Saves inputCanv as a *.png file
+            //The file is placed in the working directory
+            //The name of the file is the TName of the canvas
+            virtual void save2png(TCanvas & inputCanvas);
+            
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
+            Uniformity::SummaryStatistics getObsData(std::string strObsName);
+            
+            std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta);
+            
+            std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::SectorEta &inputEta);
+            
+            //Printers - Methods that Print Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Setters - Methods that Set Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Data Members
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            bool bSaveCanvases;
+            
+        }; //End class VisualizeUniformity
+    } //End namespace Uniformity
+} //End namespace QualityControl
 
-        std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::SectorEta &inputEta);
-        
-        //Printers - Methods that Print Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        
-        //Setters - Methods that Set Something
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        
-        //Data Members
-        //------------------------------------------------------------------------------------------------------------------------------------------
-        bool bSaveCanvases;
-        
-    }; //End class VisualizeUniformity
-} //End namespace Uniformity

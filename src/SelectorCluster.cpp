@@ -12,23 +12,24 @@ using std::cout;
 using std::string;
 using std::vector;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 SelectorCluster::SelectorCluster(){
-    
+    bVerboseMode = false;
 } //End Default Constructor
 
 //Filters an input vector<Uniformity::Cluster object based on the stored Uniformity::AnalysisSetupUniformity attribute
-vector<Cluster> SelectorCluster::filterClusters(std::vector<Cluster> vec_inputClust){
-    vector<Cluster> vec_retClust;
+vector<Cluster> SelectorCluster::filterClusters(std::vector<Cluster> vec_inputClusts){
+    //Variable Declaration
+    vector<Cluster> vec_retClusts;
     
     //Could do this with vector::erase but believe that would be more inefficient (since container is re-organized everytime)
-    for (auto iterClust = vec_inputClust.begin(); iterClust != vec_inputClust.end(); ++iterClust) { //Loop Over input Clusters
-        if ( clusterPassesSelection( (*iterClust) ) ) { vec_retClust.push_back( *iterClust ); }
+    for (auto iterClust = vec_inputClusts.begin(); iterClust != vec_inputClusts.end(); ++iterClust) { //Loop Over input Clusters
+        if ( clusterPassesSelection( (*iterClust) ) ) { vec_retClusts.push_back( *iterClust ); }
     } //End Loop Over input Clusters
     
-    return vec_retClust;
+    return vec_retClusts;
 } //End SelectorCluster::filterClusters()
 
 //Given an output ROOT file from AMORE (ROOTDATATYPE = CLUSTERS)
@@ -68,8 +69,8 @@ void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity:
 //Input is a TFile *
 void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    int iFirstEvt = aSetupUniformity.iEvt_First;
-    int iNEvt = aSetupUniformity.iEvt_Total;
+    //int iFirstEvt = aSetup.iEvt_First;
+    //int iNEvt = aSetup.iEvt_Total;
     
     Int_t iClustMulti;  //I cry a little inside because of this
     Int_t iClustPos_Y[3072];
@@ -80,6 +81,8 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     Float_t fClustADC[3072];
     
     Cluster clust;
+    
+    std::pair<int,int> pair_iEvtRange;
     
     TTree *tree_Clusters = NULL;
     
@@ -111,13 +114,15 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
     tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
     
-    if ( -1 == iNEvt ) { //Case: All Events
+    //Determine Event Range
+    //------------------------------------------------------
+    /*if ( -1 == iNEvt ) { //Case: All Events
         iFirstEvt = 0;
         iNEvt = tree_Clusters->GetEntries();
     } //End Case: All Events
     else{ //Case: Event Range
         if ( iFirstEvt > tree_Clusters->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("SelectorCluster","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetupUniformity.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
+            printClassMethodMsg("SelectorCluster","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetup.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
             printClassMethodMsg("SelectorCluster","setClusters", "Exiting!!!");
             return;
         } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
@@ -127,12 +132,14 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
         else if( iFirstEvt < 0){
             iFirstEvt = 0;
         }
-    } //End Case: Event Range
+    }*/ //End Case: Event Range
+    
+    pair_iEvtRange = getEventRange( aSetup.iEvt_First, aSetup.iEvt_Total, tree_Clusters->GetEntries() );
     
     //Get data event-by-event
     //------------------------------------------------------
-    //for (int i=0; i < tree_Clusters->GetEntries(); ++i) {
-    for (int i=iFirstEvt; i < iNEvt; ++i) {
+    //for (int i=iFirstEvt; i < iNEvt; ++i) {
+    for (int i=pair_iEvtRange.first; i < pair_iEvtRange.second; ++i) {
         //Needed to implement a Hack
         //First check to make sure the cluster multiplicity is within the selection
         //Only then get the info on the clusters
@@ -150,7 +157,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
         //If the event fails to pass the selection; skip it
         //---------------Event Selection---------------
         //Cut on number of clusters
-        if ( !(aSetupUniformity.selClust.iCut_MultiMin < iClustMulti && iClustMulti < aSetupUniformity.selClust.iCut_MultiMax) ) continue;
+        if ( !(aSetup.selClust.iCut_MultiMin < iClustMulti && iClustMulti < aSetup.selClust.iCut_MultiMax) ) continue;
         
         //Okay make sure we can read all branches
         tree_Clusters->SetBranchStatus("*",1);
@@ -185,21 +192,21 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     return;
 } //End SelectorCluster::setClusters()
 
-//Check if Cluster Passes selection stored in aSetupUniformity? True -> Passes; False -> Fails
+//Check if Cluster Passes selection stored in aSetup? True -> Passes; False -> Fails
 bool SelectorCluster::clusterPassesSelection(Cluster &inputClust){
     //Cluster Selection
     
     //Cluster with ADC below noise threshold?
 	//cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
-    if (inputClust.fADC < aSetupUniformity.selClust.iCut_ADCNoise){ return false; }
+    if (inputClust.fADC < aSetup.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?
-    if (inputClust.iSize < aSetupUniformity.selClust.iCut_SizeMin){ return false; }
-    if (inputClust.iSize > aSetupUniformity.selClust.iCut_SizeMax) {return false; }
+    if (inputClust.iSize < aSetup.selClust.iCut_SizeMin){ return false; }
+    if (inputClust.iSize > aSetup.selClust.iCut_SizeMax) {return false; }
     
     //Cluster Time too early or too late?
-    if (inputClust.iTimeBin < aSetupUniformity.selClust.iCut_TimeMin){ return false; }
-    if (inputClust.iTimeBin > aSetupUniformity.selClust.iCut_TimeMax) {return false; }
+    if (inputClust.iTimeBin < aSetup.selClust.iCut_TimeMin){ return false; }
+    if (inputClust.iTimeBin > aSetup.selClust.iCut_TimeMax) {return false; }
     
     //If we arrive here the cluster passes our selection; give true
     return true;

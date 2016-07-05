@@ -13,23 +13,21 @@ using std::endl;
 using std::map;
 using std::vector;
 
-using Timing::getString;
+using QualityControl::Timing::getString;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default constructor
 DetectorMPGD::DetectorMPGD(){
     strDetName = "Detector";
     strDetNameNoSpecChar	= "Detector";
-    //bAnaSetup = false;
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
 DetectorMPGD::DetectorMPGD(vector<Cluster> vec_inputClusters){
     strDetName = "Detector";
     strDetNameNoSpecChar	= "Detector";
-    //bAnaSetup = false;
-    setCluster(vec_inputClusters);
+    setClusters(vec_inputClusters);
 }
 
 //Constructor to use when supplying a map of eta sectors
@@ -357,3 +355,19 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
         return;
     } //End Case: Eta Sector does not exists; CREATE!
 } //End DetectorMPGD::setEtaSector
+
+void DetectorMPGD::setEvent(Event &inputEvt){
+    //Fill event level distributions
+    hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
+    hMulti_Hit->Fill( inputEvt.vec_hits.size() );
+    
+    //Set Physics Objects
+    setClusters( inputEvt.vec_clusters );
+    setHits( inputEvt.vec_hits );
+    
+    return;
+} //End DetectorMPGD::setEvent()
+
+
+
+

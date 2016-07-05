@@ -51,105 +51,108 @@
  *
  */
 
-namespace Timing {
-    //Function Declaration
-    //========================================================================================
-    //boolean
-    bool convert2bool(std::string str, bool &bExitSuccess);
-    
-    //File I/O
-    std::istream & getlineNoSpaces(std::istream & stream, std::string & str);
-    
-    //Math
-    //Addition method
-    //template<class T>
-    /*template<typename T>
-    struct addVal{
-        T tVal;
-     
-        addVal(T tAdd){
-            tVal = tAdd;
-        }
-     
-        void operator()(T &tInput) const{
-            //input += val_fixed; //internet says "input += fixed"
-            tInput += tVal;
-        }
-        //usage example:
-        //std::for_each(myvec.begin(), myvec.end(), addVal(1.0));
-     };*/
-    
-    //Can't seem to get the templated form above to work
-    struct addVal{
-        int iVal;
+namespace QualityControl {
+    namespace Timing {
+        //Function Declaration
+        //========================================================================================
+        //boolean
+        bool convert2bool(std::string str, bool &bExitSuccess);
         
-        addVal(int iAdd){
-            iVal = iAdd;
-        }
+        //File I/O
+        std::istream & getlineNoSpaces(std::istream & stream, std::string & str);
         
-        void operator()(int &iInput) const{
-            iInput += iVal;
-        }
-        //usage example:
-        //std::for_each(myvec.begin(), myvec.end(), addVal(1.0));
-    };
-    
-    //T -> Type; A -> Allocator
-    template<typename T, typename A>
-    float deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2);
-    
-    int getDeltaTForChannel(std::map<std::string, int> inputMap);
-    int getMaxForChannelAND(std::map<std::string, int> inputMap);
-    int getMinForChannelOR(std::map<std::string, int> inputMap);
-    
-    //printers
-    void printROOTFileStatus(TFile *file_ROOT);
-    //void printROOTFileStatus(std::shared_ptr<TFile> file_ROOT);
-    void printStreamStatus(std::ifstream &inputStream);
-    void printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename);
-    
-    //string manipulation
-    std::vector<std::string> getCharSeparatedList(std::string strInput, char cDelimiter);
-    
-    std::pair<std::string,std::string> getParsedLine(std::string strInputLine, bool &bExitSuccess);
-    
-    template<class TConversion>
-    std::string getString(TConversion input);
-    
-    float stofSafe(std::string strInputValue);
-    float stofSafe(std::string strInputField, std::string strInputValue);
-    
-    int stoiSafe(std::string strInputValue);
-    int stoiSafe(std::string strInputField, std::string strInputValue);
-    
-    //unsorted
-    int getCyclicColor(int iInput);
-    
-    //Code Begins for TEMPLATED functions
-    //========================================================================================
-    
-    //Math
-    //----------------------------------------------------------------------------------------
-    //T -> Type; A -> Allocator
-    //Determines the difference in mean between two datasets
-    template<typename T, typename A>
-    float deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2){
-        float fMean1 = (std::accumulate(vec1.begin(), vec1.end(), 0.0) / (float) vec1.size() );
-        float fMean2 = (std::accumulate(vec2.begin(), vec2.end(), 0.0) / (float) vec2.size() );
+        //Math
+        //Addition method
+        //template<class T>
+        /*template<typename T>
+         struct addVal{
+         T tVal;
+         
+         addVal(T tAdd){
+         tVal = tAdd;
+         }
+         
+         void operator()(T &tInput) const{
+         //input += val_fixed; //internet says "input += fixed"
+         tInput += tVal;
+         }
+         //usage example:
+         //std::for_each(myvec.begin(), myvec.end(), addVal(1.0));
+         };*/
         
-        return fMean1 - fMean2;
-    } //End deltaMean
+        //Can't seem to get the templated form above to work
+        struct addVal{
+            int iVal;
+            
+            addVal(int iAdd){
+                iVal = iAdd;
+            }
+            
+            void operator()(int &iInput) const{
+                iInput += iVal;
+            }
+            //usage example:
+            //std::for_each(myvec.begin(), myvec.end(), addVal(1.0));
+        };
+        
+        //T -> Type; A -> Allocator
+        template<typename T, typename A>
+        float deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2);
+        
+        int getDeltaTForChannel(std::map<std::string, int> inputMap);
+        int getMaxForChannelAND(std::map<std::string, int> inputMap);
+        int getMinForChannelOR(std::map<std::string, int> inputMap);
+        
+        //printers
+        void printROOTFileStatus(TFile *file_ROOT);
+        //void printROOTFileStatus(std::shared_ptr<TFile> file_ROOT);
+        void printStreamStatus(std::ifstream &inputStream);
+        void printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename);
+        
+        //string manipulation
+        std::vector<std::string> getCharSeparatedList(std::string strInput, char cDelimiter);
+        
+        std::pair<std::string,std::string> getParsedLine(std::string strInputLine, bool &bExitSuccess);
+        
+        template<class TConversion>
+        std::string getString(TConversion input);
+        
+        float stofSafe(std::string strInputValue);
+        float stofSafe(std::string strInputField, std::string strInputValue);
+        
+        int stoiSafe(std::string strInputValue);
+        int stoiSafe(std::string strInputField, std::string strInputValue);
+        
+        //unsorted
+        int getCyclicColor(int iInput);
+        
+        //Code Begins for TEMPLATED functions
+        //========================================================================================
+        
+        //Math
+        //----------------------------------------------------------------------------------------
+        //T -> Type; A -> Allocator
+        //Determines the difference in mean between two datasets
+        template<typename T, typename A>
+        float deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2){
+            float fMean1 = (std::accumulate(vec1.begin(), vec1.end(), 0.0) / (float) vec1.size() );
+            float fMean2 = (std::accumulate(vec2.begin(), vec2.end(), 0.0) / (float) vec2.size() );
+            
+            return fMean1 - fMean2;
+        } //End deltaMean
+        
+        //string manipulation
+        //----------------------------------------------------------------------------------------
+        //template method must be defined in the header file
+        template<class TConversion>
+        std::string getString(TConversion input){
+            std::stringstream sstream;
+            sstream<<input;
+            return sstream.str();
+        } //End getString()
+        
+    } //End namespace Timing    
+} //End namespace QualityControl
 
-    //string manipulation
-    //----------------------------------------------------------------------------------------    
-    //template method must be defined in the header file
-    template<class TConversion>
-    std::string getString(TConversion input){
-        std::stringstream sstream;
-        sstream<<input;
-        return sstream.str();
-    } //End getString()
-
-} //End namespace
 
 #endif
