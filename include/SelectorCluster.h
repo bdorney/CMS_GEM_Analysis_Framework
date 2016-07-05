@@ -12,6 +12,7 @@
 //C++ Includes
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 //Framework Includes
 #include "DetectorMPGD.h"
@@ -35,6 +36,15 @@ namespace Uniformity {
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Filters an input vector<Uniformity::Cluster object based on the stored Uniformity::AnalysisSetupUniformity attribute
+        virtual std::vector<Uniformity::Cluster> filterClusters(std::vector<Uniformity::Cluster> vec_inputClust);
+        
+        //Filters an input vector<Uniformity::Cluster> object based on the provided Uniformity::AnalysisSetupUniformity object
+        virtual std::vector<Uniformity::Cluster> filterClusters(std::vector<Uniformity::Cluster> vec_inputClust, Uniformity::AnalysisSetupUniformity inputSetup){
+            setAnalysisParameters(inputSetup);
+            return filterClusters(vec_inputClust);
+        };
+        
         
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------

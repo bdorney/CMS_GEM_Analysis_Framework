@@ -161,7 +161,7 @@ namespace Uniformity {
         Hit(){
             iPos_Y = iStripNum = iTimeBin = -1;
             
-	    sADCIntegral = 0;
+            sADCIntegral = 0;
 
             vec_sADC.resize(30);
         } //End Initialization
@@ -192,6 +192,27 @@ namespace Uniformity {
             fPos_X = fADC = -1.;
         } //End initialization
     }; //End Cluster
+    
+    struct Event{
+        int iNum_Evt, iNum_Run;
+        
+        std::vector<Hit> vec_hits;
+        std::vector<Cluster> vec_clusters;
+        
+        //Default Constructor
+        Event(){
+            iNum_Evt = iNum_Run = 1;
+        }
+        
+        //Copy Constructor
+        Event(const Event& other){
+            iNum_Evt    = other.iNum_Evt;
+            iNum_Run    = other.iNum_Run;
+            
+            vec_hits    = other.vec_hits;
+            vec_clusters= other.vec_clusters;
+        }
+    };
     
     //Cluster Histograms
     struct HistosPhysObj{
