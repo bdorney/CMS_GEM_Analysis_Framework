@@ -35,7 +35,7 @@ void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup input
 
 //Sets the analysis setup in all classes
 //Initializes all histograms
-void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
+/*void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
     
     aSetup = inputAnaSetup;
     rSetup = inputRunSetup;
@@ -65,4 +65,4 @@ void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup input
     }
     
     return;
-} //End InterfaceAnalysis::initialize()
+}*/ //End InterfaceAnalysis::initialize()

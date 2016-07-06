@@ -39,7 +39,7 @@ namespace QualityControl {
             
             //Sets the analysis setup in all classes
             //Initializes all histograms
-            virtual void initialize(QualityControl::Uniformity::AnalysisSetupUniformity inputAnaSetup, QualityControl::Uniformity::RunSetup inputRunSetup, QualityControl::Uniformity::DetectorMPGD & inputDet);
+            //virtual void initialize(QualityControl::Uniformity::AnalysisSetupUniformity inputAnaSetup, QualityControl::Uniformity::RunSetup inputRunSetup, QualityControl::Uniformity::DetectorMPGD & inputDet);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
