@@ -518,8 +518,8 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
     } //End Check if File Failed to Open Correctly
     
     //Call the store histos sequence
-    //storeHistos(ptr_fileOutput, inputDet);
-    storeHistos(ptr_fileOutput);
+    storeHistos(ptr_fileOutput, inputDet);
+    //storeHistos(ptr_fileOutput);
     
     //Close the ROOT file
     ptr_fileOutput->Close();
@@ -663,8 +663,8 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
     } //End Check if File Failed to Open Correctly
     
     //Call the store fits sequence
-    //storeFits(ptr_fileOutput, inputDet);
-    storeFits(ptr_fileOutput);
+    storeFits(ptr_fileOutput, inputDet);
+    //storeFits(ptr_fileOutput);
     
     //Close the ROOT file
     ptr_fileOutput->Close();
