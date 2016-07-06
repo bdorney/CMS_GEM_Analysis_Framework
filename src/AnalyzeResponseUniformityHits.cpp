@@ -262,7 +262,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
             dir_SectorPhi->cd();
             (*iterPhi).second.hitHistos.hADC->Write();
             (*iterPhi).second.hitHistos.hTime->Write();
-		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Write();
+            (*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Write();
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
     

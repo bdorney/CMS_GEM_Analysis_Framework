@@ -170,10 +170,10 @@ void InterfaceRun::analyzeAmoreSRSRunClustersOnly(string strInputRun){
         
         //Fill Distributions & Update Detector - Clusters
         //------------------------------------------------------
-        clustAnalyzer.setDetector(detMPGD);
-        clustAnalyzer.fillHistos();
+        //clustAnalyzer.setDetector(detMPGD);
+        clustAnalyzer.fillHistos(detMPGD);
         
-        detMPGD = clustAnalyzer.getDetector();
+        //detMPGD = clustAnalyzer.getDetector();
     } //End Loop Over Events
     
     //Close the Input ROOT File

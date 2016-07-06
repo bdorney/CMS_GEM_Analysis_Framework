@@ -7,6 +7,11 @@
 *                                                *
 **************************************************
 
+Update: July 6th
+==================================================
+->Performance is abysmal in this new mode.  Trying to improve.
+->Overloading fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityClusters to take as input a DetectorMPGD object by reference and work with this object instead of the object as a class attribute.
+
 Update: July 5th
 ==================================================
 ->Added overloaded method Uniformity::SelectorCluster::filterClusters() for filtering an input vector<Cluster> based on selection criterion stored in the stored/provided Uniformity::AnalysisSetupUniformity
