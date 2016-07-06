@@ -256,10 +256,10 @@ int main( int argc_, char * argv_[] ){
 
     //Setup the analysis interface
     //------------------------------------------------------
-    //anaInterface.setAnalysisParameters(aSetup);
-    //anaInterface.setDetector(detMPGD);
-    //anaInterface.setRunParameters(rSetup);
-    anaInterface.initialize(aSetup, rSetup, detMPGD);
+    anaInterface.setAnalysisParameters(aSetup);
+    anaInterface.setDetector(detMPGD);
+    anaInterface.setRunParameters(rSetup);
+    //anaInterface.initialize(aSetup, rSetup, detMPGD);
     anaInterface.setVerboseMode(bVerboseMode);
     
     //Perform the user defined analysis interface
