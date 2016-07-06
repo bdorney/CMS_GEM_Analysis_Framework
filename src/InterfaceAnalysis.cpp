@@ -82,8 +82,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     
     SectorEta etaSector;
     
-    //TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
-    TFile *file_ROOTOutput_All, *file_ROOTOutput_Single;
+    TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
+    //TFile *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
 	//Debugging
 	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;
@@ -135,7 +135,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Open this run's root file & check to see if data file opened successfully
         //------------------------------------------------------
-        /*file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
+        file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
         
         if ( !file_ROOTInput->IsOpen() || file_ROOTInput->IsZombie() ) { //Case: failed to load ROOT file
             perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + vec_strRunList[i] ).c_str() );
@@ -143,7 +143,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             std::cout << "Skipping!!!\n";
             
             continue;
-        }*/ //End Case: failed to load ROOT file
+        } //End Case: failed to load ROOT file
         
         //Debugging
         //cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Hit Ana detMPGD.getName() = " << detMPGD.getName() << endl;
@@ -151,7 +151,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
-        /*if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
             //Hit Selection
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
             
@@ -205,12 +205,12 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Update the Detector!
             detMPGD = clustAnalyzer.getDetector();
-        }*/ //End Case: Cluster Analysis
+        } //End Case: Cluster Analysis
         
         //Analyze Run
         //------------------------------------------------------
         //Setup the runInterface for this run
-        if (!rSetup.bMultiOutput) {
+        /*if (!rSetup.bMultiOutput) {
             runInterface.setDetector(detMPGD);
             
             if (i == 0) { runInterface.initialize(aSetup, rSetup); }
@@ -221,7 +221,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Run analysis and retrive the detector
         runInterface.analyzeInputAmoreSRS(vec_strRunList[i]);
-        detMPGD = runInterface.getDetector();
+        detMPGD = runInterface.getDetector();*/
         
         //User requests multiple output files?
         //------------------------------------------------------
