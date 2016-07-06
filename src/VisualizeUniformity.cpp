@@ -1363,6 +1363,9 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, U
     else if (0 == strObsName.compare("HITADC") ) { //Case: Hit ADC
         ret_histo = inputEta.hitHistos.hADC;
     } //End Case: Hit ADC
+    else if (0 == strObsName.compare("HITMULTI") ) { //Case: Cluster Multi
+        ret_histo = inputEta.hitHistos.hMulti;
+    } //End Case: Cluster Multi
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
 	    ret_histo = inputEta.hitHistos.hPos;
 	} //End Case: Hit Position

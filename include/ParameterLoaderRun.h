@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <utility>
@@ -20,6 +21,7 @@
 
 //Framework Includes
 #include "TimingUtilityFunctions.h"
+#include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
@@ -42,10 +44,8 @@ namespace QualityControl {
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Gets the list of input runs from the input config file
+            std::vector<std::pair<int, std::string> > getPairedRunList(std::ifstream &file_Input, bool bVerboseMode);
             std::vector<std::string> getRunList(std::ifstream &file_Input, bool bVerboseMode);
-            
-            //Gets the run number from an input run name
-            int getRunNumber(std::string & strRunName);
             
             //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
             virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
@@ -63,6 +63,14 @@ namespace QualityControl {
             //Data Memebers
             
         private:
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Gets the run number from an input run name
+            int getRunNumber(std::string strRunName);
+
+            //Attributes
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
             std::string strSecBegin_RunInfo;
             std::string strSecBegin_RunList;
             

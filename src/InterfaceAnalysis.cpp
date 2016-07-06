@@ -21,7 +21,7 @@ InterfaceAnalysis::InterfaceAnalysis(){
     bVerboseMode = false;
 } //End Default Constructor
 
-//Performs the analysis on the detMPGD object defined by rSetup and aSetup on the input files stored in vec_strRunList
+//Performs the analysis on the detMPGD object defined by rSetup and aSetup on the input files stored in vec_pairedRunList
 void InterfaceAnalysis::analyzeInput(){
     //Variable Declaration
     
@@ -129,16 +129,16 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
 
     //Loop over input files
     //------------------------------------------------------
-    for (int i=0; i < vec_strRunList.size(); ++i) { //Loop over vec_strRunList
+    for (int i=0; i < vec_pairedRunList.size(); ++i) { //Loop over vec_pairedRunList
         //Wipe physics objects from previous file (prevent double counting)
         detMPGD.resetPhysObj();
         
         //Open this run's root file & check to see if data file opened successfully
         //------------------------------------------------------
-        file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
+        file_ROOTInput = new TFile(vec_pairedRunList[i].second.c_str(),"READ","",1);
         
         if ( !file_ROOTInput->IsOpen() || file_ROOTInput->IsZombie() ) { //Case: failed to load ROOT file
-            perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + vec_strRunList[i] ).c_str() );
+            perror( ("InterfaceAnalysis::analyzeInputAmoreSRS() - error while opening file: " + vec_pairedRunList[i].second ).c_str() );
             Timing::printROOTFileStatus(file_ROOTInput);
             std::cout << "Skipping!!!\n";
             
@@ -156,7 +156,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             /*hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
             
             if (bVerboseMode) { //Print Number of Selected Hits to User
-                cout<<vec_strRunList[i] << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
+                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
             } //End Print Number of Selected Hits to User
             
             //Load the required input parameters
@@ -172,20 +172,22 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             detMPGD = hitAnalyzer.getDetector();*/
             
             //Hit Selection
+            hitSelector.setRunNum(vec_pairedRunList[i].first);
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
              
-             if (bVerboseMode) { //Print Number of Selected Hits to User
-             cout<<vec_strRunList[i] << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
-             } //End Print Number of Selected Hits to User
-             
-             //Load the required input parameters
-             if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-             //hitAnalyzer.setDetector(detMPGD);
-             
-             if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
-             
-             //Hit Analysis
-             hitAnalyzer.fillHistos(detMPGD);
+            if (bVerboseMode) { //Print Number of Selected Hits to User
+                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
+            } //End Print Number of Selected Hits to User
+
+            //Load the required input parameters
+            if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
+            //hitAnalyzer.setDetector(detMPGD);
+
+            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
+
+            //Hit Analysis
+            hitAnalyzer.setRunNum(vec_pairedRunList[i].first);
+            hitAnalyzer.fillHistos(detMPGD);
         } //End Case: Hit Analysis
         
         //Cluster Reconstruction
@@ -203,7 +205,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             /*clustSelector.setClusters(file_ROOTInput, detMPGD, aSetup);
             
             if (bVerboseMode) { //Print Number of Selected Clusters to User
-                cout<<vec_strRunList[i] << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
+                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
             } //End Print Number of Selected Clusters to User
             
             //Load the required input parameters
@@ -223,10 +225,11 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             detMPGD = clustAnalyzer.getDetector();*/
             
             //Cluster Selection
+            clustSelector.setRunNum(vec_pairedRunList[i].first);
             clustSelector.setClusters(file_ROOTInput, detMPGD, aSetup);
             
             if (bVerboseMode) { //Print Number of Selected Clusters to User
-                cout<<vec_strRunList[i] << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
+                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
             } //End Print Number of Selected Clusters to User
             
             //Load the required input parameters
@@ -239,6 +242,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             }
             
             //Cluster Analysis
+            clustAnalyzer.setRunNum(vec_pairedRunList[i].first);
             clustAnalyzer.fillHistos(detMPGD);
         } //End Case: Cluster Analysis
         
@@ -246,7 +250,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //------------------------------------------------------
         if (rSetup.bMultiOutput) { //Case: User wants one output file per input file
             //Setup the name of the output file
-            string strTempRunName = vec_strRunList[i];
+            string strTempRunName = vec_pairedRunList[i].second;
             
             if ( strTempRunName.find("dataTree.root") != string::npos ){
                 strTempRunName.erase(strTempRunName.find("dataTree.root"), strTempRunName.length() - strTempRunName.find("dataTree.root") );
@@ -285,7 +289,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //------------------------------------------------------
         file_ROOTInput->Close();
         delete file_ROOTInput;
-    } //End Loop over vec_strRunList
+    } //End Loop over vec_pairedRunList
     
 	//Debugging
 	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): Pre Storing detMPGD.getName() = " << detMPGD.getName() << endl;
@@ -322,13 +326,13 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
     TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
     //Loop over input files
-    for (int i=0; i < vec_strRunList.size(); ++i) { //Loop over input files
+    for (int i=0; i < vec_pairedRunList.size(); ++i) { //Loop over input files
         //Open this run's root file & check to see if data file opened successfully
         //------------------------------------------------------
-        file_ROOTInput = new TFile(vec_strRunList[i].c_str(),"READ","",1);
+        file_ROOTInput = new TFile(vec_pairedRunList[i].second.c_str(),"READ","",1);
         
         if ( !file_ROOTInput->IsOpen() || file_ROOTInput->IsZombie() ) { //Case: failed to load ROOT file
-            perror( ("InterfaceAnalysis::analyzeInputFrmwrk() - error while opening file: " + vec_strRunList[i] ).c_str() );
+            perror( ("InterfaceAnalysis::analyzeInputFrmwrk() - error while opening file: " + vec_pairedRunList[i].second ).c_str() );
             Timing::printROOTFileStatus(file_ROOTInput);
             std::cout << "Skipping!!!\n";
             
@@ -381,7 +385,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         //  e.g. there is no "aggregate file"
         //------------------------------------------------------
         //Setup the name of the output file
-        string strTempRunName = vec_strRunList[i];
+        string strTempRunName = vec_pairedRunList[i].second;
         
         if ( strTempRunName.find("Ana.root") != string::npos ) {
             strTempRunName.erase(strTempRunName.find("Ana.root"), strTempRunName.length() - strTempRunName.find("Ana.root") );
@@ -461,6 +465,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
         
         if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
             map_hit_ObsAndDrawOpt["HitADC"]="E1";
+            map_hit_ObsAndDrawOpt["HitMulti"]="E1";
             map_hit_ObsAndDrawOpt["HitTime"]="E1";
             
             visualizeUni.storeCanvasHistoSegmented(file_Results, "HitPos", "E1", rSetup.bVisPlots_PhiLines);
@@ -470,6 +475,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
         
         if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
             map_clust_ObsAndDrawOpt["ClustADC"]="E1";
+            map_clust_ObsAndDrawOpt["ClustMulti"]="E1";
             map_clust_ObsAndDrawOpt["ClustSize"]="E1";
             map_clust_ObsAndDrawOpt["ClustTime"]="E1";
             

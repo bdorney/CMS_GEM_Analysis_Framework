@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <utility>
 
 //Framework Includes
 //#include "SelectorCluster.h"
@@ -51,16 +52,28 @@ namespace QualityControl {
             virtual void analyzeInput();
             
             //As above, but resets vec_strRunList to be a single file
-            virtual void analyzeInput(std::string strInputRun){
-                vec_strRunList.clear();
-                vec_strRunList.push_back(strInputRun);
+            virtual void analyzeInput(int iNum_Run, std::string strInputRun){
+                //vec_strRunList.clear();
+                vec_pairedRunList.clear();
+                //vec_strRunList.push_back(strInputRun);
+                vec_pairedRunList.push_back(std::make_pair(iNum_Run, strInputRun ) );
+                analyzeInput();
+                return;
+            };
+            
+            virtual void analyzeInput(std::vector<std::pair<int, std::string> > vec_inputPairedRunList){
+                vec_pairedRunList = vec_inputPairedRunList;
                 analyzeInput();
                 return;
             };
             
             //As above, but resets vec_strRunList to be a new list of files
+            //Note no run numbers are assigned here
             virtual void analyzeInput(std::vector<std::string> vec_strInputRuns){
-                vec_strRunList = vec_strInputRuns;
+                vec_pairedRunList.clear();
+                for (int i=0; i<vec_strInputRuns.size(); ++i) {
+                    vec_pairedRunList.push_back(std::make_pair(-1, vec_strInputRuns[i] ) );
+                }
                 analyzeInput();
                 return;
             };
@@ -71,26 +84,12 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //virtual Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets the Analysis Setup
-            //virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup){ aSetup = inputSetup; return; };
-            
-            //Sets the Detector
-            /*virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet;
-                //std::cout<<"InterfaceAnalysis::setDetector() - detMPGD.getName() = " << detMPGD.getName() << std::endl;
-                return; };*/
-            
-            //Sets the Run Setup
-            //virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
-            
-            //Sets the Verbose Output Mode
-            //virtual void setVerboseMode(bool bInput){ bVerboseMode = bInput; return; };
             
             //Data Memebers
             
@@ -116,33 +115,11 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //Data Memebers
-            //bool bInitialized;
-            //bool bVerboseMode;
+            //Attributes
+            //------------------------------------------------------------------------------------------------------------------------------------------
             
-            std::vector<std::string> vec_strRunList;
-            
-            //Analyzers
-            //AnalyzeResponseUniformityClusters clustAnalyzer;
-            //AnalyzeResponseUniformityHits hitAnalyzer;
-            
-            //Containers
-            //AnalysisSetupUniformity aSetup;
-            //RunSetup rSetup;
-            
-            //Detector
-            //DetectorMPGD detMPGD;
-            
-            //Selectors
-            //SelectorCluster clustSelector;
-            //SelectorHit hitSelector;
-            
-            //Visualizer
-            //VisualizeUniformity visualizeUni;
-            
-            //Interfaces
-            //InterfaceRun runInterface;
-            
+            std::vector<std::pair<int, std::string> > vec_pairedRunList; //vec_pairedRunList[i].first -> Run number; vec_pairedRunList[i].second -> filename
+            //std::vector<std::string> vec_strRunList;
         }; //End InterfaceAnalysis
     } //End namespace Uniformity
 } //End namespace QualityControl

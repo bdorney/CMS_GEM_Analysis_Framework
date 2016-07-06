@@ -11,9 +11,11 @@
 
 //C++ Includes
 #include <algorithm>
+#include <string>
 #include <utility>
 
 //Framework Includes
+#include "TimingUtilityFunctions.h"
 
 //ROOT Includes
 
@@ -32,6 +34,18 @@ namespace QualityControl {
         {
             return std::make_tuple(std::get<0>(a) + std::get<0>(b), std::get<1>(a) + std::get<1>(b), std::get<2>(a) + std::get<2>(b) );
         }; //End std::tuple addition operator
+        
+        //UnaryPredicate - checks if a string contains a substring
+        struct contains{
+            std::string strSub;
+            
+            //Constructor
+            contains(std::string strInput){ strSub = strInput; }
+            
+            bool operator()(std::string strInput){
+                return ( strInput.find(strSub) == std::string::npos );
+            }
+        };
         
         //UnaryPredicate - divides input by a scalar
         struct divides{

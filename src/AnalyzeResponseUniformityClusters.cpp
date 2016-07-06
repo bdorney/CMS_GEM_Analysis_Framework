@@ -706,13 +706,6 @@ void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, D
         //Store Fits - SectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
-
-	cout<<"file_InputRootFile = " << file_InputRootFile << endl;
-	cout<<"dir_SectorEta = " << dir_SectorEta << endl;
-	cout<<"(*iterEta).second.gEta_ClustADC_Fit_NormChi2 = " << (*iterEta).second.gEta_ClustADC_Fit_NormChi2 << endl;
-	cout<<"(*iterEta).second.gEta_ClustADC_Fit_NormChi2->GetName() = " << (*iterEta).second.gEta_ClustADC_Fit_NormChi2->GetName();
-
-
         (*iterEta).second.gEta_ClustADC_Fit_NormChi2->Write();
         ( (*iterEta).second.gEta_ClustADC_Fit_PkPos.get() )->Write();
         (*iterEta).second.gEta_ClustADC_Fit_PkRes->Write();
