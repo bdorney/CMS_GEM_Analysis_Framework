@@ -141,7 +141,7 @@ namespace QualityControl {
             //VisualizeUniformity visualizeUni;
             
             //Interfaces
-            InterfaceRun runInterface;
+            //InterfaceRun runInterface;
             
         }; //End InterfaceAnalysis
     } //End namespace Uniformity

@@ -30,38 +30,60 @@ AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(){
 } //End Default Constructor
 
 //Set inputs at construction
-AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup, DetectorMPGD & inputDet){
+AnalyzeResponseUniformityHits::AnalyzeResponseUniformityHits(AnalysisSetupUniformity inputSetup){
     strAnalysisName = "analysis";
     
     //Store Analysis Parameters
     aSetup = inputSetup;
     
     //Store Detector
-    detMPGD = inputDet;
+    //detMPGD = inputDet;
 } //End Constructor
 
-//Loops over all stored Hits in detMPGD and Book histograms for the full detector
-void AnalyzeResponseUniformityHits::fillHistos(){
+//Loops over all stored hits in an input DetectorMPGD objectand fills histograms for the full detector
+void AnalyzeResponseUniformityHits::fillHistos(DetectorMPGD & inputDet){
     //Variable Declaration
+    std::multimap<int, Hit> map_hits;
+    vector<int> vec_iEvtList;
+    
+    //Determine Hit Multiplicity - Detector Level
+    map_hits = inputDet.getHits();
+    vec_iEvtList = getVectorOfKeys( map_hits );
+    for (auto iterEvt = vec_iEvtList.begin(); iterEvt != vec_iEvtList.end(); ++iterEvt) {
+        inputDet.hMulti_Hit->Fill( map_hits.count( (*iterEvt) ) );
+    }
     
     //Loop Over Stored iEta Sectors
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+    for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Determine Cluster Multiplicity - iEta Level
+        map_hits = inputDet.getHits( (*iterEta).first );
+        vec_iEvtList = getVectorOfKeys( map_hits );
+        for (auto iterEvt = vec_iEvtList.begin(); iterEvt != vec_iEvtList.end(); ++iterEvt) {
+            (*iterEta).second.hitHistos.hMulti->Fill( map_hits.count( (*iterEvt) ) );
+        }
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             
+            //Determine Hit Multiplicity - iPhi Level
+            vec_iEvtList = getVectorOfKeys( (*iterPhi).second.map_hits );
+            for (auto iterEvt = vec_iEvtList.begin(); iterEvt != vec_iEvtList.end(); ++iterEvt) {
+                (*iterPhi).second.hitHistos.hMulti->Fill( (*iterPhi).second.map_hits.count( (*iterEvt) ) );
+            }
+            
             //Loop Over Stored Hits
-            for (auto iterHit = (*iterPhi).second.vec_hits.begin(); iterHit != (*iterPhi).second.vec_hits.end(); ++iterHit) { //Loop Over Stored Hits
+            for (auto iterHit = (*iterPhi).second.map_hits.begin(); iterHit != (*iterPhi).second.map_hits.end(); ++iterHit) { //Loop Over Stored Hits
                 //Fill iEta Histograms
-                (*iterEta).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
-                (*iterEta).second.hitHistos.hPos->Fill( (*iterHit).iStripNum );
-                (*iterEta).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin );
-		(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
+                (*iterEta).second.hitHistos.hADC->Fill( (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
+                (*iterEta).second.hitHistos.hPos->Fill( (*iterHit).second.iStripNum );
+                (*iterEta).second.hitHistos.hTime->Fill( (*iterHit).second.iTimeBin );
+		(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
 
                 //Fill iPhi Histograms
-                (*iterPhi).second.hitHistos.hADC->Fill( (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
-                (*iterPhi).second.hitHistos.hTime->Fill( (*iterHit).iTimeBin);
-		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).sADCIntegral, (*iterHit).vec_sADC[(*iterHit).iTimeBin] );
+                (*iterPhi).second.hitHistos.hADC->Fill( (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
+                (*iterPhi).second.hitHistos.hTime->Fill( (*iterHit).second.iTimeBin);
+		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
             } //End Loop Over Stored Hits
         } //End Loop Over iPhi Sectors
         
@@ -72,9 +94,9 @@ void AnalyzeResponseUniformityHits::fillHistos(){
     return;
 } //End AnalyzeResponseUniformityHits::fillHistos() - Full Detector
 
-//Loops over all slices in detMPGD and fits Booked histograms for the full detector
+//Loops over all slices in inputDet and fits Booked histograms for the full detector
 //Assumes Histos have been filled already (obviously)
-void AnalyzeResponseUniformityHits::fitHistos(){
+void AnalyzeResponseUniformityHits::fitHistos(DetectorMPGD & inputDet){
     
     //Placeholder
     
@@ -82,38 +104,28 @@ void AnalyzeResponseUniformityHits::fitHistos(){
 } //End AnalyzeResponseUniformityHits::fitHistos()
 
 //Loops through the detector and initalizes all cluster histograms
-void AnalyzeResponseUniformityHits::initHistosHits(){
+void AnalyzeResponseUniformityHits::initHistosHits(DetectorMPGD & inputDet){
     //Loop Over Stored iEta Sectors
-    
-    //Debugging
-    //cout<<"AnalyzeResponseUniformityHits::initHistosHits()\n";
-    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
-    
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+    for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Grab Eta Sector width (for ClustPos Histo)
         aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
         aSetup.histoSetup_hitPos.fHisto_xUpper = 128. * (*iterEta).second.map_sectorsPhi.size();
         aSetup.histoSetup_hitPos.iHisto_nBins = 128. * (*iterEta).second.map_sectorsPhi.size();
         
-        //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-        
         //Initialize iEta Histograms - 1D
         (*iterEta).second.hitHistos.hADC = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitADC ) );
+        (*iterEta).second.hitHistos.hMulti = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitMulti ) );
         (*iterEta).second.hitHistos.hPos = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitPos ) );
         (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
         
         //Initialize iEta Histograms - 2D
         (*iterEta).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>( getHistogram2D((*iterEta).first, -1, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
         
-        //Debugging
-        //cout<<"(*iterEta).second.hitHistos.hADC->GetName() = " << (*iterEta).second.hitHistos.hADC->GetName() << endl;
-        
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
             //Initialize iPhi Histograms - 1D
             (*iterPhi).second.hitHistos.hADC = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitADC ) );
+            (*iterPhi).second.hitHistos.hMulti = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitMulti ) );
             (*iterPhi).second.hitHistos.hTime = make_shared<TH1F>(getHistogram( (*iterEta).first, (*iterPhi).first, aSetup.histoSetup_hitTime ) );
             
             //Initialize iPhi Histograms - 2D
@@ -122,16 +134,14 @@ void AnalyzeResponseUniformityHits::initHistosHits(){
     } //End Loop Over iEta Sectors
     
     //Initialize histograms over the entire detector
-    detMPGD.hMulti_Hit = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_hitMulti ) );
+    inputDet.hMulti_Hit = make_shared<TH1F>(getHistogram( -1, -1, aSetup.histoSetup_hitMulti ) );
     
-	//cout<<"detMPGD.hMulti_Hit = " << detMPGD.hMulti_Hit << endl;
-
     return;
 } //End AnalyzeResponseUniformityHits::initHistosHits()
 
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityHits
-//Loads all TObjects found in the input ROOT file into detMPGD;
-//Any previously stored information in detMPGD is lost.
+//Loads all TObjects found in the input ROOT file into inputDet;
+//Any previously stored information in inputDet is lost.
 void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
     
     //Placeholder
@@ -141,7 +151,7 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
 
 //Stores booked histograms (for those histograms that are non-null)
 //Takes a std::string which stores the physical filename as input
-void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption ){
+void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet){
     //Variable Declaration
     //HistosPhysObj summaryHistos; //Histograms for the entire Detector
     
@@ -158,7 +168,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
     } //End Check if File Failed to Open Correctly
     
     //Call the store histos sequence
-    storeHistos(ptr_fileOutput);
+    storeHistos(ptr_fileOutput, inputDet);
      
     //Close the ROOT file
     ptr_fileOutput->Close();
@@ -168,7 +178,7 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 
 //Stores booked histograms (for those histograms that are non-null)
 //Takes a TFile * which the histograms are written to as input
-void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
+void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet){
     //Variable Declaration
     //HistosPhysObj summaryHistos; //Histograms for the entire Detector
     
@@ -214,7 +224,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
     } //End Case: Directory did not exist in file, CREATE
     
     //Loop Over Stored iEta Sectors
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+    for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
         //Get Directory
         //-------------------------------------
@@ -238,6 +248,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
         //-------------------------------------
         dir_SectorEta->cd();
         (*iterEta).second.hitHistos.hADC->Write();
+        (*iterEta).second.hitHistos.hMulti->Write();
         (*iterEta).second.hitHistos.hPos->Write();
         (*iterEta).second.hitHistos.hTime->Write();
         (*iterEta).second.hitHistos.hADCMax_v_ADCInt->Write();
@@ -261,6 +272,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
             //-------------------------------------
             dir_SectorPhi->cd();
             (*iterPhi).second.hitHistos.hADC->Write();
+            (*iterPhi).second.hitHistos.hMulti->Write();
             (*iterPhi).second.hitHistos.hTime->Write();
             (*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Write();
         } //End Loop Over Stored iPhi Sectors
@@ -269,7 +281,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
     //Store the Summary Histograms
     dir_Summary->cd();
     hHitADC_All.Write();
-    detMPGD.hMulti_Hit->Write();
+    inputDet.hMulti_Hit->Write();
 	hHitPos_All.Write();    
 	hHitTime_All.Write();
 
@@ -278,7 +290,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile){
     return;
 } //End storeHistos()
 
-void AnalyzeResponseUniformityHits::storeFits( string & strOutputROOTFileName, std::string strOption ){
+void AnalyzeResponseUniformityHits::storeFits( string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet){
     
     //Placeholder
     

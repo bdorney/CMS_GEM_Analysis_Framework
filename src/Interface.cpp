@@ -46,10 +46,10 @@ void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup input
         hitSelector.setAnalysisParameters(aSetup);
         
         hitAnalyzer.setAnalysisParameters(aSetup);
-        hitAnalyzer.setDetector(detMPGD);
-        hitAnalyzer.initHistosHits();
+        //hitAnalyzer.setDetector(detMPGD);
+        hitAnalyzer.initHistosHits(detMPGD);
         
-        detMPGD = hitAnalyzer.getDetector();
+        //detMPGD = hitAnalyzer.getDetector();
     } //End Case: Hits Desired
     
     //Initialize Cluster Related Items
@@ -57,11 +57,11 @@ void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup input
         clustSelector.setAnalysisParameters(aSetup);
         
         clustAnalyzer.setAnalysisParameters(aSetup);
-        clustAnalyzer.setDetector(detMPGD);
-        clustAnalyzer.initGraphsClusters();
-        clustAnalyzer.initHistosClusters();
+        //clustAnalyzer.setDetector(detMPGD);
+        clustAnalyzer.initGraphsClusters(detMPGD);
+        clustAnalyzer.initHistosClusters(detMPGD);
         
-        detMPGD = clustAnalyzer.getDetector();
+        //detMPGD = clustAnalyzer.getDetector();
     }
     
     return;

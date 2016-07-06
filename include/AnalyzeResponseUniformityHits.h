@@ -62,21 +62,21 @@ namespace QualityControl {
             AnalyzeResponseUniformityHits();
             
             //Set the detector and anlysis parameters at construction
-            AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
+            AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup);
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Filling*****************
             //Loops over all stored clusters in detMPGD and Book histograms for the full detector
-            virtual void fillHistos();
+            virtual void fillHistos(DetectorMPGD & inputDet);
             
             //Fitting*****************
             //Loops over all slices in detMPGD and fits Booked histograms for the full detector
-            virtual void fitHistos();
+            virtual void fitHistos(DetectorMPGD & inputDet);
             
             //Initialize**************
             //Loops through the detector and initalizes all cluster histograms
-            virtual void initHistosHits();
+            virtual void initHistosHits(DetectorMPGD & inputDet);
             
             //Loading*****************
             //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityHits
@@ -91,15 +91,15 @@ namespace QualityControl {
             //Storing*****************
             //Stores booked cluster histograms (for those histograms that are non-null)
             //Takes a std::string which stores the physical filename as input
-            void storeHistos(std::string & strOutputROOTFileName, std::string strOption);
+            void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
             
             //Stores booked cluster histograms (for those histograms that are non-null)
             //Takes a TFile * which the histograms are written to as input
-            void storeHistos(TFile * file_InputRootFile);
+            void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
             
             //Stores booked cluster fits (for those fits that are non-null)
             //Takes a std::string which stores the physical filename as input
-            void storeFits(std::string & strOutputROOTFileName, std::string strOption);
+            void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
             
             //Stores booked cluster fits (for those fits that are non-null)
             //Takes a TFile * which the histograms are written to as input
