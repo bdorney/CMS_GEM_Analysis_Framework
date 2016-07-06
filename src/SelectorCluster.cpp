@@ -116,24 +116,6 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     
     //Determine Event Range
     //------------------------------------------------------
-    /*if ( -1 == iNEvt ) { //Case: All Events
-        iFirstEvt = 0;
-        iNEvt = tree_Clusters->GetEntries();
-    } //End Case: All Events
-    else{ //Case: Event Range
-        if ( iFirstEvt > tree_Clusters->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("SelectorCluster","setClusters", ("Error, First Event Requested as " + Timing::getString( aSetup.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Clusters->GetEntries() ) ).c_str() );
-            printClassMethodMsg("SelectorCluster","setClusters", "Exiting!!!");
-            return;
-        } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-        else if( (iFirstEvt + iNEvt) > tree_Clusters->GetEntries() ){
-            iNEvt = tree_Clusters->GetEntries() - iFirstEvt;
-        }
-        else if( iFirstEvt < 0){
-            iFirstEvt = 0;
-        }
-    }*/ //End Case: Event Range
-    
     pair_iEvtRange = getEventRange( aSetup.iEvt_First, aSetup.iEvt_Total, tree_Clusters->GetEntries() );
     
     //Get data event-by-event
@@ -183,7 +165,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
             if ( !clusterPassesSelection(clust) ) continue;
             
             //If a cluster makes it here, store it in the detector
-            inputDet.setCluster(clust);
+            inputDet.setCluster(i, clust);
         } //End Loop Over Number of Clusters
     } //End Loop Over "Events"
     

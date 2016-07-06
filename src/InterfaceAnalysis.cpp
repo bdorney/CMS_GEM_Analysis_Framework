@@ -161,16 +161,13 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Load the required input parameters
             if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            hitAnalyzer.setDetector(detMPGD);
+            //hitAnalyzer.setDetector(detMPGD);
             
             //Initialize the hit histograms if this is the first run
-            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(); }
+            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
             
             //Hit Analysis
-            hitAnalyzer.fillHistos();
-            
-            //Update the Detector!
-            detMPGD = hitAnalyzer.getDetector();
+            hitAnalyzer.fillHistos(detMPGD);
         } //End Case: Hit Analysis
         
         //Cluster Reconstruction
@@ -192,19 +189,19 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-                clustAnalyzer.setDetector(detMPGD);
+            //clustAnalyzer.setDetector(detMPGD);
             
             //Initialize the cluster histograms if this is the first run
             if (i == 0 || rSetup.bMultiOutput) {
-                clustAnalyzer.initGraphsClusters();
-                clustAnalyzer.initHistosClusters();
+                clustAnalyzer.initGraphsClusters(detMPGD);
+                clustAnalyzer.initHistosClusters(detMPGD);
             }
             
             //Cluster Analysis
-            clustAnalyzer.fillHistos();
+            clustAnalyzer.fillHistos(detMPGD);
             
             //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();
+            //detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
         
         //Analyze Run
@@ -339,14 +336,12 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
 	    //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
             
-            //Load previous cluster histograms
+            //Load previous cluster histograms & setup the detector
             clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
+            detMPGD = clustAnalyzer.getDetector();
 
             //Initialize Graphs
-            clustAnalyzer.initGraphsClusters();
-
-            //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();
+            clustAnalyzer.initGraphsClusters(detMPGD);
         } //End Case: Cluster Analysis
         
         //Store the Output
@@ -404,19 +399,19 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
 
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
-    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results);
-    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results);
+    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results, detMPGD);
+    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results, detMPGD);
     
     //Fit Histograms After Analyzing all input files
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
         if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
-            clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
-            clustAnalyzer.fitHistos();
-            clustAnalyzer.storeFits(file_Results);
+            //clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
+            clustAnalyzer.fitHistos(detMPGD);
+            clustAnalyzer.storeFits(file_Results, detMPGD);
             
             //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();
+            //detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
     } //End Case: Fitting Stored Distributions
     

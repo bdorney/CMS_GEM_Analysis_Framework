@@ -10,7 +10,10 @@
 Update: July 6th
 ==================================================
 ->Performance is abysmal in this new mode.  Trying to improve.
-->Overloading fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityClusters to take as input a DetectorMPGD object by reference and work with this object instead of the object as a class attribute.
+->Changed fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityClusters to take as input a DetectorMPGD object by reference and work with this object instead of the stored DetectorMPGD class attribute inherited from FrameworkBase.
+->Changed QualityControl::Uniformity::SectorPhi::vec_clusters and vec_hits to std::multimap<int,Cluster> and std::multimap<int,Hit>, respectively.  Here the key value is the event number
+->Changed DetectorMPGD get/set methods to work mostly with std::multimap<int, X> for X = {Cluster, Hit} instead of with std::vector<X>
+->Changed fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityHits to take as input a DetectorMPGD object by reference and work with this object instead of the stored DetectorMPGD class attribute inherited from FrameworkBase.
 
 Update: July 5th
 ==================================================

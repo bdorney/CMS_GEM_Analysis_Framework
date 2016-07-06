@@ -24,6 +24,8 @@ namespace QualityControl {
     public:
         //Constructors
         //------------------------------------------------------------------------------------------------------------------------------------------
+        //Default
+        FrameworkBase();
         
         //Actions - Methods that Do Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +33,9 @@ namespace QualityControl {
         //Getters - Methods that Get (i.e. Return) Something
         //------------------------------------------------------------------------------------------------------------------------------------------
         virtual Uniformity::DetectorMPGD getDetector(){ return detMPGD; };
+        
+        //Sets the run number
+        virtual int getRunNum(){ return iNum_Run; };
         
         //Printers - Methods that Print Something
         //------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,6 +48,9 @@ namespace QualityControl {
         //Sets the Detector
         virtual void setDetector(Uniformity::DetectorMPGD & inputDet){ detMPGD = inputDet; return; };
 
+        //Sets the run number
+        virtual void setRunNum(int iInput){ iNum_Run = iInput; return; };
+        
         //Sets the Verbose Output Mode
         virtual void setVerboseMode(bool bInput){ bVerboseMode = bInput; return; };
         
@@ -61,8 +69,9 @@ namespace QualityControl {
         
         //Attributes
         //------------------------------------------------------------------------------------------------------------------------------------------
+        bool bVerboseMode; //flag for level of printing to the user
         
-        bool bVerboseMode;
+        int iNum_Run;   //Run number
         
         QualityControl::Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         

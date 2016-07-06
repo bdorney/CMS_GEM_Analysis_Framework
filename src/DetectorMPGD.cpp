@@ -11,6 +11,7 @@
 using std::cout;
 using std::endl;
 using std::map;
+using std::multimap;
 using std::vector;
 
 using QualityControl::Timing::getString;
@@ -24,10 +25,10 @@ DetectorMPGD::DetectorMPGD(){
 } //End default constructor
 
 //Constructor to use when supplying a vector of clusters
-DetectorMPGD::DetectorMPGD(vector<Cluster> vec_inputClusters){
+DetectorMPGD::DetectorMPGD(multimap<int, Cluster> map_inputClusters){
     strDetName = "Detector";
     strDetNameNoSpecChar	= "Detector";
-    setClusters(vec_inputClusters);
+    setClusters(map_inputClusters);
 }
 
 //Constructor to use when supplying a map of eta sectors
@@ -45,7 +46,7 @@ void DetectorMPGD::resetClusters(){
     for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
-            (*iterPhi).second.vec_clusters.clear();
+            (*iterPhi).second.map_clusters.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
     } //End Loop Over Detector's SectorEta Objects
     
@@ -57,7 +58,7 @@ void DetectorMPGD::resetHits(){
     for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
-            (*iterPhi).second.vec_hits.clear();
+            (*iterPhi).second.map_hits.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
     } //End Loop Over Detector's SectorEta Objects
     
@@ -69,8 +70,8 @@ void DetectorMPGD::resetPhysObj(){
     for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
-            (*iterPhi).second.vec_clusters.clear();
-            (*iterPhi).second.vec_hits.clear();
+            (*iterPhi).second.map_clusters.clear();
+            (*iterPhi).second.map_hits.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
     } //End Loop Over Detector's SectorEta Objects
     
@@ -78,14 +79,14 @@ void DetectorMPGD::resetPhysObj(){
 } //End DetectorMPGD::resetHits()
 
 //Returns all clusters
-vector<Cluster> DetectorMPGD::getClusters(){
+multimap<int, Cluster> DetectorMPGD::getClusters(){
     //Variable Declaration
-    vector<Cluster> vec_retClus;
+    multimap<int, Cluster> map_retClus;
     
     if (map_sectorsEta.size() > 0) { //Case: Eta Sectors Defined
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
             for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) {
-                vec_retClus.insert(vec_retClus.end(), (*iterPhi).second.vec_clusters.begin(), (*iterPhi).second.vec_clusters.end() );
+                map_retClus.insert( (*iterPhi).second.map_clusters.begin(), (*iterPhi).second.map_clusters.end() );
             } //End Loop Over Phi Sectors within an Eta Sector
         } //End Loop Over map_sectorsEta
     } //End Case: Eta Sectors Defined
@@ -94,36 +95,34 @@ vector<Cluster> DetectorMPGD::getClusters(){
         printClassMethodMsg("DetectorMPGD","getClusters","\tPlease Initialize Eta Sectors Before Trying to Set Clusters");
     } //End Case: No Sectors Defined
     
-    return vec_retClus;
+    return map_retClus;
 } //End DetectorMPGD::getClusters()
 
 //Returns clusters associated with a specific iEta value (all iPhi for this sector)
-vector<Cluster> DetectorMPGD::getClusters(int iEta){
+multimap<int, Cluster> DetectorMPGD::getClusters(int iEta){
     //Variable Declaration
-    vector<Cluster> vec_retClus;
+    multimap<int, Cluster> map_retClus;
     
     if (map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value Exists!!
-        //return map_sectorsEta[iEta].vec_clusters;
-        
         for (auto iterPhi = map_sectorsEta[iEta].map_sectorsPhi.begin(); iterPhi != map_sectorsEta[iEta].map_sectorsPhi.end(); ++iterPhi) {
-            vec_retClus.insert(vec_retClus.end(), (*iterPhi).second.vec_clusters.begin(), (*iterPhi).second.vec_clusters.end() );
+            map_retClus.insert( (*iterPhi).second.map_clusters.begin(), (*iterPhi).second.map_clusters.end() );
         } //End Loop Over Phi Sectors within an Eta Sector
     } //End Case: Requested iEta Value Exists!!
     else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
         printClassMethodMsg("DetectorMPGD","getClusters", ("Error: iEta " + getString(iEta) + " Does NOT Exists!!!" ).c_str() );
         printClassMethodMsg("DetectorMPGD","getClusters", "\tThe Returned vector is Empty!!!");
     } //End Case: Requested iEta Value doesn ot exist, return an empty vector
-    return vec_retClus;
+    return map_retClus;
 } //End getClusters
 
 //Returns cluster associated with a specific (iEta, iPhi) location
-vector<Cluster> DetectorMPGD::getClusters(int iEta, int iPhi){
+multimap<int, Cluster> DetectorMPGD::getClusters(int iEta, int iPhi){
     //Variable Declaration
-    vector<Cluster> vec_retClus;
+    multimap<int, Cluster> map_retClus;
     
     if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
         if ( map_sectorsEta[iEta].map_sectorsPhi.count(iPhi) > 0 ) { //Case: Requeste iPhi Value exists
-            vec_retClus = map_sectorsEta[iEta].map_sectorsPhi[iPhi].vec_clusters;
+            map_retClus = map_sectorsEta[iEta].map_sectorsPhi[iPhi].map_clusters;
         } //End Case: Requeste iPhi Value exists
         else{ //Case: Requested iPhi Value doesn ot exist, return an empty vector
             printClassMethodMsg("DetectorMPGD","getClusters", ("Error: (iEta,iPhi) = (" + getString(iEta) + "," + getString(iPhi) + ") Does NOT Exists!!!" ).c_str() );
@@ -135,18 +134,18 @@ vector<Cluster> DetectorMPGD::getClusters(int iEta, int iPhi){
         printClassMethodMsg("DetectorMPGD","getClusters", "\tThe Returned vector is Empty!!!");
     } //End Case: Requested iEta Value doesn ot exist, return an empty vector
     
-    return vec_retClus;
+    return map_retClus;
 } //End getClusters
 
 //Returns all hits
-vector<Hit> DetectorMPGD::getHits(){
+multimap<int, Hit> DetectorMPGD::getHits(){
     //Variable Declaration
-    vector<Hit> vec_retHits;
+    multimap<int, Hit> map_retHits;
     
     if (map_sectorsEta.size() > 0) { //Case: Eta Sectors Defined
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
             for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) {
-                vec_retHits.insert(vec_retHits.end(), (*iterPhi).second.vec_hits.begin(), (*iterPhi).second.vec_hits.end() );
+                map_retHits.insert( (*iterPhi).second.map_hits.begin(), (*iterPhi).second.map_hits.end() );
             } //End Loop Over Phi Sectors within an Eta Sector
         } //End Loop Over map_sectorsEta
     } //End Case: Eta Sectors Defined
@@ -155,19 +154,17 @@ vector<Hit> DetectorMPGD::getHits(){
         printClassMethodMsg("DetectorMPGD","getHits","\tPlease Initialize Eta Sectors Before Trying to Set Clusters");
     } //End Case: No Sectors Defined
     
-    return vec_retHits;
+    return map_retHits;
 } //End DetectorMPGD::getHits()
 
 //Returns hits associated with a specific iEta value (all iPhi for this sector)
-vector<Hit> DetectorMPGD::getHits(int iEta){
+multimap<int, Hit> DetectorMPGD::getHits(int iEta){
     //Variable Declaration
-    vector<Hit> vec_retHits;
+    multimap<int, Hit> map_retHits;
     
     if (map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value Exists!!
-        //return map_sectorsEta[iEta].vec_clusters;
-        
         for (auto iterPhi = map_sectorsEta[iEta].map_sectorsPhi.begin(); iterPhi != map_sectorsEta[iEta].map_sectorsPhi.end(); ++iterPhi) {
-            vec_retHits.insert(vec_retHits.end(), (*iterPhi).second.vec_hits.begin(), (*iterPhi).second.vec_hits.end() );
+            map_retHits.insert( (*iterPhi).second.map_hits.begin(), (*iterPhi).second.map_hits.end() );
         } //End Loop Over Phi Sectors within an Eta Sector
     } //End Case: Requested iEta Value Exists!!
     else{ //Case: Requested iEta Value doesn ot exist, return an empty vector
@@ -175,17 +172,17 @@ vector<Hit> DetectorMPGD::getHits(int iEta){
         printClassMethodMsg("DetectorMPGD","getHits", "\tThe Returned vector is Empty!!!");
     } //End Case: Requested iEta Value doesn ot exist, return an empty vector
     
-    return vec_retHits;
+    return map_retHits;
 } //End DetectorMPGD::getHits()
 
 //Returns cluster associated with a specific (iEta, iPhi) location
-vector<Hit> DetectorMPGD::getHits(int iEta, int iPhi){
+multimap<int, Hit> DetectorMPGD::getHits(int iEta, int iPhi){
     //Variable Declaration
-    vector<Hit> vec_retHits;
+    multimap<int, Hit> map_retHits;
     
     if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
         if ( map_sectorsEta[iEta].map_sectorsPhi.count(iPhi) > 0 ) { //Case: Requeste iPhi Value exists
-            vec_retHits = map_sectorsEta[iEta].map_sectorsPhi[iPhi].vec_hits;
+            map_retHits = map_sectorsEta[iEta].map_sectorsPhi[iPhi].map_hits;
         } //End Case: Requeste iPhi Value exists
         else{ //Case: Requested iPhi Value doesn ot exist, return an empty vector
             printClassMethodMsg("DetectorMPGD","getHits", ("Error: (iEta,iPhi) = (" + getString(iEta) + "," + getString(iPhi) + ") Does NOT Exists!!!" ).c_str() );
@@ -197,7 +194,7 @@ vector<Hit> DetectorMPGD::getHits(int iEta, int iPhi){
         printClassMethodMsg("DetectorMPGD","getHits", "\tThe Returned vector is Empty!!!");
     } //End Case: Requested iEta Value doesn ot exist, return an empty vector
     
-    return vec_retHits;
+    return map_retHits;
 } //End DetectorMPGD::getHits()
 
 //Returns the position of an iEta sector
@@ -258,7 +255,7 @@ SectorPhi DetectorMPGD::getPhiSector(int iEta, int iPhi){
 } //End getPhiSector
 
 //Sets a cluster
-void DetectorMPGD::setCluster(Cluster &inputCluster){
+void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
     //Check if the DetectorMPGD is initialized!
     if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
@@ -269,7 +266,7 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
                     
                     if ( (*iterPhi).second.fPos_Xlow <= inputCluster.fPos_X && inputCluster.fPos_X < (*iterPhi).second.fPos_Xhigh ) { //Case: Matching Phi Sector Found!
-                        (*iterPhi).second.vec_clusters.push_back(inputCluster);
+                        (*iterPhi).second.map_clusters.insert( std::pair<int, Cluster>(iNum_Evt, inputCluster) );
                         break;
                     } //End Case: Matching Phi Sector Found!
                 } //End Loop Over map_sectorsPhi
@@ -288,7 +285,7 @@ void DetectorMPGD::setCluster(Cluster &inputCluster){
 } //End DetectorMPGD::setCluster
 
 //Sets a hit
-void DetectorMPGD::setHit(Hit &inputHit){
+void DetectorMPGD::setHit(int iNum_Evt, Hit &inputHit){
     //Check if the DetectorMPGD is initialized!
     if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
@@ -299,7 +296,7 @@ void DetectorMPGD::setHit(Hit &inputHit){
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
                     
                     if ( (*iterPhi).second.iStripNum_Min <= inputHit.iStripNum && inputHit.iStripNum < (*iterPhi).second.iStripNum_Max ) { //Case: Matching Phi Sector Found!
-                        (*iterPhi).second.vec_hits.push_back(inputHit);
+                        (*iterPhi).second.map_hits.insert( std::pair<int, Hit>(iNum_Evt, inputHit) );
                         break;
                     } //End Case: Matching Phi Sector Found!
                 } //End Loop Over map_sectorsPhi
@@ -365,9 +362,15 @@ void DetectorMPGD::setEvent(Event &inputEvt){
     hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
     hMulti_Hit->Fill( inputEvt.vec_hits.size() );
     
-    //Set Physics Objects
-    setClusters( inputEvt.vec_clusters );
-    setHits( inputEvt.vec_hits );
+    //Set Clusters
+    for (int i=0; i < inputEvt.vec_clusters.size(); ++i) {
+        setCluster(inputEvt.iNum_Evt, inputEvt.vec_clusters[i]);
+    }
+    
+    //Set Hits
+    for (int i=0; i < inputEvt.vec_hits.size(); ++i) {
+        setHit(inputEvt.iNum_Evt, inputEvt.vec_hits[i]);
+    }
     
     return;
 } //End DetectorMPGD::setEvent()
@@ -376,8 +379,10 @@ void DetectorMPGD::setEventOnlyClusters(Event &inputEvt){
     //Fill event level distributions
     hMulti_Clust->Fill( inputEvt.vec_clusters.size() );
     
-    //Set Physics Objects
-    setClusters( inputEvt.vec_clusters );
+    //Set Clusters
+    for (int i=0; i < inputEvt.vec_clusters.size(); ++i) {
+        setCluster(inputEvt.iNum_Evt, inputEvt.vec_clusters[i]);
+    }
     
     return;
 } //End DetectorMPGD::setEvent()
@@ -386,8 +391,10 @@ void DetectorMPGD::setEventOnlyHits(Event &inputEvt){
     //Fill event level distributions
     hMulti_Hit->Fill( inputEvt.vec_hits.size() );
     
-    //Set Physics Objects
-    setHits( inputEvt.vec_hits );
+    //Set Hits
+    for (int i=0; i < inputEvt.vec_hits.size(); ++i) {
+        setHit(inputEvt.iNum_Evt, inputEvt.vec_hits[i]);
+    }
     
     return;
 } //End DetectorMPGD::setEventOnlyHits()

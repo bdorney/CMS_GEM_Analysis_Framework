@@ -182,24 +182,6 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
        
     //Determine Event Range
     //------------------------------------------------------
-    /*if ( -1 == iNEvt ) { //Case: All Events
-        iFirstEvt = 0;
-        iNEvt = tree_Hits->GetEntries();
-    } //End Case: All Events
-    else{ //Case: Event Range
-        if ( iFirstEvt > tree_Hits->GetEntries() ) { //Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-            printClassMethodMsg("SelectorHit","setHits", ("Error, First Event Requested as " + Timing::getString( aSetup.iEvt_First ) + " Greater Thant Total Number of Events " + Timing::getString( tree_Hits->GetEntries() ) ).c_str() );
-            printClassMethodMsg("SelectorHit","setHits", "Exiting!!!");
-            return;
-        } //End Case: Incorrect Event Range, 1st Event Requested Beyond All Events
-        else if( (iFirstEvt + iNEvt) > tree_Hits->GetEntries() ){
-            iNEvt = tree_Hits->GetEntries() - iFirstEvt;
-        }
-        else if( iFirstEvt < 0){
-            iFirstEvt = 0;
-        }
-    }*/ //End Case: Event Range
-    
     pair_iEvtRange = getEventRange( aSetup.iEvt_First, aSetup.iEvt_Total, tree_Hits->GetEntries() );
     
     //Get data event-by-event
@@ -282,7 +264,7 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
             if ( !hitPassesSelection(hitStrip) ) continue;
             
             //If a hit makes it here, store it in the detector
-            inputDet.setHit(hitStrip);
+            inputDet.setHit(i, hitStrip);
         } //End Loop Over Number of hits
     } //End Loop Over "Events"
     

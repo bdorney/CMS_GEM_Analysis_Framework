@@ -14,10 +14,12 @@
 #include <cctype>
 #include <cmath>
 #include <iostream>
+//#include <list>
 #include <stdio.h>
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 //Framework Includes
 #include "TimingUtilityFunctions.h"
@@ -39,9 +41,6 @@ namespace QualityControl {
     namespace Uniformity {
         //Math
         //BinaryOperation - Uses the tuple addition operator defined in UniformityUtilityOperators.h for stl algorithms (e.g. std::accumulate)
-        //accumulate is unable to resolve this templated type
-        //template<typename T1, typename T2, typename T3>
-        //std::tuple<T1, T2, T3> addTuple(const std::tuple<T1, T2, T3> & a, const std::tuple<T1, T2, T3> & b) { return a+b; };
         std::tuple<double, double, double> addTuple(const std::tuple<double, double, double> & a, const std::tuple<double, double, double> & b);
         
         //iFirstEvt -> a starting event number
@@ -56,6 +55,19 @@ namespace QualityControl {
         T ceilPowerTen(T tInput, int iPower);
         template<typename T>
         T ceilPowerTen(T tInput, int iScalar, int iPower);
+        
+        //map manipulation
+        //returns a vector of keys
+        //T1 & T2 -> type; C -> Compare; A -> allocator
+        template<typename T1, typename T2, typename C, typename A>
+        std::vector<T1> getVectorOfKeys(std::map<T1,T2,C,A> inputMap);
+        
+        //returns a vector of keys in a multimap
+        //note duplicate stored keys are removed from the vector  before being returned
+        //T1 & T2 -> type; C -> Compare; A -> allocator
+        template<typename T1, typename T2, typename C, typename A>
+        std::vector<T1> getVectorOfKeys(std::multimap<T1,T2,C,A> inputMap);
+        
         
         //printers
         //void printClassMethodMsg(std::string &strClass, std::string &strMethod, std::string &strMessage);
@@ -96,8 +108,38 @@ namespace QualityControl {
             } //End Case: value
         } //End ceilPowerTen()
         
-        //string manipulation
+        //map manipulation
         //----------------------------------------------------------------------------------------
+        //T1 & T2 -> type; C -> Compare; A -> allocator
+        template<typename T1, typename T2, typename C, typename A>
+        std::vector<T1> getVectorOfKeys(std::map<T1,T2,C,A> inputMap){
+            
+            std::vector<T1> vec_retKeys;
+            
+            for (auto iterMap = inputMap.begin(); iterMap != inputMap.end(); ++iterMap) {
+                vec_retKeys.push_back( (*iterMap).first );
+            }
+            
+            return vec_retKeys;
+        } //End getVectorOfKeys()
+        
+        //T1 & T2 -> type; C -> Compare; A -> allocator
+        template<typename T1, typename T2, typename C, typename A>
+        std::vector<T1> getVectorOfKeys(std::multimap<T1,T2,C,A> inputMap){
+            
+            std::vector<T1> vec_retKeys;
+            
+            for (auto iterMap = inputMap.begin(); iterMap != inputMap.end(); ++iterMap) {
+                vec_retKeys.push_back( (*iterMap).first );
+            }
+            
+            auto iterVec = vec_retKeys.begin();
+            iterVec = std::unique( vec_retKeys.begin(), vec_retKeys.end() );
+            vec_retKeys.resize( std::distance(vec_retKeys.begin(),iterVec) );
+
+            return vec_retKeys;
+        } //End getVectorOfKeys()
+        
         //template method must be defined in the header file
         
         

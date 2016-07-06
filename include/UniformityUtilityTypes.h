@@ -420,8 +420,10 @@ namespace QualityControl {
             
             std::map<int, SectorSlice> map_slices;  //Slices of this sector
             
-            std::vector<Cluster> vec_clusters;
-            std::vector<Hit> vec_hits;
+            //std::vector<Cluster> vec_clusters;
+            std::multimap<int, Cluster> map_clusters;   //key value understood as event number
+            //std::vector<Hit> vec_hits;
+            std::multimap<int, Hit> map_hits;           //key value understood as event number
             
             //Histograms
             HistosPhysObj clustHistos;
@@ -444,8 +446,10 @@ namespace QualityControl {
                 
                 map_slices = other.map_slices;
                 
-                vec_hits    = other.vec_hits;
-                vec_clusters= other.vec_clusters;
+                //vec_hits    = other.vec_hits;
+                map_hits    = other.map_hits;
+                //vec_clusters= other.vec_clusters;
+                map_clusters= other.map_clusters;
                 
                 clustHistos = other.clustHistos;
                 hitHistos   = other.hitHistos;
@@ -464,8 +468,10 @@ namespace QualityControl {
                     
                     map_slices = other.map_slices;
                     
-                    vec_hits    = other.vec_hits;
-                    vec_clusters= other.vec_clusters;
+                    //vec_hits    = other.vec_hits;
+                    map_hits    = other.map_hits;
+                    //vec_clusters= other.vec_clusters;
+                    map_clusters= other.map_clusters;
                     
                     clustHistos = other.clustHistos;
                     hitHistos   = other.hitHistos;

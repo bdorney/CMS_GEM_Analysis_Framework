@@ -60,12 +60,12 @@ namespace QualityControl {
                 statClustADC_Fit_PkPos      = other.statClustADC_Fit_PkPos;
                 statClustADC_Fit_PkRes      = other.statClustADC_Fit_PkRes;
 
-		if( other.hMulti_Clust != NULL ){	hMulti_Clust = std::make_shared<TH1F>( *other.hMulti_Clust.get() ); }
+                if( other.hMulti_Clust != NULL ){	hMulti_Clust = std::make_shared<TH1F>( *other.hMulti_Clust.get() ); }
                 if( other.hMulti_Hit != NULL ){		hMulti_Hit   = std::make_shared<TH1F>( *other.hMulti_Hit.get() ); }
             };
             
-            //Constructor to use when supplying a vector of clusters
-            DetectorMPGD(std::vector<Cluster> vec_inputClusters);
+            //Constructor to use when supplying a multimap of clusters
+            DetectorMPGD(std::multimap<int, Cluster> map_inputClusters);
             
             //Constructor to use when supplying a list of sectors;
             DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
@@ -129,13 +129,13 @@ namespace QualityControl {
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Returns all clusters
-            virtual std::vector<Cluster> getClusters();
+            virtual std::multimap<int, Cluster> getClusters();
             
             //Returns clusters for a given iEta value (all iPhi)
-            virtual std::vector<Cluster> getClusters(int iEta);
+            virtual std::multimap<int, Cluster> getClusters(int iEta);
             
             //Returns clusters for a given (iEta,iPhi value)
-            virtual std::vector<Cluster> getClusters(int iEta, int iPhi);
+            virtual std::multimap<int, Cluster> getClusters(int iEta, int iPhi);
             
             //returns the position of an iEta sector
             virtual float getEtaPos(int iEta);
@@ -148,13 +148,13 @@ namespace QualityControl {
             virtual float getEtaWidth(int iEta);
             
             //Returns all hits
-            virtual std::vector<Hit> getHits();
+            virtual std::multimap<int, Hit> getHits();
             
             //Returns clusters for a given iEta value (all iPhi)
-            virtual std::vector<Hit> getHits(int iEta);
+            virtual std::multimap<int, Hit> getHits(int iEta);
             
             //Returns clusters for a given (iEta,iPhi value)
-            virtual std::vector<Hit> getHits(int iEta, int iPhi);
+            virtual std::multimap<int, Hit> getHits(int iEta, int iPhi);
             
             //returns the name of the detector
             virtual std::string getName(){ return strDetName; };
@@ -180,12 +180,12 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Sets a cluster
-            virtual void setCluster(Cluster &inputCluster);
+            virtual void setCluster(int iNum_Evt, Cluster &inputCluster);
             
             //Sets all clusters
-            virtual void setClusters(std::vector<Cluster> &vec_inputClusters){
-                for (int i=0; i<vec_inputClusters.size(); ++i) {
-                    setCluster(vec_inputClusters[i]);
+            virtual void setClusters(std::multimap<int, Cluster> &map_inputClusters){
+                for (auto iterClust = map_inputClusters.begin(); iterClust != map_inputClusters.end(); ++iterClust) {
+                    setCluster( (*iterClust).first, (*iterClust).second );
                 }
                 
                 return;
@@ -224,12 +224,12 @@ namespace QualityControl {
             };
             
             //Sets a hit
-            virtual void setHit(Hit &inputHit);
+            virtual void setHit(int iNum_Evt, Hit &inputHit);
             
             //Sets all hits
-            virtual void setHits(std::vector<Hit> & vec_inputHits){
-                for (int i=0; i < vec_inputHits.size(); ++i) {
-                    setHit(vec_inputHits[i]);
+            virtual void setHits(std::multimap<int, Hit> & map_inputHits){
+                for (auto iterHit = map_inputHits.begin(); iterHit != map_inputHits.end(); ++iterHit) {
+                    setHit( (*iterHit).first, (*iterHit).second );
                 }
                 
                 return;
