@@ -70,6 +70,10 @@ namespace QualityControl {
             //Constructor to use when supplying a list of sectors;
             DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
             
+	    //Destructors
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            ~DetectorMPGD();
+
             //Operators
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Overloaded Assignment Operator

@@ -36,6 +36,10 @@ DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
     map_sectorsEta = map_inputSectors;
 }
 
+DetectorMPGD::~DetectorMPGD(){
+    reset();
+} //End Destructor
+
 //Wipes all stored Clusters
 void DetectorMPGD::resetClusters(){
     for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects

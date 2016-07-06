@@ -606,7 +606,7 @@ void InterfaceRun::analyzeAmoreSRSRunFullNoReReco(string strInputRun){
         //Get & Select Physics Objects - Hits
         //------------------------------------------------------
         tree_Hits->SetBranchStatus("*",1);
-        
+
         //Now get the remaining data
         tree_Hits->GetEntry(i);
         
