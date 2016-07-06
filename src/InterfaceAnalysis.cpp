@@ -152,7 +152,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
         if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
-            //Hit Selection
+            /*//Hit Selection
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
             
             if (bVerboseMode) { //Print Number of Selected Hits to User
@@ -161,13 +161,18 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Load the required input parameters
             if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            //hitAnalyzer.setDetector(detMPGD);
+            hitAnalyzer.setDetector(detMPGD);
             
             //Initialize the hit histograms if this is the first run
-            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
+            //if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
+            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(); }
             
             //Hit Analysis
-            hitAnalyzer.fillHistos(detMPGD);
+            //hitAnalyzer.fillHistos(detMPGD);
+            hitAnalyzer.fillHistos();
+            
+            //Update the detector
+            detMPGD = hitAnalyzer.getDetector();*/
         } //End Case: Hit Analysis
         
         //Cluster Reconstruction
@@ -189,19 +194,21 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            //clustAnalyzer.setDetector(detMPGD);
+            clustAnalyzer.setDetector(detMPGD);
             
             //Initialize the cluster histograms if this is the first run
             if (i == 0 || rSetup.bMultiOutput) {
-                clustAnalyzer.initGraphsClusters(detMPGD);
-                clustAnalyzer.initHistosClusters(detMPGD);
+                //clustAnalyzer.initGraphsClusters(detMPGD);
+                clustAnalyzer.initGraphsClusters();
+                //clustAnalyzer.initHistosClusters(detMPGD);
+                clustAnalyzer.initHistosClusters();
             }
             
             //Cluster Analysis
-            clustAnalyzer.fillHistos(detMPGD);
+            clustAnalyzer.fillHistos();
             
             //Update the Detector!
-            //detMPGD = clustAnalyzer.getDetector();
+            detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
         
         //Analyze Run
@@ -338,10 +345,11 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
             
             //Load previous cluster histograms & setup the detector
             clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
-            detMPGD = clustAnalyzer.getDetector();
 
             //Initialize Graphs
-            clustAnalyzer.initGraphsClusters(detMPGD);
+            clustAnalyzer.initGraphsClusters();
+            
+            detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
         
         //Store the Output
@@ -399,22 +407,19 @@ void InterfaceAnalysis::storeResults(TFile * file_Results){
 
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
-    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results, detMPGD);
-    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results, detMPGD);
+    //if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results);
+    if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results);
     
     //Fit Histograms After Analyzing all input files
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
         if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
-            //clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
-		clustAnalyzer.initGraphsClusters(detMPGD);            
-		clustAnalyzer.fitHistos(detMPGD);
-
-	    clustAnalyzer.setDetector(detMPGD);
-            clustAnalyzer.storeFits(file_Results/*, detMPGD*/);
+            clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
+            clustAnalyzer.fitHistos();
+            clustAnalyzer.storeFits(file_Results);
             
             //Update the Detector!
-            //detMPGD = clustAnalyzer.getDetector();
+            detMPGD = clustAnalyzer.getDetector();
         } //End Case: Cluster Analysis
     } //End Case: Fitting Stored Distributions
     

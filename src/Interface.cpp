@@ -57,11 +57,11 @@ void Interface::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup input
         clustSelector.setAnalysisParameters(aSetup);
         
         clustAnalyzer.setAnalysisParameters(aSetup);
-        //clustAnalyzer.setDetector(detMPGD);
-        clustAnalyzer.initGraphsClusters(detMPGD);
-        clustAnalyzer.initHistosClusters(detMPGD);
+        clustAnalyzer.setDetector(detMPGD);
+        clustAnalyzer.initGraphsClusters();
+        clustAnalyzer.initHistosClusters();
         
-        //detMPGD = clustAnalyzer.getDetector();
+        detMPGD = clustAnalyzer.getDetector();
     }
     
     return;
