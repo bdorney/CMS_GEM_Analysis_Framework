@@ -51,6 +51,8 @@ void InterfaceRun::analyzeAmoreSRSRunClustersOnly(string strInputRun){
     //Variable Declaration
     //bool bFrmwrkTree;
     
+	cout<<"Executing QualityControl::Uniformity::InterfaceRun::analyzeAmoreSRSRunClustersOnly()\n";
+
     Event evt;
     
     std::pair<int,int> pair_iEvtRange;
@@ -111,7 +113,7 @@ void InterfaceRun::analyzeAmoreSRSRunClustersOnly(string strInputRun){
     for (int i=pair_iEvtRange.first; i < pair_iEvtRange.second; ++i) { //Loop Over Events
         //Call reset/clear methods at the start of this iteration
         evt.clear();
-        detMPGD.resetPhysObj();
+       	detMPGD.resetPhysObj();
         
         //Set the event number & run number
         //------------------------------------------------------
@@ -164,6 +166,8 @@ void InterfaceRun::analyzeAmoreSRSRunClustersOnly(string strInputRun){
             evt.vec_clusters.push_back(clust);
         } //End Loop Over Number of Clusters
         
+	//cout<<"evt.vec_clusters.size() = " << evt.vec_clusters.size() << endl;
+
         //Give the Event to detMPG to store the Physics Objects
         //------------------------------------------------------
         detMPGD.setEventOnlyClusters(evt);

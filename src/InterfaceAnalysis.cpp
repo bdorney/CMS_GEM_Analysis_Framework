@@ -151,7 +151,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
-        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+        /*if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
             //Hit Selection
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
             
@@ -205,12 +205,12 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             
             //Update the Detector!
             detMPGD = clustAnalyzer.getDetector();
-        } //End Case: Cluster Analysis
+        }*/ //End Case: Cluster Analysis
         
         //Analyze Run
         //------------------------------------------------------
         //Setup the runInterface for this run
-        /*if (!rSetup.bMultiOutput) {
+        if (!rSetup.bMultiOutput) {
             runInterface.setDetector(detMPGD);
             
             if (i == 0) { runInterface.initialize(aSetup, rSetup); }
@@ -221,7 +221,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Run analysis and retrive the detector
         runInterface.analyzeInputAmoreSRS(vec_strRunList[i]);
-        detMPGD = runInterface.getDetector();*/
+        detMPGD = runInterface.getDetector();
         
         //User requests multiple output files?
         //------------------------------------------------------
