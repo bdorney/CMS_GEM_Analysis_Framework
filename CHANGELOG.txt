@@ -3,9 +3,14 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.0.0                               *
-*	LAST UPDATE: July 5 2016                     *
+*	LAST UPDATE: July 7 2016                     *
 *                                                *
 **************************************************
+
+Update: July 7th
+==================================================
+->Removed InterfaceRun workflow, class still exists but is no longer used
+->Added std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run to QualityControl::Uniformity::HistosPhysObj; here key is a run number and the value is the histogram
 
 Update: July 6th
 ==================================================

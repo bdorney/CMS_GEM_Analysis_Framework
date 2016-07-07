@@ -237,13 +237,14 @@ namespace QualityControl {
             std::shared_ptr<TH1F> hTime;   //Time          "                    "
             
             //Two dimensional histograms
-            std::shared_ptr<TH2F> hADC_v_EvtNum;    //ADC vs Event Number for all physics objects (time series)
             std::shared_ptr<TH2F> hADC_v_Pos;       //ADC vs Position for all physics objects
             std::shared_ptr<TH2F> hADC_v_Size;      //ADC vs Size for all physics objects
             std::shared_ptr<TH2F> hADC_v_Time;      //ADC vs Time for all physics objects
             std::shared_ptr<TH2F> hADCMax_v_ADCInt;	//Max ADC of an object (from all time bins) vs. Integral of object's ADC (summing all time bins)
             
-            //Three dimensional histograms
+            //Run Histograms dimensional histograms
+            std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run; //ADC vs Event Number for all physics objects (time series) for a given run (map_hADC_v_EvtNum_by_Run.first)
+            
             
             //Default Constructor
             HistosPhysObj(){
@@ -263,6 +264,8 @@ namespace QualityControl {
                 if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
                 if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                 if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
+                
+                map_hADC_v_EvtNum_by_Run = other.map_hADC_v_EvtNum_by_Run;
             } //End Copy Constructor
             
             //Assignment operator
@@ -279,6 +282,8 @@ namespace QualityControl {
                     if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
                     if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                     if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
+                    
+                    map_hADC_v_EvtNum_by_Run = other.map_hADC_v_EvtNum_by_Run;
                 } //Protects against invalid self-assignment
                 
                 return *this;

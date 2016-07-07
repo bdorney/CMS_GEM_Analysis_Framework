@@ -80,6 +80,10 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
                 (*iterEta).second.clustHistos.hSize->Fill( (*iterClust).second.iSize );
                 (*iterEta).second.clustHistos.hTime->Fill( (*iterClust).second.iTimeBin );
                 
+                if ( (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.count(iNum_Run) > 0 ) {
+                    (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iNum_Run]->Fill( (*iterClust).first, (*iterClust).second.fADC );
+                }
+                
                 (*iterEta).second.clustHistos.hADC_v_Pos->Fill( (*iterClust).second.fPos_X, (*iterClust).second.fADC );
                 (*iterEta).second.clustHistos.hADC_v_Size->Fill( (*iterClust).second.iSize, (*iterClust).second.fADC );
                 (*iterEta).second.clustHistos.hADC_v_Time->Fill( (*iterClust).second.iTimeBin, (*iterClust).second.fADC );
@@ -88,6 +92,10 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
                 (*iterPhi).second.clustHistos.hADC->Fill( (*iterClust).second.fADC );
                 (*iterPhi).second.clustHistos.hSize->Fill( (*iterClust).second.iSize);
                 (*iterPhi).second.clustHistos.hTime->Fill( (*iterClust).second.iTimeBin);
+                
+                if ( (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.count(iNum_Run) > 0 ) {
+                    (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iNum_Run]->Fill( (*iterClust).first, (*iterClust).second.fADC );
+                }
                 
                 (*iterPhi).second.clustHistos.hADC_v_Pos->Fill( (*iterClust).second.fPos_X, (*iterClust).second.fADC );
                 (*iterPhi).second.clustHistos.hADC_v_Size->Fill( (*iterClust).second.iSize, (*iterClust).second.fADC );
@@ -348,6 +356,58 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(DetectorMPGD & inputD
     return;
 } //End AnalyzeResponseUniformityClusters::initHistosClusters()
 
+//Loops through the detector and initalizes all cluster histograms
+void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet){
+    //Loop Over Stored iEta Sectors
+    for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Grab Eta Sector width (for clustPos Histo)
+        //aSetup.histoSetup_clustPos.iHisto_nBins  = 3. * aSetup.iUniformityGranularity;
+        //aSetup.histoSetup_clustPos.fHisto_xLower = -0.5*(*iterEta).second.fWidth;
+        //aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
+        
+        //Initialize iEta Histograms - 1D
+        
+            //Placeholder
+        
+        //Initialize iEta Histograms - 2D
+        //preliminary test, come back and improve this
+        (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iNum_Run) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
+        (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
+        
+        //Loop Over Stored iPhi Sectors
+        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors
+            //Special case for Cluster Position, the number of bins here should be factor 3 less than requested (eta case)
+            //Timing::HistoSetup setupClustPosPhi	= aSetup.histoSetup_clustPos;
+            //setupClustPosPhi.iHisto_nBins		= aSetup.iUniformityGranularity;
+            //setupClustPosPhi.fHisto_xLower		= (*iterPhi).second.fPos_Xlow;
+            //setupClustPosPhi.fHisto_xUpper 		= (*iterPhi).second.fPos_Xhigh;
+            
+            //Initialize iPhi Histograms - 1D
+            
+                //Placeholder
+            
+            //Initialize iEta Histograms - 2D
+            //preliminary test, come back and improve this
+            (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iNum_Run) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
+            (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
+            
+            //Setup the Slices
+            /*for (int i=1; i<= aSetup.iUniformityGranularity; ++i) { //Loop Over Slices
+                
+                //Placeholder
+                
+            }*/ //End Loop Over Slices
+        } //End Loop Over iPhi Sectors
+    } //End Loop Over iEta Sectors
+    
+    //Initialize histograms over the entire detector
+    
+        //Placeholder
+    
+    return;
+} //End AnalyzeResponseUniformityClusters::initHistosClustersByRun()
+
 //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
 //Loads all TObjects found in the input ROOT file into detMPGD;
 //Any previously stored information in detMPGD is lost.
@@ -564,12 +624,25 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
         //-------------------------------------
         //Check to see if the directory exists already
         TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
+        TDirectory *dir_RunHistory_Eta;
         
         //If the above pointer is null the directory does NOT exist, create it
         if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
             dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
+            
+            dir_RunHistory_Eta = dir_SectorEta->GetDirectory( "RunHistory", false, "GetDirectory" );
+            
+            if (dir_RunHistory_Eta == nullptr) {
+                dir_RunHistory_Eta = dir_SectorEta->mkdir( "RunHistory" );
+            }
         } //End Case: Directory did not exist in file, CREATE
-        
+        else{ //Case: Directory Exists
+            dir_RunHistory_Eta = dir_SectorEta->GetDirectory( "RunHistory", false, "GetDirectory" );
+            
+            if (dir_RunHistory_Eta == nullptr) {
+                dir_RunHistory_Eta = dir_SectorEta->mkdir( "RunHistory" );
+            }
+        } //End Case: Directoy Exists
         
         //Add this sector to the summary histogram
         hclustADC_All.Add((*iterEta).second.clustHistos.hADC.get() );
@@ -589,17 +662,36 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
         (*iterEta).second.clustHistos.hADC_v_Size->Write();
         (*iterEta).second.clustHistos.hADC_v_Time->Write();
         
+        dir_RunHistory_Eta->cd();
+        for (auto iterHiso = (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin(); iterHiso != (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.end(); ++iterHiso) {
+            (*iterHiso).second->Write();
+        }
+        
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
             //Get Directory
             //-------------------------------------
             //Check to see if the directory exists already
             TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            TDirectory *dir_RunHistory_Phi;
             
             //If the above pointer is null the directory does NOT exist, create it
             if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
                 dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
+                
+                dir_RunHistory_Phi = dir_SectorPhi->GetDirectory( "RunHistory", false, "GetDirectory" );
+                
+                if (dir_RunHistory_Phi == nullptr) {
+                    dir_RunHistory_Phi = dir_SectorPhi->mkdir( "RunHistory" );
+                }
             } //End Case: Directory did not exist in file, CREATE
+            else{ //Case: Directory Exists
+                dir_RunHistory_Phi = dir_SectorPhi->GetDirectory( "RunHistory", false, "GetDirectory" );
+                
+                if (dir_RunHistory_Phi == nullptr) {
+                    dir_RunHistory_Phi = dir_SectorPhi->mkdir( "RunHistory" );
+                }
+            } //End Case: Directoy Exists
             
             //Store Histograms - SectorPhi Level
             //-------------------------------------
@@ -611,6 +703,11 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
             (*iterPhi).second.clustHistos.hADC_v_Pos->Write();
             (*iterPhi).second.clustHistos.hADC_v_Size->Write();
             (*iterPhi).second.clustHistos.hADC_v_Time->Write();
+            
+            dir_RunHistory_Phi->cd();
+            for (auto iterHiso = (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin(); iterHiso != (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.end(); ++iterHiso) {
+                (*iterHiso).second->Write();
+            }
             
             //Slices
             //Now that all clusters have been analyzed we extract the slices

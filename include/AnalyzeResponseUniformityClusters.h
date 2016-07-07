@@ -69,12 +69,16 @@ namespace QualityControl {
             //Loops over all slices in detMPGD and fits Booked histograms for the full detector
             virtual void fitHistos(DetectorMPGD & inputDet);
             
+            
             //Initialize**************
             //Loops through the detector and initializes all cluster graphs
             virtual void initGraphsClusters(DetectorMPGD & inputDet);
             
             //Loops through the detector and initalizes all cluster histograms
             virtual void initHistosClusters(DetectorMPGD & inputDet);
+            
+            //Loops through the detector and creates a new set of histograms specific to the run iInputRunNo
+            virtual void initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet);
             
             //Loading*****************
             //Loads a ROOT file previously created by an instance of AnalyzeResponseUniformityClusters
