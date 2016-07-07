@@ -284,24 +284,41 @@ vector<string> ParameterLoaderRun::getRunList(ifstream &file_Input, bool bVerbos
     //Do not close the input file, it will be used elsewhere
     
     return vec_strRetRuns;
-} //End ParameterLoaderRun::getRunMap()
+} //End ParameterLoaderRun::getRunList()
 
 int ParameterLoaderRun::getRunNumber(std::string strRunName){
     //Variable Declaration
     int iRetVal;
-    
+
+	//cout<<"getRunNumber() strRunName = " << strRunName.c_str() << endl;   
+ 
     std::transform(strRunName.begin(), strRunName.end(), strRunName.begin(), toupper);
-    
+   
+	//cout<<"getRunNumber() post transfer strRunName = " << strRunName.c_str() << endl;
+ 
     vector<string> vec_strParsedName = getCharSeparatedList(strRunName, '_');
+
+	/*cout<<"i\tParsedInput\tContains\n";
+	for(int i=0; i < vec_strParsedName.size(); ++i){
+		contains cont("RUN");
+		cout<<i<<"\t"<<vec_strParsedName[i]<<"\t"<<cont(vec_strParsedName[i])<<endl;
+	}*/
 
     auto iterStr = std::find_if(vec_strParsedName.begin(), vec_strParsedName.end(), QualityControl::Uniformity::contains("RUN") );
     
+	//cout<<"getRunNumber() - iterStr = 
+
     //Input file name did not contain the phrase "RUN"
     if ( iterStr == vec_strParsedName.end() ) {
         return -1;
     }
     
+	//cout<<"getRunNumber() - iterStr = " << (*iterStr).c_str() << endl;
+
     //(*iterStr).erase(remove((*iterStr).begin(), (*iterStr).end(), "RUN"), (*iterStr).end() );
+    
+    //cout<<"getRunNumber() - (*iterStr).find('RUN') = " << (*iterStr).find("RUN") << endl;
+   
     (*iterStr).erase( (*iterStr).find("RUN"), 3);
     iRetVal = stoiSafe( (*iterStr) );
     

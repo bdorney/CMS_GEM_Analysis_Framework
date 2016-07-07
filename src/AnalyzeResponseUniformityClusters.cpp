@@ -358,6 +358,8 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(DetectorMPGD & inputD
 
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet){
+	//cout<<"AnalyzeResponseUniformityClusters::initHistosClustersByRun() - iInputRunNo = " << iInputRunNo << endl;
+
     //Loop Over Stored iEta Sectors
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
@@ -372,7 +374,9 @@ void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo,
         
         //Initialize iEta Histograms - 2D
         //preliminary test, come back and improve this
-        (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iNum_Run) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
+	//cout<<"getNameByIndex() = " << getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str() << endl;
+
+        (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
         (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
         
         //Loop Over Stored iPhi Sectors
@@ -389,7 +393,7 @@ void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo,
             
             //Initialize iEta Histograms - 2D
             //preliminary test, come back and improve this
-            (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iNum_Run) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
+            (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
             (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
             
             //Setup the Slices

@@ -43,7 +43,7 @@ namespace QualityControl {
             contains(std::string strInput){ strSub = strInput; }
             
             bool operator()(std::string strInput){
-                return ( strInput.find(strSub) == std::string::npos );
+                return ( strInput.find(strSub) != std::string::npos );
             }
         };
         

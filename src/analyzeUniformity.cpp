@@ -39,6 +39,7 @@ using std::cout;
 using std::endl;
 using std::ifstream;
 using std::map;
+using std::pair;
 using std::string;
 using std::vector;
 
@@ -78,7 +79,8 @@ int main( int argc_, char * argv_[] ){
     
     vector<string> vec_strInputArgs;
     vector<string> vec_strInputFiles;
-    
+    vector<pair<int, string> > vec_pairedRunList;
+
     //Transfer Input Arguments into vec_strInputArgs
     //------------------------------------------------------
     vec_strInputArgs.resize(argc_);
@@ -240,7 +242,8 @@ int main( int argc_, char * argv_[] ){
         return -1;
     }
     
-    vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode);
+    if( rSetup.bInputFromFrmwrk ){	vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode); }
+    else {				vec_pairedRunList = loaderRun.getPairedRunList(file_Config, bVerboseMode); }
     
     file_Config.close();
     
@@ -264,8 +267,9 @@ int main( int argc_, char * argv_[] ){
     
     //Perform the user defined analysis interface
     //------------------------------------------------------
-    anaInterface.analyzeInput(vec_strInputFiles);
-    
+    if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
+    else {				anaInterface.analyzeInput(vec_pairedRunList); }
+
     cout<<"Success!"<<endl;
     
     return 0;

@@ -235,12 +235,15 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
             
-            //Initialize the cluster histograms if this is the first run
+            //Initialize the cluster histograms for all runs; if this is the first run
             if (i == 0 || rSetup.bMultiOutput) {
                 clustAnalyzer.initGraphsClusters(detMPGD);
                 clustAnalyzer.initHistosClusters(detMPGD);
             }
-            
+
+	    //Initialize the cluster histograms specific to this run
+	    clustAnalyzer.initHistosClustersByRun(vec_pairedRunList[i].first, detMPGD);
+	
             //Cluster Analysis
             clustAnalyzer.setRunNum(vec_pairedRunList[i].first);
             clustAnalyzer.fillHistos(detMPGD);
