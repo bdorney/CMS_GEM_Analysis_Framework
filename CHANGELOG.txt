@@ -3,16 +3,25 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.0.0                               *
-*	LAST UPDATE: July 7 2016                     *
+*	LAST UPDATE: Aug 19 2016                     *
 *                                                *
 **************************************************
 
-Update: July 7th
+Update: August 19th 2016
+==================================================
+->Fixed an error in VisualizeUniformity where iphi was drawn in the wrong order on the summary canvases
+
+Update: August 18th 2016
+==================================================
+->Changed the mapping files, config/Mapping_GE11-VII-S.cfg and config/Mapping_GE11-VII-L.cfg, to have the width & height matching the CMS Geometry
+->Note the CMS Geometry for GE1/1 is found in table 2 of https://twiki.cern.ch/twiki/bin/viewauth/CMS/GEMGeometryStatusNew#GE_1_1_Global_Position
+
+Update: July 7th 2016
 ==================================================
 ->Removed InterfaceRun workflow, class still exists but is no longer used
 ->Added std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run to QualityControl::Uniformity::HistosPhysObj; here key is a run number and the value is the histogram
 
-Update: July 6th
+Update: July 6th 2016
 ==================================================
 ->Performance is abysmal in this new mode.  Trying to improve.
 ->Changed fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityClusters to take as input a DetectorMPGD object by reference and work with this object instead of the stored DetectorMPGD class attribute inherited from FrameworkBase.
@@ -24,7 +33,7 @@ Update: July 6th
 ->Added method QualityControl::Uniformity::ParameterLoaderRun::getRunNumber() for determining the run number from an input filename
 ->Added method QualityControl::Uniformity::ParameterLoaderRun::getPairedRunList() for determing the requested input runs paired to a run number
 
-Update: July 5th
+Update: July 5th 2016
 ==================================================
 ->Added overloaded method Uniformity::SelectorCluster::filterClusters() for filtering an input vector<Cluster> based on selection criterion stored in the stored/provided Uniformity::AnalysisSetupUniformity
 ->Added overloaded method Uniformity::SelectorHit::filterHits() for filtering an input vector<Hit> based on selection criterion stored in the stored/provided Uniformity::AnalysisSetupUniformity

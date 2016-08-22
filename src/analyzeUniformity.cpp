@@ -183,7 +183,7 @@ int main( int argc_, char * argv_[] ){
         cout<<"#-----End of Analysis Config File-----\n";
         cout<<"The '#' symbol is recognized as a comment indication\n";
 
-	return 0;
+        return 0;
     } //End Case: Help Menu
     else if(vec_strInputArgs.size() == 3){ //Case: Analysis!
         bool bExitSuccess = false;
@@ -243,7 +243,7 @@ int main( int argc_, char * argv_[] ){
     }
     
     if( rSetup.bInputFromFrmwrk ){	vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode); }
-    else {				vec_pairedRunList = loaderRun.getPairedRunList(file_Config, bVerboseMode); }
+    else {                          vec_pairedRunList = loaderRun.getPairedRunList(file_Config, bVerboseMode); }
     
     file_Config.close();
     
@@ -268,7 +268,7 @@ int main( int argc_, char * argv_[] ){
     //Perform the user defined analysis interface
     //------------------------------------------------------
     if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
-    else {				anaInterface.analyzeInput(vec_pairedRunList); }
+    else {                          anaInterface.analyzeInput(vec_pairedRunList); }
 
     cout<<"Success!"<<endl;
     
