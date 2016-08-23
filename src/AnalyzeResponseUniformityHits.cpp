@@ -109,7 +109,7 @@ void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, stri
     
     //Setup output file
     //------------------------------------------------------
-    file_DeadStripList.open( strOutputTextFileName.c_str() );
+    file_DeadStripList.open( strOutputTextFileName.c_str(), std::fstream::out );
     
     //Check to see if the config file opened successfully
     if (!file_DeadStripList.is_open()) {
