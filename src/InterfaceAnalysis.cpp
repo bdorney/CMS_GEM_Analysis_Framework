@@ -82,6 +82,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     
     SectorEta etaSector;
     
+    string strTempRunName;
+    
     TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
     //TFile *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
@@ -253,15 +255,17 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //------------------------------------------------------
         if (rSetup.bMultiOutput) { //Case: User wants one output file per input file
             //Setup the name of the output file
-            string strTempRunName = vec_pairedRunList[i].second;
+            strTempRunName = vec_pairedRunList[i].second;
             
             if ( strTempRunName.find("dataTree.root") != string::npos ){
                 strTempRunName.erase(strTempRunName.find("dataTree.root"), strTempRunName.length() - strTempRunName.find("dataTree.root") );
                 strTempRunName = strTempRunName + "Ana.root";
+                //replaceSubStr1WithSubStr2(strTempRunName, "dataTree.root", "Ana.root");
             } //End Case: Input Tree File
             else if ( strTempRunName.find(".root") != string::npos ) {
                 strTempRunName.erase(strTempRunName.find(".root"), strTempRunName.length() - strTempRunName.find(".root") );
                 strTempRunName = strTempRunName + "Ana.root";
+                //replaceSubStr1WithSubStr2(strTempRunName, ".root", "Ana.root");
             } //End Case: Other ROOT file
             
             //Create the file
@@ -281,7 +285,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             } //End Case: failed to load ROOT file
             
             //Store the results
-            storeResults(file_ROOTOutput_Single);
+            storeResults(file_ROOTOutput_Single, strTempRunName);
             
             //Close the file before the next iteration
             file_ROOTOutput_Single->Close();
@@ -311,7 +315,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     	} //End Case: failed to load ROOT file
     
     	//Store the results
-    	storeResults(file_ROOTOutput_All);
+    	storeResults(file_ROOTOutput_All, rSetup.strFile_Output_Name);
     
         //Close the file
     	file_ROOTOutput_All->Close();
@@ -393,6 +397,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         if ( strTempRunName.find("Ana.root") != string::npos ) {
             strTempRunName.erase(strTempRunName.find("Ana.root"), strTempRunName.length() - strTempRunName.find("Ana.root") );
             strTempRunName = strTempRunName + "NewAna.root";
+            //replaceSubStr1WithSubStr2(strTempRunName,"Ana.root","NewAna.root");
         } //End Case: Other ROOT file
         
         //Create the file
@@ -413,7 +418,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         
         //Store the results
         //cout<<"InterfaceAnalysis::analyzeInputFrmwrk(): file_ROOTOutput_Single = " << file_ROOTOutput_Single << endl;
-        storeResults(file_ROOTOutput_Single);
+        storeResults(file_ROOTOutput_Single, strTempRunName);
         
         //Close the files & delete pointers before the next iter
         //------------------------------------------------------
@@ -427,20 +432,39 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
     return;
 } //End InterfaceAnalysis::analyzeInputFrmwrk()
 
-void InterfaceAnalysis::storeResults(TFile * file_Results){
+void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
     //Variable Declaration
     map<string,string> map_clust_ObsAndDrawOpt; //Cluster observables & draw option
     map<string,string> map_hit_ObsAndDrawOpt;   //as above but for hits
     map<string,string> map_res_ObsAndDrawOpt;   //as above but for results (e.g. fits)
+    
+    string strTempRunName;
     
 	//cout<<"InterfaceAnalysis::storeResults(): file_Results = " << file_Results << endl;
 	//cout<<"InterfaceAnalysis::storeResults(): detMPGD.getName() = " << detMPGD.getName() << endl;
 
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
-    //if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results);
-    //if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results);
-    if ( rSetup.bAnaStep_Hits) hitAnalyzer.storeHistos(file_Results, detMPGD);
+    if ( rSetup.bAnaStep_Hits){ //Case: Hits
+        //Store Hit Histograms
+        hitAnalyzer.storeHistos(file_Results, detMPGD);
+        
+        //Setup name for strip list
+        strTempRunName = strFileName;
+        if ( strTempRunName.find("dataTree.root") != string::npos ){
+            strTempRunName.erase(strTempRunName.find("dataTree.root"), strTempRunName.length() - strTempRunName.find("dataTree.root") );
+            strTempRunName = strTempRunName + "DeadStripList.txt";
+            //replaceSubStr1WithSubStr2(strTempRunName, "dataTree.root", "Ana.root");
+        } //End Case: Input Tree File
+        else if ( strTempRunName.find(".root") != string::npos ) {
+            strTempRunName.erase(strTempRunName.find(".root"), strTempRunName.length() - strTempRunName.find(".root") );
+            strTempRunName = strTempRunName + "DeadStripList.txt";
+            //replaceSubStr1WithSubStr2(strTempRunName, ".root", "Ana.root");
+        } //End Case: Other ROOT file
+        
+        //Store Dead Strip List
+        hitAnalyzer.findDeadStrips(detMPGD, strTempRunName);
+    } //End Case: Hits
     if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results, detMPGD);
     
     //Fit Histograms After Analyzing all input files

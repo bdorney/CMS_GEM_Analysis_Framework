@@ -107,6 +107,7 @@ namespace QualityControl {
         void printROOTFileStatus(TFile *file_ROOT);
         //void printROOTFileStatus(std::shared_ptr<TFile> file_ROOT);
         void printStreamStatus(std::ifstream &inputStream);
+        void printStreamStatus(std::fstream &inputStream);
         void printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename);
         
         //string manipulation

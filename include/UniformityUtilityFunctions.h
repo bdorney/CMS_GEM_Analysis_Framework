@@ -56,6 +56,19 @@ namespace QualityControl {
         template<typename T>
         T ceilPowerTen(T tInput, int iScalar, int iPower);
         
+        //Recursive function
+        //Given the maximum number of strips in a readout sector (iStripNum_Max)
+        //Converts strip number in an iEta row [1,N] to strip number in a readout sector [1,M]
+        template<typename T>
+        T getPhiStripNum(T tInput, int iStripNum_Max=128);
+        
+        //Recursive function
+        //Given the maximum number of strips in a readout sector (iStripNum_Max)
+        //Given a strip number in an iEta row
+        //Returns the iPhi sector the strip is from
+        template<typename T>
+        int getPhiSectorVal(T tInput, int iStripNum_Max=128, int iPhi=1);
+        
         //map manipulation
         //returns a vector of keys
         //T1 & T2 -> type; C -> Compare; A -> allocator
@@ -68,13 +81,16 @@ namespace QualityControl {
         template<typename T1, typename T2, typename C, typename A>
         std::vector<T1> getVectorOfKeys(std::multimap<T1,T2,C,A> inputMap);
         
-        
         //printers
         //void printClassMethodMsg(std::string &strClass, std::string &strMethod, std::string &strMessage);
         void printClassMethodMsg(const char charClass[], const char charMethod[], const char charMsg[]);
         
         //string manipulation
         std::string getStringOnlyNumeric(std::string strInput);
+        
+        //Finds strSub1 in strInput and replaces it with strSub2
+        //Needs more work to be exception safe, right now if strSub1 is at the END of the string a problem might occur
+        //void replaceSubStr1WithSubStr2(std::string &strInput, std::string strSub1, std::string strSub2);
         
         //Code Begins for TEMPLATED functions
         //========================================================================================
@@ -107,6 +123,20 @@ namespace QualityControl {
                 return iScalar * std::pow(10, iPower);
             } //End Case: value
         } //End ceilPowerTen()
+        
+        template<typename T>
+        T getPhiStripNum(T tInput, int iStripNum_Max){
+            return ( (tInput > iStripNum_Max) ?  getPhiStripNum(tInput-iStripNum_Max, iStripNum_Max) : tInput );
+        } //End getPhiStripNum()
+        
+        //Recursive function
+        //Given the maximum number of strips in a readout sector (iStripNum_Max)
+        //Given a strip number in an iEta row
+        //Returns the iPhi sector the strip is from
+        template<typename T>
+        int getPhiSectorVal(T tInput, int iStripNum_Max, int iPhi){
+            return ( (tInput > iStripNum_Max) ?  getPhiSectorVal(tInput - iStripNum_Max, iStripNum_Max, ++iPhi) : iPhi );
+        } //End getPhiSectorVal()
         
         //map manipulation
         //----------------------------------------------------------------------------------------

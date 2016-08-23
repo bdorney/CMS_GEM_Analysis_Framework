@@ -104,7 +104,7 @@ namespace QualityControl {
             virtual void analyzeInputFrmwrk();
             
             //Stores the results of the analysis based on rSetup
-            virtual void storeResults(TFile * file_Results);
+            virtual void storeResults(TFile * file_Results, std::string strFileName);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------

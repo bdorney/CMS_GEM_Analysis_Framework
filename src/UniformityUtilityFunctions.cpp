@@ -84,4 +84,16 @@ string QualityControl::Uniformity::getStringOnlyNumeric(string strInput){
     strInput.erase(strInput.begin(),strInput.begin()+iPosLastAlpha);
     
     return strInput;
-}
+} //End QualityControl::Uniformity::getStringOnlyNumeric
+
+//Needs more work to be exception safe, right now if strSub1 is at the END of the string a problem might occur
+/*void QualityControl::replaceSubStr1WithSubStr2(std::string &strInput, std::string strSub1, std::string strSub2){
+    
+    int iPosStrSub1 = strInput.find(strSub1);
+    
+    strInput.erase(strInput.find(strSub1), strInput.length() - strInput.find(strSub1) );
+    strInput.insert(iPosStrSub1+1, strSub2);
+    //strInput = strInput + strSub2;
+    
+    return;
+} //End QualityControl::replaceSubStr1WithSubStr2()*/

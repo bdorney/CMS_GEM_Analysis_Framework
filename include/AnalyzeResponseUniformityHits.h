@@ -12,6 +12,7 @@
 //C++ Includes
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <iterator>
 #include <map>
 #include <memory>
@@ -69,6 +70,10 @@ namespace QualityControl {
             //Filling*****************
             //Loops over all stored clusters in detMPGD and Book histograms for the full detector
             virtual void fillHistos(DetectorMPGD & inputDet);
+            
+            //Find Dead Strips********
+            //Loops over all slices in detMPGD and fits Booked histograms for the full detector
+            virtual void findDeadStrips(DetectorMPGD & inputDet, std::string & strOutputTextFileName);
             
             //Fitting*****************
             //Loops over all slices in detMPGD and fits Booked histograms for the full detector

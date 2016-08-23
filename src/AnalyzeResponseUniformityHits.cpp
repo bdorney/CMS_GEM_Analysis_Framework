@@ -94,6 +94,69 @@ void AnalyzeResponseUniformityHits::fillHistos(DetectorMPGD & inputDet){
     return;
 } //End AnalyzeResponseUniformityHits::fillHistos() - Full Detector
 
+//Loops over all stored hits in an input DetectorMPGD objectand fills histograms for the full detector
+void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, string & strOutputTextFileName){
+    //Variable Declaration
+    int iNbinsX = 0;
+    //int iReadoutStripNum_Max = -1;  //Eta sector
+    
+    int iReadoutStripNum = -1;  //From [1,128]
+    int iReadoutPhi = 1;
+    
+    float fBinContent = 0.;
+    
+    std::fstream file_DeadStripList;
+    
+    //Setup output file
+    //------------------------------------------------------
+    file_DeadStripList.open( strOutputTextFileName.c_str() );
+    
+    //Check to see if the config file opened successfully
+    if (!file_DeadStripList.is_open()) {
+        perror( ("AnalyzeResponseUniformityHits::findDeadStrips() - error while opening file: " + strOutputTextFileName).c_str() );
+        Timing::printStreamStatus(file_DeadStripList);
+        
+        cout<<"\tCheck for dead strips is being skipped!\n";
+        cout<<"\tExitting!!!\n";
+        
+        return;
+    } //End Case: Input Not Understood
+    
+    file_DeadStripList<<"Cut_HitAdc_Min = "<<aSetup.selHit.iCut_ADCNoise<<endl;
+    //file_DeadStripList<<"Cut_HitAdc_Max = "<<aSetup.selHit.iCut_ADCSat
+    file_DeadStripList<<"iEta\tiPhi\tiStrip\n";
+    
+    //Check for dead strips
+    //Loop Over Stored iEta Sectors
+    //------------------------------------------------------
+    for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
+        
+        //Set the number of bins in this histogram (should be the same for all iEta);
+        iNbinsX = (*iterEta).second.hitHistos.hPos->GetNbinsX();
+        //iReadoutStripNum_Max = iNbinsX / (*iterEta).second.map_sectorsPhi.size();
+        
+        for(int i=1; i <=iNbinsX; ++i ){ //Loop Over Bins of (*iterEta).second.hitHistos.hPos
+            
+            fBinContent = (*iterEta).second.hitHistos.hPos->GetBinContent(i);
+            
+            //Check for dead strip
+            if ( !(fBinContent > 0 ) ) { //Case: Dead Strip
+                //cout<<(*iterEta).first<<"\t"<<i<<endl;
+                iReadoutPhi     = getPhiSectorVal(i, 128);
+                iReadoutStripNum= getPhiStripNum(i, 128);
+                
+                //cout<<(*iterEta).first<<"\t"<<iReadoutPhi<<"\t"<<iReadoutStripNum<<endl;
+                
+                file_DeadStripList<<(*iterEta).first<<"\t"<<iReadoutPhi<<"\t"<<iReadoutStripNum<<endl;
+            } //End Case: Dead Strip
+        } //End Loop Over Bins of (*iterEta).second.hitHistos.hPos
+    } //End Loop Over iEta Sectors
+    
+    file_DeadStripList.close();
+    
+    return;
+} //End AnalyzeResponseUniformityHits::fillHistos() - Full Detector
+
 //Loops over all slices in inputDet and fits Booked histograms for the full detector
 //Assumes Histos have been filled already (obviously)
 void AnalyzeResponseUniformityHits::fitHistos(DetectorMPGD & inputDet){

@@ -181,6 +181,17 @@ void QualityControl::Timing::printStreamStatus(std::ifstream &inputStream){
     return;
 } //End treeProducerTDC::printStreamStatus()
 
+//Prints All Bit Flags for an input fstream
+void QualityControl::Timing::printStreamStatus(std::fstream &inputStream){
+    std::cout << "Input File Stream Bit Status:\n";
+    std::cout << " good()=" << inputStream.good() << std::endl;
+    std::cout << " eof()=" << inputStream.eof() << std::endl;
+    std::cout << " fail()=" << inputStream.fail() << std::endl;
+    std::cout << " bad()=" << inputStream.bad() << std::endl;
+    
+    return;
+} //End treeProducerTDC::printStreamStatus()
+
 //string manipulation
 //----------------------------------------------------------------------------------------
 //Safe conversion to float
