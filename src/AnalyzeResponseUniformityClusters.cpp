@@ -234,16 +234,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 } //End Case: Invalid Fit (minimizer did not find minum)
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
-        
-        //Calculate statistics for this iEta sector - Fit
-        /*if ((*iterEta).second.mset_fClustADC_Fit_PkPos.size() > 0) { //Check if stored fit positions exist
-         calcStatistics( (*iterEta).second.statClustADC_Fit_PkPos, (*iterEta).second.mset_fClustADC_Fit_PkPos );
-         } //End Check if stored fit positions exist
-         
-         //Calculate statistics for this iEta sector - Spec
-         if ((*iterEta).second.mset_fClustADC_Spec_PkPos.size() > 0) { //Check if stored Spec positions exist
-         calcStatistics( (*iterEta).second.statClustADC_Spec_PkPos, (*iterEta).second.mset_fClustADC_Spec_PkPos );
-         }*/ //End Check if stored Spec positions exist
     } //End Loop Over iEta Sectors
     
     //Calculate statistics

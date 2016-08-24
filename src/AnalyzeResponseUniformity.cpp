@@ -40,40 +40,6 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor
 
-//Checks to see if the detector's uniformity is within requested amount
-/*void AnalyzeResponseUniformity::checkUniformity(){
-    //Check to make sure at least one peak exists
-    if(detMPGD.vec_allADCPeaks.size() == 0){
-	cout<<"============Analysis Summary============\n";
-    	cout<<"No Stored ADC Peaks; All Fits Failed!?\n";
-	cout<<"You should Investigate the output data file\n";
-	return;
-    }
-
-    //Variable Declaration
-    float fResponse_Max = *(std::max_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
-    float fResponse_Min = *(std::min_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
-    float fResponse_Var = (fResponse_Max - fResponse_Min) / fResponse_Max;
-    
-    //Output Above Info to User
-    cout<<"============Analysis Summary============\n";
-    cout<<"Detector's Minimum Response: " << fResponse_Min << endl;
-    cout<<"Detector's Maximum Response: " << fResponse_Max << endl;
-    cout<<"Calculated Difference: " << fResponse_Var << endl;
-
-    //Check if Detector is within tolerance
-    if ( fabs(fResponse_Var) <= aSetup.fUniformityTolerance ) { //Case: Detector Within Tolerance
-        cout<<"This is found to be within Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER PASSES!!!\n";
-        cout<<"You should Investigate the output data file\n";
-    } //End Case: Detector Within Tolerance
-    else{ //Case: Detector OUTSIDE Tolerance
-        cout<<"This is found to be OUTSIDE Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER FAILS!!!\n";
-        cout<<"You should Investigate the output data file\n";
-    } //End Case: Detector OUTSIDE Tolerance
-    
-    return;
-}*/ //check AnalyzeResponseUniformity::Uniformity
-
 void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, string strObsName){
     //Variable Declaration;
     std::vector<float> vec_fInputObsVariance;

@@ -187,10 +187,10 @@
         For executing:  ./analyzeUniformity <PFN of Run Config File> <Verbose Mode true/false>
 
     Here the physical file name (PFN) represents the full path+filename to the file in question.
-    The configuration files, including the run config file) are described in Section 4.e.  The
+    The configuration files, including the run config file, are described in Section 4.e.  The
     executable can analyze files produced either by amoreSRS/amoreSRS_ZS or by the
     CMS_GEM_Analysis_Framework.  For a full explanation of the available configurations please
-    consult 4.e.
+    consult Sections 4.e for a description, and Sections 3.a.i through 3.a.iii for examples.
 
     The contents and layout of the output files are described in Section 4.f.
 
@@ -198,6 +198,13 @@
     file have been provided in the default repository.  A usage example is given as:
 
         ./analyzeUniformity config/configRun.cfg true
+
+    As a general rule each detector you are testing will usually have a series of raw files associated
+    with it.  It is recommended each raw file should have a run number associated with it.  The set of
+    run numbers for a given detector should be unique (i.e. two different detectors can have a run 1
+    but for a specific detector run 1 is unique).  The framework expects that you provide a run number,
+    form "_RunX_" for X some integer, in each of the input files defined in your config/configRun.cfg
+    (see Section 4.e.iii).
 
             # 3.a.i Helper Script - Run Mode: Grid
             # --------------------------------------------------------
@@ -253,6 +260,23 @@
             NOTE: Modications to config/configRun_Template_Grid.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
 
+            If you are interested in merging only a subset of the output TFile's the scripts/mergeSelectedRuns.sh
+            is provided to perform this task.  The expected syntax is:
+
+                source mergeSelectedRuns.sh <Output ROOT Filename w/Key Phrase> <Key Phrase> <Data File Directory> <Comma and/or Dash Delimited Run List>
+
+            Where: the "Output ROOT Filename w/Key Phrase" is the name of the merged ROOT file which includes a
+            "Key Phrase" that the script will use string replacement to indicate the total number of events from
+            the input run list (provided each input run has the field "YYkEvt" present in the filename); "Data Directory"
+            is the PFP where the input data files to be merged are located; and "Comma and/or Dash Delimited Run List"
+            is the list of input runs to be considered for merging.  Example:
+
+                source mergeSelectedRuns.sh GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root YY $DATA_QC5/GE11-VII-S-CERN-0002 133,135,137-158
+
+            Here the key phrase is "YY" and runs 133, 135, and 137 through 158 will be merged together to make
+            GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root with YY replaced
+            with the total event number indicated in the filenames.
+
             # 3.a.ii Helper Script - Run Mode: Rerun
             # --------------------------------------------------------
 
@@ -286,7 +310,7 @@
 
             The script:
 
-                scripts/configRun_Template_Series.cfg
+                scripts/runMode_Series.sh
 
             is for running the framework over a set of input files in series, i.e. one after the other, and
             creating a single output TFile.  The expected syntax is:
@@ -313,14 +337,18 @@
 
     This section describes the contents of the repository, the expected inputs, and the produced outputs.
     Developers should have a firm grasp of this entire section; users need only be concerned with sections
-    4.e and 4.f.
+    4.e and 4.f.  However users may be interested in understanding what TObjects are created/stored in the
+    output ROOT file and may wish to browse the sections below.
 
     # 4.a. Namespaces
     # --------------------------------------------------------
 
-    This repository at presently makes use of two namespaces: Timing, Uniformity.  The Timing namespace
-    includes several operators, types, and utility functions that were developed in CMS_GEM_TB_Timing;
-    the contents of the Timing namespace offer substantial utility and "quality of life features."
+    This repository at presently makes use of two namespaces: Timing, Uniformity.  Both of these
+    namespaces reside within the QualityControl namespace.
+
+    The Timing namespace includes several operators, types, and utility functions that were developed
+    in CMS_GEM_TB_Timing; the contents of the Timing namespace offer substantial utility and "quality
+    of life features."
 
     The Uniformity namespace contains the majority of source code for analyzing response uniformity
     measurements performed for GE1/1 detectors; and hopefully GE2/1 & ME0 detectors in the future.
@@ -584,7 +612,6 @@
                 AnalysisSetupUniformity::iEvt_First             //First event of TTree, produced by amoreSRS, to process.
                 AnalysisSetupUniformity::iEvt_Total             //Total events of a TTree, produced by amoreSRS, to process.
                 AnalysisSetupUniformity::iUniformityGranularity //The level of granularity the analysis will be carried out on  all iPhi sectors of a DetectorMPGD object (e.g. a value of 128 means at the strip level, a value of 2 means two groups of 64 strips).
-                AnalysisSetupUniformity::fUniformityTolerance   //The requested tolerance on the gain uniformity
 
                 AnalysisSetupUniformity::histoSetup_clustADC    //HistoSetup obejct for specifying cluster ADC TH1 & TF1 objects
                 AnalysisSetupUniformity::histoSetup_clustMulti  //HistoSetup obejct for specifying cluster multiplicity TH1 objects
@@ -593,6 +620,7 @@
                 AnalysisSetupUniformity::histoSetup_clustTime   //HistoSetup obejct for specifying cluster time bin TH1 objects
 
                 AnalysisSetupUniformity::histoSetup_hitADC      //HistoSetup object for specifying hit ADC TH1 objects
+                AnalysisSetupUniformity::histoSetup_hitMulti    //HistoSetup obejct for specifying hit multiplicity TH1 objects
                 AnalysisSetupUniformity::histoSetup_hitPos      //HistoSetup object for specifying hit position TH1 objects (in strip No.)
                 AnalysisSetupUniformity::histoSetup_hitTime     //HistoSetup object for specifying hit time bin TH1 objects
 
@@ -629,16 +657,16 @@
                 HistosPhysObj::hPos             //Position     "                                                    "
                 HistosPhysObj::hSize            //Size         "                                                    "
                 HistosPhysObj::hTime            //Time bin (e.g. latency) "                                         "
-                HistosPhysObj::hADC_v_EvtNum    //PENDING IMPLEMENTATION ADC vs event number "                                             "
                 HistosPhysObj::hADC_v_Pos       //ADC vs Position "                                                 "
                 HistosPhysObj::hADC_v_Size      //ADC vs Size "                                                     "
                 HistosPhysObj::hADC_v_Time      //ADC vs Latency "                                                  "
-
                 HistosPhysObj::hADCMax_v_ADCInt //Max ADC (from all latency bins) of an object vs Integral of object's ADC (sum of all latency bins)
+
+                HistosPhysObj::map_hADC_v_EvtNum_by_Run //map of TH2F objects, each TH2F shows ADC vs evt no. for a given run (i.e. input file)
 
             For clusters hPos is the position along the detector trapezoid in mm with the detector axis being 0 mm in
             the iPhi=2 sector, negative (positive) position values occur in iPhi = 1 (3).  For hits the position is
-            the strip number along the detector from 0 to 383 increasing with increasing iPhi.
+            the strip number along the detector from 1 to 384 increasing with increasing iPhi.
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
@@ -705,19 +733,20 @@
 
                 SectorEta::fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
                 SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
+
                 SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
-                SectorEta::mset_fClustADC_Fit_PkPos     //Container storing peak position from Clust ADC Fit
-                SectorEta::mset_fClustADC_Spec_PkPos    //Container storing peak position from TSpectrum::Search() & TSpectrum::GetPositionX()
+
                 SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
                 SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
-                SectorEta::gEta_ClustADC_Fit_PkRes      //std::shared_ptr of a TGraphErrors storing ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC
+                SectorEta::gEta_ClustADC_Fit_PkRes      //std::shared_ptr of a TGraphErrors storing ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC.  See Section 4.e.ii.IV for more details.
+
                 SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
+
                 SectorEta::gEta_ClustADC_Spec_NumPks    //std::shared_ptr of a TGraphErrors storing number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
                 SectorEta::gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
+
                 SectorEta::clustHistos                  //An instance of the Uniformity::HistosPhysObj struct for Clusters; at present time all members of the struct are used except hMulti
                 SectorEta::hitHistos                    //An instance of the Uniformity::HistosPhysObj struct for Hits; at present time only hPos and hTime are used
-                SectorEta::statClustADC_Fit_PkPos       //An instance of the Uniformity::SummaryStatistics struct for results of the cluster ADC peak position fitting
-                SectorEta::statClustADC_Spec_PkPos      //As SectorEta::statClustADC_Fit_PkPos but from TSpectrum::Search() & TSpectrum::GetPositionX()
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
@@ -732,9 +761,11 @@
                 SectorPhi::fWidth                   //Width of iPhi sector, in mm, at SectorEta::fPos_Y;
                 SectorPhi::iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
                 SectorPhi::iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
+
                 SectorPhi::map_slices               //Container storing Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
-                SectorPhi::vec_clusters             //vector of stored Uniformity::Cluster located in this SectorPhi (iPhi value)
-                SectorPhi::vec_hits                 //vector of stored Uniformity::Hit located in this SectorPhi (iPhi value)
+                SectorPhi::map_clusters             //std::multimap of stored Uniformity::Cluster located in this SectorPhi (iPhi value).  Here the key value is the event number the Cluster is associated with
+                SectorPhi::map_hits                 //std::multimap of stored Uniformity::Hit located in this SectorPhi (iPhi value).  Here the key value is the event number the Hit is associated with
+
                 SectorPhi::clustHistos              //As SectorEta::clustHistos but only for this SectorPhi (iPhi value)
                 SectorPhi::hitHistos                //As SectorEta::hitHistos but only for this SectorPhi (iPhi value)
 
@@ -784,6 +815,9 @@
                 SummaryStatistics::fStdDev          //Standard deviation of dataset
                 SummaryStatistics::mset_fOutliers   //Container storing outliers of a dataset; outlier definition is defined per Analyzer
                 SummaryStatistics::hDist            //TH1F object of which stores the distribution of the dataset
+                SummaryStatistics::fitDist          //TF1 object which attempts a Gaussian fit to hDist
+
+                SummaryStatistics::clear()          //resets all floats to -1, resets TObjects, and clears all stl containers
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
@@ -806,12 +840,16 @@
             #################################################################################################
             #   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
             #################################################################################################
-            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR1,    139,         401,       3,       1
+            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR1,    1014.95,         411.402,       3,       1
             ...     ...         ...      ...        ...         ...          ...        ...     ...
-            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR8,    1169,        223,       3,       1
+            ...     ...         ...      ...        ...         ...          ...        ...     ...
+            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR8,    0,        231.186,       3,       1
 
         For each "DET" line defined in this file an entry in the DetectorMPGD::map_sectorsEta map will be
         stored.  In this way the amoreSRS mapping config file specifies the geometry of the DetectorMPGD object.
+
+        Right now the framework only supports detectors with 1D readouts.  Although the future plan would be
+        to extend the software to 2D readouts.
 
         # 4.e.ii. Analysis Config File
         # --------------------------------------------------------
@@ -887,7 +925,7 @@
             The following parameters are supported:
             #		<FIELD>             <DATA TYPE, DESCRIPTION>
 
-                Cut_ADC_Min             integer, clusters with ADC values less than this value are rejected.
+                Cut_ClusterADC_Min      integer, clusters with ADC values less than this value are rejected.
 
                 Cut_ClusterMulti_Min    integer, events with clusters multiplicity less than or equal to this
                                         value are rejected.
@@ -929,25 +967,28 @@
                 Uniformity_Granularity  integer, numer of slices, or partitions, to split one iPhi sector into
                                         for the response uniformity measurement.
 
-                Uniformity_Tolerance    float, checks if fabs( (Det_Resp_Max - Det_Resp_Min) / Det_Resp_Max )
-                                        is less than the input value.  If it is the response uniformity is
-                                        considered to be within the tolerance.  Expected to be from 0.0 to 1.0
-
         # 4.e.ii.IV HEADER PARAMETERS - ADC_FIT_INFO
         # --------------------------------------------------------
 
-        A set of keywords = {"AMPLITUDE","MEAN","PEAK","SIGMA"} is presently supported which
-        allows the user to configure complex expressions for the initial guess of fit parameters,
-        their limits, and the fit range.  In the future we hope to add additional keywords (e.g.
-        "HWHM" and "FWHM").  The table below describes the keywords:
+        A set of keywords = {"AMPLITUDE","FWHM","HWHM","MEAN","PEAK","SIGMA"} is presently supported
+        which allows the user to configure complex expressions for the initial guess of fit parameters,
+        their limits, and the fit range.  In the future additional keywords may be added as requested.
+        The table below describes the keywords:
 
-            The following keywords are supported:
+            The following keywords are supported and describe how they define the initial guess for a
+            given fit:
             #       <KEYWORD>       <DESCRIPTION>
 
-                AMPLITUDE           The fit parameter is set based on the value of the TH1 bin with the largest
+                AMPLITUDE           The fit parameter is set to the value of the TH1 bin with the largest
                                     content (e.g. TH1::GetBinContent(TH1::GetMaximumBin() ) ).
 
-                MEAN                The fit parameter is set based on the mean of the distribution stored in
+                FWHM                The fit parameter is set to the RMS of the distribution stored in
+                                    the TH1 object (e.g. TH1::GetRMS() ).
+
+                HWHM                The fit parameter is set to half the RMS of the distribution stored in
+                                    the TH1 object (e.g. TH1::GetRMS() ).
+
+                MEAN                The fit parameter is set to the mean of the distribution stored in
                                     the TH1 object (e.g. TH1::GetMean() ).
 
                 PEAK                An instance of the ROOT::TSpectrum class is created and searches the TH1
@@ -957,9 +998,33 @@
                                     fit parameter (e.g. TSpectrum::Search() and TSpectrum::GetPositionX()
                                     are used).
 
-                SIGMA               The fit parameter is set based on the SIGMA of the distribution stored in
-                                    the TH1 object (e.g. TH1::GetRMS() ).
+                SIGMA               As "FWHM"
 
+        The framework will calculate the energy resolution of a given slice of the detector.  The energy
+        resolution is always taken as:
+
+            E_Res = PEAK_FWHM / PEAK_Pos
+
+        In your fit formula you must label one parameter in the "Fit_Param_Map" (see table below) from
+        the peak width set {"FWHM","HWHM","SIGMA"}.  Failure to do so will cause the energy resolution
+        to be zero for all slices (i.e. all points in gEta_ClustADC_Fit_PkRes will be 0 for all SectorEta
+        objects defined).  The table below shows how the PEAK_FWHM is determined for each of the entires
+        in the peak width set:
+
+            Energy resolution determination for each of the three input parameter values:
+            #       <KEYWORD>       <DESCRIPTION>
+
+                FWHM                E_Res = FWHM / PEAK_Pos; where FWHM is the value of the fit
+                                    parameter, post fit, given the meaning "FWHM" in the Fit_Param_Map
+                                    field.
+
+                HWHM                E_Res = (2.*HWHM) / PEAK_Pos; where HWHM is the value of the
+                                    fit parameter, post fit, given the meaning "HWHM" in the Fit_Param_Map
+                                    field.
+
+                SIGMA               E_Res = (2. * sqrt( 2. * ln(2.) ) * SIGMA ) / PEAK_Pos; where SIGMA
+                                    is the value of the fit parameter, post fit, given the meaning "SIGMA"
+                                    in the Fit_Param_Map field.
 
         The table below describes the allowed input fields and their data types:
 
@@ -985,17 +1050,17 @@
 
                 Fit_Param_Limit_Max     string, as Fit_Param_IGuess but for the upper limit on fit parameters.
 
-                Fit_Param_Limit_Min     string, as Fit_Param_IGuess but for the upper limit on fit parameters.
+                Fit_Param_Limit_Min     string, as Fit_Param_IGuess but for the lower limit on fit parameters.
 
                 Fit_Param_Map           string, words to help the user track the meaning of the fit parameter.
                                         The order follows the ordering schema described in Fit_Param_IGuess.
-                                        NOTE: at least one parameter must be given the value "PEAK" from the
-                                        supported keywords.  The vertical error-bar also comes from the fit
-                                        error on this parameter (open issue to move to "SIGMA", "HWHM",
-                                        or "FWHM").
+                                        NOTE: at least one parameter must be given the value "PEAK" and one
+                                        parameter must be given a value from the set {"FWHM","HWHM","SIGMA"}.
+                                        The vertical error-bar on these two parameters comes from the error
+                                        on the corresponding fit parameter determined in ROOT (e.g. TF1::GetParError() )
 
                 Fit_Range               string, as Fit_Param_IGuess but for the fit range.  NOTE: must supply
-                                        at least two parameters.  If more then two parameters are supplied
+                                        exactly two parameters.  If more then two parameters are supplied
                                         only those that evaluate to the maximum and minimum are used.
 
         # 4.e.ii.V HEADER PARAMETERS - HISTO_INFO
@@ -1020,7 +1085,7 @@
                                         this entry should appear as the first line below the section
                                         header ("BEGIN_HISTO_INFO") and only entries from the following
                                         set are allowed: {"clustADC", "clustMulti", "clustPos", "clustSize",
-                                        "clustTime", "hitADC", "hitPos", "hitTime"}.
+                                        "clustTime", "hitADC", "hitMulti", "hitPos", "hitTime"}.
 
                 Histo_XTitle            string, title of the x-axis, full TLatex style entires are supported.
                                         Explicitly "cluster position #left(#mum#right)" will result in a
@@ -1030,12 +1095,12 @@
                 Histo_YTitle            string, as Histo_XTitle but for the y-axis.
 
                 Histo_BinRange          float, two floats separated by a comma specifying the lowest and
-                                        highest values of the x-axis.  In the case of Histo_Name = clustPos
+                                        highest values of the x-axis.  In the case of Histo_Name = {clustPos, hitPos}
                                         this field is automatically set based on input from amoreSRS mapping file.
 
                 Histo_NumBins           integer, number of bins in the histogram.  In the case of
-                                        Histo_Name = clustPos this field is automatically set based on input
-                                        from amoreSRS mapping file.
+                                        Histo_Name = {clustPos, hitPos} this field is automatically set
+                                        based on input from amoreSRS mapping file.
 
         # 4.e.ii.VI Example Config File
         # --------------------------------------------------------
@@ -1047,7 +1112,7 @@
                 [BEGIN_UNIFORMITY_INFO]
                     #Selection Cuts
                     ####################################
-                    Cut_ADC_Min = '700';
+                    Cut_ClusterADC_Min = '700';
                     Cut_ClusterMulti_Min = '0';
                     Cut_ClusterMulti_Max = '20';
                     Cut_ClusterSize_Min = '2';
@@ -1056,6 +1121,7 @@
                     Cut_ClusterTime_Max = '14';
                     #Selection Cuts - Hit
                     ####################################
+                    Cut_HitAdc_Min = '60';
                     Cut_HitMulti_Min = '0';
                     Cut_HitMulti_Max = '3072';
                     Cut_HitTime_Min = '1';
@@ -1069,23 +1135,22 @@
                     Uniformity_Granularity = '8';
                     #Requested Tolerance on Uniformity
                     ####################################
-                    Uniformity_Tolerance = '0.15';
                     [BEGIN_ADC_FIT_INFO]
                         #ADC Spectrum Fit Parameters - Brian (Lorentz + Poly BKG; Lorentz = CauchyDist in ROOT)
                         Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol4(3)';
                         Fit_Option = 'QM';
                         Fit_Param_Map = 'AMPLITUDE, PEAK, HWHM';
                         Fit_Param_IGuess = '127898, PEAK, 200';
-                        Fit_Param_Limit_Min = '10, PEAK-0.1*PEAK, 10';
-                        Fit_Param_Limit_Max = '700000, PEAK+0.1*PEAK, 800';
+                        Fit_Param_Limit_Min = '10, PEAK-0.1*PEAK, 0.1*PEAK';
+                        Fit_Param_Limit_Max = '700000, PEAK+0.1*PEAK, 0.75*PEAK';
                         Fit_Range = '800, 6000';
                     [END_ADC_FIT_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustADC';
                         Histo_XTitle = 'Cluster ADC';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,15000';
-                        Histo_NumBins = '100';
+                        Histo_BinRange = '0,10000';
+                        Histo_NumBins = '50';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustMulti';'
@@ -1112,8 +1177,22 @@
                         Histo_Name = 'clustTime';
                         Histo_XTitle = 'Time Bin';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,23';  #Expects two numbers separated by a comma
-                        Histo_NumBins = '23';
+                        Histo_BinRange = '0,30';  #Expects two numbers separated by a comma
+                        Histo_NumBins = '30';
+                    [END_HISTO_INFO]
+                    [BEGIN_HISTO_INFO]
+                        Histo_Name = 'hitADC';
+                        Histo_XTitle = 'Hit ADC';
+                        Histo_YTitle = 'N';
+                        Histo_BinRange = '0,2000';  #Expects two numbers separated by a comma
+                        Histo_NumBins = '200';
+                    [END_HISTO_INFO]
+                    [BEGIN_HISTO_INFO]
+                        Histo_Name = 'hitMulti';'
+                        Histo_XTitle = 'Hit Multiplicity';
+                        Histo_YTitle = 'N';
+                        Histo_BinRange = '0,20';  #Expects two numbers separated by a comma
+                        Histo_NumBins = '20';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'hitPos';
@@ -1266,25 +1345,29 @@
         the framework analysis is desired; but this will be applied to EACH of the input files defined in
         the "[BEGIN_RUN_LIST]" header.  If the need arises we can implement a way to assign a different
         analysis and mapping config file to each of the input files defined in the "[BEGIN_RUN_LIST]" header
-        but right now this functionality is not foreseen.
+        but right now this functionality is not foreseen.  It is recommended to just do two runs of the
+        executable after changing the configuration.
 
         The second mode is the computing cluster mode; but to avoid confusion with charge clusters this is
         referred to as "grid" mode. Here the input run config file contains only a single input file in the
         "[BEGIN_RUN_LIST]" header and the "[BEGIN_RUN_INFO]" header is configured such that Ana_Fitting and
         Visualize_Plots are set to false.  The user uses a script/scheduler of their choice to launch their
-        jobs to a computing cluster to analyze a set of input files in parallel (scripts to do this are not
-        yet present in the repository but is foreseen).  Then after all jobs are finished and the outputs
-        retrieved the user can merge the output files together (if running on amoreSRS input files) using
-        the "hadd" command in ROOT.  Then this merged file can be reprocessed in series mode with
-        Input_Is_Frmwrk_Output, Ana_Fitting, and Visualize_Plots set to true.
+        jobs to a computing cluster to analyze a set of input files in parallel (scripts to do this with the
+        batch submission system on CERN's lxplus are included in the repository).  Then after all jobs are
+        finished and the outputs retrieved the user can merge the output files together (if running on
+        amoreSRS input files) using the "hadd" command in ROOT.  Then this merged file can be reprocessed
+        in series mode with Input_Is_Frmwrk_Output, Ana_Fitting, and Visualize_Plots set to true.
 
         The third mode is the "re-run" mode.  Here one can take a TFile that has been previously produced by
         the CMS_GEM_Analysis_Framework and reanalyze it after changing the fit parameters defined in the
         analysis configuration file.  Each run will result in a new TFile (independent from the input) that
         has the updated results.  This allows the user to more rapidly study variations in parameters without
-        having to waste time performing the base selection (which may not need to change).
+        having to waste time performing the base selection (which may not need to change).  Right now in
+        "re-run" mode only cluster level plots are propogated to the new TFile.
 
-        Example configuration files illustrating these options are provided in the sections below.
+        Example configuration files illustrating these options are provided in the sections below.  Furthermore
+        template config files and helper scripts are provided in the framework to run in each mode.  For details
+        on this functionality see Sections 3.a.i through 3.a.iii.
 
         # 4.e.iii.IV  Example Config File - Mode: Series
         # --------------------------------------------------------
@@ -1300,7 +1383,7 @@
                 #Config Files
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
                 #Detector
                 ####################################
                 Detector_Name = 'DETECTORNAME';
@@ -1343,7 +1426,7 @@
                 #Config Files
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
                 #Detector
                 ####################################
                 Detector_Name = 'GE1/1-VII-L-CERN-0001';
@@ -1401,7 +1484,7 @@
                 #Config Files
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
@@ -1438,7 +1521,7 @@
                 #Config Files
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/GE7MappingCMScernData2016.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
                 #Detector
                 ####################################
                 Detector_Name = 'DETECTORNAME';
@@ -1498,7 +1581,7 @@
         will include the string "_iEtaX_" to ensure they are unique.
 
         Within each "SectorEtaX" folder will be nbConnect number of TDirectory's labeled "SectorPhiY" for
-        Y = {1, 2, 3}.  Similarly to the above, the TObject's stored in the Uniformity::SectorPhi struct
+        Y = {1, ... , nbConnect}.  Similarly to the above, the TObject's stored in the Uniformity::SectorPhi struct
         will be stored directly in this "SectorPhiY" TDirectory; they will represent only distributions
         from this (iEta, iPhi) value.  Again, the TName's for each TObject here will include the string
         "_iEtaXiPhiY_" to ensure they are unique.
@@ -1525,10 +1608,11 @@
                 canv_<Detector_Name>_<Observable>_AllEta_Segmented
 
             will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
-            configRun.cfg file and "Observable" comes from the set {ClustPos, ClustADC, ClustSize, ClustTime}.
+            configRun.cfg file and "Observable" comes from the set {ClustADC, ClustMulti, ClustPos, ClustSize,
+            ClustTime, HitADC, HitMulti, HitPos, HitTime}.
 
             These will show a TCanvas with an array of TPads placed in a 2x4 grid (columns-by-rows).  Each TPad
-            will have ieta index written in the upper left corner of the pad and have the corresponding TObject
+            will have iEta index written in the upper left corner of the pad and have the corresponding TObject
             from this iEta value drawn on the pad.
 
             # 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
@@ -1544,11 +1628,12 @@
                 h_Summary_<Observable>Dataset
 
             Here the "Detector_Name" is the parameter defined in the given
-            configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos}, to be expanded at a later date.
+            configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos, ResponseFitPkRes},
+            with expansions possible if requested.
 
             The x-axis will be the <Observable> in question (e.g. for ResponseFitPkPos this will be the cluster ADC
             of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution
-            of the observable in questin over the entire detector.  The TH1F in question will always have the bin
+            of the observable in question over the entire detector.  The TH1F in question will always have the bin
             range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
             of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
             fit with a Gaussian whose mean and sigma parameters will be written on the TPad.  The percent error of
@@ -1570,7 +1655,7 @@
 
             Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
             is from the set {ResponseFitChi2, ResponseFitPkPos, ResponseFitPkRes} for the normalized Chi2 value
-            of the fit, determined peak position, and determined peak resolution (resolution = FWHM / position),
+            of the fit, determined peak position, and determined peak resolution (see Section 4.e.ii.IV for details),
             respectively.
 
             # 4.f.i.IV 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
@@ -1594,12 +1679,40 @@
             These plots may take some time to load.  This is due to the rendering that is done by ROOT; be
             patient.  Consider transfering the file to your local machine if it is not already.  Once they load
             the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
-            of the detector and the Z-axis will be hte FitObservable.
+            of the detector and the Z-axis will be the FitObservable.
 
         # 4.f.ii Output Text File
         # --------------------------------------------------------
 
+        An output text file will be created that will show in tabular form a table which
+        looks like:
 
+                            Cut_HitAdc_Min = 60
+                            iEta	iPhi	iStrip
+                            1       1       64
+                            1       1       65
+                            1       2       64
+                            1       3       64
+                            ...     ...     ...
+                            ...     ...     ...
+                            7       1       128
+                            7       2       1
+                            8       3       64
+                            8       2       1
+
+        The first row will show Cut_HitAdc_Min, the minimum ADC cut on hits, applied
+        during the analysis.
+
+        A strip is considered dead if there are no entries in the corresponding bin of
+        hit position histogram at the ieta level.  The algorithm will transpose this
+        strip number from iEta numbering, e.g. [1,384], to iPhi numbering [1,128].
+        This should allow the user to easily identify which strip on a connector is
+        reported as dead.
+
+        Note that having the Cut_HitAdc_Min "too high" may cause strips to be reported
+        as dead.  Also when identifying dead strips it is important to understand if
+        the problem is a dead strip on the detector or a dead channel on the front end
+        used to readout the sector.
 
     # 4.g. Source Code Name Conventions
     # --------------------------------------------------------
@@ -1661,6 +1774,8 @@
                     TF1                 The sequence 'fit' should start the object name, e.g. fitSlice_ClustADC
 
                     TGraph              The character 'g' should start the object name, e.g. gClustADC
+
+                    TGraph2D            The character 'g2D' should start the object name, e.g. g2D_RespFitPkPos
 
 # 5. Known & Outstanding Issues
 # ========================================================

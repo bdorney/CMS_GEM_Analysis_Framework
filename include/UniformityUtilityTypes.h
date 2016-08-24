@@ -72,8 +72,6 @@ namespace QualityControl {
             int iEvt_Total;    //Total number of Events to Analyze
             int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
             
-            float fUniformityTolerance; //Detector should be uniform within this percent
-            
             Timing::HistoSetup histoSetup_clustADC;
             Timing::HistoSetup histoSetup_clustMulti;
             Timing::HistoSetup histoSetup_clustPos;
@@ -493,9 +491,6 @@ namespace QualityControl {
             
             std::map<int, SectorPhi> map_sectorsPhi;
             
-            //std::multiset<float> mset_fClustADC_Fit_PkPos;
-            //std::multiset<float> mset_fClustADC_Spec_PkPos;
-            
             //One dimensional graphs
             std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
             std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
@@ -508,10 +503,6 @@ namespace QualityControl {
             //histograms
             HistosPhysObj clustHistos;
             HistosPhysObj hitHistos;
-            
-            //Summary Statistics
-            //SummaryStatistics statClustADC_Fit_PkPos;
-            //SummaryStatistics statClustADC_Spec_PkPos;
             
             //Default Constructor
             SectorEta(){
