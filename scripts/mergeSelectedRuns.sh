@@ -23,6 +23,7 @@ if [ -d $DIR_SRC ]; then
 else
 	echo "Directory " $DIR_SRC " not found"
 	echo "Exitting!!!"
+	return
 fi
 
 # Determine which files should be merged
