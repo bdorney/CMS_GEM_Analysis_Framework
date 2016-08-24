@@ -2,10 +2,19 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.0.0                               *
+*	VERSION: 2.0.1                               *
 *	LAST UPDATE: Aug 19 2016                     *
 *                                                *
 **************************************************
+
+Update: August 23 2016
+==================================================
+->Added method AnalyzeResponseUniformityHits::findDeadStrips(), produces a text file including tabular data of dead strips in eta/phi
+->Added function QualityControl::Uniformity::getPhiStripNum() for converting strip number in iEta row to iPhi sector
+->Added function QualityControl::Uniformity::getPhiSectorVal() for determining which phi sector an iEta strip is in
+->Added overloaded function QualityControl::Timing::printStreamStatus() for dealing with std::fstream objects
+->Changed InterfaceAnalysis::storeResults to take 2 arguments, the second being the file name of the input TFile
+->InterfaceAnalysis::storeResults will now call AnalyzeResponseUniformityHits::findDeadStrips()
 
 Update: August 19th 2016
 ==================================================

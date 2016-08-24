@@ -3,7 +3,8 @@
 
 	Software tools for the analysis of experimental data collected by the CMS GEM community
 
-	Designed to work on lxplus running slc6 with ROOT version 6.00.02 and g++ version 4.8.4
+	Designed to work on lxplus running slc6 with ROOT version 6.00.02 or higher and g++
+    version 4.8.4.
 
     Instructions below assume the user is using a sh/bash/zsh shell.  Scripts for csh/tsch
     have not been implemented yet.
@@ -79,11 +80,13 @@
                 4.e.iii.IV  Example Config File - Mode: Series
                 4.e.iii.V   Example Config File - Mode: Grid
                 4.e.iii.VI  Example Config File - Mode: Re-Run
-        4.f. Output ROOT File
-                4.f.i.      "Segmented" Plots Stored in "Summary" folder
-                4.f.ii.     "Dataset" Plots Stored in "Summary" folder
-                4.f.iii.    1D Fit Summary Plots Stored in "Summary" folder
-                4.f.iv.     2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+        4.f. Output Files
+            4.f.i           Output ROOT File
+                4.f.i.I     "Segmented" Plots Stored in "Summary" folder
+                4.f.i.II    "Dataset" Plots Stored in "Summary" folder
+                4.f.i.III   1D Fit Summary Plots Stored in "Summary" folder
+                4.f.i.IV    2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+            4.f.ii          Output Text File
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -97,7 +100,8 @@
     This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi.
     The original selection & analysis algorithms are based off work done by J. Merlin.  This
     package makes use of several features from the CMS_GEM_TB_Timing repository (also by B. Dorney).
-    Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this repository.
+    Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this
+    repository.
 
     This package makes use of the "C++ Mathematical Expression Library" designed by Arash Partow,
     available at (http://www.partow.net/programming/exprtk/index.html), and referred to as ExprTk.
@@ -109,7 +113,7 @@
 # 2. Installation Instructions
 # ========================================================
 
-    This is repository follows the guidelines of Vincent Driessen in
+    This repository follows the guidelines of Vincent Driessen in
     "A successful Git branching model" available at:
 
     http://nvie.com/posts/a-successful-git-branching-model/
@@ -188,7 +192,7 @@
     CMS_GEM_Analysis_Framework.  For a full explanation of the available configurations please
     consult 4.e.
 
-    The contents and layout of the output root file are described in Section 4.f.
+    The contents and layout of the output files are described in Section 4.f.
 
     Three example config files: 1) mapping config file, 2) analysis config file, and 3) run config
     file have been provided in the default repository.  A usage example is given as:
@@ -1472,115 +1476,130 @@
         Astute readers will note this is identical to the series mode example 2 with just one input file.
         This is true; however, I felt the explicit example could prove useful.
 
-    # 4.f. Output ROOT File
+    # 4.f. Output Files
     # --------------------------------------------------------
 
-    The output ROOT file produced by classes inheriting from AnalyzeResponseUniformity will contain the
-    TObjects described in Sections 4.b.i, 4.b.iii, and 4.d.ii.  The output file will have a repeating file
-    structure.  For each SectorEta defined (i.e. "DET" line in the amoreSRS mapping config file) there
-    will be one TDirectory named "SectorEtaX" where X is an integer.  Those TObject's stored in the
-    Uniformity::SectorEta struct will be stored directly in this "SectorEtaX" TDirectory; and obviously
-    they will represent only distributions from that iEta value.  The TName's for each TObject here
-    will include the string "_iEtaX_" to ensure they are unique.
+    The framework will produce a number of output ROOT files and text files depending
+    on the configuration used.  When Output_Individual = true one ROOT file and text
+    file will be produced per input file.  Otherwise a single ROOT and text file will
+    be produced which represents the aggregate of the input file(s) analyzed
 
-    Within each "SectorEtaX" folder will be nbConnect number of TDirectory's labeled "SectorPhiY" for
-    Y = {1, 2, 3}.  Similarly to the above, the TObject's stored in the Uniformity::SectorPhi struct
-    will be stored directly in this "SectorPhiY" TDirectory; they will represent only distributions
-    from this (iEta, iPhi) value.  Again, the TName's for each TObject here will include the string
-    "_iEtaXiPhiY_" to ensure they are unique.
+    The output (text) ROOT file is described in Section (4.f.ii) 4.f.i.
 
-    Within each "SectorPhiY" folder there will exist AnalysisSetupUniformity::iUniformityGranularity
-    number of TDirectory's labeled "SliceZ" where Z is an integer from 1 to
-    AnalysisSetupUniformity::iUniformityGranularity.  Similarly, the TObject's stored in
-    Uniformity::SectorSlice will be stored directly in this "SliceZ" TDirectory; they will only
-    represent distributions from this (iEta, iPhi, Slice) value.  Again, the TName's for each TObject
-    here will include the string "_iEtaXiPhiYSliceZ_" to ensure tehy are unique.
-
-    One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
-    for each cluster/hit observable.  The contents of these histograms is simply the sum of the
-    corresponding SectorEtaX histograms (e.g. TH1::Add() method).
-
-    Additionally the VisualizeUniformity class places additional TObjects (e.g. TCanvas, TMultiGraph, etc...)
-    to assist the analyst in making the "pass/fail" statement.  These are desribed below.
-
-        # 4.f.i. "Segmented" Plots Stored in "Summary" folder
+        # 4.f.i Output ROOT File
         # --------------------------------------------------------
 
-        Several TCanvas objects with TNames of the form:
+        The output ROOT file produced by classes inheriting from AnalyzeResponseUniformity will contain the
+        TObjects described in Sections 4.b.i, 4.b.iii, and 4.d.ii.  The output file will have a repeating file
+        structure.  For each SectorEta defined (i.e. "DET" line in the amoreSRS mapping config file) there
+        will be one TDirectory named "SectorEtaX" where X is an integer.  Those TObject's stored in the
+        Uniformity::SectorEta struct will be stored directly in this "SectorEtaX" TDirectory; and obviously
+        they will represent only distributions from that iEta value.  The TName's for each TObject here
+        will include the string "_iEtaX_" to ensure they are unique.
 
-            canv_<Detector_Name>_<Observable>_AllEta_Segmented
+        Within each "SectorEtaX" folder will be nbConnect number of TDirectory's labeled "SectorPhiY" for
+        Y = {1, 2, 3}.  Similarly to the above, the TObject's stored in the Uniformity::SectorPhi struct
+        will be stored directly in this "SectorPhiY" TDirectory; they will represent only distributions
+        from this (iEta, iPhi) value.  Again, the TName's for each TObject here will include the string
+        "_iEtaXiPhiY_" to ensure they are unique.
 
-        will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
-        configRun.cfg file and "Observable" comes from the set {ClustPos, ClustADC, ClustSize, ClustTime}.
+        Within each "SectorPhiY" folder there will exist AnalysisSetupUniformity::iUniformityGranularity
+        number of TDirectory's labeled "SliceZ" where Z is an integer from 1 to
+        AnalysisSetupUniformity::iUniformityGranularity.  Similarly, the TObject's stored in
+        Uniformity::SectorSlice will be stored directly in this "SliceZ" TDirectory; they will only
+        represent distributions from this (iEta, iPhi, Slice) value.  Again, the TName's for each TObject
+        here will include the string "_iEtaXiPhiYSliceZ_" to ensure tehy are unique.
 
-        These will show a TCanvas with an array of TPads placed in a 2x4 grid (columns-by-rows).  Each TPad
-        will have ieta index written in the upper left corner of the pad and have the corresponding TObject
-        from this iEta value drawn on the pad.
+        One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
+        for each cluster/hit observable.  The contents of these histograms is simply the sum of the
+        corresponding SectorEtaX histograms (e.g. TH1::Add() method).
 
-        # 4.f.ii. "Dataset" Plots Stored in "Summary" folder
+        Additionally the VisualizeUniformity class places additional TObjects (e.g. TCanvas, TMultiGraph, etc...)
+        to assist the analyst in making the "pass/fail" statement.  These are desribed below.
+
+            # 4.f.i.I "Segmented" Plots Stored in "Summary" folder
+            # --------------------------------------------------------
+
+            Several TCanvas objects with TNames of the form:
+
+                canv_<Detector_Name>_<Observable>_AllEta_Segmented
+
+            will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
+            configRun.cfg file and "Observable" comes from the set {ClustPos, ClustADC, ClustSize, ClustTime}.
+
+            These will show a TCanvas with an array of TPads placed in a 2x4 grid (columns-by-rows).  Each TPad
+            will have ieta index written in the upper left corner of the pad and have the corresponding TObject
+            from this iEta value drawn on the pad.
+
+            # 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
+            # --------------------------------------------------------
+
+            Several TCanvas objects with TNames of the form:
+
+                canv_<Detector_Name>_<Observable>Dataset_AllEta
+
+            will be stored in the folder along with matching TH1F objects for each TCanvas with the
+            TName of the form:
+
+                h_Summary_<Observable>Dataset
+
+            Here the "Detector_Name" is the parameter defined in the given
+            configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos}, to be expanded at a later date.
+
+            The x-axis will be the <Observable> in question (e.g. for ResponseFitPkPos this will be the cluster ADC
+            of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution
+            of the observable in questin over the entire detector.  The TH1F in question will always have the bin
+            range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
+            of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
+            fit with a Gaussian whose mean and sigma parameters will be written on the TPad.  The percent error of
+            the dataset, defined as sigma / mean from the Gaussian, will also be displayed on the TPad.  This offers
+            an "at a glance" look at the total distribution for a given observable and may help understand an immediate
+            pass/fail condition.
+
+            # 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
+            # --------------------------------------------------------
+
+            Several TCanvas objects with TNames of the form:
+
+                canv_<Detector_Name>_<FitObservable>_AllEta
+
+            will be stored in the folder along with matching TMultiGraph objects for each TCanvas with the
+            TName of the form:
+
+                mgraph_<Detector_Name>_<FitObservable>_AllEta
+
+            Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
+            is from the set {ResponseFitChi2, ResponseFitPkPos, ResponseFitPkRes} for the normalized Chi2 value
+            of the fit, determined peak position, and determined peak resolution (resolution = FWHM / position),
+            respectively.
+
+            # 4.f.i.IV 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+            # --------------------------------------------------------
+
+            Several TCanvas objects with TNames of the form:
+
+                canv_<Detector_Name>_<FitObservable>2D_AllEta
+
+            will be stored in the folder along with matching TGraph2D objects for each TCanvas with the
+            TName of the form:
+
+                g2D_<Detector_Name>_<FitObservable>_AllEta
+
+            Note in the case of the TCanvas a "2D" is placed in the TName to distinguish it from the 1D case.
+            Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
+            is from the set {ResponseFitPkPos, ResponseFitPkPosNormalized, ResponseFitPkRes,
+            ResponseFitPkResNormalized}.  For the "Normalized" cases the z-axis at every point will be the point
+            divided by the mean of the dataset formed by all points of the FitObservable (e.g. z / z_avg);
+
+            These plots may take some time to load.  This is due to the rendering that is done by ROOT; be
+            patient.  Consider transfering the file to your local machine if it is not already.  Once they load
+            the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
+            of the detector and the Z-axis will be hte FitObservable.
+
+        # 4.f.ii Output Text File
         # --------------------------------------------------------
 
-        Several TCanvas objects with TNames of the form:
 
-            canv_<Detector_Name>_<Observable>Dataset_AllEta
-
-        will be stored in the folder along with matching TH1F objects for each TCanvas with the
-        TName of the form:
-
-            h_Summary_<Observable>Dataset
-
-        Here the "Detector_Name" is the parameter defined in the given
-        configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos}, to be expanded at a later date.
-
-        The x-axis will be the <Observable> in question (e.g. for ResponseFitPkPos this will be the cluster ADC
-        of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution
-        of the observable in questin over the entire detector.  The TH1F in question will always have the bin
-        range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
-        of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
-        fit with a Gaussian whose mean and sigma parameters will be written on the TPad.  The percent error of
-        the dataset, defined as sigma / mean from the Gaussian, will also be displayed on the TPad.  This offers
-        an "at a glance" look at the total distribution for a given observable and may help understand an immediate
-        pass/fail condition.
-
-        # 4.f.iii. 1D Fit Summary Plots Stored in "Summary" folder
-        # --------------------------------------------------------
-
-        Several TCanvas objects with TNames of the form:
-
-            canv_<Detector_Name>_<FitObservable>_AllEta
-
-        will be stored in the folder along with matching TMultiGraph objects for each TCanvas with the
-        TName of the form:
-
-            mgraph_<Detector_Name>_<FitObservable>_AllEta
-
-        Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
-        is from the set {ResponseFitChi2, ResponseFitPkPos, ResponseFitPkRes} for the normalized Chi2 value
-        of the fit, determined peak position, and determined peak resolution (resolution = FWHM / position),
-        respectively.
-
-        # 4.f.iv. 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-        # --------------------------------------------------------
-
-        Several TCanvas objects with TNames of the form:
-
-            canv_<Detector_Name>_<FitObservable>2D_AllEta
-
-        will be stored in the folder along with matching TGraph2D objects for each TCanvas with the
-        TName of the form:
-
-            g2D_<Detector_Name>_<FitObservable>_AllEta
-
-        Note in the case of the TCanvas a "2D" is placed in the TName to distinguish it from the 1D case.
-        Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
-        is from the set {ResponseFitPkPos, ResponseFitPkPosNormalized, ResponseFitPkRes,
-        ResponseFitPkResNormalized}.  For the "Normalized" cases the z-axis at every point will be the point
-        divided by the mean of the dataset formed by all points of the FitObservable (e.g. z / z_avg);
-
-        These plots may take some time to load.  This is due to the rendering that is done by ROOT; be
-        patient.  Consider transfering the file to your local machine if it is not already.  Once they load
-        the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
-        of the detector and the Z-axis will be hte FitObservable.
 
     # 4.g. Source Code Name Conventions
     # --------------------------------------------------------
