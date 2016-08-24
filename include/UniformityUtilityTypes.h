@@ -91,8 +91,6 @@ namespace QualityControl {
                 iEvt_First =  0;
                 iEvt_Total = -1;
                 iUniformityGranularity = 4;
-                
-                fUniformityTolerance = 0.15;
             } //End Initialization
         }; //End AnalysisSetupUniformity
         

@@ -3,9 +3,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.0.1                               *
-*	LAST UPDATE: Aug 19 2016                     *
+*	LAST UPDATE: Aug 23 2016                     *
 *                                                *
 **************************************************
+
+Update: August 24 2016
+==================================================
+->Removed AnalysisSetupUniformity::fUniformityTolerance and all associated functionality
 
 Update: August 23 2016
 ==================================================
