@@ -1,6 +1,7 @@
 # Back-Up Files #
 #################
 *~
+*.swp
 
 # Binary Files #
 ################
@@ -49,3 +50,4 @@ data/*
 ##############
 #*PFP.txt
 #setup_files/Production_ConfigFile.txt
+*DeadStripList.txt

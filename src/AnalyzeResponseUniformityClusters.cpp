@@ -466,7 +466,7 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInpu
     ParameterLoaderAmoreSRS amoreLoader;
     amoreLoader.loadAmoreMapping(strInputMappingFileName);
     detMPGD = amoreLoader.getDetector();
-    
+
     //Check to see if data file opened successfully, if so load the tree
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie() ) { //Case: failed to load ROOT file
@@ -495,8 +495,9 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInpu
         
         //Load Histograms - SectorEta Level
         //-------------------------------------
-        dir_SectorEta->cd();
+        dir_SectorEta->cd();        
         (*iterEta).second.clustHistos.hADC = make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( ("h_iEta" + getString( (*iterEta).first ) +  "_clustADC").c_str() ) ) );
+	(*iterEta).second.clustHistos.hMulti = make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( ("h_iEta" + getString( (*iterEta).first ) +  "_clustMulti").c_str() ) ) );
         (*iterEta).second.clustHistos.hPos = make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( ("h_iEta" + getString( (*iterEta).first ) +  "_clustPos").c_str() ) ) );
         (*iterEta).second.clustHistos.hSize = make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( ("h_iEta" + getString( (*iterEta).first ) +  "_clustSize").c_str() ) ) );
         (*iterEta).second.clustHistos.hTime = make_shared<TH1F>( *((TH1F*) dir_SectorEta->Get( ("h_iEta" + getString( (*iterEta).first ) +  "_clustTime").c_str() ) ) );
@@ -518,6 +519,7 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInpu
             //-------------------------------------
             dir_SectorPhi->cd();
             (*iterPhi).second.clustHistos.hADC = make_shared<TH1F>( *((TH1F*) dir_SectorPhi->Get( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustADC").c_str() ) ) );
+            (*iterPhi).second.clustHistos.hMulti = make_shared<TH1F>( *((TH1F*) dir_SectorPhi->Get( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustMulti").c_str() ) ) );	    
             (*iterPhi).second.clustHistos.hSize = make_shared<TH1F>( *((TH1F*) dir_SectorPhi->Get( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustSize").c_str() ) ) );
             (*iterPhi).second.clustHistos.hTime = make_shared<TH1F>( *((TH1F*) dir_SectorPhi->Get( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustTime").c_str() ) ) );
             (*iterPhi).second.clustHistos.hADC_v_Pos    = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_clustADC_v_clustPos").c_str() ) ) );
@@ -559,6 +561,16 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInpu
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
+
+        //Load Summary Case Histograms (Special Case for hMulti?)
+        //-------------------------------------
+        //Check to see if the directory exists already
+        TDirectory *dir_Summary = file_InputRootFile->GetDirectory( "Summary", false, "GetDirectory" );
+        
+        //If the above pointer is null the directory does NOT exist, skip this Eta Sector
+        if (dir_Summary != nullptr){
+		detMPGD.hMulti_Clust = make_shared<TH1F>( *((TH1F*) dir_Summary->Get("h_Summary_clustMulti" ) ) );
+	}
 
     //Do not close file_InputRootFile it is used elsewhere
     

@@ -453,12 +453,12 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
         strTempRunName = strFileName;
         if ( strTempRunName.find("dataTree.root") != string::npos ){
             strTempRunName.erase(strTempRunName.find("dataTree.root"), strTempRunName.length() - strTempRunName.find("dataTree.root") );
-            strTempRunName = strTempRunName + "DeadStripList.txt";
+            strTempRunName = strTempRunName + "_DeadStripList.txt";
             //replaceSubStr1WithSubStr2(strTempRunName, "dataTree.root", "Ana.root");
         } //End Case: Input Tree File
         else if ( strTempRunName.find(".root") != string::npos ) {
             strTempRunName.erase(strTempRunName.find(".root"), strTempRunName.length() - strTempRunName.find(".root") );
-            strTempRunName = strTempRunName + "DeadStripList.txt";
+            strTempRunName = strTempRunName + "_DeadStripList.txt";
             //replaceSubStr1WithSubStr2(strTempRunName, ".root", "Ana.root");
         } //End Case: Other ROOT file
         

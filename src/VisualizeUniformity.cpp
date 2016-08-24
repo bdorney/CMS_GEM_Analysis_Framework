@@ -526,6 +526,8 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
 	//g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
+    canv_DetSum.SetTheta(90);
+    canv_DetSum.SetPhi(0.05);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -1362,6 +1364,14 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, U
     else if (0 == strObsName.compare("CLUSTTIME") ) { //Case: Cluster Time
         ret_histo = inputEta.clustHistos.hTime;
     } //End Case: Cluster Time
+    //=======================Fit Parameters=======================
+    /*else if (0 == strObsName.compare("NORMCHI2") ) { //Case: Fit Normalized Chi2
+	shared_ptr<TCanvas> canv_Temp = std::make_shared<TCanvas>( TCanvas("canv_Temp","",600,600) );
+	canv_Temp->cd();
+	inputEta.gEta_ClustADC_Fit_NormChi2->Draw("AP");
+
+        ret_histo = std::make_shared<TH1F>( inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
+    }*/ //End Case: Fit Normalized Chi2
     //=======================Hit Parameters=======================
     else if (0 == strObsName.compare("HITADC") ) { //Case: Hit ADC
         ret_histo = inputEta.hitHistos.hADC;
