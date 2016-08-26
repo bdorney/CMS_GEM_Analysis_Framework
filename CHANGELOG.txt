@@ -3,9 +3,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.0.1                               *
-*	LAST UPDATE: Aug 23 2016                     *
+*	LAST UPDATE: Aug 26 2016                     *
 *                                                *
 **************************************************
+
+Update: August 26 2016
+==================================================
+->Updated default GE1/1-VII-L & GE1/1-VII-S mapping again, now origin is in center of detector's local coordinate (matches DPG)
 
 Update: August 24 2016
 ==================================================
