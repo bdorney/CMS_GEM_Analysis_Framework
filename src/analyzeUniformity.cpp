@@ -204,7 +204,7 @@ int main( int argc_, char * argv_[] ){
         
         //Load the Input Config File
         //------------------------------------------------------
-        file_Config.open(vec_strInputArgs[1].c_str() );
+        file_Config.open( vec_strInputArgs[1].c_str() );
         
         //Check to see if the config file opened successfully
         if (!file_Config.is_open()) {
@@ -242,8 +242,30 @@ int main( int argc_, char * argv_[] ){
         return -1;
     }
     
-    if( rSetup.bInputFromFrmwrk ){	vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode); }
-    else {                          vec_pairedRunList = loaderRun.getPairedRunList(file_Config, bVerboseMode); }
+    if( rSetup.bInputFromFrmwrk ){ //Case: Framework Input
+        vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode);
+        
+        if (vec_strInputFiles.size() == 0) {
+            cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
+            cout<<"\tExiting! Please cross-check input file!!!\n";
+            
+            return -4;
+        }
+        
+    } //End Case: Framework Input
+    else { //Case: amoreSRS Input
+        vec_pairedRunList = loaderRun.getPairedRunList(file_Config, bVerboseMode);
+        
+        //Check if
+        if (vec_pairedRunList.size() == 0) {
+            cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
+            cout<<"\tMaybe you forgot to have a field 'RunX' in the input filenames?\n";
+            cout<<"\tThis should be separated by underscores e.g. '_', and for each input file be some unique interger X"
+            cout<<"\tExiting! Please cross-check input file!!!\n";
+            
+            return -4;
+        }
+    } //End Case: amoreSRS Input
     
     file_Config.close();
     
