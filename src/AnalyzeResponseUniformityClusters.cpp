@@ -838,6 +838,8 @@ void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, D
             //Slices
             //Now that all clusters have been analyzed we extract the slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
+                if ((*iterSlice).second.fitSlice_ClustADC == nullptr) { continue; }
+                
                 //Get Directory
                 //-------------------------------------
                 //Check to see if the directory exists already
