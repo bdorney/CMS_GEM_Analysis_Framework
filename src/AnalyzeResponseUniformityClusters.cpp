@@ -146,7 +146,7 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 vec_fFitRange.clear();
                 
                 //Check if Histogram does not exist
-                if ( (*iterSlice).second.hSlice_ClustADC == nullptr) continue;
+                if ( (*iterSlice).second.hSlice_ClustADC == nullptr || !( (*iterSlice).second.hSlice_ClustADC->GetEntries() > 0) ) continue;
                 
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
