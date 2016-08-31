@@ -260,7 +260,7 @@ int main( int argc_, char * argv_[] ){
         if (vec_pairedRunList.size() == 0) {
             cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
             cout<<"\tMaybe you forgot to have a field 'RunX' in the input filenames?\n";
-            cout<<"\tThis should be separated by underscores e.g. '_', and for each input file be some unique interger X";
+            cout<<"\tThis should be separated by underscores e.g. '_', and for each input file be some unique interger X\n";
             cout<<"\tExiting! Please cross-check input file!!!\n";
             
             return -4;
