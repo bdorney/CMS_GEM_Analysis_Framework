@@ -291,10 +291,8 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
         
         //Get Directory
         //-------------------------------------
-        //Check to see if the directory exists already
+        //Check to see if dir_SectorEta directory exists already, if not create it
         TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
-        
-        //If the above pointer is null the directory does NOT exist, create it
         if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
             dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
         } //End Case: Directory did not exist in file, CREATE
@@ -307,7 +305,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
         hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
         hHitTime_All.Add((*iterEta).second.hitHistos.hTime.get() );
 
-        //Store Histograms - SectorEta Level
+        //Store Histograms - ReadoutSectorEta Level
         //-------------------------------------
         dir_SectorEta->cd();
         (*iterEta).second.hitHistos.hADC->Write();
@@ -320,10 +318,8 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
             //Get Directory
             //-------------------------------------
-            //Check to see if the directory exists already
+            //Check to see if dir_SectorPhi directory exists already, if not create it
             TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
-            
-            //If the above pointer is null the directory does NOT exist, create it
             if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
                 dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
             } //End Case: Directory did not exist in file, CREATE
@@ -331,7 +327,7 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
             //Debugging
             //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
             
-            //Store Histograms - SectorPhi Level
+            //Store Histograms - ReadoutSectorPhi Level
             //-------------------------------------
             dir_SectorPhi->cd();
             (*iterPhi).second.hitHistos.hADC->Write();

@@ -32,7 +32,7 @@ DetectorMPGD::DetectorMPGD(multimap<int, Cluster> map_inputClusters){
 }
 
 //Constructor to use when supplying a map of eta sectors
-DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
+DetectorMPGD::DetectorMPGD(map<int,ReadoutSectorEta> map_inputSectors){
     //bAnaSetup = false;
     map_sectorsEta = map_inputSectors;
 }
@@ -43,37 +43,37 @@ DetectorMPGD::DetectorMPGD(map<int,SectorEta> map_inputSectors){
 
 //Wipes all stored Clusters
 void DetectorMPGD::resetClusters(){
-    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's ReadoutSectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
             (*iterPhi).second.map_clusters.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
-    } //End Loop Over Detector's SectorEta Objects
+    } //End Loop Over Detector's ReadoutSectorEta Objects
     
     return;
 } //End DetectorMPGD::resetClusters()
 
 //Wipes all stored Hits
 void DetectorMPGD::resetHits(){
-    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's ReadoutSectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
             (*iterPhi).second.map_hits.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
-    } //End Loop Over Detector's SectorEta Objects
+    } //End Loop Over Detector's ReadoutSectorEta Objects
     
     return;
 } //End DetectorMPGD::resetHits()
 
 //Wipes all stored physics objects (Clusters and Hits)
 void DetectorMPGD::resetPhysObj(){
-    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's SectorEta Objects
+    for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) { //Loop Over Detector's ReadoutSectorEta Objects
         
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Phi Sectors within an Eta Sector
             (*iterPhi).second.map_clusters.clear();
             (*iterPhi).second.map_hits.clear();
         } //End Loop Over Phi Sectors within an Eta Sector
-    } //End Loop Over Detector's SectorEta Objects
+    } //End Loop Over Detector's ReadoutSectorEta Objects
     
     return;
 } //End DetectorMPGD::resetHits()
@@ -218,8 +218,8 @@ float DetectorMPGD::getEtaWidth(int iEta){
 } //End DetectorMPGD::getEtaWidth()
 
 //Returns the eta sector
-SectorEta DetectorMPGD::getEtaSector(int iEta){
-    SectorEta retSector;
+ReadoutSectorEta DetectorMPGD::getEtaSector(int iEta){
+    ReadoutSectorEta retSector;
     
     if ( map_sectorsEta.count(iEta) > 0 ) { //Case: Requested iEta Value exists
         retSector = map_sectorsEta[iEta];
@@ -233,9 +233,9 @@ SectorEta DetectorMPGD::getEtaSector(int iEta){
 } //End getEtaSector
 
 //Returns the phi sector
-SectorPhi DetectorMPGD::getPhiSector(int iEta, int iPhi){
-    SectorPhi retSector;
-    SectorEta etaSector = getEtaSector(iEta);
+ReadoutSectorPhi DetectorMPGD::getPhiSector(int iEta, int iPhi){
+    ReadoutSectorPhi retSector;
+    ReadoutSectorEta etaSector = getEtaSector(iEta);
     
     if ( etaSector.map_sectorsPhi.size() > 0 ) { //Case: Requested iEta Value exists
         if ( etaSector.map_sectorsPhi.count(iPhi) > 0 ) { //Case: Requested iPhi Value exists
@@ -327,7 +327,7 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
     } //End Case: Eta Sector Exists; DO NOTHING
     else{ //Case: Eta Sector does not exists; CREATE!
         //Variable Declaration
-        SectorEta etaSector;
+        ReadoutSectorEta etaSector;
         
         etaSector.fPos_Y = fInputPos_Y;
         etaSector.fWidth = fInputWidth;
@@ -337,7 +337,7 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
         
         //Make three Phi Sectors for this Eta Sector
         for (int i=1; i <= iNumPhiSector; ++i) {
-            SectorPhi phiSector;
+            ReadoutSectorPhi phiSector;
             
             phiSector.fPos_Xlow = -0.5 * fInputWidth + (i-1) * fInputWidth / 3.;
             phiSector.fPos_Xhigh= -0.5 * fInputWidth + (i) * fInputWidth / 3.;

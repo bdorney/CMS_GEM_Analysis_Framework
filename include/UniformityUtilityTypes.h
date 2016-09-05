@@ -152,7 +152,6 @@ namespace QualityControl {
             short sADCIntegral;         //Integral of vec_sADC
             
             //For now ADC is not used
-            //float fADC[30];           //ADC value of hit for time bin i; e.g. fADC[iTimeBine] gives the adc value at the assigned time bin
             std::vector<short> vec_sADC;//ADC value of hit for time bin i; e.g. vec_fADC[iTimeBine] gives the adc value at the assigned time bin
             
             //Set Initial Values
@@ -167,18 +166,13 @@ namespace QualityControl {
         
         //Cluster of strips
         struct Cluster{
-            //Int_t *fPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
             int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
-            //Float_t *fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
             float fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
             
-            //Float_t *fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
             float fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
             
-            //Int_t *fSize;      //Number of strips in cluster; e.g. clustSize from amoreSRS
             int iSize;      //Number of strips in cluster; e.g. clustSize from amoreSRS
             
-            //Int_t *fTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
             int iTimeBin;   //Time bin of cluster (not sure what that physically means...); e.g. clustTimeBin from amoreSRS
             
             std::map<int, Hit> map_hits;    //Hits used to reconstruct this cluster; placeholder, key-val here is the hit's strip number iStripNum
@@ -240,7 +234,7 @@ namespace QualityControl {
             
             //Run Histograms dimensional histograms
             std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run; //ADC vs Event Number for all physics objects (time series) for a given run (map_hADC_v_EvtNum_by_Run.first)
-            
+            std::map<int, std::shared_ptr<TH2F> > map_hTime_v_EvtNum_by_Run; //Time vs Event Number for all physics objects (time series) for a given run (map_hTime_v_EvtNum_by_Run.first)
             
             //Default Constructor
             HistosPhysObj(){
@@ -408,166 +402,7 @@ namespace QualityControl {
                 return *this;
             } //End Assignment operator
         }; //End SectorSlice
-        
-        //Defines the phi sector within the detector
-        struct SectorPhi{
-            float fPos_Xlow;    //Lower Bound X Position
-            float fPos_Xhigh;   //Upper Bound X Position
-            
-            float fWidth;       //Sector Width (mm)
-            
-            int iStripNum_Min;  //Minimum Strip number of sector (inclusive)
-            int iStripNum_Max;  //Maximum Strip number of sector (exclusive)
-            
-            std::map<int, SectorSlice> map_slices;  //Slices of this sector
-            
-            //std::vector<Cluster> vec_clusters;
-            std::multimap<int, Cluster> map_clusters;   //key value understood as event number
-            //std::vector<Hit> vec_hits;
-            std::multimap<int, Hit> map_hits;           //key value understood as event number
-            
-            //Histograms
-            HistosPhysObj clustHistos;
-            HistosPhysObj hitHistos;
-            
-            //Default Constructor
-            SectorPhi(){
-                fPos_Xlow = fPos_Xhigh = fWidth = -1;
-            } //End Default Constructor
-            
-            //Copy Constructor
-            SectorPhi(const SectorPhi& other){
-                fPos_Xlow   = other.fPos_Xlow;
-                fPos_Xhigh  = other.fPos_Xhigh;
-                
-                fWidth = other.fWidth;
-                
-                iStripNum_Min = other.iStripNum_Min;
-                iStripNum_Max = other.iStripNum_Max;
-                
-                map_slices = other.map_slices;
-                
-                //vec_hits    = other.vec_hits;
-                map_hits    = other.map_hits;
-                //vec_clusters= other.vec_clusters;
-                map_clusters= other.map_clusters;
-                
-                clustHistos = other.clustHistos;
-                hitHistos   = other.hitHistos;
-            } //End Copy Constructor
-            
-            //Assignment operator
-            SectorPhi & operator=(const SectorPhi & other){
-                if (this != &other ){ //Protects against invalid self-assignment
-                    fPos_Xlow  = other.fPos_Xlow;
-                    fPos_Xhigh = other.fPos_Xhigh;
-                    
-                    fWidth = other.fWidth;
-                    
-                    iStripNum_Min = other.iStripNum_Min;
-                    iStripNum_Max = other.iStripNum_Max;
-                    
-                    map_slices = other.map_slices;
-                    
-                    //vec_hits    = other.vec_hits;
-                    map_hits    = other.map_hits;
-                    //vec_clusters= other.vec_clusters;
-                    map_clusters= other.map_clusters;
-                    
-                    clustHistos = other.clustHistos;
-                    hitHistos   = other.hitHistos;
-                } //Protects against invalid self-assignment
-                
-                return *this;
-            } //End Assignment Operator
-        }; //End SectorPhi
-        
-        //Defines the pseudorapidity sector within the detector (note this is considered 3 phi sectors)
-        struct SectorEta{
-            float fPos_Y;       //Roughly Central Y Position of sector
-            float fWidth;       //Width of detector at this iEta value
-            
-            std::map<int, SectorPhi> map_sectorsPhi;
-            
-            //One dimensional graphs
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkRes;      //Peak Width / Peak Pos
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_Failures;
-            
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
-            std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
-            
-            //histograms
-            HistosPhysObj clustHistos;
-            HistosPhysObj hitHistos;
-            
-            //Default Constructor
-            SectorEta(){
-                fPos_Y = fWidth = -1;
-            } //End Default Constructor
-            
-            //Copy Constructor
-            SectorEta(const SectorEta& other){
-                fPos_Y = other.fPos_Y;
-                fWidth = other.fWidth;
-                
-                map_sectorsPhi = other.map_sectorsPhi;
-                
-                //mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
-                //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
-                
-                //histograms
-                clustHistos = other.clustHistos;
-                hitHistos = other.hitHistos;
-                
-                //Summary Statistics
-                //statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
-                //statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
-                
-                //Deep Copy
-                if( other.gEta_ClustADC_Fit_NormChi2 != NULL )  gEta_ClustADC_Fit_NormChi2  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_NormChi2.get() );
-                if( other.gEta_ClustADC_Fit_PkPos != NULL )     gEta_ClustADC_Fit_PkPos     = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_PkPos.get() );
-                if( other.gEta_ClustADC_Fit_PkRes != NULL )     gEta_ClustADC_Fit_PkRes     = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_PkRes.get() );
-                if( other.gEta_ClustADC_Fit_Failures != NULL )  gEta_ClustADC_Fit_Failures  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_Failures.get() );
-                
-                if( other.gEta_ClustADC_Spec_NumPks != NULL )   gEta_ClustADC_Spec_NumPks   = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Spec_NumPks.get() );
-                if( other.gEta_ClustADC_Spec_PkPos != NULL )    gEta_ClustADC_Spec_PkPos    = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Spec_PkPos.get() );
-            } //End Copy Constructor
-            
-            //Assignment operator
-            SectorEta & operator=(const SectorEta & other){
-                if (this != &other ){ //Protects against invalid self-assignment
-                    fPos_Y = other.fPos_Y;
-                    fWidth = other.fWidth;
-                    
-                    map_sectorsPhi = other.map_sectorsPhi;
-                    
-                    //mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
-                    //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
-                    
-                    //histograms
-                    clustHistos = other.clustHistos;
-                    hitHistos = other.hitHistos;
-                    
-                    //Summary Statistics
-                    //statClustADC_Fit_PkPos  = other.statClustADC_Fit_PkPos;
-                    //statClustADC_Spec_PkPos = other.statClustADC_Spec_PkPos;
-                    
-                    //Deep Copy
-                    if( other.gEta_ClustADC_Fit_NormChi2 != NULL )  gEta_ClustADC_Fit_NormChi2  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_NormChi2.get() );
-                    if( other.gEta_ClustADC_Fit_PkPos != NULL )     gEta_ClustADC_Fit_PkPos     = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_PkPos.get() );
-                    if( other.gEta_ClustADC_Fit_PkRes != NULL )     gEta_ClustADC_Fit_PkRes     = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_PkRes.get() );
-                    if( other.gEta_ClustADC_Fit_Failures != NULL )  gEta_ClustADC_Fit_Failures  = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Fit_Failures.get() );
-                    
-                    if( other.gEta_ClustADC_Spec_NumPks != NULL )   gEta_ClustADC_Spec_NumPks   = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Spec_NumPks.get() );
-                    if( other.gEta_ClustADC_Spec_PkPos != NULL )    gEta_ClustADC_Spec_PkPos    = std::make_shared<TGraphErrors>( *other.gEta_ClustADC_Spec_PkPos.get() );
-                } //Protects against invalid self-assignment
-                
-                return *this;
-            } //End Assignment Operator
-        }; //End SectorEta
-    } //End namespace uniformity
+    } //End namespace Uniformity
 } //End namespace QualityControl
 
 

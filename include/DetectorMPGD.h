@@ -18,6 +18,8 @@
 #include <vector>
 
 //Framework Includes
+#include "ReadoutSectorEta.h"
+#include "ReadoutSectorPhi.h"
 #include "TimingUtilityFunctions.h"
 #include "UniformityUtilityTypes.h"
 #include "UniformityUtilityFunctions.h"
@@ -68,7 +70,7 @@ namespace QualityControl {
             DetectorMPGD(std::multimap<int, Cluster> map_inputClusters);
             
             //Constructor to use when supplying a list of sectors;
-            DetectorMPGD(std::map<int, SectorEta> map_inputSectors);
+            DetectorMPGD(std::map<int, ReadoutSectorEta> map_inputSectors);
             
 	    //Destructors
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -141,8 +143,8 @@ namespace QualityControl {
             virtual float getEtaPos(int iEta);
             
             //returns the eta sector
-            virtual SectorEta getEtaSector(int iEta);
-            //virtual void getEtaSector(int iEta, SectorEta & retSector);
+            virtual ReadoutSectorEta getEtaSector(int iEta);
+            //virtual void getEtaSector(int iEta, ReadoutSectorEta & retSector);
             
             //returns the width of an iEta sector
             virtual float getEtaWidth(int iEta);
@@ -166,7 +168,7 @@ namespace QualityControl {
             virtual int getNumEtaSectors(){ return map_sectorsEta.size(); };
             
             //returns the phi sector
-            virtual SectorPhi getPhiSector(int iEta, int iPhi);
+            virtual ReadoutSectorPhi getPhiSector(int iEta, int iPhi);
             
             //returns the summary statistics
             //virtual QualityControl::Uniformity::SummaryStatistics getStatPkPos(){ return statClustADC_Fit_PkPos; };
@@ -195,13 +197,13 @@ namespace QualityControl {
             virtual void setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, int iNumPhiSector);
             
             //Sets a single eta sector; over-writes what is currently stored (if any)
-            virtual void setEtaSector(int iEta, SectorEta inputEtaSector){
+            virtual void setEtaSector(int iEta, ReadoutSectorEta inputEtaSector){
                 map_sectorsEta[iEta] = inputEtaSector;
                 return;
             };
             
             //Sets all eta sectors; over-writes what is currently stored (if any)
-            virtual void setEtaSector(std::map<int, SectorEta> map_inputSectors){
+            virtual void setEtaSector(std::map<int, ReadoutSectorEta> map_inputSectors){
                 map_sectorsEta = map_inputSectors; return;
             };
             
@@ -252,7 +254,7 @@ namespace QualityControl {
                 return;
             };
             
-            std::map<int, SectorEta> map_sectorsEta;
+            std::map<int, ReadoutSectorEta> map_sectorsEta;
             
             std::multiset<float> mset_fClustADC_Fit_PkPos;
             std::multiset<float> mset_fClustADC_Fit_PkRes;

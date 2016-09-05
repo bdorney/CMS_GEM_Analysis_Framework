@@ -108,12 +108,12 @@ namespace QualityControl {
             //Takes a TFile *, which the canvas is writtent to, as input
             virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
             
-            //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+            //Partitions a canvas into N TPads where N = number of ReadoutSectorEta for input DetectorMPGD
             //Draws a given observable on each pad
             //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
             
-            //Partitions a canvas into N TPads where N = number of SectorEta for input DetectorMPGD
+            //Partitions a canvas into N TPads where N = number of ReadoutSectorEta for input DetectorMPGD
             //Draws a given observable on each pad
             //Takes a std::string which stores the physical filename as input
             //Takes a TFile * which the histograms are written to as input
@@ -182,12 +182,14 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //std::vector<float> getObsData(std::string strObsName, Uniformity::SectorEta &inputEta);
+            //std::vector<float> getObsData(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
             Uniformity::SummaryStatistics getObsData(std::string strObsName);
             
-            std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta);
+            std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
             
-            std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::SectorEta &inputEta);
+            std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+            
+            std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------

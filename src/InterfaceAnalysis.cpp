@@ -80,7 +80,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
     //Variable Declaration
     //ParameterLoaderAmoreSRS amoreLoader;
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     string strTempRunName;
     
@@ -96,19 +96,19 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         
         //Detector info
         cout<<"iEta\tY_Pos\tWidth\tX_Low\tX_High\tX_Low\tX_High\tX_Low\tX_High\n";
-        for (int i=1; i <= detMPGD.getNumEtaSectors(); ++i) { //Loop through Detector's SectorEta objects
+        for (int i=1; i <= detMPGD.getNumEtaSectors(); ++i) { //Loop through Detector's ReadoutSectorEta objects
             cout<<i<<"\t";
             
             etaSector = detMPGD.getEtaSector(i);
             
             cout<<etaSector.fPos_Y<<"\t"<<etaSector.fWidth<<"\t";
             
-            for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) { //Loop through SectorEta's SectorPhi objects
+            for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) { //Loop through ReadoutSectorEta's ReadoutSectorPhi objects
                 cout<<(*iterPhi).second.fPos_Xlow<<"\t"<<(*iterPhi).second.fPos_Xhigh<<"\t";
-            } //End Loop through SectorEta's SectorPhi objects
+            } //End Loop through ReadoutSectorEta's ReadoutSectorPhi objects
             
             cout<<endl;
-        } //End Loop through Detector's SectorEta objects
+        } //End Loop through Detector's ReadoutSectorEta objects
         
         //Analysis parameters
         cout<<"-----------------Hit Parameters-----------------\n";

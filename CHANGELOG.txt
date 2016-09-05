@@ -2,10 +2,16 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.1                                 *
+*	VERSION: 2.1.1                               *
 *	LAST UPDATE: Aug 31 2016                     *
 *                                                *
 **************************************************
+
+Update: September 2nd 2016
+==================================================
+->struct's SectorEta & SectorPhi (in QualityControl::Uniformity) being converted into classes ReadoutSectorEta & ReadoutSectorPhi which inherit from ReadoutSector (in QualityControl::Uniformity)
+->Updated Makefile.clang & Makefile.gpp to compile new classes: ReadoutSector, ReadoutSectorPhi, and ReadoutSectorEta
+->QualityControl::Uniformity::VisualizeUniformity::getObsX() methods, for X={Data,Histo} being changed to take a ReadoutSector object as input instead of a ReadoutSectorEta object
 
 Update: August 31 2016
 ==================================================

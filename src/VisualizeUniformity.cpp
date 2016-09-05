@@ -11,6 +11,7 @@
 
 using std::cout;
 using std::endl;
+using std::map;
 using std::shared_ptr;
 using std::string;
 using std::tuple;
@@ -77,7 +78,7 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //std::vector<float> vec_fObs;
     //std::vector<float> vec_fObsVariance;
     
-    //SectorEta etaSector;
+    //ReadoutSectorEta etaSector;
     
     //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
@@ -251,7 +252,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     shared_ptr<TGraphErrors> gObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
 
@@ -413,7 +414,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     
     shared_ptr<TGraphErrors> gObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
 	vector<tuple<double,double,double> > vec_tup3DPt;
@@ -601,7 +602,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     shared_ptr<TH1F> hObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     std::vector<shared_ptr<TH1F> > vec_hObs;
     
@@ -755,7 +756,7 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     
     shared_ptr<TH1F> hObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     vector<tuple<float,float,float> > vec_tup3DPt;
     
@@ -879,7 +880,7 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
 //inputCanvas is split into two columns;
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
-//The SectorEta is used to determine the location of the SectorPhi's
+//The ReadoutSectorEta is used to determine the location of the ReadoutSectorPhi's
 //Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //TFile does not manage objects
@@ -917,7 +918,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
 //inputCanvas is split into two columns;
 //The Pad is created when this method is called; iEta and iNumEta define the pad position automatically
 //Odd (even) values of iEta are on the left (right)
-//The SectorEta is used to determine the location of the SectorPhi's
+//The ReadoutSectorEta is used to determine the location of the ReadoutSectorPhi's
 //Takes a TFile * which the histograms are written to as input
 void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
     //Variable Declaration
@@ -933,7 +934,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     shared_ptr<TH1F> hObs; //Observable to be drawn
     
-    SectorEta etaSector;
+    ReadoutSectorEta etaSector;
     
     std::vector<shared_ptr<TH1F> > vec_hObs;
     std::vector<TPad *> vec_padSectorObs;
@@ -990,7 +991,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     //Loop Over the detector's Eta Sectors to make the TCanvas
     //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Get the SectorEta
+        //Get the ReadoutSectorEta
         etaSector = detMPGD.getEtaSector(iEta);
         
         //Determine the Pad Coordinates
@@ -1276,11 +1277,6 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     //Variable Declaration
     string strName = inputCanvas.GetName();
     
-    //std::shared_ptr<TImage> img = std::make_shared<TImage>( &TImage::Create() );
-    
-    //img->FromPad( inputCanvas.cd() );
-    //img->WriteImage( ( strName + ".png" ).c_str() );
-    
     inputCanvas.SaveAs( ( strName + ".pdf" ).c_str(), "RECREATE" );
     inputCanvas.SaveAs( ( strName + ".png" ).c_str(), "RECREATE" );
     
@@ -1295,7 +1291,6 @@ SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     
     //=======================Fit Result Parameters=======================
     if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
-        //ret_mset = inputEta.mset_fClustADC_Fit_PkPos;
         ret_stat = detMPGD.getStatPkPos();
     } //End Case: Fit Pk Pos
     else if (0 == strObsName.compare("RESPONSEFITPKRES") ) { //Case: Fit Pk Resolution
@@ -1312,7 +1307,7 @@ SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     return ret_stat;
 } //End VisualizeUniformity::getObsGraph()
 
-std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strObsName, Uniformity::SectorEta &inputEta){
+std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta){
     //Variable Declaration
     std::shared_ptr<TGraphErrors> ret_graph;
     
@@ -1339,7 +1334,7 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strOb
     return ret_graph;
 } //End VisualizeUniformity::getObsGraph()
 
-std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, Uniformity::SectorEta &inputEta){
+std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector){
     //Variable Declaration
     std::shared_ptr<TH1F> ret_histo;
     
@@ -1350,40 +1345,33 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, U
     
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("CLUSTADC") ) { //Case: Cluster ADC's
-        ret_histo = inputEta.clustHistos.hADC;
+        ret_histo = inputSector.clustHistos.hADC;
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("CLUSTMULTI") ) { //Case: Cluster Multi
-        ret_histo = inputEta.clustHistos.hMulti;
+        ret_histo = inputSector.clustHistos.hMulti;
     } //End Case: Cluster Multi
     else if (0 == strObsName.compare("CLUSTPOS") ) { //Case: Cluster Position
-        ret_histo = inputEta.clustHistos.hPos;
+        ret_histo = inputSector.clustHistos.hPos;
     } //End Case: Cluster Position
     else if (0 == strObsName.compare("CLUSTSIZE") ) { //Case: Cluster Size
-        ret_histo = inputEta.clustHistos.hSize;
+        ret_histo = inputSector.clustHistos.hSize;
     } //End Case: Cluster Size
     else if (0 == strObsName.compare("CLUSTTIME") ) { //Case: Cluster Time
-        ret_histo = inputEta.clustHistos.hTime;
+        ret_histo = inputSector.clustHistos.hTime;
     } //End Case: Cluster Time
     //=======================Fit Parameters=======================
-    /*else if (0 == strObsName.compare("NORMCHI2") ) { //Case: Fit Normalized Chi2
-	shared_ptr<TCanvas> canv_Temp = std::make_shared<TCanvas>( TCanvas("canv_Temp","",600,600) );
-	canv_Temp->cd();
-	inputEta.gEta_ClustADC_Fit_NormChi2->Draw("AP");
-
-        ret_histo = std::make_shared<TH1F>( inputEta.gEta_ClustADC_Fit_NormChi2->GetHistogram() );
-    }*/ //End Case: Fit Normalized Chi2
     //=======================Hit Parameters=======================
     else if (0 == strObsName.compare("HITADC") ) { //Case: Hit ADC
-        ret_histo = inputEta.hitHistos.hADC;
+        ret_histo = inputSector.hitHistos.hADC;
     } //End Case: Hit ADC
     else if (0 == strObsName.compare("HITMULTI") ) { //Case: Cluster Multi
-        ret_histo = inputEta.hitHistos.hMulti;
+        ret_histo = inputSector.hitHistos.hMulti;
     } //End Case: Cluster Multi
     else if (0 == strObsName.compare("HITPOS") ) { //Case: Hit Position
-	    ret_histo = inputEta.hitHistos.hPos;
+	    ret_histo = inputSector.hitHistos.hPos;
 	} //End Case: Hit Position
     else if (0 == strObsName.compare("HITTIME") ) { //Case: Hit Time
-        ret_histo = inputEta.hitHistos.hTime;
+        ret_histo = inputSector.hitHistos.hTime;
     } //End Case: Hit Time
     //=======================Unrecognized Parameters=======================
     else{ //Case: Unrecognized Parameter
@@ -1393,4 +1381,29 @@ std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, U
     return ret_histo;
 } //End VisualizeUniformity::getObsHisto()
 
-
+std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector){
+    //Variable Declaration
+    map<int, std::shared_ptr<TH2F> > ret_map;
+    
+    //=======================Cluster Parameters=======================
+    if (0 == strObsName.compare("HISTORYCLUSTADC") ) { //Case: Cluster ADC's
+        ret_map = inputSector.clustHistos.map_hADC_v_EvtNum_by_Run;
+    } //End Case: Cluster ADC's
+    else if (0 == strObsName.compare("HISTORYCLUSTTIME") ) { //Case: Cluster Time
+        ret_map = inputSector.clustHistos.map_hTime_v_EvtNum_by_Run;
+    } //End Case: Cluster Time
+    //=======================Fit Parameters=======================
+    //=======================Hit Parameters=======================
+    else if (0 == strObsName.compare("HISTORYHITADC") ) { //Case: Hit ADC
+        ret_map = inputSector.hitHistos.map_hADC_v_EvtNum_by_Run;
+    } //End Case: Hit ADC
+    else if (0 == strObsName.compare("HISTORYHITTIME") ) { //Case: Hit Time
+        ret_map = inputSector.hitHistos.map_hTime_v_EvtNum_by_Run;
+    } //End Case: Hit Time
+    //=======================Unrecognized Parameters=======================
+    else{ //Case: Unrecognized Parameter
+        cout<<"QualityControl::Uniformity::VisualizeUniformity::getMapObsHisto2D() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
+    } //End Case: Unrecognized Parameter
+    
+    return ret_map;
+} //End VisualizeUniformity::getMapObsHisto2D()
