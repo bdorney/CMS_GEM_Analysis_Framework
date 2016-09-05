@@ -670,6 +670,14 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
         
         iRunFirst = (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin()->first;
         iRunLast =  (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.rbegin()->first;
+        
+        cout<<"iRunFirst = " << iRunFirst << endl;
+        cout<<"iRunLast = " << iRunLast << endl;
+        
+        cout<<"(*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.size() = " << (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.size() << endl;
+        
+        cout<<"(*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run.size() = " << (*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run.size() << endl;
+        
         for (int i=iRunFirst; i<=iRunLast; ++i) {
             dir_RunHistory_Eta_ADC->cd();
             (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[i]->Write();

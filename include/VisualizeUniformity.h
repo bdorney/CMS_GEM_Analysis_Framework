@@ -68,6 +68,14 @@ namespace QualityControl {
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a std::string which stores the physical filename as input
+            virtual void makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a TFile *, which the canvas is writtent to, as input
+            virtual void makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+            
             //Draws the distribution of an observable onto a single pad of canvas
             //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
@@ -100,17 +108,6 @@ namespace QualityControl {
             //Takes a TFile * which the histograms are written to as input
             virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
             
-            //Makes a 2D plot of a given observable in the detector's active area
-            //Takes a std::string which stores the physical filename as input
-            virtual void storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-            
-            //Makes a 2D plot of a given observable in the detector's active area
-            //Takes a TFile *, which the canvas is writtent to, as input
-            virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-            
-            //Partitions a canvas into N TPads where N = number of ReadoutSectorEta for input DetectorMPGD
-            //Draws a given observable on each pad
-            //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
             
             //Partitions a canvas into N TPads where N = number of ReadoutSectorEta for input DetectorMPGD
@@ -118,6 +115,14 @@ namespace QualityControl {
             //Takes a std::string which stores the physical filename as input
             //Takes a TFile * which the histograms are written to as input
             virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+            //Draws the run history of a given observable onto a segment canvas
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHisto2DHistorySegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bIsEta);
+            
+            //Draws the run history of a given observable onto a segment canvas
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHisto2DHistorySegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bIsEta);
             
             //For each member of the input map storeListOfCanvasesGraph is called
             //Takes a std::string which stores the physical filename as input
@@ -182,14 +187,19 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual TPad *getPadEta(int iEta, int iNumEta);
+            virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
+            
             //std::vector<float> getObsData(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
-            Uniformity::SummaryStatistics getObsData(std::string strObsName);
+            virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);
             
-            std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
+            virtual std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
             
-            std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+            virtual std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
             
-            std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+            virtual std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+            
+            virtual std::shared_ptr<TH2F> getSummarizedRunHistoryHisto2D(std::map<int, std::shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi );
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------

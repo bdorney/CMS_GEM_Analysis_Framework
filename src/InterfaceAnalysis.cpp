@@ -38,54 +38,18 @@ void InterfaceAnalysis::analyzeInput(){
     return;
 } //End InterfaceAnalysis::analyzeInput()
 
-/*void InterfaceAnalysis::initialize(AnalysisSetupUniformity inputAnaSetup, RunSetup inputRunSetup, DetectorMPGD & inputDet){
-    
-    aSetup = inputAnaSetup;
-    rSetup = inputRunSetup;
-    detMPGD= inputDet;
-    
-    //initialize Hit Related Items
-    if (rSetup.bAnaStep_Hits) {
-        hitSelector.setAnalysisParameters(aSetup);
-        
-        hitAnalyzer.setAnalysisParameters(aSetup);
-        hitAnalyzer.setDetector(detMPGD);
-        hitAnalyzer.initHistosHits();
-        
-        detMPGD = hitAnalyzer.getDetector();
-    } //End Case: Hits Desired
-    
-    //initialize Cluster Related Items
-    if (rSetup.bAnaStep_Clusters) {
-        clustSelector.setAnalysisParameters(aSetup);
-        
-        clustAnalyzer.setAnalysisParameters(aSetup);
-        clustAnalyzer.setDetector(detMPGD);
-        clustAnalyzer.initGraphsClusters();
-        clustAnalyzer.initHistosClusters();
-        
-        detMPGD = clustAnalyzer.getDetector();
-    }
-    
-    runInterface.initialize(inputAnaSetup, inputRunSetup);
-    
-    return;
-}*/ //End InterfaceAnalysis::initialize()
-
 //Runs the analysis framework on input created by amoreSRS
 void InterfaceAnalysis::analyzeInputAmoreSRS(){
    //TFile does not automatically own histograms 
    TH1::AddDirectory(kFALSE);
 
     //Variable Declaration
-    //ParameterLoaderAmoreSRS amoreLoader;
     
     ReadoutSectorEta etaSector;
     
     string strTempRunName;
     
     TFile *file_ROOTInput, *file_ROOTOutput_All, *file_ROOTOutput_Single;
-    //TFile *file_ROOTOutput_All, *file_ROOTOutput_Single;
     
 	//Debugging
 	//cout<<"InterfaceAnalysis::analyzeInputAmoreSRS(): detMPGD.getName() = " << detMPGD.getName() << endl;
@@ -155,25 +119,6 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //Force the hit analysis if the user requested cluster reconstruction
         if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
             //Hit Selection
-            /*hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
-            
-            if (bVerboseMode) { //Print Number of Selected Hits to User
-                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getHits().size() << " hits passing selection" << endl;
-            } //End Print Number of Selected Hits to User
-            
-            //Load the required input parameters
-            if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            hitAnalyzer.setDetector(detMPGD);
-            
-            if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(); }
-            
-            //Hit Analysis
-            hitAnalyzer.fillHistos();
-            
-            //Update the detector
-            detMPGD = hitAnalyzer.getDetector();*/
-            
-            //Hit Selection
             hitSelector.setRunNum(vec_pairedRunList[i].first);
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
              
@@ -183,7 +128,6 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
 
             //Load the required input parameters
             if (i == 0) { hitAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            //hitAnalyzer.setDetector(detMPGD);
 
             if (i == 0 || rSetup.bMultiOutput) { hitAnalyzer.initHistosHits(detMPGD); }
 
@@ -204,29 +148,6 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
             //Cluster Selection
-            /*clustSelector.setClusters(file_ROOTInput, detMPGD, aSetup);
-            
-            if (bVerboseMode) { //Print Number of Selected Clusters to User
-                cout<<vec_pairedRunList[i].second << " has " << detMPGD.getClusters().size() << " clusters passing selection" << endl;
-            } //End Print Number of Selected Clusters to User
-            
-            //Load the required input parameters
-            if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            clustAnalyzer.setDetector(detMPGD);
-            
-            //Initialize the cluster histograms if this is the first run
-            if (i == 0 || rSetup.bMultiOutput) {
-                clustAnalyzer.initGraphsClusters();
-                clustAnalyzer.initHistosClusters();
-            }
-            
-            //Cluster Analysis
-            clustAnalyzer.fillHistos();
-            
-            //Update the Detector!
-            detMPGD = clustAnalyzer.getDetector();*/
-            
-            //Cluster Selection
             clustSelector.setRunNum(vec_pairedRunList[i].first);
             clustSelector.setClusters(file_ROOTInput, detMPGD, aSetup);
             
@@ -243,8 +164,8 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
                 clustAnalyzer.initHistosClusters(detMPGD);
             }
 
-	    //Initialize the cluster histograms specific to this run
-	    clustAnalyzer.initHistosClustersByRun(vec_pairedRunList[i].first, detMPGD);
+            //Initialize the cluster histograms specific to this run
+            clustAnalyzer.initHistosClustersByRun(vec_pairedRunList[i].first, detMPGD);
 	
             //Cluster Analysis
             clustAnalyzer.setRunNum(vec_pairedRunList[i].first);
@@ -366,17 +287,7 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         //Cluster Analysis
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
-	    //Load the required input parameters
-            /*if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
-            
-            //Load previous cluster histograms & setup the detector
-            clustAnalyzer.loadHistosFromFile(rSetup.strFile_Config_Map, file_ROOTInput);
-
-            //Initialize Graphs
-            clustAnalyzer.initGraphsClusters();
-            
-            detMPGD = clustAnalyzer.getDetector();*/
-            
+            //Load the required input parameters
             if (i == 0) { clustAnalyzer.setAnalysisParameters(aSetup); } //Fixed for all runs
             
             //Load previous cluster histograms & setup the detector
@@ -471,13 +382,6 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
         if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
-            /*clustAnalyzer.setDetector(detMPGD); //Update the detector just in case
-             clustAnalyzer.fitHistos();
-             clustAnalyzer.storeFits(file_Results);
-             
-             //Update the Detector!
-             detMPGD = clustAnalyzer.getDetector();*/
-            
             clustAnalyzer.fitHistos(detMPGD);
             clustAnalyzer.storeFits(file_Results, detMPGD);
         } //End Case: Cluster Analysis
@@ -497,7 +401,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             
             visualizeUni.storeCanvasHistoSegmented(file_Results, "HitPos", "E1", rSetup.bVisPlots_PhiLines);
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_hit_ObsAndDrawOpt, false);
-            //visualizeUni.storeCanvasHisto2D(file_Results,"HitPos","TRI2");
+            //visualizeUni.makeAndStoreCanvasHisto2D(file_Results,"HitPos","TRI2");
         } //End Case: Hit Analysis
         
         if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
@@ -508,8 +412,11 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             
             visualizeUni.storeCanvasHistoSegmented(file_Results, "ClustPos", "E1", rSetup.bVisPlots_PhiLines);
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_clust_ObsAndDrawOpt, false);
-            //visualizeUni.storeCanvasHisto2D(file_Results,"ClustPos","TRI2");
-
+            //visualizeUni.makeAndStoreCanvasHisto2D(file_Results,"ClustPos","TRI2");
+            
+            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
+            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
+            
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";

@@ -3,9 +3,18 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.1.1                               *
-*	LAST UPDATE: Aug 31 2016                     *
+*	LAST UPDATE: Sept 5 2016                     *
 *                                                *
 **************************************************
+
+Update: September 5th 2016
+==================================================
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters will now fill and store a run history for the cluster time vs. evt number
+->Added new private method QualityControl::Uniformity::VisualizeUniformity::getMapObsHisto2D for selecting() the run history distribution of interest (e.g. ADC vs. Evt Num for all runs)
+->Added new private method QualityControl::Uniformity::VisualizeUniformity::getSummarizedRunHistoryHisto2D() for transforming obs vs. evt number to obs vs. run number
+->Renamed QualityControl::Uniformity::VisualizeUniformity::storeCanvasHisto2D() to QualityControl::Uniformity::VisualizeUniformity::makeAndStoreCanvasHisto2D()
+->Added new method QualityControl::Uniformity::VisualizeUniformity::storeCanvasHisto2DHistorySegmented() for storing run history plots segmented by Eta or Phi
+->Added new private methods QualityControl::Uniformity::VisualizeUniformity::getPadEta() and QualityControl::Uniformity::VisualizeUniformity::getPadPhi()
 
 Update: September 2nd 2016
 ==================================================

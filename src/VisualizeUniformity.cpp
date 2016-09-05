@@ -11,6 +11,7 @@
 
 using std::cout;
 using std::endl;
+using std::make_shared;
 using std::map;
 using std::shared_ptr;
 using std::string;
@@ -35,6 +36,163 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
     detMPGD         = inputDet;
     //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Constructor with Setup & Detector inputs
+
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a std::string which stores the physical filename as input
+void VisualizeUniformity::makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D", "\tExiting; Nothing has been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Call the method below
+    makeAndStoreCanvasHisto2D(ptr_fileOutput, strObsName, strDrawOption);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::makeAndStoreCanvasHisto2D()
+
+//Makes a 2D plot of a given observable in the detector's active area
+//Takes a TFile *, which the canvas is writtent to, as input
+void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    shared_ptr<TH1F> hObs; //Observable to be drawn
+    
+    ReadoutSectorEta etaSector;
+    
+    vector<tuple<float,float,float> > vec_tup3DPt;
+    
+    TGraph2D *g2DObs = new TGraph2D();   //Two dimmensional graph
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+    
+    //Set the name of the g2DObs
+    //------------------------------------------------------
+    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","makeAndStoreCanvasHisto2D", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if the directory exists already
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    
+    //If the above pointer is null the directory does NOT exist, create it
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over the detector's Eta Sectors to fill vec_tup3DPt
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        hObs = getObsHisto(strObsName, etaSector);
+        
+        //Fill the points of the 2D graph
+        //cout<<"iEta\ti\tL.B.\tU.B.\tPx\tPy\tPz\n";
+        float fPx=0, fPy=etaSector.fPos_Y, fObs=0;
+        for (int i = ( 1 + (iEta-1) * hObs->GetNbinsX() ); i < ( 1 + iEta * hObs->GetNbinsX() ); ++i) { //Loop Over Points of hObs
+            fPx = hObs->GetBinCenter( (iEta * hObs->GetNbinsX() ) - i );
+            fObs = hObs->GetBinContent( (iEta * hObs->GetNbinsX() ) - i );
+            
+            //Debugging
+            cout<<iEta<<"\t"<<i<<"\t"<<( (iEta-1) * hObs->GetNbinsX() )<<"\t"<<(iEta * hObs->GetNbinsX() )<<"\t"<<fPx<<"\t"<<fPy<<"\t"<<fObs<<endl;
+            
+            //Need to prevent (0,Y,0)'s from being drawn (causes coincidence points in drawing, bad)
+            //First we store all non (0,Y,0) points then in another loop we fill g2DObs
+            if( !(fPx == fObs ) ) vec_tup3DPt.push_back( std::make_tuple(fPx, fPy, fObs) );
+        } //End Loop Over Points of gObs
+    } //End Loop Over Detector's Eta Sector
+    
+    //Loop Over vec_tup3DPt and set members to g2DObs
+    //------------------------------------------------------
+    for( int i=0; i < vec_tup3DPt.size(); ++i){ //Loop over vec_tup3DPt
+        g2DObs->SetPoint(i,std::get<0>(vec_tup3DPt[i]), std::get<1>(vec_tup3DPt[i]), std::get<2>(vec_tup3DPt[i]));
+    } //End Loop over vec_tup3DPt
+    
+    //Make the color Palette
+    //------------------------------------------------------
+    const Int_t NRGBs = 5;
+    const Int_t NCont = 255;
+    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+    gStyle->SetNumberContours(NCont);
+    
+    //Draw the g2DObs
+    //------------------------------------------------------
+    canv_DetSum.cd();
+    g2DObs->SetTitle("");
+    g2DObs->GetXaxis()->SetTitle( hObs->GetXaxis()->GetTitle() );
+    g2DObs->GetYaxis()->SetTitle( "Position Y #left(mm#right)" );
+    g2DObs->GetZaxis()->SetTitle( hObs->GetYaxis()->GetTitle() );
+    g2DObs->UseCurrentStyle();
+    //g2DObs->SetNpx(200);
+    //g2DObs->SetNpy(200);
+    g2DObs->Draw( strDrawOption.c_str() );
+    canv_DetSum.SetTheta(90);
+    //canv_DetSum.SetPhi(0.05);
+    canv_DetSum.SetPhi(0.0);
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    cout<<"Points Stored In 2D Graph\n";
+    cout<<"====================================================\n";
+    cout<<"i\tPx\tPy\tPz\n";
+    Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
+    for(int i=0; i<g2DObs->GetN(); ++i){
+        cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
+    }
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
+    g2DObs->Write();
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::makeAndStoreCanvasHisto2D()
 
 void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
     //TFile does not manage objects
@@ -74,11 +232,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     int iNumEta = detMPGD.getNumEtaSectors();
     
     SummaryStatistics statObs;
-    //shared_ptr<TGraphErrors> gObs; //Observable to be drawn
-    //std::vector<float> vec_fObs;
-    //std::vector<float> vec_fObsVariance;
-    
-    //ReadoutSectorEta etaSector;
     
     //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
     
@@ -90,7 +243,7 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph","Error: File I/O");
-        printROOTFileStatus(file_InputRootFile);
+            printROOTFileStatus(file_InputRootFile);
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tExiting; No Histograms have been stored!\n" );
         
@@ -113,70 +266,14 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //legObs->SetFillColor(kWhite);
     //legObs->SetLineColor(kBlack);
     
-    //Loop Over the detector's Eta Sectors
-    //------------------------------------------------------
-    /*for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //cout<<"=====NEXT ITERATION=====\n";
-
-        int iOrigSize = vec_fObs.size();
-
-        etaSector = detMPGD.getEtaSector(iEta);
-        
-        std::vector<float> vec_fObsThisEta = getObsData(strObsName, etaSector); //Temporary container for valid r-value
-        
-        vec_fObs.resize( vec_fObs.size() + vec_fObsThisEta.size() );
-
-        //cout<<"BEFORE COPY\n";
-        //cout<<"vec_fObs.size() = " << vec_fObs.size() << endl;
-        //cout<<"vec_fObsThisEta.size() = " << vec_fObsThisEta.size() << endl;
-
-        auto iterObs = std::next(vec_fObs.begin(), iOrigSize );
-        std::copy(vec_fObsThisEta.begin(),vec_fObsThisEta.end(), iterObs );
-        
-        //cout<<"AFTER COPY\n";
-        //cout<<"VisualizeUniformity::storeCanvasData() - vec_fObsThisEta.size() = " << vec_fObsThisEta.size() << endl;
-        //cout<<"VisualizeUniformity::storeCanvasData() - vec_fObs.size() = " << vec_fObs.size() << endl;
-    }*/ //End Loop Over Detector's Eta Sector
-    
-    //Determine the average of the dataset
-    //------------------------------------------------------
-    //float fAvg = std::accumulate(vec_fObs.begin(), vec_fObs.end(), 0. ) / vec_fObs.size();
-
-    //vec_fObsVariance.resize( vec_fObs.size() );
-    //std::transform(vec_fObs.begin(), vec_fObs.end(), vec_fObsVariance.begin(), [fAvg](float x) { return x - fAvg; });
-
-    //float fStdDev = std::sqrt( std::inner_product(vec_fObsVariance.begin(), vec_fObsVariance.end(), vec_fObsVariance.begin(), 0.0) /  vec_fObsVariance.size() );
-
-    //Create Distribution
-    //------------------------------------------------------
-    /*std::shared_ptr<TH1F> hObs = std::make_shared<TH1F>( TH1F( getNameByIndex(-1, -1, -1, "h", strObsName + "Dataset" ).c_str(), "", 40, fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
-    hObs->Sumw2();
-    hObs->GetXaxis()->SetTitle( strObsName.c_str() );
-    hObs->GetYaxis()->SetTitle( "N" );
-
-    for(int i=0; i < vec_fObs.size(); ++i){
-        hObs->Fill(vec_fObs[i]);
-    }*/
-
     //Get the requested dataset
     //------------------------------------------------------
     statObs = getObsData(strObsName);
     
-    //Fit hObs
-    //------------------------------------------------------
-    /*std::shared_ptr<TF1> funcObs = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "func", strObsName + "Dataset" ).c_str(), "gaus(0)", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev) );
-    funcObs->SetParameter(0, hObs->GetBinContent( hObs->GetMaximumBin() ) );
-    funcObs->SetParameter(1, hObs->GetMean() );
-    funcObs->SetParameter(2, hObs->GetRMS() );
-
-    hObs->Fit(funcObs.get(),"QM","", fAvg - 5. * fStdDev, fAvg + 5. * fStdDev );*/
-
     //Draw hObs
     //------------------------------------------------------
     canv_DetSum.cd();
-    //hObs->Draw( strDrawOption.c_str() );
     statObs.hDist->Draw( strDrawOption.c_str() );
-    //funcObs->Draw("same");
     statObs.fitDist->Draw("same");
 
     //Setup the TLatex for "CMS Preliminary"
@@ -442,7 +539,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D","Error: File I/O");
-        printROOTFileStatus(file_InputRootFile);
+            printROOTFileStatus(file_InputRootFile);
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tPlease cross check input file name, option, and the execution directory\n" );
         printClassMethodMsg("VisualizeUniformity","storeCanvasGraph2D", "\tExiting; No Histograms have been stored!\n" );
         
@@ -528,7 +625,8 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
     canv_DetSum.SetTheta(90);
-    canv_DetSum.SetPhi(0.05);
+    //canv_DetSum.SetPhi(0.05);
+    canv_DetSum.SetPhi(0.0);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -612,8 +710,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     //------------------------------------------------------
 	//cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getNameNoSpecial() = " << detMPGD.getNameNoSpecial() << endl;
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-
+    
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -715,164 +812,6 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     return;
 } //End VisualizeUniformity::storeCanvasHisto()
 
-//Makes a 2D plot of a given observable in the detector's active area
-//Takes a std::string which stores the physical filename as input
-void VisualizeUniformity::storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
-    //TFile does not manage objects
-    TH1::AddDirectory(kFALSE);
-    
-    //Variable Declaration
-    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
-    
-    //Check if File Failed to Open Correctly
-    //------------------------------------------------------
-    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D","Error: File I/O");
-        printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tExiting; Nothing has been stored!\n" );
-        
-        return;
-    } //End Check if File Failed to Open Correctly
-    
-    //Call the method below
-    storeCanvasHisto2D(ptr_fileOutput, strObsName, strDrawOption);
-    
-    //Close the File
-    //------------------------------------------------------
-    ptr_fileOutput->Close();
-    
-    return;
-} //End VisualizeUniformity::storeCanvasHisto2D()
-
-//Makes a 2D plot of a given observable in the detector's active area
-//Takes a TFile *, which the canvas is writtent to, as input
-void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
-    //TFile does not manage objects
-    TH1::AddDirectory(kFALSE);
-    
-    //Variable Declaration
-    int iNumEta = detMPGD.getNumEtaSectors();
-    
-    shared_ptr<TH1F> hObs; //Observable to be drawn
-    
-    ReadoutSectorEta etaSector;
-    
-    vector<tuple<float,float,float> > vec_tup3DPt;
-    
-    TGraph2D *g2DObs = new TGraph2D();   //Two dimmensional graph
-    
-    //Make the Canvas
-    //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "2D_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-
-    //Set the name of the g2DObs
-    //------------------------------------------------------
-    g2DObs->SetName( ("g2D_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta").c_str() );
-    //g2DObs->SetName( ("g2D_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta").c_str() );
-    
-    //Check if File Failed to Open Correctly
-    //------------------------------------------------------
-    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D","Error: File I/O");
-        printROOTFileStatus(file_InputRootFile);
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2D", "\tExiting; No Histograms have been stored!\n" );
-        
-        return;
-    } //End Check if File Failed to Open Correctly
-    
-    //Get/Make the Summary Directory
-    //------------------------------------------------------
-    //Check to see if the directory exists already
-    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
-    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
-        dir_Summary = file_InputRootFile->mkdir("Summary");
-    } //End Case: Directory did not exist in file, CREATE
-    
-    //Loop Over the detector's Eta Sectors to fill vec_tup3DPt
-    //------------------------------------------------------
-    for (int iEta=1; iEta <= iNumEta; ++iEta) {
-        //Get the histogram & draw it
-        etaSector = detMPGD.getEtaSector(iEta);
-        hObs = getObsHisto(strObsName, etaSector);
-        
-        //Fill the points of the 2D graph
-        //cout<<"iEta\ti\tL.B.\tU.B.\tPx\tPy\tPz\n";
-        float fPx=0, fPy=etaSector.fPos_Y, fObs=0;
-        for (int i = ( 1 + (iEta-1) * hObs->GetNbinsX() ); i < ( 1 + iEta * hObs->GetNbinsX() ); ++i) { //Loop Over Points of hObs
-            fPx = hObs->GetBinCenter( (iEta * hObs->GetNbinsX() ) - i );
-            fObs = hObs->GetBinContent( (iEta * hObs->GetNbinsX() ) - i );
-            
-            //Debugging
-            cout<<iEta<<"\t"<<i<<"\t"<<( (iEta-1) * hObs->GetNbinsX() )<<"\t"<<(iEta * hObs->GetNbinsX() )<<"\t"<<fPx<<"\t"<<fPy<<"\t"<<fObs<<endl;
-            
-            //Need to prevent (0,Y,0)'s from being drawn (causes coincidence points in drawing, bad)
-            //First we store all non (0,Y,0) points then in another loop we fill g2DObs
-            if( !(fPx == fObs ) ) vec_tup3DPt.push_back( std::make_tuple(fPx, fPy, fObs) );
-        } //End Loop Over Points of gObs
-    } //End Loop Over Detector's Eta Sector
-    
-    //Loop Over vec_tup3DPt and set members to g2DObs
-    //------------------------------------------------------
-    for( int i=0; i < vec_tup3DPt.size(); ++i){ //Loop over vec_tup3DPt
-        g2DObs->SetPoint(i,std::get<0>(vec_tup3DPt[i]), std::get<1>(vec_tup3DPt[i]), std::get<2>(vec_tup3DPt[i]));
-    } //End Loop over vec_tup3DPt
-    
-    //Make the color Palette
-    //------------------------------------------------------
-    const Int_t NRGBs = 5;
-    const Int_t NCont = 255;
-    Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
-    Double_t red[NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
-    Double_t green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
-    Double_t blue[NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
-    TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
-    gStyle->SetNumberContours(NCont);
-    
-    //Draw the g2DObs
-    //------------------------------------------------------
-    canv_DetSum.cd();
-    g2DObs->SetTitle("");
-    g2DObs->GetXaxis()->SetTitle( hObs->GetXaxis()->GetTitle() );
-    g2DObs->GetYaxis()->SetTitle( "Position Y #left(mm#right)" );
-    g2DObs->GetZaxis()->SetTitle( hObs->GetYaxis()->GetTitle() );
-    g2DObs->UseCurrentStyle();
-    //g2DObs->SetNpx(200);
-    //g2DObs->SetNpy(200);
-    g2DObs->Draw( strDrawOption.c_str() );
-    canv_DetSum.SetTheta(90);
-    canv_DetSum.SetPhi(0.05);
-    
-    //Setup the TLatex for "CMS Preliminary"
-    //------------------------------------------------------
-    TLatex latex_CMSPrelim;
-    latex_CMSPrelim.SetTextSize(0.05);
-    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    
-    cout<<"Points Stored In 2D Graph\n";
-    cout<<"====================================================\n";
-    cout<<"i\tPx\tPy\tPz\n";
-    Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
-    for(int i=0; i<g2DObs->GetN(); ++i){
-        cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
-    }
-    
-    //Write the Canvas to the File
-    //------------------------------------------------------
-    dir_Summary->cd();
-    canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
-    g2DObs->Write();
-    
-    //Do not close file_InputRootFile it is used elsewhere
-    
-    return;
-} //End VisualizeUniformity::storeCanvasHisto2D()
-
 //This method is longer than I'd like it to be
 //But it seems that TCanvas doesn't perpetuate its drawn TObject's
 //So passing it to another method by reference keeps the TCanvas alive, but ends up being blank with nothing drawn on it =/
@@ -893,7 +832,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTF
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented","Error: File I/O");
-        printROOTFileStatus(ptr_fileOutput);
+            printROOTFileStatus(ptr_fileOutput);
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tExiting; No Histograms have been stored!\n" );
         
@@ -926,11 +865,11 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     float fMaxBinVal = -1;
     
-    float fXPad_Low;
-    float fXPad_High;
+    //float fXPad_Low;
+    //float fXPad_High;
     
-    float fYPad_Low;
-    float fYPad_High;
+    //float fYPad_Low;
+    //float fYPad_High;
     
     shared_ptr<TH1F> hObs; //Observable to be drawn
     
@@ -944,33 +883,28 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     //Make the Canvas
     //------------------------------------------------------
-	//cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getName() = " << detMPGD.getName() << endl;
-    //cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getNameNoSpecial() = " << detMPGD.getNameNoSpecial() << endl;
-    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
-    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2500);
+	TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 1000, 2400);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented","Error: File I/O");
-        printROOTFileStatus(file_InputRootFile);
+            printROOTFileStatus(file_InputRootFile);
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
         printClassMethodMsg("VisualizeUniformity","storeCanvasHistoSegmented", "\tExiting; No Histograms have been stored!\n" );
         
         return;
     } //End Check if File Failed to Open Correctly
     
-    //Get/Make the Summary Directory
+    //Check to see if dir_Summary exists, if not create it
     //------------------------------------------------------
-    //Check to see if the directory exists already
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
     
     //Loop Over the detector's Eta sectors to determine the Y-Axis range to be used for all plots
+    //------------------------------------------------------
     for (int iEta=1; iEta <= iNumEta; ++iEta) {
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
@@ -995,7 +929,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         etaSector = detMPGD.getEtaSector(iEta);
         
         //Determine the Pad Coordinates
-        if (iEta % 2 != 0){ //Case: iEta is Odd
+        /*if (iEta % 2 != 0){ //Case: iEta is Odd
             fXPad_Low   = 0.02;
             fXPad_High  = 0.48;
         } //End Case: iEta is Odd
@@ -1012,16 +946,18 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         //cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
         
         //Initialize the Pad
-        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);*/
+        
+        TPad *pad_SectorObs = (TPad *) getPadEta(iEta, iNumEta)->Clone( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ).c_str() );
         vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
         
         canv_DetSum.cd();
-        vec_padSectorObs[iEta-1]->Draw();
-        vec_padSectorObs[iEta-1]->cd();
+        //vec_padSectorObs[iEta-1]->Draw();
+        vec_padSectorObs.back()->Draw();
+        //vec_padSectorObs[iEta-1]->cd();
+        vec_padSectorObs.back()->cd();
         
         //Draw the histogram
-        //hObs = getObsHisto(strObsName, etaSector);
-        //vec_hObs.push_back(hObs);			//Need to keep this pointer alive outside of Loop?
         vec_hObs[iEta-1]->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
         vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         
@@ -1051,7 +987,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
 
                 //Draw the TLatex
                 latex_PhiSector.SetTextSize(0.05);
-                //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
                 latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
 		
                 //Segment the Plot with lines
@@ -1077,6 +1012,168 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     return;
 } //End VisualizeUniformity::storeCanvasHistoSegmented()
+
+//Draws the run history of a given observable onto a segment canvas
+//Takes a std::string which stores the physical filename as input
+void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bIsEta){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented","Error: File I/O");
+            printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Call the method below
+    //------------------------------------------------------
+    storeCanvasHisto2DHistorySegmented(ptr_fileOutput, strObsName, strDrawOption, bIsEta);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasHisto2DHistorySegmented()
+
+//Draws the run history of a given observable onto a segment canvas
+//Takes a std::string which stores the physical filename as input
+void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bIsEta){
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    float fMaxBinVal = -1;
+    
+    ReadoutSectorEta etaSector;
+    
+    map<int, shared_ptr<TH2F> > map_hObs2DRunHistory;
+    shared_ptr<TH2F> hObs2D;    //Maybe this should be a map?
+    
+    //std::vector<shared_ptr<TH2F> > vec_hObs2D;
+    map<int, map<int, shared_ptr<TH2F> > > map_hObs2DSummaries; //Outer key -> iEta; inner key-> iPhi
+    std::vector<TPad *> vec_padSectorObs;
+    
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Make the canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), strObsName.c_str(), 1000, 2400);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented","Error: File I/O");
+            printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasHisto2DHistorySegmented", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Check to see if dir_Summary exists, if not create it
+    //------------------------------------------------------
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Loop Over the detector's readout sectors to get the TH2F to be plotted
+    //Also determine maximum bin val
+    //------------------------------------------------------
+    for (int iEta=1; iEta <= iNumEta; ++iEta) {
+        //Get the histogram & draw it
+        etaSector = detMPGD.getEtaSector(iEta);
+        
+        //create temporary container
+        map<int, shared_ptr<TH2F> > map_hObs2DTemp;
+        
+        if (bIsEta) { //Case: run history @ eta level
+            map_hObs2DRunHistory = getMapObsHisto2D(strObsName, etaSector);
+            
+            hObs2D = getSummarizedRunHistoryHisto2D(map_hObs2DRunHistory, iEta, -1 );
+            
+            //Check if there is a new fMaxBinVal
+            if (fMaxBinVal < hObs2D->GetBinContent(hObs2D->GetMaximumBin() ) ) {
+                fMaxBinVal = hObs2D->GetBinContent(hObs2D->GetMaximumBin() );
+            }
+            
+            map_hObs2DTemp[-1]=hObs2D;
+            map_hObs2DSummaries[iEta]=map_hObs2DTemp;
+        } //End Case: run history @ eta level
+        else { //Case: run history @ phi level
+            for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) { //Loop over phi sectors
+                map_hObs2DRunHistory = getMapObsHisto2D(strObsName, (*iterPhi).second );
+                
+                hObs2D = getSummarizedRunHistoryHisto2D(map_hObs2DRunHistory, iEta, (*iterPhi).first );
+                
+                //Check if there is a new fMaxBinVal
+                if (fMaxBinVal < hObs2D->GetBinContent(hObs2D->GetMaximumBin() ) ) {
+                    fMaxBinVal = hObs2D->GetBinContent(hObs2D->GetMaximumBin() );
+                }
+                
+                map_hObs2DTemp[(*iterPhi).first]=hObs2D;
+            } //End Loop over phi sectors
+            
+            map_hObs2DSummaries[iEta]=map_hObs2DTemp;
+        } //End Case: run history @ phi level
+    } //End Loop Over Detector's Eta Sectors
+
+    //Round fMaxBinVal to the nearest power of ten
+    //------------------------------------------------------
+    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 0);
+    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 1, 0);
+    fMaxBinVal = std::ceil(1.1 * (fMaxBinVal / 1e3) ) * 1e3;
+
+    //Loop Over map_hObs2DSummaries to make the TCanvas
+    for (auto iterEta = map_hObs2DSummaries.begin(); iterEta != map_hObs2DSummaries.end(); ++iterEta) { //Loop over eta sectors
+        
+        for (auto iterPhi = (*iterEta).second.begin(); iterPhi != (*iterEta).second.end(); ++iterPhi) { //Loop over histos stored in phi sectors
+            //Declare the TPad
+            TPad *pad_SectorObs;
+            
+            if (bIsEta) { //Case: Arrange Pads in eta grid
+                pad_SectorObs = (TPad *) getPadEta( (*iterEta).first, iNumEta)->Clone( getNameByIndex((*iterEta).first, -1, -1, "pad", "Obs" + getString( (*iterEta).first ) ).c_str() );
+            } //End Case: Arrange Pads in eta grid
+            else { //Case: Arrange Pads in phi grid
+                pad_SectorObs = (TPad *) getPadPhi( (*iterEta).first, iNumEta, (*iterPhi).first, (*iterEta).second.size() )->Clone( getNameByIndex((*iterEta).first, (*iterPhi).first, -1, "pad", "Obs" + getString( (*iterEta).first ) + getString( (*iterPhi).first ) ).c_str() );
+            } //End Case: Arrange Pads in phi grid
+            
+            vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
+            
+            canv_DetSum.cd();
+            vec_padSectorObs.back()->Draw();
+            vec_padSectorObs.back()->cd();
+            (*iterPhi).second->GetZaxis()->SetRangeUser(1e-1,fMaxBinVal);
+            (*iterPhi).second->Draw( strDrawOption.c_str() );
+            
+            //Setup the TLatex for "CMS Preliminary"
+            TLatex latex_CMSPrelim;
+            latex_CMSPrelim.SetTextSize(0.05);
+            if( 1 == (*iterEta).first ){
+                latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+            }
+        } //End Loop over histos stored in phi sectors
+    } //End Loop over eta sectors
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeCanvasHisto2DHistorySegmented()
 
 //For each member of the input map storeListOfCanvasesGraph is called
 //Takes a std::string which stores the physical filename as input
@@ -1253,7 +1350,7 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
         printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph","Error: File I/O");
-        printROOTFileStatus(file_InputRootFile);
+            printROOTFileStatus(file_InputRootFile);
         printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
         printClassMethodMsg("VisualizeUniformity","storeListOfCanvasesGraph", "\tExiting; No Histograms have been stored!\n" );
         
@@ -1282,6 +1379,50 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     
     return;
 } //End VisualizeUniformity::save2png()
+
+TPad * VisualizeUniformity::getPadEta(int iEta, int iNumEta){
+    //Variable Declaration
+    float fXPad_Low, fXPad_High;
+    float fYPad_Low, fYPad_High;
+    
+    //Determine the Pad Coordinates
+    if (iEta % 2 != 0){ //Case: iEta is Odd
+        fXPad_Low   = 0.02;
+        fXPad_High  = 0.48;
+    } //End Case: iEta is Odd
+    else{ //Case: iEta is Even
+        fXPad_Low   = 0.52;
+        fXPad_High  = 0.98;
+    } //End Case: iEta is Even
+    
+    //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
+    fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
+    fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
+    
+    //Initialize the Pad
+    TPad *ret_pad = new TPad( "tempPad" ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+    
+    return ret_pad;
+} //End getPadEta()
+
+TPad * VisualizeUniformity::getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi){
+    //Variable Declaration
+    float fXPad_Low, fXPad_High;
+    float fYPad_Low, fYPad_High;
+    
+    //Determine the Pad X-Coordinates
+    fXPad_Low  = ( (0.96 * (iPhi - 1.0 ) ) + 0.02 ) / iNumPhi;
+    fXPad_High = ( (0.96 * (iPhi ) ) - 0.02 ) / iNumPhi;
+    
+    //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
+    fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
+    fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
+    
+    //Initialize the Pad
+    TPad *ret_pad = new TPad( "tempPad" ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
+    
+    return ret_pad;
+} //End getPadEta()
 
 SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     //Variable Declaration
@@ -1385,6 +1526,8 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
     //Variable Declaration
     map<int, std::shared_ptr<TH2F> > ret_map;
     
+    std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
+    
     //=======================Cluster Parameters=======================
     if (0 == strObsName.compare("HISTORYCLUSTADC") ) { //Case: Cluster ADC's
         ret_map = inputSector.clustHistos.map_hADC_v_EvtNum_by_Run;
@@ -1407,3 +1550,67 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
     
     return ret_map;
 } //End VisualizeUniformity::getMapObsHisto2D()
+
+//Summarizes a map of run history histograms
+//There are no checks to make sure the map does not return a null pointer
+//At this stage if it returns a null pointer there was a problem elsewhere!
+shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi ){
+    //Variable Declaration
+    float fBinWidth_X = -1;
+    
+    Timing::HistoSetup setupHisto_RunHistory_X, setupHisto_RunHistory_Y;
+    
+    map<int, shared_ptr<TH2F> >::iterator iterTempHisto2D = inputMapHisto2D.begin();
+    
+    string strObsName;
+    
+    shared_ptr<TH2F> ret_histo2D;
+    
+    vector<string> vec_strParsedName = Timing::getCharSeparatedList( (*iterTempHisto2D).second->GetName(), '_');
+    
+    //Initialize setupHisto_RunHistory_X
+    //------------------------------------------------------
+    setupHisto_RunHistory_X.strHisto_Name = "RunNo";
+    setupHisto_RunHistory_X.iHisto_nBins = inputMapHisto2D.size();
+    setupHisto_RunHistory_X.fHisto_xLower = inputMapHisto2D.begin()->first;
+    setupHisto_RunHistory_X.fHisto_xUpper = inputMapHisto2D.rbegin()->first;
+    setupHisto_RunHistory_X.strHisto_Title_X = "Run Number";
+    
+    fBinWidth_X = (setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower) / setupHisto_RunHistory_X.iHisto_nBins;
+    
+    //Initialize setupHisto_RunHistory_Y
+    //------------------------------------------------------
+    //Check for observable name; will have "clustX" or "hitX" in title
+    for (int i=0; i < vec_strParsedName.size(); ++i) {
+        if ( vec_strParsedName[i].find("clust") != std::string::npos || vec_strParsedName[i].find("hit") != std::string::npos ) {
+            setupHisto_RunHistory_Y.strHisto_Name = vec_strParsedName[i];
+            setupHisto_RunHistory_Y.strHisto_Title_X = vec_strParsedName[i];
+            break;
+        }
+    } //End Loop over parsed histogram name
+    
+    setupHisto_RunHistory_Y.iHisto_nBins = (*iterTempHisto2D).second->GetNbinsY();
+    setupHisto_RunHistory_Y.fHisto_xLower = (*iterTempHisto2D).second->GetYaxis()->GetBinLowEdge(1);
+    setupHisto_RunHistory_Y.fHisto_xUpper = (*iterTempHisto2D).second->GetYaxis()->GetBinLowEdge(setupHisto_RunHistory_Y.iHisto_nBins+1);
+    
+    //Initialize ret_histo2D
+    //------------------------------------------------------
+    ret_histo2D = make_shared<TH2F>( getHistogram2D(iEta, iPhi, setupHisto_RunHistory_X, setupHisto_RunHistory_Y ) );
+    
+    //Loop over map to summarize the stored TH2F's
+    //------------------------------------------------------
+    for (auto iterHisto2D = inputMapHisto2D.begin(); iterHisto2D != inputMapHisto2D.end(); ++iterHisto2D) {
+        //Project the i^th element of the map
+        std::shared_ptr<TH1F> hTempHisto = make_shared<TH1F>( *( (TH1F*) (*iterHisto2D).second->ProjectionY( "hTempHisto",1, setupHisto_RunHistory_Y.iHisto_nBins, "" ) ) );
+        
+        //Fill the slice of ret_histo2D that this corresponds too
+        int iBinX = ( (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower ) / fBinWidth_X;
+        for (int j=1; j <= hTempHisto->GetNbinsX(); ++j) {
+            ret_histo2D->SetBinContent(iBinX, j, hTempHisto->GetBinContent(j) );
+            ret_histo2D->SetBinError(iBinX, j, hTempHisto->GetBinError(j) );
+        } //End Loop over bins of hTempHisto
+    } //End Loop over inputMapHisto2D
+    
+    return ret_histo2D;
+} //End VisualizeUniformity::getSummarizedRunHistoryHisto2D()
+
