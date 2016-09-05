@@ -1066,7 +1066,10 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
     
     //Make the canvas
     //------------------------------------------------------
-    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented" ).c_str(), strObsName.c_str(), 1000, 2400);
+    string strCanvName;
+    if (bIsEta) { 	strCanvName = "canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented";}
+    else {		strCanvName = "canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllPhi_Segmented";}
+    TCanvas canv_DetSum( strCanvName.c_str(), strObsName.c_str(), 1000, 2400);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -1415,8 +1418,10 @@ TPad * VisualizeUniformity::getPadPhi(int iEta, int iNumEta, int iPhi, int iNumP
     fXPad_High = ( (0.96 * (iPhi ) ) - 0.02 ) / iNumPhi;
     
     //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
-    fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
-    fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
+    //fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
+    fYPad_Low   = 1. - (1. / (iNumEta) ) * ( iEta - 1);
+    //fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
+    fYPad_High  = 1. - (1. / (iNumEta) ) * ( iEta );
     
     //Initialize the Pad
     TPad *ret_pad = new TPad( "tempPad" ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);
@@ -1534,6 +1539,7 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("HISTORYCLUSTTIME") ) { //Case: Cluster Time
         ret_map = inputSector.clustHistos.map_hTime_v_EvtNum_by_Run;
+	cout<<"ret_map.size() = " << ret_map.size() << endl;
     } //End Case: Cluster Time
     //=======================Fit Parameters=======================
     //=======================Hit Parameters=======================
@@ -1556,7 +1562,7 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
 //At this stage if it returns a null pointer there was a problem elsewhere!
 shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi ){
     //Variable Declaration
-    float fBinWidth_X = -1;
+    //float fBinWidth_X = -1;
     
     Timing::HistoSetup setupHisto_RunHistory_X, setupHisto_RunHistory_Y;
     
@@ -1566,17 +1572,18 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
     
     shared_ptr<TH2F> ret_histo2D;
     
+	cout<<iEta<<"\t"<<iPhi<<"\t"<<"inputMapHisto2D.size() = " << inputMapHisto2D.size() << endl;
     vector<string> vec_strParsedName = Timing::getCharSeparatedList( (*iterTempHisto2D).second->GetName(), '_');
     
     //Initialize setupHisto_RunHistory_X
     //------------------------------------------------------
     setupHisto_RunHistory_X.strHisto_Name = "RunNo";
-    setupHisto_RunHistory_X.iHisto_nBins = inputMapHisto2D.size();
+    setupHisto_RunHistory_X.iHisto_nBins = inputMapHisto2D.size()+1;
     setupHisto_RunHistory_X.fHisto_xLower = inputMapHisto2D.begin()->first;
-    setupHisto_RunHistory_X.fHisto_xUpper = inputMapHisto2D.rbegin()->first;
+    setupHisto_RunHistory_X.fHisto_xUpper = inputMapHisto2D.rbegin()->first+1;
     setupHisto_RunHistory_X.strHisto_Title_X = "Run Number";
     
-    fBinWidth_X = (setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower) / setupHisto_RunHistory_X.iHisto_nBins;
+    //fBinWidth_X = (setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower) / setupHisto_RunHistory_X.iHisto_nBins;
     
     //Initialize setupHisto_RunHistory_Y
     //------------------------------------------------------
@@ -1604,7 +1611,8 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
         std::shared_ptr<TH1F> hTempHisto = make_shared<TH1F>( *( (TH1F*) (*iterHisto2D).second->ProjectionY( "hTempHisto",1, setupHisto_RunHistory_Y.iHisto_nBins, "" ) ) );
         
         //Fill the slice of ret_histo2D that this corresponds too
-        int iBinX = ( (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower ) / fBinWidth_X;
+        //int iBinX = ( (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower ) / fBinWidth_X;
+        int iBinX = (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower + 1;
         for (int j=1; j <= hTempHisto->GetNbinsX(); ++j) {
             ret_histo2D->SetBinContent(iBinX, j, hTempHisto->GetBinContent(j) );
             ret_histo2D->SetBinError(iBinX, j, hTempHisto->GetBinError(j) );

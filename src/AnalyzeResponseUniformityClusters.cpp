@@ -593,8 +593,8 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
 //Takes a TFile * which the histograms are written to as input
 void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile, DetectorMPGD & inputDet){
     //Variable Declaration
-    int iRunFirst = -1; //First run number
-    int iRunLast = -1;  //Last run number
+    //int iRunFirst = -1; //First run number
+    //int iRunLast = -1;  //Last run number
     
     //Check if File Failed to Open Correctly
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -668,23 +668,15 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
         (*iterEta).second.clustHistos.hADC_v_Size->Write();
         (*iterEta).second.clustHistos.hADC_v_Time->Write();
         
-        iRunFirst = (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin()->first;
-        iRunLast =  (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.rbegin()->first;
-        
-        cout<<"iRunFirst = " << iRunFirst << endl;
-        cout<<"iRunLast = " << iRunLast << endl;
-        
-        cout<<"(*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.size() = " << (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.size() << endl;
-        
-        cout<<"(*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run.size() = " << (*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run.size() << endl;
-        
-        for (int i=iRunFirst; i<=iRunLast; ++i) {
+	auto iterHistoTime = (*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run.begin();
+	for(auto iterHistoADC = (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin(); iterHistoADC != (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run.end(); ++iterHistoADC){
             dir_RunHistory_Eta_ADC->cd();
-            (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[i]->Write();
-            
+	    (*iterHistoADC).second->Write();
+
             dir_RunHistory_Eta_Time->cd();
-            (*iterEta).second.clustHistos.map_hTime_v_EvtNum_by_Run[i]->Write();
-        }
+	    (*iterHistoTime).second->Write();
+	    ++iterHistoTime;
+	}
         
         //Loop Over Stored iPhi Sectors within this iEta Sector
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
@@ -725,16 +717,16 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
             (*iterPhi).second.clustHistos.hADC_v_Size->Write();
             (*iterPhi).second.clustHistos.hADC_v_Time->Write();
             
-            iRunFirst = (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin()->first;
-            iRunLast =  (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.rbegin()->first;
-            for (int i=iRunFirst; i<=iRunLast; ++i) {
-                dir_RunHistory_Phi_ADC->cd();
-                (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[i]->Write();
-                
-                dir_RunHistory_Phi_Time->cd();
-                (*iterPhi).second.clustHistos.map_hTime_v_EvtNum_by_Run[i]->Write();
-            }
-            
+            iterHistoTime = (*iterPhi).second.clustHistos.map_hTime_v_EvtNum_by_Run.begin();
+	    for(auto iterHistoADC = (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.begin(); iterHistoADC != (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run.end(); ++iterHistoADC){
+            	dir_RunHistory_Phi_ADC->cd();
+	    	(*iterHistoADC).second->Write();
+
+            	dir_RunHistory_Phi_Time->cd();
+	    	(*iterHistoTime).second->Write();
+	    	++iterHistoTime;
+	    }
+        
             //Slices
             //Now that all clusters have been analyzed we extract the slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
