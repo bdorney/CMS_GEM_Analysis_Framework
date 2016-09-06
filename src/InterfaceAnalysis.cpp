@@ -416,8 +416,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             
             visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
             visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
-            //visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level - Seg faults???
-            //visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level - Seg faults???
+            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
+            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level
             
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";

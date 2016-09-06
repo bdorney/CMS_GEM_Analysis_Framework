@@ -255,7 +255,8 @@ namespace QualityControl {
                 if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                 if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
                 
-                map_hADC_v_EvtNum_by_Run = other.map_hADC_v_EvtNum_by_Run;
+                map_hADC_v_EvtNum_by_Run    = other.map_hADC_v_EvtNum_by_Run;
+                map_hTime_v_EvtNum_by_Run   = other.map_hTime_v_EvtNum_by_Run;
             } //End Copy Constructor
             
             //Assignment operator
@@ -273,7 +274,8 @@ namespace QualityControl {
                     if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                     if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
                     
-                    map_hADC_v_EvtNum_by_Run = other.map_hADC_v_EvtNum_by_Run;
+                    map_hADC_v_EvtNum_by_Run    = other.map_hADC_v_EvtNum_by_Run;
+                    map_hTime_v_EvtNum_by_Run   = other.map_hTime_v_EvtNum_by_Run;
                 } //Protects against invalid self-assignment
                 
                 return *this;

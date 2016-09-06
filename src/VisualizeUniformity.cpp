@@ -1068,7 +1068,7 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
     //------------------------------------------------------
     string strCanvName;
     if (bIsEta) { 	strCanvName = "canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta_Segmented";}
-    else {		strCanvName = "canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllPhi_Segmented";}
+    else {          strCanvName = "canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllPhi_Segmented";}
     TCanvas canv_DetSum( strCanvName.c_str(), strObsName.c_str(), 1000, 2400);
     
     //Check if File Failed to Open Correctly
@@ -1539,7 +1539,6 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
     } //End Case: Cluster ADC's
     else if (0 == strObsName.compare("HISTORYCLUSTTIME") ) { //Case: Cluster Time
         ret_map = inputSector.clustHistos.map_hTime_v_EvtNum_by_Run;
-	cout<<"ret_map.size() = " << ret_map.size() << endl;
     } //End Case: Cluster Time
     //=======================Fit Parameters=======================
     //=======================Hit Parameters=======================
@@ -1572,8 +1571,7 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
     
     shared_ptr<TH2F> ret_histo2D;
     
-	cout<<iEta<<"\t"<<iPhi<<"\t"<<"inputMapHisto2D.size() = " << inputMapHisto2D.size() << endl;
-    vector<string> vec_strParsedName = Timing::getCharSeparatedList( (*iterTempHisto2D).second->GetName(), '_');
+	vector<string> vec_strParsedName = Timing::getCharSeparatedList( (*iterTempHisto2D).second->GetName(), '_');
     
     //Initialize setupHisto_RunHistory_X
     //------------------------------------------------------
