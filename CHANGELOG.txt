@@ -9,14 +9,16 @@
 
 Update: September 10th 2016
 ==================================================
-->QualityControl::Uniformity::AnalyzeResponseUniformity::fitHistos() will now only attempt a fit if the histogram integral is non-zero in the fit range
-->Added QualityControl::Timing::AnalyzeResponseUniformity::HistoSetup::fHisto_BinWidth for storing bin width of histograms
+->Added QualityControl::Timing::HistoSetup::fHisto_BinWidth for storing bin width of histograms
 ->QualityControl::Uniformity::ParameterLoaderAnalysis::loadAnalysisParametersHistograms() will calculate the histogram bin width for each HistoSetup identified
-->Adding method QualityControl::Uniformity::AnalyzeResponseUniformity::isQualityFit() for accepting/rejecting a fit
+->Adding overloaded method QualityControl::Uniformity::AnalyzeResponseUniformity::isQualityFit() for accepting/rejecting a fit
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will now only attempt a fit if the histogram integral is non-zero in the fit range
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will only accept fits that have TFitResultsPtr::IsValid() and the peak parameter must not be: zero, within 0.1% of the limits, or having a percent error > 10%
 ->Added data member QualityControl::Uniformity::ReadoutSectorPhi::fNFitSuccess for tracking number of successful slice fits per sector
 ->Added private method QualityControl::Uniformity::VisualizeUniformity::getCanvasSliceFit() for making a canvas of the slice histo & fit
 ->Added overloaded method QualityControl::Uniformity::VisualizeUniformity::storeCanvasFits() for calling getCanvasSliceFit() for all slices and making a summary of the success rate of fitting
 ->QualityControl::Uniformity::InterfaceAnalysis::storeResults() will now call VisualizeUniformity::storeCanvasFits()
+->QualityControl::Uniformity::AnalyzeResponseUniformity::calcStatistics() will no longer attempt to discard "outliers" when determining uniformity
 
 Update: September 9th 2016
 ==================================================

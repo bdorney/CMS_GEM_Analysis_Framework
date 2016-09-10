@@ -355,7 +355,7 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
     
     ReadoutSectorEta etaSector = detMPGD.getEtaSector(1);
     
-    TH2F *hFitSucess2D = new TH2F("h_Summary_FitSuccess","",etaSector.map_sectorsPhi.size()+1,1,etaSector.map_sectorsPhi.size()+1, iNumEta+1, 1, iNumEta+1 );
+    TH2F *hFitSucess2D = new TH2F("h_Summary_FitSuccess","",etaSector.map_sectorsPhi.size(),1,etaSector.map_sectorsPhi.size(), iNumEta, 1, iNumEta+1 );
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -389,7 +389,7 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
                 dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
             } //End Case: Directory did not exist in file, CREATE
             
-            hFitSucess2D->SetBinContent(iEta, (*iterPhi).first, (*iterPhi).second.fNFitSuccess / aSetup.iUniformityGranularity );
+            hFitSucess2D->SetBinContent( (*iterPhi).first, iEta, (*iterPhi).second.fNFitSuccess / aSetup.iUniformityGranularity );
             
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice) {
                 //Check to see if dir_Slice exists already, if not create it
@@ -1474,7 +1474,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     //------------------------------------------------------
     TLatex latex_SlicePos;
     latex_SlicePos.SetTextSize(0.03);
-    latex_SlicePos.DrawLatexNDC(0.75, 0.85, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
+    latex_SlicePos.DrawLatexNDC(0.55, 0.7, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
     
     return ret_Canvas;
 } //End VisualizeUniformity::getCanvasSliceFit()

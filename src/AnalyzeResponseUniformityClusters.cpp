@@ -110,8 +110,9 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
                 
                 //Two cases, the slice histogram is empty (first analyzed run), or the slice histogram has nonzero entries (subsequent runs)
                 //Projecting a slice from the 2D histogram, setting this to a temporary histogram, and then adding it to the slice histogram covers both cases!!!
-                std::shared_ptr<TH1F> hTempSliceHisto = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( "hTempSliceHisto",i,i,"") ) );
-                (*iterPhi).second.map_slices[i].hSlice_ClustADC->Add( hTempSliceHisto.get() );
+                //std::shared_ptr<TH1F> hTempSliceHisto = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( "hTempSliceHisto",i,i,"") ) );
+                //(*iterPhi).second.map_slices[i].hSlice_ClustADC->Add( hTempSliceHisto.get() );
+		(*iterPhi).second.map_slices[i].hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_clustADC").c_str(),i,i,"") ) );
             } //End Loop Over Slices
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
@@ -122,17 +123,19 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
 //Assumes Histos have been filled already (obviously)
 void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
     //Variable Declaration
+    //bool bIsQuality;	//If fit passes basic quality requirements
+
     Double_t *dPeakPos;
     
-    TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
-    
-    //float fChi2 = -1;
     float fMin = -1e12, fMax = 1e12;
     float fNormChi2;
     float fPkPos = 0, fPkPosErr = 0;        //Peak Position
     float fPkWidth = 0, fPkWidthErr = 0;    //Peak Width
     
     int iBinMin, iBinMax;	//Bins in histogram encapsulating fMin to fMax
+    int iIdxPk, iIdxWidth;	//Position in fit parameter meaning container of the peak and the width parameters
+
+    TSpectrum specADC(1,2);    //One peak; 2 sigma away from any other peak
 
     vector<float> vec_fFitRange;
     
@@ -197,29 +200,55 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, dPeakPos[0] );
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
                 
+		//Find the index of the PEAK parameter and one of the width parameters (HWHM, FWHM, SIGMA)
+		auto iterParamFWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "FWHM");
+		auto iterParamHWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "HWHM");
+		auto iterParamPEAK = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "PEAK");
+		auto iterParamSigma= std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "SIGMA");
+
+		//Get the Peak Position
+		iIdxPk = std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamPEAK);
+                fPkPos      = (*iterSlice).second.fitSlice_ClustADC->GetParameter(iIdxPk);
+                fPkPosErr   = (*iterSlice).second.fitSlice_ClustADC->GetParError(iIdxPk);
+                    
+		//Get the Peak Width
+                    if ( iterParamHWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning HWHM
+			iIdxWidth= std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamHWHM);
+			fPkWidth      = 2. * (*iterSlice).second.fitSlice_ClustADC->GetParameter(iIdxWidth);
+                	fPkWidthErr   = 2. * (*iterSlice).second.fitSlice_ClustADC->GetParError(iIdxWidth);
+                    } //End Case: Fit Parameter List Has Meaning HWHM
+                    else if( iterParamFWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
+			iIdxWidth= std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamFWHM);
+			fPkWidth      = (*iterSlice).second.fitSlice_ClustADC->GetParameter(iIdxWidth);
+                	fPkWidthErr   = (*iterSlice).second.fitSlice_ClustADC->GetParError(iIdxWidth);
+                    } //End Case: Fit Parameter List Has Meaning FWHM
+                    else if( iterParamSigma != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning SIGMA
+			iIdxWidth= std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamSigma);
+			fPkWidth      = 2. * sqrt( 2. * log( 2. ) ) * (*iterSlice).second.fitSlice_ClustADC->GetParameter(iIdxWidth);
+                	fPkWidthErr   = 2. * sqrt( 2. * log( 2. ) ) * (*iterSlice).second.fitSlice_ClustADC->GetParError(iIdxWidth);
+                    } //End Case: Fit Parameter List Has Meaning SIGMA
+                    
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
-                if ( fitRes_ADC.IsValid() && isQualityFit( (*iterSlice).second.fitSlice_ClustADC ) ) { //Case: Valid Fit!!!
+		//bIsQuality = ( isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPkPos ) && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth ) );
+                if ( fitRes_ADC.IsValid() 
+		  && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPk ) 
+		  /*&& isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth )*/ ) { //Case: Valid Fit!!!
 		    (*iterPhi).second.fNFitSuccess++;
 
                     //Get the Peak Position
-                    fPkPos      = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
-                    fPkPosErr   = getParamError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
+                    //fPkPos      = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
+                    //fPkPosErr   = getParamError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
                     
-                    //Get the Peak Width
-                    auto iterParamHWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "HWHM");
-                    auto iterParamFWHM = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "FWHM");
-                    auto iterParamSigma= std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "SIGMA");
-                    
-                    if ( iterParamHWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning HWHM
+                    /*if ( iterParamHWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning HWHM
                         fPkWidth = 2. * getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "HWHM" );
                     } //End Case: Fit Parameter List Has Meaning HWHM
                     else if( iterParamFWHM != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
                         fPkWidth = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "FWHM" );
                     } //End Case: Fit Parameter List Has Meaning FWHM
-                    else if( iterParamSigma != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning FWHM
+                    else if( iterParamSigma != aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end() ){ //Case: Fit Parameter List Has Meaning SIGMA
                         fPkWidth = 2. * sqrt( 2. * log( 2. ) ) * getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "SIGMA" );
-                    } //End Case: Fit Parameter List Has Meaning FWHM
+                    }*/ //End Case: Fit Parameter List Has Meaning SIGMA
                     
                     //Record observables for the summary stat (Used for checking uniformity)
                     //(*iterEta).second.mset_fClustADC_Fit_PkPos.insert( fPkPos );
@@ -250,6 +279,9 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
+	//Debugging
+	//cout<<"inputDet.mset_fClustADC_Fit_PkPos.size() = " << inputDet.mset_fClustADC_Fit_PkPos.size() << endl;
+
     //Calculate statistics
     if ( inputDet.mset_fClustADC_Fit_PkPos.size() > 0 ) { //Check if stored fit positions exist
         calcStatistics( inputDet.statClustADC_Fit_PkPos, inputDet.mset_fClustADC_Fit_PkPos, "ResponseFitPkPos" );

@@ -91,10 +91,13 @@ namespace QualityControl {
             
 	    //Determines if a fit is "good"
 	    //Good fits have:
-	    //		fit parameter != 0
+	    //		fit parameter != 0 (hold that thought...better implementation needed?)
 	    //		fit parameter != parameter limit
 	    //		Percent Error on fit parameter (sigma/value) <= 0.1
 	    bool isQualityFit(std::shared_ptr<TF1> fitInput);
+
+	    //As above but for a specific parameter iPar
+	    bool isQualityFit(std::shared_ptr<TF1> fitInput, int iPar);
 
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------

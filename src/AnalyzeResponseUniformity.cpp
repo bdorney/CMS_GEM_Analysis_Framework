@@ -82,9 +82,9 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     for (auto iterSet = inputStatObs.mset_fOutliers.begin(); iterSet != inputStatObs.mset_fOutliers.end(); ++iterSet) { //Loop Over input multiset
         inputStatObs.hDist->Fill( (*iterSet) );
         
-        if (inDataRange( (*iterSet) ) ) {
+        /*if (inDataRange( (*iterSet) ) ) {
             iterSet = inputStatObs.mset_fOutliers.erase(iterSet);
-        }
+        }*/
     } //End Loop Over input multiset
     
     //Fit distribution
@@ -102,29 +102,50 @@ bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput){
     //Variable Declaration
     bool bIsQuality = true;
 
-    double dPar, dPar_Err;
-    double dParLimit_Lower, dParLimit_Upper;
-
     for( int i=0; i < fitInput->GetNpar(); i++){
-	dPar = fitInput->GetParameter(i);
-	dPar_Err = fitInput->GetParError(i);
-	fitInput->GetParLimits(i,dParLimit_Lower,dParLimit_Upper);
+	bIsQuality = isQualityFit(fitInput, i);
 
-	if (dPar == 0) {
-		bIsQuality = false; break;
-	}
-	else if ( ( fabs(dPar - dParLimit_Lower) / dPar ) < 0.001 ){
-		bIsQuality = false; break;
-	}
-	else if ( ( fabs(dPar - dParLimit_Upper) / dPar) < 0.001 ){
-		bIsQuality = false; break;
-	}
-	else if ( ( dPar_Err / dPar ) > 0.1 ) {
-		bIsQuality = false; break;
-	}
+	if(!bIsQuality) break;
     }    
 
     return bIsQuality;
+} //End AnalyzeResponseUniformity::isQualityFit()
+
+bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput, int iPar){
+    //Variable Declaration
+    double dPar, dPar_Err;
+    double dParLimit_Lower, dParLimit_Upper;
+
+	dPar = fitInput->GetParameter(iPar);
+	dPar_Err = fitInput->GetParError(iPar);
+	fitInput->GetParLimits(iPar,dParLimit_Lower,dParLimit_Upper);
+
+	if (dPar == 0) {
+		//cout<<"Failed, Parameter " << iPar << " is zero\n";
+		//cout<<"dPar = " << dPar << endl;
+		return false;
+	}
+	else if ( ( fabs(dPar - dParLimit_Lower) / dPar ) < 0.001 ){
+		//cout<<"Failed, Parameter " << iPar << " is too close to lower boundary\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dParLimit_Lower = " << dParLimit_Lower << endl;
+		return false;
+	}
+	else if ( ( fabs(dPar - dParLimit_Upper) / dPar) < 0.001 ){
+		//cout<<"Failed, Parameter " << iPar << " is too close to upper boundary\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dParLimit_Upper = " << dParLimit_Upper << endl;		
+		return false;
+	}
+	else if ( ( dPar_Err / dPar ) > 0.1 ) {
+		//cout<<"Failed, Parameter " << iPar << " has too large of an uncertainty\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dPar_Err = " << dPar_Err << endl;
+		//cout<<"Percent Error = " << dPar_Err / dPar << endl;
+		return false;
+	}
+
+    return true;
 } //End AnalyzeResponseUniformity::isQualityFit()
 
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
