@@ -89,6 +89,13 @@ namespace QualityControl {
             //Calculates Summary Statistics
             void calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, std::string strObsName);
             
+	    //Determines if a fit is "good"
+	    //Good fits have:
+	    //		fit parameter != 0
+	    //		fit parameter != parameter limit
+	    //		Percent Error on fit parameter (sigma/value) <= 0.1
+	    bool isQualityFit(std::shared_ptr<TF1> fitInput);
+
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             

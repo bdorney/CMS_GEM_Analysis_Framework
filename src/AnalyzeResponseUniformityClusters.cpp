@@ -132,6 +132,8 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
     float fPkPos = 0, fPkPosErr = 0;        //Peak Position
     float fPkWidth = 0, fPkWidthErr = 0;    //Peak Width
     
+    int iBinMin, iBinMax;	//Bins in histogram encapsulating fMin to fMax
+
     vector<float> vec_fFitRange;
     
     //Loop Over Stored iEta Sectors
@@ -168,6 +170,15 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                     fMin = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
                     fMax = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
                     
+		    iBinMin = std::floor( (fMin - aSetup.histoSetup_clustADC.fHisto_xLower) / aSetup.histoSetup_clustADC.fHisto_BinWidth );
+		    iBinMax = std::ceil( (fMax - aSetup.histoSetup_clustADC.fHisto_xLower) / aSetup.histoSetup_clustADC.fHisto_BinWidth ) + 1;
+
+		    //Skip this histo if integral over fit range is zero
+		    if( !( (*iterSlice).second.hSlice_ClustADC->Integral(iBinMin, iBinMax) > 0 ) ){
+			(*iterSlice).second.fitSlice_ClustADC.reset();
+			continue;
+		    } 
+
                     fitRes_ADC = *((*iterSlice).second.hSlice_ClustADC->Fit( (*iterSlice).second.fitSlice_ClustADC.get(),aSetup.histoSetup_clustADC.strFit_Option.c_str(),"", fMin, fMax) );
                 } //End Case: Fit within the user specific range
                 else{ //Case: No range to use
@@ -185,11 +196,12 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 //Store - Peak Position (from spectrum)
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPoint(iPoint, (*iterSlice).second.fPos_Center, dPeakPos[0] );
                 (*iterEta).second.gEta_ClustADC_Spec_PkPos->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
-                //(*iterEta).second.mset_fClustADC_Spec_PkPos.insert( dPeakPos[0] );
                 
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
-                if ( fitRes_ADC.IsValid() ) { //Case: Valid Fit!!!
+                if ( fitRes_ADC.IsValid() && isQualityFit( (*iterSlice).second.fitSlice_ClustADC ) ) { //Case: Valid Fit!!!
+		    (*iterPhi).second.fNFitSuccess++;
+
                     //Get the Peak Position
                     fPkPos      = getParam( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );
                     fPkPosErr   = getParamError( (*iterSlice).second.fitSlice_ClustADC, aSetup.histoSetup_clustADC, "PEAK" );

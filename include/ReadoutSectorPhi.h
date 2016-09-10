@@ -34,6 +34,8 @@ namespace QualityControl{
             
             //Data Members
             //------------------------------------------------------------------------------------------------------------------------------------------
+	    float fNFitSuccess;	//Number of successful fits;
+
             float fPos_Xlow;    //Lower Bound X Position
             float fPos_Xhigh;   //Upper Bound X Position
             
@@ -50,6 +52,8 @@ namespace QualityControl{
             //Assignment operator
             ReadoutSectorPhi & operator=(const ReadoutSectorPhi & other){
                 if (this != &other ){ //Protects against invalid self-assignment
+		    fNFitSuccess = other.fNFitSuccess;
+
                     fPos_Xlow  = other.fPos_Xlow;
                     fPos_Xhigh = other.fPos_Xhigh;
                     
@@ -58,11 +62,8 @@ namespace QualityControl{
                     iStripNum_Min = other.iStripNum_Min;
                     iStripNum_Max = other.iStripNum_Max;
                     
-                    map_slices = other.map_slices;
-                    
-                    //vec_hits    = other.vec_hits;
+                    map_slices  = other.map_slices;
                     map_hits    = other.map_hits;
-                    //vec_clusters= other.vec_clusters;
                     map_clusters= other.map_clusters;
                     
                     clustHistos = other.clustHistos;

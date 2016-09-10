@@ -231,6 +231,11 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //Variable Declaration
     int iNumEta = detMPGD.getNumEtaSectors();
     
+    float fMu, fErr_Mu;		//Mean
+    float fNormChi2;		//Normalized Chi2
+    float fSigma, fErr_Sigma;	//Sigma
+    float fPerErr, fErr_PerErr;	//Percent Error
+
     SummaryStatistics statObs;
     
     //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
@@ -278,18 +283,30 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
 
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
-    TLatex latex_CMSPrelim, latex_Obs_Mean, latex_Obs_StdDev, latex_Obs_PerErr;
+    fMu		= statObs.fitDist->GetParameter(1);
+    fNormChi2	= statObs.fitDist->GetChisquare() / statObs.fitDist->GetNDF();
+    fSigma	= statObs.fitDist->GetParameter(2);
+    fPerErr	= fSigma / fMu;
+
+    fErr_Mu	= statObs.fitDist->GetParError(1);
+    fErr_Sigma	= statObs.fitDist->GetParError(2);
+    fErr_PerErr	= sqrt( pow(fErr_Sigma / fMu, 2) + pow( ( fSigma * fErr_Mu ) / pow(fMu, 2), 2) );
+
+    TLatex latex_CMSPrelim, latex_Obs_Mean, latex_Obs_NormChi2, latex_Obs_StdDev, latex_Obs_PerErr;
     latex_CMSPrelim.SetTextSize(0.05);
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
     
+    latex_Obs_NormChi2.SetTextSize(0.03);
+    latex_Obs_NormChi2.DrawLatexNDC(0.14, 0.85, ( "#chi^{2} / NDF = " + getString( fNormChi2 ) ).c_str() );
+
     latex_Obs_Mean.SetTextSize(0.03);
-    latex_Obs_Mean.DrawLatexNDC(0.15, 0.8, ("#mu = " + getString( statObs.fitDist->GetParameter(1) ) ).c_str() );
+    latex_Obs_Mean.DrawLatexNDC(0.14, 0.8, ("#mu = " + getString( fMu ) + " #pm " + getString ( fErr_Mu ) ).c_str() );
     
     latex_Obs_StdDev.SetTextSize(0.03);
-    latex_Obs_StdDev.DrawLatexNDC(0.15, 0.75, ("#sigma = " + getString( statObs.fitDist->GetParameter(2) ) ).c_str() );
+    latex_Obs_StdDev.DrawLatexNDC(0.14, 0.75, ("#sigma = " + getString( fSigma ) + " #pm " + getString( fErr_Sigma ) ).c_str() );
     
     latex_Obs_PerErr.SetTextSize(0.03);
-    latex_Obs_PerErr.DrawLatexNDC(0.15, 0.7, ("#frac{#sigma}{#mu} = " + getString( statObs.fitDist->GetParameter(2) / statObs.fitDist->GetParameter(1) ) ).c_str() );
+    latex_Obs_PerErr.DrawLatexNDC(0.14, 0.7, ("#frac{#sigma}{#mu} = " + getString( fPerErr ) + " #pm " + getString( fErr_PerErr) ).c_str() );
     
     //Draw the Legend
     //------------------------------------------------------
@@ -625,8 +642,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     g2DObs->Draw( strDrawOption.c_str() );
     //g2DObs->Draw( "TRI1" );
     canv_DetSum.SetTheta(90);
-    //canv_DetSum.SetPhi(0.05);
-    canv_DetSum.SetPhi(0.0);
+    canv_DetSum.SetPhi(0.001);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------

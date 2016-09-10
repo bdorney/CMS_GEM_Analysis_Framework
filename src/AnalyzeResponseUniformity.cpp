@@ -98,6 +98,35 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
 
+bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput){
+    //Variable Declaration
+    bool bIsQuality = true;
+
+    double dPar, dPar_Err;
+    double dParLimit_Lower, dParLimit_Upper;
+
+    for( int i=0; i < fitInput->GetNpar(); i++){
+	dPar = fitInput->GetParameter(i);
+	dPar_Err = fitInput->GetParError(i);
+	fitInput->GetParLimits(i,dParLimit_Lower,dParLimit_Upper);
+
+	if (dPar == 0) {
+		bIsQuality = false; break;
+	}
+	else if ( ( fabs(dPar - dParLimit_Lower) / dPar ) < 0.001 ){
+		bIsQuality = false; break;
+	}
+	else if ( ( fabs(dPar - dParLimit_Upper) / dPar) < 0.001 ){
+		bIsQuality = false; break;
+	}
+	else if ( ( dPar_Err / dPar ) > 0.1 ) {
+		bIsQuality = false; break;
+	}
+    }    
+
+    return bIsQuality;
+} //End AnalyzeResponseUniformity::isQualityFit()
+
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
     float fLimit_Max = setupHisto.fHisto_xUpper, fLimit_Min = setupHisto.fHisto_xLower;

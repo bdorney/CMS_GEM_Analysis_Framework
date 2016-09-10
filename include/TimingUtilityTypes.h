@@ -49,6 +49,7 @@ namespace QualityControl {
             //float fFitRange_xLower; //lower range of fit
             //float fFitRange_xUpper; //upper range of fit
             
+	    float fHisto_BinWidth;//bin width of histo
             float fHisto_xLower;  //lower x range of histo
             float fHisto_xUpper;  //upper x range of histo
             
@@ -73,6 +74,7 @@ namespace QualityControl {
             HistoSetup(){
                 bFit = bFit_AutoRanging = bIsTrig = false;
                 
+		fHisto_BinWidth = 1;
                 fHisto_xLower = 0;
                 fHisto_xUpper = 1200;
                 

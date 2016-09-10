@@ -183,16 +183,16 @@ bool SelectorCluster::clusterPassesSelection(Cluster &inputClust){
     if (inputClust.fADC < aSetup.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?
-    //if (inputClust.iSize < aSetup.selClust.iCut_SizeMin){ return false; }
-    //if (inputClust.iSize > aSetup.selClust.iCut_SizeMax) {return false; }
-    if (inputClust.iSize <= aSetup.selClust.iCut_SizeMin){ return false; }
-    if (inputClust.iSize >= aSetup.selClust.iCut_SizeMax) {return false; }
+    if (inputClust.iSize < aSetup.selClust.iCut_SizeMin){ return false; }
+    if (inputClust.iSize > aSetup.selClust.iCut_SizeMax) {return false; }
+    //if (inputClust.iSize <= aSetup.selClust.iCut_SizeMin){ return false; }
+    //if (inputClust.iSize >= aSetup.selClust.iCut_SizeMax) {return false; }
     
     //Cluster Time too early or too late?
-    //if (inputClust.iTimeBin < aSetup.selClust.iCut_TimeMin){ return false; }
-    //if (inputClust.iTimeBin > aSetup.selClust.iCut_TimeMax) {return false; }
-    if (inputClust.iTimeBin <= aSetup.selClust.iCut_TimeMin){ return false; }
-    if (inputClust.iTimeBin >= aSetup.selClust.iCut_TimeMax) {return false; }
+    if (inputClust.iTimeBin < aSetup.selClust.iCut_TimeMin){ return false; }
+    if (inputClust.iTimeBin > aSetup.selClust.iCut_TimeMax) {return false; }
+    //if (inputClust.iTimeBin <= aSetup.selClust.iCut_TimeMin){ return false; }
+    //if (inputClust.iTimeBin >= aSetup.selClust.iCut_TimeMax) {return false; }
     
     //If we arrive here the cluster passes our selection; give true
     return true;

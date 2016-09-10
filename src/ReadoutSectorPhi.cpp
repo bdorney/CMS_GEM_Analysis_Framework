@@ -12,11 +12,14 @@ using namespace QualityControl::Uniformity;
 
 //Default constructor
 ReadoutSectorPhi::ReadoutSectorPhi(){
+    fNFitSuccess = 0;
     fPos_Xlow = fPos_Xhigh = fWidth = -1;
 } //End default constructor
 
 //Copy constructor
 ReadoutSectorPhi::ReadoutSectorPhi(const ReadoutSectorPhi & other){
+    fNFitSuccess= other.fNFitSuccess;
+
     fPos_Xlow   = other.fPos_Xlow;
     fPos_Xhigh  = other.fPos_Xhigh;
     

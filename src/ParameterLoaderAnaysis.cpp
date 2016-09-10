@@ -430,6 +430,10 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
         } //End Case: Parameter was NOT fetched Successfully
     } //End Loop through Section
     
+    if( hSetup.iHisto_nBins > 0 ){
+	hSetup.fHisto_BinWidth = (hSetup.fHisto_xUpper - hSetup.fHisto_xLower) / hSetup.iHisto_nBins;
+    }
+
     return;
 } //End ParameterLoaderAnalysis::loadAnalysisParametersHistograms() - Histogram specific
 

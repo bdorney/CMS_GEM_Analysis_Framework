@@ -414,11 +414,13 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_clust_ObsAndDrawOpt, false);
             //visualizeUni.makeAndStoreCanvasHisto2D(file_Results,"ClustPos","TRI2");
             
-            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
-            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
-            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
-            visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level
-            
+	    if( !rSetup.bInputFromFrmwrk ) {
+            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
+            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
+            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
+            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level
+	    }            
+
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";

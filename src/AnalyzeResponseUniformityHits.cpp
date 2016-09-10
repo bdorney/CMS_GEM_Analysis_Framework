@@ -169,6 +169,12 @@ void AnalyzeResponseUniformityHits::fitHistos(DetectorMPGD & inputDet){
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityHits::initHistosHits(DetectorMPGD & inputDet){
     //Loop Over Stored iEta Sectors
+    HistoSetup hSetup_ADCIntegral = aSetup.histoSetup_hitADC;
+    
+    hSetup_ADCIntegral.strHisto_Title_X = "Hit ADC Integral";
+    hSetup_ADCIntegral.fHisto_xUpper = 6. * hSetup_ADCIntegral.fHisto_xUpper;
+    hSetup_ADCIntegral.iHisto_nBins = 6. * hSetup_ADCIntegral.iHisto_nBins;
+
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Grab Eta Sector width (for ClustPos Histo)
         aSetup.histoSetup_hitPos.fHisto_xLower = 0.;
@@ -182,7 +188,7 @@ void AnalyzeResponseUniformityHits::initHistosHits(DetectorMPGD & inputDet){
         (*iterEta).second.hitHistos.hTime = make_shared<TH1F>(getHistogram((*iterEta).first, -1, aSetup.histoSetup_hitTime ) );
         
         //Initialize iEta Histograms - 2D
-        (*iterEta).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>( getHistogram2D((*iterEta).first, -1, aSetup.histoSetup_hitADC, aSetup.histoSetup_hitADC) );
+        (*iterEta).second.hitHistos.hADCMax_v_ADCInt = make_shared<TH2F>( getHistogram2D((*iterEta).first, -1, hSetup_ADCIntegral, aSetup.histoSetup_hitADC) );
         
         //Loop Over Stored iPhi Sectors
         for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over iPhi Sectors

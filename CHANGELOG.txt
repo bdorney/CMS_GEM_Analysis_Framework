@@ -2,10 +2,23 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.1.1                               *
-*	LAST UPDATE: Sept 5 2016                     *
+*	VERSION: 2.1.3                               *
+*	LAST UPDATE: Sept 10 2016                    *
 *                                                *
 **************************************************
+
+Update: September 10th 2016
+==================================================
+->QualityControl::Uniformity::AnalyzeResponseUniformity::fitHistos() will now only attempt a fit if the histogram integral is non-zero in the fit range
+->Added QualityControl::Timing::AnalyzeResponseUniformity::HistoSetup::fHisto_BinWidth for storing bin width of histograms
+->QualityControl::Uniformity::ParameterLoaderAnalysis::loadAnalysisParametersHistograms() will calculate the histogram bin width for each HistoSetup identified
+->Adding method QualityControl::Uniformity::AnalyzeResponseUniformity::isQualityFit() for accepting/rejecting a fit
+->Added data member QualityControl::Uniformity::ReadoutSectorPhi::fNFitSuccess for tracking number of successful slice fits per sector
+
+Update: September 9th 2016
+==================================================
+->Dataset distributions will now display the normalized chi^2 value of the fit applied to the dataset
+->Dataset distributions will now display the error on the mean, sigma, and percent error of the dataset
 
 Update: September 5th 2016
 ==================================================
