@@ -16,6 +16,7 @@
 #include <utility>
 
 //Framework Includes
+#include "ParameterLoader.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityTypes.h"
@@ -25,7 +26,7 @@
 
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderAnaysis {
+        class ParameterLoaderAnaysis : public ParameterLoader {
             
         public:
             //Constructors

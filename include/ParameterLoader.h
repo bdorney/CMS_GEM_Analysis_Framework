@@ -1,50 +1,47 @@
 //
-//  ParameterLoaderAmoreSRS.h
+//  ParameterLoader.h
 //  
 //
-//  Created by Brian L Dorney on 26/01/16.
+//  Created by Brian L Dorney on 10/09/16.
 //
 //
 
-#ifndef ____ParameterLoaderAmoreSRS__
-#define ____ParameterLoaderAmoreSRS__
+#ifndef ____ParameterLoader__
+#define ____ParameterLoader__
 
 //C++ Includes
 #include <algorithm>
-#include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <string>
+#include <utility>
 #include <vector>
 
-//My Includes
-#include "ParameterLoader.h"
+//Framework Includes
 #include "TimingUtilityFunctions.h"
-#include "UniformityUtilityFunctions.h"
+#include "UniformityUtilityOperators.h"
+#include "UniformityUtilityTypes.h"
 
 //ROOT Includes
 
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderAmoreSRS : public ParameterLoader{
-            
-        private:
-            DetectorMPGD det_GE11;  //Link to header file in ParameterLoaderAmoreSRS.cpp file
+        class ParameterLoader {
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderAmoreSRS();
+            ParameterLoader();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Load the Amore mapping file and initializes the detector
-            void loadAmoreMapping(std::string & strInputMappingFileName);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Returns the detector; this allows for some more flexibility; maybe we want to manipulate it after initializing in the future
-            DetectorMPGD getDetector(){ return det_GE11; };
+            //Gets the list of input runs from the input config file
+            std::vector<std::pair<int, std::string> > getPairedRunList(std::ifstream &file_Input, bool bVerboseMode);
+            std::vector<std::string> getRunList(std::ifstream &file_Input, bool bVerboseMode);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,11 +49,19 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-        private:
-            bool bVerbose_IO;   //Flag for printing additional output to the user; concerns file input/output operations
+            //Data Memebers
             
-        }; //End class ParameterLoaderAmore
+        protected:
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Gets the run number from an input run name
+            int getRunNumber(std::string strRunName);
+            
+            //Attributes
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            std::string strSecBegin_RunList, strSecEnd_RunList;
+        }; //End class ParameterLoader
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____ParameterLoaderAmore__) */
+#endif /* defined(____ParameterLoader__) */

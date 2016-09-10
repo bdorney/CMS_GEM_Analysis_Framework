@@ -23,11 +23,10 @@
 #include <vector>
 
 //Framework Includes
-#include "AnalyzeResponseUniformity.h"
-//#include "DetectorMPGD.h" //Done in source file not header file due to inheritance/friendship
 #include "TimingUtilityFunctions.h"
 #include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
+#include "Visualizer.h"
 
 //ROOT Includes
 #include "TCanvas.h"
@@ -56,7 +55,7 @@
 namespace QualityControl {
     namespace Uniformity {
         
-        class VisualizeUniformity : public AnalyzeResponseUniformity {
+        class VisualizeUniformity : public Visualizer {
             
         public:
             //Constructors
@@ -179,23 +178,14 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets the flag for automatically saving canvases
-            virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
             
         private:
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Saves inputCanv as a *.png file
-            //The file is placed in the working directory
-            //The name of the file is the TName of the canvas
-            virtual void save2png(TCanvas & inputCanvas);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice);
-            
-            virtual TPad *getPadEta(int iEta, int iNumEta);
-            virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
             
             //std::vector<float> getObsData(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
             virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);
@@ -216,7 +206,6 @@ namespace QualityControl {
             
             //Data Members
             //------------------------------------------------------------------------------------------------------------------------------------------
-            bool bSaveCanvases;
             
         }; //End class VisualizeUniformity
     } //End namespace Uniformity

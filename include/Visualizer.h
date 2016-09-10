@@ -1,56 +1,65 @@
 //
-//  ParameterLoaderRun.h
+//  Visualizer.h
 //  
 //
-//  Created by Brian L Dorney on 03/05/16.
+//  Created by Brian L Dorney on 10/09/16.
 //
 //
 
-#ifndef ____ParameterLoaderRun__
-#define ____ParameterLoaderRun__
+#ifndef ____Visualizer__
+#define ____Visualizer__
 
 //C++ Includes
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <map>
 #include <stdio.h>
 #include <string>
-#include <utility>
-#include <vector>
 
 //Framework Includes
-#include "ParameterLoader.h"
-#include "TimingUtilityFunctions.h"
-#include "UniformityUtilityOperators.h"
+#include "AnalyzeResponseUniformity.h"
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
+#include "TCanvas.h"
+#include "TPad.h"
 
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderRun : public ParameterLoader {
+        class Visualizer : public AnalyzeResponseUniformity {
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderRun();
+            Visualizer();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Opens a text file set by the user and loads the requested parameters
-            virtual void loadRunParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
-            virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
-                Uniformity::RunSetup rSetup;
-                loadRunParameters(file_Input, bVerboseMode, rSetup);
-                return rSetup;
-            };
+            //Printers - Methods that Print Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            
+            //Setters - Methods that Set Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Sets the flag for automatically saving canvases
+            virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
+            
+        protected:
+            //Actions - Methods that Do Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Saves inputCanv as a *.png file
+            //The file is placed in the working directory
+            //The name of the file is the TName of the canvas
+            virtual void save2png(TCanvas & inputCanvas);
+            
+            //Getters - Methods that Get (i.e. Return) Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            //Get a TPad sized for an iEta Grid
+            virtual TPad *getPadEta(int iEta, int iNumEta);
+            
+            //Get a TPad sized for an iPhi Grid
+            virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,18 +67,12 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //Data Memebers
-            
-        private:
-            //Getters - Methods that Get (i.e. Return) Something
+            //Data Members
             //------------------------------------------------------------------------------------------------------------------------------------------
+            bool bSaveCanvases;
             
-            //Attributes
-            //------------------------------------------------------------------------------------------------------------------------------------------
-            
-            std::string strSecBegin_RunInfo, strSecEnd_RunInfo;
-        }; //End ParameterLoaderRun
+        }; //End class Visualizer
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____ParameterLoaderRun__) */
+#endif /* defined(____Visualizer__) */

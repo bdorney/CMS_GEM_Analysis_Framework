@@ -2,7 +2,7 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.1.3                               *
+*	VERSION: 2.1.4                               *
 *	LAST UPDATE: Sept 10 2016                    *
 *                                                *
 **************************************************
@@ -21,6 +21,8 @@ Update: September 10th 2016
 ->QualityControl::Uniformity::AnalyzeResponseUniformity::calcStatistics() will no longer attempt to discard "outliers" when determining uniformity
 ->Fixed a bug in series & re-run mode in which the clusters in each slice were being over-counted progressively as number of input files increased
 ->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will now also create the slice histograms
+->QualityControl::Uniformity::VisualizeUniformity now inherits from QualityControl::Uniformity::Visualizer, future functionality foreseen
+->All QualityControl::Uniformity::ParameterLoaderX classes now inherit from QualityControl::Uniformity::ParameterLoader, future functionality foreseen
 
 Update: September 9th 2016
 ==================================================
