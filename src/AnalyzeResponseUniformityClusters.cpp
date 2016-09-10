@@ -144,9 +144,15 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
                 cout<<"Attempting to Fit (iEta, iPhi, iSlice) = (" << (*iterEta).first << ", " << (*iterPhi).first << ", " << (*iterSlice).first << ")\n";
                 
-                //Get the histogram & check if it does not exist
-                (*iterPhi).second.map_slices[(*iterSlice).first+1].hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString((*iterSlice).first+1) + "_clustADC").c_str(),(*iterSlice).first+1,(*iterSlice).first+1,"") ) );
-                if ( (*iterSlice).second.hSlice_ClustADC == nullptr || !( (*iterSlice).second.hSlice_ClustADC->GetEntries() > 0) ) continue;
+                //Check if the slice histogram does not exist, get it if it doesn't
+                if ( (*iterSlice).second.hSlice_ClustADC == nullptr ){
+			if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr ) continue;
+
+			(*iterSlice).second.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString((*iterSlice).first+1) + "_clustADC").c_str(),(*iterSlice).first+1,(*iterSlice).first+1,"") ) );
+		}
+
+		//Skip this slice if the histogram has zero entries
+                if ( !( (*iterSlice).second.hSlice_ClustADC->GetEntries() > 0) ) continue;
                 
                 //Find peak & store it's position
                 specADC.Search( (*iterSlice).second.hSlice_ClustADC.get(), 2, "nobackground", 0.5 );
@@ -259,9 +265,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
-	//Debugging
-	//cout<<"inputDet.mset_fClustADC_Fit_PkPos.size() = " << inputDet.mset_fClustADC_Fit_PkPos.size() << endl;
-
     //Calculate statistics
     if ( inputDet.mset_fClustADC_Fit_PkPos.size() > 0 ) { //Check if stored fit positions exist
         calcStatistics( inputDet.statClustADC_Fit_PkPos, inputDet.mset_fClustADC_Fit_PkPos, "ResponseFitPkPos" );
@@ -775,7 +778,7 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
     //Do not close file_InputRootFile it is used elsewhere
     
     return;
-} //End storeFits()
+} //End storeHistos()
 
 //Stores booked cluster fits (for those fits that are non-null)
 //Takes a std::string which stores the physical filename as input
@@ -862,7 +865,7 @@ void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, D
             //Slices
             //Now that all clusters have been analyzed we extract the slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
-                if ((*iterSlice).second.fitSlice_ClustADC == nullptr) { continue; }
+                //if ((*iterSlice).second.fitSlice_ClustADC == nullptr) { continue; }
                 
                 //Get Directory
                 //-------------------------------------
@@ -875,8 +878,8 @@ void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, D
                 //Store Fits - Slice Level
                 //-------------------------------------
                 dir_Slice->cd();
-                (*iterSlice).second.hSlice_ClustADC->Write();
-                (*iterSlice).second.fitSlice_ClustADC->Write();
+                if ((*iterSlice).second.hSlice_ClustADC != nullptr) (*iterSlice).second.hSlice_ClustADC->Write();
+                if ((*iterSlice).second.fitSlice_ClustADC != nullptr) (*iterSlice).second.fitSlice_ClustADC->Write();
             } //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors

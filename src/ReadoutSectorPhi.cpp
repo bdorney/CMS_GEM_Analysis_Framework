@@ -28,11 +28,8 @@ ReadoutSectorPhi::ReadoutSectorPhi(const ReadoutSectorPhi & other){
     iStripNum_Min = other.iStripNum_Min;
     iStripNum_Max = other.iStripNum_Max;
     
-    map_slices = other.map_slices;
-    
-    //vec_hits    = other.vec_hits;
+    map_slices  = other.map_slices;
     map_hits    = other.map_hits;
-    //vec_clusters= other.vec_clusters;
     map_clusters= other.map_clusters;
     
     clustHistos = other.clustHistos;

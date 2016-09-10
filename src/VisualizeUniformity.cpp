@@ -1671,11 +1671,11 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
     
     //Initialize setupHisto_RunHistory_X
     //------------------------------------------------------
-    setupHisto_RunHistory_X.strHisto_Name = "RunNo";
-    setupHisto_RunHistory_X.iHisto_nBins = inputMapHisto2D.size()+1;
-    setupHisto_RunHistory_X.fHisto_xLower = inputMapHisto2D.begin()->first;
-    setupHisto_RunHistory_X.fHisto_xUpper = inputMapHisto2D.rbegin()->first+1;
-    setupHisto_RunHistory_X.strHisto_Title_X = "Run Number";
+    setupHisto_RunHistory_X.strHisto_Name	= "RunNo";
+    setupHisto_RunHistory_X.fHisto_xLower 	= inputMapHisto2D.begin()->first;
+    setupHisto_RunHistory_X.fHisto_xUpper 	= inputMapHisto2D.rbegin()->first+1;
+    setupHisto_RunHistory_X.iHisto_nBins 	= setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower;
+    setupHisto_RunHistory_X.strHisto_Title_X	= "Run Number";
     
     //fBinWidth_X = (setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower) / setupHisto_RunHistory_X.iHisto_nBins;
     
