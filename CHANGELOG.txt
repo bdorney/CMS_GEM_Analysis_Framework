@@ -19,6 +19,8 @@ Update: September 10th 2016
 ->Added overloaded method QualityControl::Uniformity::VisualizeUniformity::storeCanvasFits() for calling getCanvasSliceFit() for all slices and making a summary of the success rate of fitting
 ->QualityControl::Uniformity::InterfaceAnalysis::storeResults() will now call VisualizeUniformity::storeCanvasFits()
 ->QualityControl::Uniformity::AnalyzeResponseUniformity::calcStatistics() will no longer attempt to discard "outliers" when determining uniformity
+->Fixed a bug in series & re-run mode in which the clusters in each slice were being over-counted progressively as number of input files increased
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will now also create the slice histograms
 
 Update: September 9th 2016
 ==================================================
