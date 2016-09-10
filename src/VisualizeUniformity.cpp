@@ -105,10 +105,8 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, 
     
     //Get/Make the Summary Directory
     //------------------------------------------------------
-    //Check to see if the directory exists already
+    //Check to see if dir_Summary exists already, if not create it
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
@@ -204,10 +202,10 @@ void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, s
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
-        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph","Error: File I/O");
+        printClassMethodMsg("VisualizeUniformity","storeCanvasData","Error: File I/O");
         printROOTFileStatus(ptr_fileOutput);
-        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
-        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tExiting; No Histograms have been stored!\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasData", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasData", "\tExiting; Nothing has been stored!\n" );
         
         return;
     } //End Check if File Failed to Open Correctly
@@ -257,10 +255,8 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     
     //Get/Make the Summary Directory
     //------------------------------------------------------
-    //Check to see if the directory exists already
+    //Check to see if dir_Summary exists already, if not create it
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
@@ -325,6 +321,130 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     return;
 } //End VisualizeUniformity::storeCanvasData()
 
+void VisualizeUniformity::storeCanvasFits(std::string & strOutputROOTFileName, std::string strOption, std::string strDrawOption){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Variable Declaration
+    TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !ptr_fileOutput->IsOpen() || ptr_fileOutput->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasFits","Error: File I/O");
+        printROOTFileStatus(ptr_fileOutput);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasFits", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasFits", "\tExiting; Nothing has been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    //Call the method below
+    storeCanvasFits(ptr_fileOutput, strDrawOption);
+    
+    //Close the File
+    //------------------------------------------------------
+    ptr_fileOutput->Close();
+    
+    return;
+} //End VisualizeUniformity::storeCanvasFits()
+
+void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::string strDrawOption){
+    //Variable Declaration
+    int iNumEta = detMPGD.getNumEtaSectors();
+    
+    ReadoutSectorEta etaSector = detMPGD.getEtaSector(1);
+    
+    TH2F *hFitSucess2D = new TH2F("h_Summary_FitSuccess","",etaSector.map_sectorsPhi.size()+1,1,etaSector.map_sectorsPhi.size()+1, iNumEta+1, 1, iNumEta+1 );
+    
+    //Check if File Failed to Open Correctly
+    //------------------------------------------------------
+    if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph","Error: File I/O");
+        printROOTFileStatus(file_InputRootFile);
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tPlease cross check input file name, option, and the execution directory\n" );
+        printClassMethodMsg("VisualizeUniformity","storeCanvasGraph", "\tExiting; No Histograms have been stored!\n" );
+        
+        return;
+    } //End Check if File Failed to Open Correctly
+    
+    for (int iEta = 1; iEta <= iNumEta; ++iEta) {
+        etaSector = detMPGD.getEtaSector(iEta);
+        
+        //Get Directory
+        //-------------------------------------
+        //Check to see if dir_SectorEta directory exists already, if not create it
+        TDirectory *dir_SectorEta = file_InputRootFile->GetDirectory( ( "SectorEta" + getString( iEta ) ).c_str(), false, "GetDirectory" );
+        if (dir_SectorEta == nullptr) { //Case: Directory did not exist in file, CREATE
+            dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( iEta ) ).c_str() );
+        } //End Case: Directory did not exist in file, CREATE
+        
+        for (auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi) {
+            
+            //Get Directory
+            //-------------------------------------
+            //Check to see if dir_SectorPhi directory exists already, if not create it
+            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
+            if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
+                dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
+            } //End Case: Directory did not exist in file, CREATE
+            
+            hFitSucess2D->SetBinContent(iEta, (*iterPhi).first, (*iterPhi).second.fNFitSuccess / aSetup.iUniformityGranularity );
+            
+            for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice) {
+                //Check to see if dir_Slice exists already, if not create it
+                TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( (*iterSlice).first ) ).c_str(), false, "GetDirectory"  );
+                if (dir_Slice == nullptr) { //Case: Directory did not exist in file, CREATE
+                    dir_Slice = dir_SectorPhi->mkdir( ( "Slice" + getString( (*iterSlice).first ) ).c_str() );
+                } //End Case: Directory did not exist in file, CREATE
+                
+                if ( (*iterSlice).second.fitSlice_ClustADC == nullptr ) {
+                    continue;
+                }
+                
+                TCanvas *canv_SliceSum = (TCanvas*) (getCanvasSliceFit( (*iterSlice).second, iEta, (*iterPhi).first, (*iterSlice).first ) )->Clone();
+                
+                dir_Slice->cd();
+                canv_SliceSum->Write();
+            } //End Loop Over iSlice
+        } //End Loop Over iPhi
+    } //End Loop Over iEta
+    
+    //Make the Canvas
+    //------------------------------------------------------
+    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_FitSuccess" ).c_str(), "Fit Successes by Sector", 600, 600);
+    
+    //Get/Make the Summary Directory
+    //------------------------------------------------------
+    //Check to see if dir_Summary exists already, if not create it
+    TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
+    if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
+        dir_Summary = file_InputRootFile->mkdir("Summary");
+    } //End Case: Directory did not exist in file, CREATE
+    
+    //Draw mgraph_Obs
+    //------------------------------------------------------
+    canv_DetSum.cd();
+    hFitSucess2D->Draw( strDrawOption.c_str() );
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Write the Canvas to the File
+    //------------------------------------------------------
+    dir_Summary->cd();
+    canv_DetSum.Write();
+    if (bSaveCanvases) { save2png(canv_DetSum); }
+    hFitSucess2D->Write();
+    
+    //Do not close file_InputRootFile it is used elsewhere
+    
+    return;
+} //End VisualizeUniformity::storeCanvasFits()
+
 //Draws a given observable onto a single pad of canvas
 //Takes a std::string which stores the physical filename as input
 void VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation){
@@ -371,15 +491,13 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
 
     TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), "");
-	//TMultiGraph *mgraph_Obs = new TMultiGraph( ( "mgraph_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), "");
-    
+	
     vector<shared_ptr<TGraphErrors> > vec_gObs;
 
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-    //TCanvas canv_DetSum( ("canv_" + strCanvIdentNoSpec + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
-
+    
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -393,10 +511,8 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     
     //Get/Make the Summary Directory
     //------------------------------------------------------
-    //Check to see if the directory exists already
+    //Check to see if dir_Summary exists already, if not create it
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
@@ -413,9 +529,6 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
         //Get the histogram & draw it
         etaSector = detMPGD.getEtaSector(iEta);
         gObs = getObsGraph(strObsName, etaSector);
-        
-        //Debugging
-        //cout<<"gObs = " << gObs << endl;
         
         gObs->SetLineColor( Timing::getCyclicColor(iEta) );
         gObs->SetMarkerColor( Timing::getCyclicColor(iEta) );
@@ -454,7 +567,6 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
 
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
             
             //Segment the Plot with lines
@@ -565,10 +677,8 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
 
     //Get/Make the Summary Directory
     //------------------------------------------------------
-    //Check to see if the directory exists already
+    //Check to see if dir_Summary exists already, if not create it
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
@@ -586,12 +696,6 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
         for (int i = ( (iEta-1) * gObs->GetN() ); i < (iEta * gObs->GetN() ); ++i) { //Loop Over Points of gObs
             gObs->GetPoint( (iEta * gObs->GetN() ) - i,dPx, dObs);
             
-            //Debugging
-            //cout<<iEta<<"\t"<<i<<"\t"<<( (iEta-1) * gObs->GetN() )<<"\t"<<(iEta * gObs->GetN() )<<"\t"<<dPx<<"\t"<<dPy<<"\t"<<dObs<<endl;
-
-            //if(fabs(dObs) > 0) g2DObs->SetPoint(i,dPx, dPy, dObs);
-            //if( !(dPx == dObs) ) g2DObs->SetPoint(i,dPx, dPy, dObs);
-	    
             //Need to prevent (0,Y,0)'s from being drawn (causes coincidence points in drawing, bad)
             //First we store all non (0,Y,0) points then in another loop we fill g2DObs
             if( !(dPx == dObs ) ) vec_tup3DPt.push_back( std::make_tuple(dPx, dPy, dObs) );
@@ -601,11 +705,6 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //Normalize elements in vec_tup3DPt to the average of the elements of vec_tup3DPt
     //------------------------------------------------------
     if ( bNormalize ) { //Case: User wants normalization
-        //Determine average of strObsName
-        //std::tuple<double, double, double> tup_Init = std::make_tuple(0.,0.,0.);
-        //tup_Init = std::accumulate(vec_tup3DPt.begin(), vec_tup3DPt.end(), tup_Init, Uniformity::addTuple);
-        //dAvg = std::get<2>(tup_Init) / vec_tup3DPt.size();
-        
         dAvg = getObsData(strObsName).fMean;
         
         //Normalize elements of vec_tup3DPt to average
@@ -649,19 +748,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     TLatex latex_CMSPrelim;
     latex_CMSPrelim.SetTextSize(0.05);
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    	
-	/*cout<<"Points Stored In 2D Graph\n";
-	cout<<"====================================================\n";
-	cout<<"i\tPx\tPy\tPz\n";
-	Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
-	for(int i=0; i<g2DObs->GetN(); ++i){
-		//double Px, Py, Pz;
-
-		//g2DObs->GetPoint(i,Px,Py,Pz);
-
-		cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
-	}*/
-
+    
     //Write the Canvas to the File
     //------------------------------------------------------
     dir_Summary->cd();
@@ -724,8 +811,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     //Make the Canvas
     //------------------------------------------------------
-	//cout<<"VisualizeUniformity::storeCanvasHisto() - detMPGD.getNameNoSpecial() = " << detMPGD.getNameNoSpecial() << endl;
-    TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
+	TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -740,10 +826,8 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     
     //Get/Make the Summary Directory
     //------------------------------------------------------
-    //Check to see if the directory exists already
+    //Check to see if dir_Summary exists already, if not create it
     TDirectory *dir_Summary = file_InputRootFile->GetDirectory("Summary", false, "GetDirectory" );
-    
-    //If the above pointer is null the directory does NOT exist, create it
     if (dir_Summary == nullptr) { //Case: Directory did not exist in file, CREATE
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
@@ -769,10 +853,10 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
         
         canv_DetSum.cd();
         if( 1 == iEta ){
-            vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+            vec_hObs.back()->Draw( strDrawOption.c_str() );
         }
         else{
-            vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
+            vec_hObs.back()->Draw( (strDrawOption + "same").c_str() );
         }
     } //End Loop Over Detector's Eta Sector
     
@@ -798,7 +882,6 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
 
             //Draw the TLatex
             latex_PhiSector.SetTextSize(0.05);
-            //latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(3 - iPhiPos) ).c_str() );
             latex_PhiSector.DrawLatexNDC(0.125 + 0.875 * ( (iPhiPos) / (float)etaSector.map_sectorsPhi.size() ), 0.8, ( "i#phi = " + getString(iPhiPos+1) ).c_str() );
 
             //Segment the Plot with lines
@@ -881,12 +964,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     float fMaxBinVal = -1;
     
-    //float fXPad_Low;
-    //float fXPad_High;
-    
-    //float fYPad_Low;
-    //float fYPad_High;
-    
     shared_ptr<TH1F> hObs; //Observable to be drawn
     
     ReadoutSectorEta etaSector;
@@ -944,38 +1021,16 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         //Get the ReadoutSectorEta
         etaSector = detMPGD.getEtaSector(iEta);
         
-        //Determine the Pad Coordinates
-        /*if (iEta % 2 != 0){ //Case: iEta is Odd
-            fXPad_Low   = 0.02;
-            fXPad_High  = 0.48;
-        } //End Case: iEta is Odd
-        else{ //Case: iEta is Even
-            fXPad_Low   = 0.52;
-            fXPad_High  = 0.98;
-        } //End Case: iEta is Even
-        
-        //Determine the Pad Y-Coordinates (Y=0 is at the top of the pad!)
-        fYPad_Low   = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) - 1);
-        fYPad_High  = 1. - (1. / (0.5 * iNumEta) ) * ( std::ceil(iEta/2.) );
-        
-        //Debugging
-        //cout<<iEta<<"\t"<<fYPad_Low<<"\t"<<fYPad_High<<endl;
-        
-        //Initialize the Pad
-        TPad *pad_SectorObs = new TPad( ( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ) ).c_str() ,"",fXPad_Low,fYPad_Low,fXPad_High,fYPad_High,kWhite);*/
-        
         TPad *pad_SectorObs = (TPad *) getPadEta(iEta, iNumEta)->Clone( getNameByIndex(iEta, -1, -1, "pad", "Obs" + getString(iEta) ).c_str() );
         vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
         
         canv_DetSum.cd();
-        //vec_padSectorObs[iEta-1]->Draw();
         vec_padSectorObs.back()->Draw();
-        //vec_padSectorObs[iEta-1]->cd();
         vec_padSectorObs.back()->cd();
         
         //Draw the histogram
-        vec_hObs[iEta-1]->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
-        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
+        vec_hObs.back()->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
+        vec_hObs.back()->Draw( strDrawOption.c_str() );
         
         //Setup the TLatex for "CMS Preliminary"
         TLatex latex_CMSPrelim;
@@ -993,7 +1048,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
             for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
                 //Ensure the pad is the active pad (it should be already but who knows...)
-                vec_padSectorObs[iEta-1]->cd();
+                vec_padSectorObs.back()->cd();
                 
                 //Declare the TLatex
                 TLatex latex_PhiSector;
@@ -1398,6 +1453,31 @@ void VisualizeUniformity::save2png(TCanvas & inputCanvas){
     
     return;
 } //End VisualizeUniformity::save2png()
+
+TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int iEta, int iPhi, int iSlice){
+    //Variable Declaration
+    TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", "clustADCfit").c_str(), "Cluster ADC Fit", 600, 600 );
+    
+    //Draw the histogram and slice
+    //------------------------------------------------------
+    ret_Canvas->cd();
+    inputSlice.hSlice_ClustADC->Draw();
+    inputSlice.fitSlice_ClustADC->Draw("same");
+    
+    //Setup the TLatex for "CMS Preliminary"
+    //------------------------------------------------------
+    TLatex latex_CMSPrelim;
+    latex_CMSPrelim.SetTextSize(0.05);
+    latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
+    
+    //Setup the TLatex for Slice Position
+    //------------------------------------------------------
+    TLatex latex_SlicePos;
+    latex_SlicePos.SetTextSize(0.03);
+    latex_SlicePos.DrawLatexNDC(0.75, 0.85, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
+    
+    return ret_Canvas;
+} //End VisualizeUniformity::getCanvasSliceFit()
 
 TPad * VisualizeUniformity::getPadEta(int iEta, int iNumEta){
     //Variable Declaration

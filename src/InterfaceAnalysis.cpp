@@ -401,7 +401,6 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             
             visualizeUni.storeCanvasHistoSegmented(file_Results, "HitPos", "E1", rSetup.bVisPlots_PhiLines);
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_hit_ObsAndDrawOpt, false);
-            //visualizeUni.makeAndStoreCanvasHisto2D(file_Results,"HitPos","TRI2");
         } //End Case: Hit Analysis
         
         if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
@@ -412,14 +411,13 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             
             visualizeUni.storeCanvasHistoSegmented(file_Results, "ClustPos", "E1", rSetup.bVisPlots_PhiLines);
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_clust_ObsAndDrawOpt, false);
-            //visualizeUni.makeAndStoreCanvasHisto2D(file_Results,"ClustPos","TRI2");
             
-	    if( !rSetup.bInputFromFrmwrk ) {
-            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
-            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
-            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
-            	visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level
-	    }            
+            if( !rSetup.bInputFromFrmwrk ) {
+                    visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
+                    visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
+                    visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
+                    visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", false); //Phi Level
+            }            
 
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
@@ -428,6 +426,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
                 
                 visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1");
                 visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1");
+                visualizeUni.storeCanvasFits(file_Results, "COLZ");
+                
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",false);
                 visualizeUni.storeCanvasGraph2D(file_Results,"ResponseFitPkPos","TRI2Z",true);	//Normalized version

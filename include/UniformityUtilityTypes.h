@@ -70,7 +70,7 @@ namespace QualityControl {
         struct AnalysisSetupUniformity{
             int iEvt_First;  //Starting Event For Analysis
             int iEvt_Total;    //Total number of Events to Analyze
-            int iUniformityGranularity; //Each iEta sector is partitioned into this many slices
+            int iUniformityGranularity; //Each iPhi sector is partitioned into this many slices
             
             Timing::HistoSetup histoSetup_clustADC;
             Timing::HistoSetup histoSetup_clustMulti;

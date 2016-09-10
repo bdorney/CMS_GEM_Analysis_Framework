@@ -294,7 +294,6 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
         //Get Directory
         //-------------------------------------
         //Check to see if dir_SectorEta directory exists already, if not create it

@@ -84,6 +84,11 @@ namespace QualityControl {
             //Takes a TFile *, which the canvas is written to, as input
             virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
             
+            //Draws a canvas with the slice histo & fit for all slices
+            //Also makes a summary distribution showing the % of good fits per ReadoutSectorPhi
+            virtual void storeCanvasFits(std::string & strOutputROOTFileName, std::string strOption, std::string strDrawOption);
+            virtual void storeCanvasFits(TFile * file_InputRootFile, std::string strDrawOption);
+            
             //Draws a given observable onto a single pad of canvas
             //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
@@ -187,6 +192,8 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice);
+            
             virtual TPad *getPadEta(int iEta, int iNumEta);
             virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
             

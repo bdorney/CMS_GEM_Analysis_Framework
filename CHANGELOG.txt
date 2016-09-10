@@ -14,6 +14,9 @@ Update: September 10th 2016
 ->QualityControl::Uniformity::ParameterLoaderAnalysis::loadAnalysisParametersHistograms() will calculate the histogram bin width for each HistoSetup identified
 ->Adding method QualityControl::Uniformity::AnalyzeResponseUniformity::isQualityFit() for accepting/rejecting a fit
 ->Added data member QualityControl::Uniformity::ReadoutSectorPhi::fNFitSuccess for tracking number of successful slice fits per sector
+->Added private method QualityControl::Uniformity::VisualizeUniformity::getCanvasSliceFit() for making a canvas of the slice histo & fit
+->Added overloaded method QualityControl::Uniformity::VisualizeUniformity::storeCanvasFits() for calling getCanvasSliceFit() for all slices and making a summary of the success rate of fitting
+->QualityControl::Uniformity::InterfaceAnalysis::storeResults() will now call VisualizeUniformity::storeCanvasFits()
 
 Update: September 9th 2016
 ==================================================

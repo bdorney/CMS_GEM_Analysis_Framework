@@ -633,7 +633,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
     
     //Loop Over Stored iEta Sectors
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
         //Get Directory
         //-------------------------------------
         //Check to see if dir_SectorEta directory exists already, if not create it
@@ -742,10 +741,8 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
                 //Get Directory
                 //-------------------------------------
-                //Check to see if the directory exists already
+                //Check to see if dir_Slice exists already, if not create it
                 TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( (*iterSlice).first ) ).c_str(), false, "GetDirectory"  );
-                
-                //If the above pointer is null the directory does NOT exist, create it
                 if (dir_Slice == nullptr) { //Case: Directory did not exist in file, CREATE
                     dir_Slice = dir_SectorPhi->mkdir( ( "Slice" + getString( (*iterSlice).first ) ).c_str() );
                 } //End Case: Directory did not exist in file, CREATE
