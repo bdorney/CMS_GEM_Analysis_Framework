@@ -45,13 +45,6 @@ namespace QualityControl {
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
-            virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
-                Uniformity::RunSetup rSetup;
-                loadRunParameters(file_Input, bVerboseMode, rSetup);
-                return rSetup;
-            };
-            
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
@@ -67,7 +60,7 @@ namespace QualityControl {
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            std::string strSecBegin_RunInfo, strSecEnd_RunInfo;
+            std::string m_strSecBegin_RunInfo, m_strSecEnd_RunInfo;
         }; //End ParameterLoaderRun
     } //End namespace Uniformity
 } //End namespace QualityControl

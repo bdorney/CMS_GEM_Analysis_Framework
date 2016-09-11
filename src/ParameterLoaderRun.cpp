@@ -22,11 +22,11 @@ using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderRun::ParameterLoaderRun(){
-    strSecBegin_RunInfo = "[BEGIN_RUN_INFO]";
-    strSecBegin_RunList = "[BEGIN_RUN_LIST]";
+    m_strSecBegin_RunInfo = "[BEGIN_RUN_INFO]";
+    m_strSecBegin_RunList = "[BEGIN_RUN_LIST]";
     
-    strSecEnd_RunInfo = "[END_RUN_INFO]";
-    strSecEnd_RunList = "[END_RUN_LIST]";
+    m_strSecEnd_RunInfo = "[END_RUN_INFO]";
+    m_strSecEnd_RunList = "[END_RUN_LIST]";
 } //End Default Constructor
 
 void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
@@ -45,7 +45,7 @@ void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMo
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Check for start of run info header
-        if ( strLine.compare( strSecBegin_RunInfo ) == 0 ) { //Case: Run info header found!
+        if ( strLine.compare( m_strSecBegin_RunInfo ) == 0 ) { //Case: Run info header found!
             cout<<"ParameterLoaderRun::loadRunParameters(): Run info header found!\n";
             
             while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through run info header
@@ -56,7 +56,7 @@ void ParameterLoaderRun::loadRunParameters(ifstream &file_Input, bool bVerboseMo
                 
                 //Has this header ended?
                 //Has the header ended?
-                if ( strLine.compare( strSecEnd_RunInfo ) == 0 ) { //Case: End of run list header
+                if ( strLine.compare( m_strSecEnd_RunInfo ) == 0 ) { //Case: End of run list header
                     if (bVerboseMode) { //Case: User Requested Verbose Input/Output
                         cout<<"ParameterLoaderRun::loadRunParameters(): End of run info header reached!\n";
                         

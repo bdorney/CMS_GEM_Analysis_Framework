@@ -1,58 +1,41 @@
 //
-//  ParameterLoader.h
+//  ParameterLoaderComparison.h
 //  
 //
-//  Created by Brian L Dorney on 10/09/16.
+//  Created by Brian L Dorney on 11/09/16.
 //
 //
 
-#ifndef ____ParameterLoader__
-#define ____ParameterLoader__
+#ifndef ____ParameterLoaderComparison__
+#define ____ParameterLoaderComparison__
 
 //C++ Includes
-#include <algorithm>
-#include <iostream>
 #include <stdio.h>
-#include <string>
-#include <utility>
-#include <vector>
 
 //Framework Includes
-#include "TimingUtilityFunctions.h"
-#include "UniformityUtilityOperators.h"
-#include "UniformityUtilityTypes.h"
+#include "ParameterLoader.h"
 
 //ROOT Includes
 
-namespace QualityControl {
+namespace  QualityControl {
     namespace Uniformity {
-        class ParameterLoader {
+        
+        class ParameterLoaderComparison : public ParameterLoader {
+            ParameterLoaderComparison
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoader();
+            ParameterLoaderComparison();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Opens a text file set by the user and loads the requested parameters
-            //Over-written by inherited classes
-            virtual void loadRunParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
+            
             
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
-            virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
-                Uniformity::RunSetup rSetup;
-                loadRunParameters(file_Input, bVerboseMode, rSetup);
-                return rSetup;
-            };
-            
-            //Gets the list of input runs from the input config file
-            std::vector<std::pair<int, std::string> > getPairedRunList(std::ifstream &file_Input, bool bVerboseMode);
-            std::vector<std::string> getRunList(std::ifstream &file_Input, bool bVerboseMode);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -62,17 +45,16 @@ namespace QualityControl {
             
             //Data Memebers
             
-        protected:
+        private:
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Gets the run number from an input run name
-            int getRunNumber(std::string strRunName);
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::string m_strSecBegin_RunList, m_strSecEnd_RunList;
-        }; //End class ParameterLoader
+            std::string m_strSecBegin_CompInfo, m_strSecEnd_CompInfo;
+        };
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____ParameterLoader__) */
+
+#endif /* defined(____ParameterLoaderComparison__) */
