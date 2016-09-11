@@ -43,7 +43,7 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Sets the flag for automatically saving canvases
-            virtual void setAutoSaveCanvas(bool bInput){ bSaveCanvases = bInput; return; };
+            virtual void setAutoSaveCanvas(bool bInput){ m_bSaveCanvases = bInput; return; };
             
         protected:
             //Actions - Methods that Do Something
@@ -67,10 +67,9 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //Data Members
+            //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            bool bSaveCanvases;
-            
+            bool m_bSaveCanvases;
         }; //End class Visualizer
     } //End namespace Uniformity
 } //End namespace QualityControl

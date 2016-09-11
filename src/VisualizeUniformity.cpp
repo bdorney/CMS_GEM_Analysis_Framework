@@ -25,14 +25,14 @@ using namespace QualityControl::Uniformity;
 
 //Default Constructor
 VisualizeUniformity::VisualizeUniformity(){
-    bSaveCanvases = false;
+    m_bSaveCanvases = false;
     //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Default Constructor
 
 //Constructor with Setup & Detector inputs
 VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet){
     aSetup          = inputSetup;
-    bSaveCanvases   = false;
+    m_bSaveCanvases   = false;
     detMPGD         = inputDet;
     //strCanvIdent = strCanvIdentNoSpec = "Ana";
 } //End Constructor with Setup & Detector inputs
@@ -184,7 +184,7 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, 
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     g2DObs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -312,7 +312,7 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     statObs.hDist->Write();
     statObs.fitDist->Write();
     
@@ -437,7 +437,7 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     hFitSucess2D->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -589,7 +589,7 @@ void VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, std::stri
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     mgraph_Obs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -753,7 +753,7 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     g2DObs->Write();
     
     //Do not close file_InputRootFile it is used elsewhere
@@ -904,7 +904,7 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     
     //Do not close file_InputRootFile it is used elsewhere
     
@@ -1077,7 +1077,7 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     
     //Do not close file_InputRootFile it is used elsewhere
     
@@ -1242,7 +1242,7 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
     //------------------------------------------------------
     dir_Summary->cd();
     canv_DetSum.Write();
-    if (bSaveCanvases) { save2png(canv_DetSum); }
+    if (m_bSaveCanvases) { save2png(canv_DetSum); }
     
     //Do not close file_InputRootFile it is used elsewhere
     
@@ -1441,15 +1441,37 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
     return;
 } //End VisualizeUniformity::storeListOfCanvasesHistoSegmented
 
-TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int iEta, int iPhi, int iSlice){
+TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit){
     //Variable Declaration
-    TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", "clustADCfit").c_str(), "Cluster ADC Fit", 600, 600 );
+    string strName = ""; (bDataOverFit) ? strName = "clustADCDataOverFit" : strName = "clustADCfit";
+    
+    TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str(), "Cluster ADC Fit", 600, 600 );
+    
+    //std::shared_ptr<TH1F> hDataOverFit;
     
     //Draw the histogram and slice
     //------------------------------------------------------
     ret_Canvas->cd();
-    inputSlice.hSlice_ClustADC->Draw();
-    inputSlice.fitSlice_ClustADC->Draw("same");
+    if (!bDataOverFit) { //Case: Data & Fit
+        //Draw Data & Fit
+        inputSlice.hSlice_ClustADC->Draw();
+        inputSlice.fitSlice_ClustADC->Draw("same");
+    } //End Case: Data & Fit
+    else { //Case: Data / Fit
+        //Draw the histogram
+        //std::shared_ptr<TH1F> hDataOverFit = std::make_shared<TH1F>( *( (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() ) ) );
+        hDataOverFit = (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() );
+        hDataOverFit->Divide( inputSlice.fitSlice_ClustADC->get() );
+        hDataOverFit->Draw();
+        
+        //Make the line
+        TLine line_DataOverFit;
+        
+        line_DataOverFit.SetLineStyle(2);
+        line_DataOverFit.SetLineWidth(2);
+        
+        line_DataOverFit.DrawLine( hDataOverFit->GetBinLowEdge(1), 1., hDataOverFit->GetBinLowEdge( hDataOverFit->GetNbinsX() +1 ), 1. );
+    } //End Case: Data / Fit
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -1462,6 +1484,20 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     TLatex latex_SlicePos;
     latex_SlicePos.SetTextSize(0.03);
     latex_SlicePos.DrawLatexNDC(0.55, 0.7, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
+    
+    //Setup the TLatex for Fit Status
+    //------------------------------------------------------
+    TLatex latex_FitStatus;
+    latex_FitStatus.SetTextSize(0.03);
+    latex_FitStatus.DrawLatexNDC(0.55, 0.65, ("Slice Fit = " + strFitStatus ).c_str() );
+    
+    TLatex latex_MinuitCode;
+    latex_MinuitCode.SetTextSize(0.03);
+    latex_MinuitCode.DrawLatexNDC(0.55, 0.6, ("Minuit Status Code = " + getString(inputSlice.iMinuitStatus) ).c_str() );
+    
+    TLatex latex_NormChi2;
+    latex_NormChi2.SetTextSize(0.03);
+    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );
     
     return ret_Canvas;
 } //End VisualizeUniformity::getCanvasSliceFit()

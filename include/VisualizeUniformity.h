@@ -185,7 +185,7 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice);
+            virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit);
             
             //std::vector<float> getObsData(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
             virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);

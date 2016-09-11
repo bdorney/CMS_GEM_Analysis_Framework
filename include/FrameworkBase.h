@@ -51,6 +51,8 @@ namespace QualityControl {
         //Sets the run number
         virtual void setRunNum(int iInput){ iNum_Run = iInput; return; };
         
+        virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
+        
         //Sets the Verbose Output Mode
         virtual void setVerboseMode(bool bInput){ bVerboseMode = bInput; return; };
         
@@ -72,6 +74,9 @@ namespace QualityControl {
         bool bVerboseMode; //flag for level of printing to the user
         
         int iNum_Run;   //Run number
+        
+        //Containers
+        QualityControl::Uniformity::RunSetup rSetup;
         
         QualityControl::Uniformity::AnalysisSetupUniformity aSetup; //Container to define the analysis setup
         

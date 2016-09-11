@@ -49,7 +49,6 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            virtual void setRunParameters(Uniformity::RunSetup inputSetup){ rSetup = inputSetup; return; };
             
         protected:
             
@@ -75,9 +74,6 @@ namespace QualityControl {
             //Analyzers
             AnalyzeResponseUniformityClusters clustAnalyzer;
             AnalyzeResponseUniformityHits hitAnalyzer;
-            
-            //Containers
-            RunSetup rSetup;
             
             //Selectors
             SelectorCluster clustSelector;

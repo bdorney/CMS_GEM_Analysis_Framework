@@ -138,6 +138,8 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
     //Variable Declaration
     bool bExitSuccess = false;
     
+    int iMin, iMax;
+    
     pair<string,string> pair_strParam; //Input file is setup in <Field, Value> pairs; not used here yet but placeholder
     
     string strLine = "";    //Line taken from the input file
@@ -174,6 +176,28 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             if( 0 == pair_strParam.first.compare("FIT_FORMULA") ){ //Case: ADC Spectrum Fit Equation
                 hSetup.strFit_Formula = pair_strParam.second;
             } //End Case: ADC Spectrum Fit Equation
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_SIG") ){ //Case: ADC Spectrum Fit Equation Signal
+                hSetup.strFit_Formula_Sig = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation Signal
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_SIG_PARAM_IDX_RANGE") ){ //Case: ADC Spectrum Fit Equation Bkg Range
+                vec_strList = getCharSeparatedList(pair_strParam.second,',');
+                
+                iMin = stoiSafe(pair_strParam.first, (*std::min_element(vec_strList.begin(), vec_strList.end() ) ) );
+                iMax = stoiSafe(pair_strParam.first, (*std::max_element(vec_strList.begin(), vec_strList.end() ) ) );
+                
+                hSetup.pair_iParamRange_Sig = std::make_pair(iMin, iMax);
+            } //End Case: ADC Spectrum Fit Equation Bkg Range
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_BKG") ){ //Case: ADC Spectrum Fit Equation Background
+                hSetup.strFit_Formula_Bkg = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation Background
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_BKG_PARAM_IDX_RANGE") ){ //Case: ADC Spectrum Fit Equation Bkg Range
+                vec_strList = getCharSeparatedList(pair_strParam.second,',');
+                
+                iMin = stoiSafe(pair_strParam.first, (*std::min_element(vec_strList.begin(), vec_strList.end() ) ) );
+                iMax = stoiSafe(pair_strParam.first, (*std::max_element(vec_strList.begin(), vec_strList.end() ) ) );
+                
+                hSetup.pair_iParamRange_Bkg = std::make_pair(iMin, iMax);
+            } //End Case: ADC Spectrum Fit Equation Bkg Range
             else if( 0 == pair_strParam.first.compare("FIT_OPTION") ){ //Case: ADC Spectrum Fit Equation
                 hSetup.strFit_Option = pair_strParam.second;
                 
@@ -192,7 +216,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
                 hSetup.vec_strFit_ParamLimit_Min = getCharSeparatedList(pair_strParam.second, ',');
             }
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_MAP") ){
-                hSetup.vec_strFit_ParamMeaning = Timing::getCharSeparatedList(pair_strParam.second,',');
+                hSetup.vec_strFit_ParamMeaning = getCharSeparatedList(pair_strParam.second,',');
             }
             else if( 0 == pair_strParam.first.compare("FIT_RANGE") ){
                 hSetup.vec_strFit_Range = getCharSeparatedList(pair_strParam.second, ',');

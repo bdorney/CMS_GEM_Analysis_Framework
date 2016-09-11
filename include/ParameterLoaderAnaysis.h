@@ -10,6 +10,7 @@
 #define ____ParameterLoaderAnaysis__
 
 //C++ Includes
+#include <algorithm>
 #include <fstream>
 #include <stdio.h>
 #include <string>

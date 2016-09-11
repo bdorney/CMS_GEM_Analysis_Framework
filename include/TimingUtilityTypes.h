@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <string>
+#include <utility>
 
 //My Includes
 #include "TimingUtilityOperators.h"
@@ -49,15 +50,20 @@ namespace QualityControl {
             //float fFitRange_xLower; //lower range of fit
             //float fFitRange_xUpper; //upper range of fit
             
-	    float fHisto_BinWidth;//bin width of histo
+            float fHisto_BinWidth;//bin width of histo
             float fHisto_xLower;  //lower x range of histo
             float fHisto_xUpper;  //upper x range of histo
             
             int iTDC_Chan;
             int iHisto_nBins;   //number of bins
             
-            std::string strFit_Formula; //Fit formula
-            std::string strFit_Name;    //
+            std::pair<int,int> pair_iParamRange_Sig;
+            std::pair<int,int> pair_iParamRange_Bkg;
+            
+            std::string strFit_Formula;     //Fit Formula (used)
+            std::string strFit_Formula_Sig; //Fit Formula - Signal (visual aid only)
+            std::string strFit_Formula_Bkg; //Fit Formula - Bkg (visual aid only)
+            std::string strFit_Name;
             std::string strFit_Option;
             
             std::string strHisto_Name;
@@ -82,6 +88,8 @@ namespace QualityControl {
                 iHisto_nBins = 1200;
                 
                 strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
+                strFit_Formula_Sig = strFit_Formula;
+                strFit_Formula_Bkg = "";
                 strFit_Name = "func_Timing";
                 strFit_Option = "R";
                 

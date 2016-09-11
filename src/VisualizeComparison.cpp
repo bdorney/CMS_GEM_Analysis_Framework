@@ -146,6 +146,16 @@ void VisualizeComparison::storeCanvasComparisonHisto(TFile * file_InputRootFile,
     return;
 } //End VisualizeComparison::storeCanvasComparisonHisto()
 
+void VisualizeComparison::setRunParameters(Uniformity::RunSetup inputSetup){
+    rSetup = inputSetup;
+    
+    visualizeComp.setIdentifier(rSetup.strIdent);
+    visualizeComp.setNormalize(rSetup.bDrawNormalized);
+    visualizeComp.setPosFull(rSetup.iEta, rSetup.iPhi, rSetup.iSlice );
+    
+    return;
+} //End VisualizeComparison::setRunParameters()
+
 //Returns a map of identifier (key) and observable histogram
 shared_ptr<TH1F> VisualizeComparison::getObsHisto(TFile * file_InputRootFile, string strObsName){
     //TFile does not manage objects

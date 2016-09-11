@@ -42,6 +42,13 @@ namespace QualityControl {
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            //Uses stored RunSetup object to a draw a given observable onto a single pad
+            virtual void storeCanvasComparisonHisto(){
+                storeCanvasComparisonHisto(rSetup.strFile_Output_Name, rSetup.strFile_Output_Option, rSetup.strObsName);
+                
+                return;
+            };
+            
             //Draws a given observable onto a single pad of canvas
             //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasComparisonHisto(std::string strOutputROOTFileName, std::string strOption, std::string strObsName);
@@ -89,6 +96,7 @@ namespace QualityControl {
                 return;
             };
             
+            virtual void setRunParameters(Uniformity::RunSetup inputSetup);
             
             
         private:
