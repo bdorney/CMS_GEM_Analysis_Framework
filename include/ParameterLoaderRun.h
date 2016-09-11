@@ -11,6 +11,7 @@
 
 //C++ Includes
 #include <algorithm>
+#include <ios>
 #include <iostream>
 #include <fstream>
 #include <map>

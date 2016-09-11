@@ -74,8 +74,10 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         printStreamStatus(fStream);
     }*/
     
-    ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
-    
+    //ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
+    ifstream fStream;
+    setFileStream(strInputSetupFile, fStream, m_bVerboseMode_IO);    
+
     ////Loop Over data Input File
     //------------------------------------------------------
     //Read the file via std::getline().  Obey good coding practice rules:
@@ -509,11 +511,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         //Should we be storing histogram/fit setup parameters?
         if ( 0 == strLine.compare(strSecBegin_Uniformity_Fit) ) { //Case: Fit Setup
             loadAnalysisParametersFits(inputFileStream, aSetupUniformity.histoSetup_clustADC);
-	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
+            continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Fit Setup
         else if( 0 == strLine.compare(strSecBegin_Uniformity_Histo) ){ //Case: Histo Setup
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity);
-	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
+            continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Histo Setup
         
         //Debugging

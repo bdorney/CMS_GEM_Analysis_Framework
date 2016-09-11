@@ -402,10 +402,12 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
                     continue;
                 }
                 
-                TCanvas *canv_SliceSum = (TCanvas*) (getCanvasSliceFit( (*iterSlice).second, iEta, (*iterPhi).first, (*iterSlice).first ) )->Clone();
+                TCanvas *canv_SliceSum = (TCanvas*) (getCanvasSliceFit( (*iterSlice).second, iEta, (*iterPhi).first, (*iterSlice).first, false ) )->Clone();
+                TCanvas *canv_SliceDataOverFit = (TCanvas*) (getCanvasSliceFit( (*iterSlice).second, iEta, (*iterPhi).first, (*iterSlice).first, true ) )->Clone();
                 
                 dir_Slice->cd();
                 canv_SliceSum->Write();
+                canv_SliceDataOverFit->Write();
             } //End Loop Over iSlice
         } //End Loop Over iPhi
     } //End Loop Over iEta
@@ -1444,24 +1446,88 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
 TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit){
     //Variable Declaration
     string strName = ""; (bDataOverFit) ? strName = "clustADCDataOverFit" : strName = "clustADCfit";
+    string strFitStatus; (inputSlice.bFitAccepted) ? strFitStatus = "Passed" : strFitStatus = "Failed";
     
     TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str(), "Cluster ADC Fit", 600, 600 );
     
+    TF1 *func_fitSig, *func_fitBkg;
+    
     //std::shared_ptr<TH1F> hDataOverFit;
+    TH1F *hDataOverFit;
+    
+    TLegend *legSlice;
     
     //Draw the histogram and slice
     //------------------------------------------------------
     ret_Canvas->cd();
     if (!bDataOverFit) { //Case: Data & Fit
+        //Setup Legend
+        legSlice = new TLegend(0.4,0.8,0.7,0.95);
+        legSlice->AddEntry(inputSlice.hSlice_ClustADC.get(), "Data", "LPE" );
+        legSlice->AddEntry(inputSlice.fitSlice_ClustADC.get(), "Fit", "L" );
+        
         //Draw Data & Fit
         inputSlice.hSlice_ClustADC->Draw();
         inputSlice.fitSlice_ClustADC->Draw("same");
+        
+        //Draw the Signal Only?
+        if (aSetup.histoSetup_clustADC.strFit_Formula_Sig.length() > 0) {
+            func_fitSig = new TF1(
+                "func_fitSig",
+                aSetup.histoSetup_clustADC.strFit_Formula_Sig.c_str(),
+                inputSlice.fitSlice_ClustADC->GetXmin(),
+                inputSlice.fitSlice_ClustADC->GetXmax()
+            );
+            
+            //Set the fit parameters from the slice fit
+            for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Sig.first;
+                 i <= aSetup.histoSetup_clustADC.pair_iParamRange_Sig.second;
+                 ++i) {
+                func_fitSig->SetParameter(i, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+            }
+            
+            func_fitSig->SetLineStyle(2);
+            func_fitSig->SetLineWidth(2);
+            func_fitSig->SetLineColor(kGreen);
+            
+            func_fitSig->Draw("same");
+            legSlice->AddEntry(func_fitSig, "Fit - Signal Only", "L");
+        }
+        
+        //Draw the Background Only?
+        if (aSetup.histoSetup_clustADC.strFit_Formula_Bkg.length() > 0) {
+            func_fitSig = new TF1(
+                "func_fitBkg",
+                aSetup.histoSetup_clustADC.strFit_Formula_Bkg.c_str(),
+                inputSlice.fitSlice_ClustADC->GetXmin(),
+                inputSlice.fitSlice_ClustADC->GetXmax()
+            );
+            
+            //Set the fit parameters from the slice fit
+            for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.first;
+                 i <= aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.second;
+                 ++i) {
+                func_fitBkg->SetParameter(i, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+            }
+            
+            func_fitBkg->SetLineStyle(2);
+            func_fitBkg->SetLineWidth(2);
+            func_fitBkg->SetLineColor(kBlue);
+            
+            func_fitBkg->Draw("same");
+            legSlice->AddEntry(func_fitBkg, "Fit - Background Only", "L");
+        }
+        
+        //Draw the legend
+        legSlice->Draw("same");
     } //End Case: Data & Fit
     else { //Case: Data / Fit
         //Draw the histogram
         //std::shared_ptr<TH1F> hDataOverFit = std::make_shared<TH1F>( *( (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() ) ) );
         hDataOverFit = (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() );
-        hDataOverFit->Divide( inputSlice.fitSlice_ClustADC->get() );
+        
+        hDataOverFit->GetYaxis()->SetTitle("Data Over Fit #left(A.U.#right)");
+        hDataOverFit->Divide( inputSlice.fitSlice_ClustADC.get() );
         hDataOverFit->Draw();
         
         //Make the line
@@ -1490,15 +1556,15 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     TLatex latex_FitStatus;
     latex_FitStatus.SetTextSize(0.03);
     latex_FitStatus.DrawLatexNDC(0.55, 0.65, ("Slice Fit = " + strFitStatus ).c_str() );
-    
+
     TLatex latex_MinuitCode;
     latex_MinuitCode.SetTextSize(0.03);
     latex_MinuitCode.DrawLatexNDC(0.55, 0.6, ("Minuit Status Code = " + getString(inputSlice.iMinuitStatus) ).c_str() );
-    
+
     TLatex latex_NormChi2;
     latex_NormChi2.SetTextSize(0.03);
-    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );
-    
+    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );	
+
     return ret_Canvas;
 } //End VisualizeUniformity::getCanvasSliceFit()
 

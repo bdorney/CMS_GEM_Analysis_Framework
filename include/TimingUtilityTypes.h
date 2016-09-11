@@ -80,22 +80,23 @@ namespace QualityControl {
             HistoSetup(){
                 bFit = bFit_AutoRanging = bIsTrig = false;
                 
-		fHisto_BinWidth = 1;
+                fHisto_BinWidth = 1;
                 fHisto_xLower = 0;
                 fHisto_xUpper = 1200;
                 
                 iTDC_Chan = 0;
                 iHisto_nBins = 1200;
                 
-                strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
-                strFit_Formula_Sig = strFit_Formula;
+                //strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
+                strFit_Formula = "";
+                strFit_Formula_Sig = "";
                 strFit_Formula_Bkg = "";
-                strFit_Name = "func_Timing";
+                strFit_Name = "";
                 strFit_Option = "R";
                 
-                strHisto_Name = "histo_Timing";
-                strHisto_Title_X = "time #left(ns#right)";
-                strHisto_Title_Y = "Counts #left(N/ns#right)";
+                strHisto_Name = "";
+                strHisto_Title_X = "";
+                strHisto_Title_Y = "";
             }
         }; //End HistoSetup
         

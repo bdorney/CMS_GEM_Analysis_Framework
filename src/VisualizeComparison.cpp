@@ -99,6 +99,8 @@ void VisualizeComparison::storeCanvasComparisonHisto(TFile * file_InputRootFile,
     for (auto iterObs = map_hObs.begin(); iterObs != map_hObs.end(); ++iterObs) { //Loop Over map_hObs
         int iIdx = std::distance(map_hObs.begin(), iterObs );
         
+	(*iterObs).second->SetFillColor( getCyclicColor(iIdx) );
+	(*iterObs).second->SetFillStyle( 3244 );
         (*iterObs).second->SetLineColor( getCyclicColor(iIdx) );
         (*iterObs).second->SetMarkerColor( getCyclicColor(iIdx) );
         legObs->AddEntry( (*iterObs).second.get(), (*iterObs).first.c_str(), "LPE" );
@@ -136,7 +138,7 @@ void VisualizeComparison::storeCanvasComparisonHisto(TFile * file_InputRootFile,
     //------------------------------------------------------
     dir_ObsName->cd();
     canv_ObsComp.Write();
-    if (bSaveCanvases) { save2png(canv_ObsComp); }
+    if (m_bSaveCanvases) { save2png(canv_ObsComp); }
     for (auto iterObs = map_hObs.begin(); iterObs != map_hObs.end(); ++iterObs) { //Loop Over map_hObs
         (*iterObs).second->Write();
     } //End Loop Over map_hObs
@@ -149,9 +151,9 @@ void VisualizeComparison::storeCanvasComparisonHisto(TFile * file_InputRootFile,
 void VisualizeComparison::setRunParameters(Uniformity::RunSetup inputSetup){
     rSetup = inputSetup;
     
-    visualizeComp.setIdentifier(rSetup.strIdent);
-    visualizeComp.setNormalize(rSetup.bDrawNormalized);
-    visualizeComp.setPosFull(rSetup.iEta, rSetup.iPhi, rSetup.iSlice );
+    setIdentifier(rSetup.strIdent);
+    setNormalize(rSetup.bDrawNormalized);
+    setPosFull(rSetup.iEta, rSetup.iPhi, rSetup.iSlice );
     
     return;
 } //End VisualizeComparison::setRunParameters()

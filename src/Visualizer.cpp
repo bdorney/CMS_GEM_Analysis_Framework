@@ -14,7 +14,7 @@ using namespace QualityControl::Uniformity;
 
 //Default Constructor
 Visualizer::Visualizer(){
-    bSaveCanvases = false;
+    m_bSaveCanvases = false;
 }
 
 //Saves inputCanv as a *.png file

@@ -49,8 +49,10 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
         printStreamStatus(file_AmoreMapping);
     }*/
     
-    ifstream file_AmoreMapping = getFileStream(strInputMappingFileName, m_bVerboseMode_IO);
-    
+    //ifstream file_AmoreMapping = getFileStream(strInputMappingFileName, m_bVerboseMode_IO);
+    ifstream file_AmoreMapping;
+    setFileStream(strInputMappingFileName, file_AmoreMapping, m_bVerboseMode_IO);    
+
     //Loop Over data Input File
     //------------------------------------------------------
     //Read the file via std::getline().  Obey good coding practice rules:

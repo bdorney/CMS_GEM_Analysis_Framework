@@ -30,6 +30,8 @@
             3.a.i           Helper Script - Run Mode: Grid
             3.a.ii          Helper Script - Run Mode: Rerun
             3.a.iii         Helper Script - Run Mode: Series
+	    3.a.iv	    Helper Script - Run Mode: Comparison
+	    3.a.v	    Helper Script - Merge Selected Files
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
@@ -331,6 +333,13 @@
 
             NOTE: Modications to config/configRun_Template_Series.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
+
+            # 3.a.iv  Helper Script - Run Mode: Comparison
+            # --------------------------------------------------------
+
+            # 3.a.v   Helper Script - Merge Selected Files
+            # --------------------------------------------------------
+
 
 # 4. Documentation
 # ========================================================
