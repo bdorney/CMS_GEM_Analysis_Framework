@@ -31,6 +31,7 @@
 #include "UniformityUtilityTypes.h"
 
 //ROOT Includes
+//#include "Math/MinimizerOptions.h"
 #include "TDirectory.h"
 #include "TF1.h"
 #include "TFitResult.h"
@@ -41,6 +42,7 @@
 //#include "TPolyMarker.h"
 #include "TROOT.h"
 #include "TSpectrum.h"
+#include "TVirtualFitter.h"
 
 //C++ Mathematical Expression Toolkit Library
 //By Arash Partow; http://www.partow.net/programming/exprtk/index.html

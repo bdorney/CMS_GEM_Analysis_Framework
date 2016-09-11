@@ -261,8 +261,9 @@ int main( int argc_, char * argv_[] ){
         //Load the Input Config File
         //------------------------------------------------------
         //file_Config.open( vec_strInputArgs[1].c_str() );
-        file_Config = loaderRun.getFileStream( vec_strInputArgs[1], bVerboseMode );
-        
+        //file_Config = loaderRun.getFileStream( vec_strInputArgs[1], bVerboseMode );
+	loaderRun.setFileStream( vec_strInputArgs[1], file_Config, bVerboseMode );
+
         //Check to see if the config file opened successfully
         if (!file_Config.is_open()) {
             perror( ("main() - error while opening file: " + vec_strInputArgs[1]).c_str() );
@@ -314,7 +315,7 @@ int main( int argc_, char * argv_[] ){
     else { //Case: amoreSRS Input
         vec_pairedRunList = loaderRun.getPairedRunList(file_Config, rSetup.strIdent, bVerboseMode);
         
-        //Check if
+	//Check if
         if (vec_pairedRunList.size() == 0) {
             cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
             cout<<"\tMaybe you forgot to have a field 'RunX' in the input filenames?\n";
@@ -355,6 +356,7 @@ int main( int argc_, char * argv_[] ){
         else {                          anaInterface.analyzeInput(vec_pairedRunList); }
     } //End Run Mode: Analysis
     else if ( 0 == rSetup.strRunMode.compare("COMPARISON") ){ //Run Mode: Comparison
+	visualizeComp.setDrawOption(rSetup.strDrawOption);
         visualizeComp.setIdentifier(rSetup.strIdent);
         visualizeComp.setInputFiles(vec_strInputFiles);
         visualizeComp.setNormalize(rSetup.bDrawNormalized);

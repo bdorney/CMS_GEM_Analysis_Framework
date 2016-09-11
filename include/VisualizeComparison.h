@@ -58,7 +58,10 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets teh input identifier
+	    //Sets the draw option
+	    virtual void setDrawOption(std::string strInput){ m_strDrawOption = strInput; return; };
+
+            //Sets the input identifier
             virtual void setIdentifier(std::string strInput){ m_strIdent = strInput; return; };
             
             //Sets the input files to be considered
@@ -114,7 +117,7 @@ namespace QualityControl {
             
             int m_iEta, m_iPhi, m_iSlice;
             
-            std::string m_strIdent;
+            std::string m_strIdent, m_strDrawOption;
             
             std::vector<std::string> m_vec_strFileList;
             

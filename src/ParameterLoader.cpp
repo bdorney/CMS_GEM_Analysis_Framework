@@ -44,7 +44,9 @@ void ParameterLoader::loadParameters(std::ifstream &file_Input, bool bVerboseMod
     return;
 } //End
 
-ifstream ParameterLoader::getFileStream(std::string strInputSetupFile, bool bVerboseMode){
+//Doesn't work in gcc < 5.0 since ifstream object is by default deleted implicitly
+//No ROOT version yet compiled on gcc >= 5.0
+/*ifstream ParameterLoader::getFileStream(std::string strInputSetupFile, bool bVerboseMode){
     //Open the Data File
     //------------------------------------------------------
     if (bVerboseMode) { //Case: User Requested Verbose Error Messages - I/O
@@ -61,7 +63,7 @@ ifstream ParameterLoader::getFileStream(std::string strInputSetupFile, bool bVer
     }
     
     return ret_fStream;
-} //End ParameterLoader::getFileStream()
+}*/ //End ParameterLoader::getFileStream()
 
 //Maps a run number, found in an input filename, to an input run found in the input config file
 //Only those input files having a run number will be returned
@@ -76,7 +78,7 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
     string strLine = "";
     
     vector<std::pair<int, string> > vec_retPairedRuns;
-    
+
     //Loop Through Data File
     //Check for faults immediately afterward
     //------------------------------------------------------
@@ -84,6 +86,8 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
         //Skip commented lines
         if (strLine.compare(0,1,"#") == 0) continue;
         
+	//cout<<"strLine = " << strLine << endl;
+
         //Check for start of run list header
         if ( strLine.compare( m_strSecBegin_RunList ) == 0 ) { //Case: Run list header
             
@@ -94,8 +98,8 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
                 //Has the header ended?
                 if ( strLine.compare( m_strSecEnd_RunList ) == 0 ) { //Case: End of run list header
                     if (bVerboseMode) { //Case: User Requested Verbose Input/Output
-                        cout<<"ParameterLoader::getRunMap(): End of run list header reached!\n";
-                        cout<<"ParameterLoader::getRunMap(): The following runs will be analyzed:\n";
+                        cout<<"ParameterLoader::getPairedRunList(): End of run list header reached!\n";
+                        cout<<"ParameterLoader::getPairedRunList(): The following runs will be analyzed:\n";
                         
                         for (auto iterPairedRuns = vec_retPairedRuns.begin(); iterPairedRuns != vec_retPairedRuns.end(); ++iterPairedRuns) { //Loop over stored runs
                             cout<<"\t"<<"Run"<<(*iterPairedRuns).first<<"\t"<<(*iterPairedRuns).second<<endl;
@@ -114,12 +118,12 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
                     vec_retPairedRuns.push_back(std::make_pair(iNum_Run, strLine ) );
                 } //End Case: Success, Run Set!
                 else{ //End Case: Input not understood/not parsed correctly
-                    cout<<"ParameterLoader::getRunMap() - ERROR!!! input file:\n";
+                    cout<<"ParameterLoader::getPairedRunList() - ERROR!!! input file:\n";
                     cout<<"\t"<<strLine.c_str()<<endl;
                     
-                    cout<<"ParameterLoader::getRunMap(): Run number not found/parsed from filename!\n";
-                    cout<<"ParameterLoader::getRunMap(): you must have the field 'RunX' in the filename, separated by underscores '_', for some unique integer X\n";
-                    cout<<"ParameterLoader::getRunMap(): This file will be skipped!!! Please cross-check input file!!!\n";
+                    cout<<"ParameterLoader::getPairedRunList(): Run number not found/parsed from filename!\n";
+                    cout<<"ParameterLoader::getPairedRunList(): you must have the field 'RunX' in the filename, separated by underscores '_', for some unique integer X\n";
+                    cout<<"ParameterLoader::getPairedRunList(): This file will be skipped!!! Please cross-check input file!!!\n";
                     
                     continue;
                 } //Case: Input not understood/not parsed correctly
@@ -129,7 +133,7 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
         if (bHeaderEnd) break;
     } //End Loop over input file
     if ( file_Input.bad() && bVerboseMode) {
-        perror( "getRunList(): error while reading config file" );
+        perror( "ParameterLoader::getPairedRunList(): error while reading config file" );
         Timing::printStreamStatus(file_Input);
     }
     
@@ -191,6 +195,34 @@ vector<string> ParameterLoader::getRunList(ifstream &file_Input, bool bVerboseMo
     
     return vec_strRetRuns;
 } //End ParameterLoader::getRunList()
+
+void ParameterLoader::setFileStream(std::string strInputSetupFile, ifstream &file_Input, bool bVerboseMode){
+    //Open the Data File
+    //------------------------------------------------------
+    if (bVerboseMode) { //Case: User Requested Verbose Error Messages - I/O
+        printClassMethodMsg("ParameterLoader","setFileStream", ("trying to open and read: " + strInputSetupFile).c_str() );
+    } //End Case: User Requested Verbose Error Messages - I/O
+    
+    if ( !file_Input.is_open() ) {
+	file_Input.open( strInputSetupFile.c_str() );
+    }
+    else {
+	if ( bVerboseMode ) {
+       		printClassMethodMsg("ParameterLoader","setFileStream", ("file: " + strInputSetupFile + " already open, doing nothing").c_str() );
+	}
+
+	return;
+    }
+    
+    //Check to See if Data File Opened Successfully
+    //------------------------------------------------------
+    if (!file_Input.is_open() && bVerboseMode) {
+        perror( ("Uniformity::ParameterLoader::setFileStream(): error while opening file: " + strInputSetupFile).c_str() );
+        printStreamStatus(file_Input);
+    }
+    
+    return;
+} //End ParameterLoader::getFileStream()
 
 int ParameterLoader::getRunNumber(std::string strRunName, string strIdent){
     //Variable Declaration

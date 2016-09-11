@@ -107,8 +107,6 @@ namespace QualityControl {
             bool bAnaStep_Visualize;            //true -> make summary plots at end of analysis; false -> do not
             
             //Setup - Comparison
-            bool bDrawNormalized;               //Comparison plots drawn normalized
-            
             std::string strIdent;               //Unique identifier in input runs
             std::string strObsName;             //Name of Observable to be compared across inputs
             
@@ -129,9 +127,12 @@ namespace QualityControl {
             std::string strFile_Output_Option;  //Option for TFile: CREATE, RECREATE, UPDATE, etc...
             
             //Setup - Visualizer
+	    bool bDrawNormalized;               //Comparison plots drawn normalized
             bool bVisPlots_PhiLines;            //true -> summary plots have phi lines segmenting sectors; false -> they do not
             bool bVisPlots_AutoSaving;          //true -> automatically save canvases during visualize step; false -> do not
             
+	    std::string strDrawOption;
+
             //Default constructor
             RunSetup(){
                 //Setup - Master Mode
@@ -142,7 +143,6 @@ namespace QualityControl {
                 bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
                 
                 //Setup - Comparison
-                bDrawNormalized = false;
                 strIdent = "RUN";
                 strObsName = "CLUSTADC";
                 
@@ -164,8 +164,11 @@ namespace QualityControl {
                 strFile_Output_Option = "RECREATE";
                 
                 //Setup - Visualizer
+                bDrawNormalized = false;
                 bVisPlots_PhiLines = true;
                 bVisPlots_AutoSaving = false;
+
+		strDrawOption = "E1";
             } //End Default constructor
         }; //End RunSetup
         
@@ -388,9 +391,13 @@ namespace QualityControl {
         
         //Defines a slice of a phi sector within the detector
         struct SectorSlice{
+	    bool bFitAccepted;
+
             float fPos_Center;    //Center of the slice;
             float fWidth;       //Width of the slice;
             
+	    int iMinuitStatus;	//Minuit Status Code
+
             //One dimensional fits
             std::shared_ptr<TF1> fitSlice_ClustADC;
             
@@ -404,14 +411,20 @@ namespace QualityControl {
             
             //Default Constructor
             SectorSlice(){
+		bFitAccepted = false;
                 fPos_Center = fWidth = -1;
+		iMinuitStatus  = 0;
             } //End Default Constructor
             
             //Copy Constructor
             SectorSlice(const SectorSlice& other){
+		bFitAccepted = other.bFitAccepted;
+
                 fPos_Center = other.fPos_Center;
                 fWidth      = other.fWidth;
                 
+		iMinuitStatus  = other.iMinuitStatus;
+
                 //Deep copy
                 if( other.fitSlice_ClustADC != NULL )   fitSlice_ClustADC   = std::make_shared<TF1>( *other.fitSlice_ClustADC.get() );
                 if( other.hSlice_ClustADC != NULL )     hSlice_ClustADC     = std::make_shared<TH1F>( *other.hSlice_ClustADC.get() );
@@ -420,9 +433,13 @@ namespace QualityControl {
             //Assignment operator
             SectorSlice & operator=(const SectorSlice & other){
                 if (this != &other ) { //Protects against invalid self-assignment
+		    bFitAccepted= other.bFitAccepted;
+
                     fPos_Center = other.fPos_Center;
                     fWidth      = other.fWidth;
                     
+		    iMinuitStatus  = other.iMinuitStatus;
+
                     //Deep copy
                     if( other.fitSlice_ClustADC != NULL )   fitSlice_ClustADC   = std::make_shared<TF1>( *other.fitSlice_ClustADC.get() );
                     if( other.hSlice_ClustADC != NULL )     hSlice_ClustADC     = std::make_shared<TH1F>( *other.hSlice_ClustADC.get() );

@@ -51,22 +51,28 @@ do
 			if [ $i -gt 999 ]; then
 				LIST_FILES="$LIST_FILES $(ls *Run$i*Ana.root)"
 			elif [ $i -gt 99 ]; then
-				LIST_FILES="$LIST_FILES $(ls *Run0$i*Ana.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run0$i*Ana.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run$i*Ana.root)"
 			elif [ $i -gt 9 ]; then
-				LIST_FILES="$LIST_FILES $(ls *Run00$i*Ana.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run00$i*Ana.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run0$i*Ana.root)"
 			else
-				LIST_FILES="$LIST_FILES $(ls *Run000$i*Ana.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run000$i*Ana.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run00$i*Ana.root)"
 			fi
 		done
 	else
 		if [ $RANGE_FIRST -gt 999 ]; then
 			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*Ana.root)"
 		elif [ $RANGE_FIRST -gt 99 ]; then
-			LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*Ana.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*Ana.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*Ana.root)"
 		elif [ $RANGE_FIRST -gt 9 ]; then
-			LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*Ana.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*Ana.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*Ana.root)"
 		else
-			LIST_FILES="$LIST_FILES $(ls *Run000$RANGE_FIRST*Ana.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run000$RANGE_FIRST*Ana.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*Ana.root)"
 		fi
 
 	fi

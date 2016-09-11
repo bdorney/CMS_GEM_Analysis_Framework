@@ -55,9 +55,11 @@ void ParameterLoaderRun::loadParameters(ifstream &file_Input, bool bVerboseMode,
         } //End Case: Reached End of Interest
         else if ( 0 == strLine.compare(m_strSecBegin_RunInfo ) ){ //Case: Run Info Header
             loadParametersRun(file_Input, bVerboseMode, inputRunSetup);
+	    continue;
         } //End Case: Run Info Header
         else if ( 0 == strLine.compare(m_strSecBegin_CompInfo ) ){ //Case: Comp Info Header
             loadParametersCompare(file_Input, bVerboseMode, inputRunSetup);
+	    continue;
         } //End Case: Comp Info Header
         else { //Case: Unsorted Parameters
             
@@ -77,8 +79,10 @@ void ParameterLoaderRun::loadParameters(ifstream &file_Input, bool bVerboseMode,
     
     inputRunSetup.bLoadSuccess = true;
     
+	//cout<<"ParameterLoaderRun::loadParameters() - strLine = " << strLine << endl;
+
     return;
-} //End ParameterLoaderRun::loadRunParameters()
+} //End ParameterLoaderRun::loadParameters()
 
 //Sets up inputRunSetup for running in analysis mode
 void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
@@ -86,7 +90,9 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
     bool bExitSuccess = false;
     
     std::pair<string,string> pair_strParam;
-    
+
+    std::streampos spos_Previous; //previous stream position    
+
     string strLine = "";
     
     if (bVerboseMode) { //Case: User Requested Verbose Error Messages - I/O
@@ -110,6 +116,7 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
                 cout<<"ParameterLoaderRun::loadParametersRun(): End of run info header reached!\n";
             } //End Case: User Requested Verbose Input/Output
             
+	    file_Input.seekg(spos_Previous);
             break;
         }
         
@@ -137,6 +144,9 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             }
             else if ( pair_strParam.first.compare("VISUALIZE_PLOTS") == 0 ) {
                 inputRunSetup.bAnaStep_Visualize = convert2bool(pair_strParam.second, bExitSuccess);
+            }
+	    else if ( pair_strParam.first.compare("INPUT_IDENTIFIER") == 0 ) {
+                inputRunSetup.strIdent = pair_strParam.second;
             }
             else if ( pair_strParam.first.compare("INPUT_IS_FRMWRK_OUTPUT") == 0 ) {
                 inputRunSetup.bInputFromFrmwrk = convert2bool(pair_strParam.second, bExitSuccess);
@@ -176,12 +186,18 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             cout<<"\t"<<strLine<<endl;
             cout<<"ParameterLoaderRun::loadParametersRun(): did not parse correctly, please cross-check input file\n";
         } //End Case: Input line did NOT parse correctly
+
+	//Store previous stream position so main loop over file exits 
+	//After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly 
+	spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && bVerboseMode) {
         perror( "ParameterLoaderRun::loadParametersRun(): error while reading config file" );
         printStreamStatus(file_Input);
     }
     
+	//cout<<"ParameterLoaderRun::loadParametersRun() - strLine = " << strLine << endl;
+
     return;
 } //End ParameterLoaderRun::loadParametersRun()
 
@@ -191,7 +207,9 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
     bool bExitSuccess = false;
     
     std::pair<string,string> pair_strParam;
-    
+
+    std::streampos spos_Previous; //previous stream position
+
     string strLine = "";
     
     if (bVerboseMode) { //Case: User Requested Verbose Error Messages - I/O
@@ -218,6 +236,7 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
                 cout<<"ParameterLoaderRun::loadParametersRun(): End of compare info header reached!\n";
             } //End Case: User Requested Verbose Input/Output
             
+	    file_Input.seekg(spos_Previous);
             break;
         }
         
@@ -259,6 +278,9 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
             else if ( pair_strParam.first.compare("VISUALIZE_DRAWNORMALIZED") == 0 ) {
                 inputRunSetup.bVisPlots_PhiLines = convert2bool(pair_strParam.second, bExitSuccess);
             }
+            else if ( pair_strParam.first.compare("VISUALIZE_DRAWOPTION") == 0 ) {
+                inputRunSetup.strDrawOption = pair_strParam.second;
+            }
             else if ( pair_strParam.first.compare("VISUALIZE_DRAWPHILINES") == 0 ) {
                 inputRunSetup.bVisPlots_PhiLines = convert2bool(pair_strParam.second, bExitSuccess);
             }
@@ -273,6 +295,10 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
             cout<<"\t"<<strLine<<endl;
             cout<<"ParameterLoaderRun::loadParametersRun(): did not parse correctly, please cross-check input file\n";
         } //End Case: Input line did NOT parse correctly
+
+	//Store previous stream position so main loop over file exits 
+	//After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly 
+	spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && bVerboseMode) {
         perror( "ParameterLoaderRun::loadParametersRun(): error while reading config file" );

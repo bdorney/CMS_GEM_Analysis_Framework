@@ -74,8 +74,10 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         printStreamStatus(fStream);
     }*/
     
-    ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
-    
+    //ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
+    ifstream fStream;
+    setFileStream(strInputSetupFile, fStream, m_bVerboseMode_IO);    
+
     ////Loop Over data Input File
     //------------------------------------------------------
     //Read the file via std::getline().  Obey good coding practice rules:

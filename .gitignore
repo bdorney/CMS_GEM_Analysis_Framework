@@ -51,3 +51,4 @@ data/*
 #*PFP.txt
 #setup_files/Production_ConfigFile.txt
 *DeadStripList.txt
+config/*.cfg_*

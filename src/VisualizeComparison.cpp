@@ -99,6 +99,8 @@ void VisualizeComparison::storeCanvasComparisonHisto(TFile * file_InputRootFile,
     for (auto iterObs = map_hObs.begin(); iterObs != map_hObs.end(); ++iterObs) { //Loop Over map_hObs
         int iIdx = std::distance(map_hObs.begin(), iterObs );
         
+	(*iterObs).second->SetFillColor( getCyclicColor(iIdx) );
+	(*iterObs).second->SetFillStyle( 3244 );
         (*iterObs).second->SetLineColor( getCyclicColor(iIdx) );
         (*iterObs).second->SetMarkerColor( getCyclicColor(iIdx) );
         legObs->AddEntry( (*iterObs).second.get(), (*iterObs).first.c_str(), "LPE" );

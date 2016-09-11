@@ -170,6 +170,10 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 //Perform Fit & Store the Result
                 TFitResult fitRes_ADC;
                 
+		TVirtualFitter::SetMaxIterations(10000);
+
+		//cout<<"TVirtualFitter::GetMaxIterations() = " << TVirtualFitter::GetMaxIterations() << endl;
+		//cout<<"ROOT::Math::MinimizerOptions::DefaultMaxFunctionCalls() = " << ROOT::Math::MinimizerOptions::DefaultMaxFunctionCalls() << endl;
                 if (vec_fFitRange.size() > 1) { //Case: Fit within the user specific range
                     fMin = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
                     fMax = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
@@ -232,10 +236,12 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
                 //bIsQuality = ( isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPkPos ) && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth ) );
+		(*iterSlice).second.iMinuitStatus  = fitRes_ADC.Status();
                 if ( fitRes_ADC.IsValid()
                     && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPk )
                   /*&& isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth )*/ ) { //Case: Valid Fit!!!
                     (*iterPhi).second.fNFitSuccess++;
+		    (*iterSlice).second.bFitAccepted = true;
 
                     //Record observables for the summary stat (Used for checking uniformity)
                     inputDet.mset_fClustADC_Fit_PkPos.insert( fPkPos );

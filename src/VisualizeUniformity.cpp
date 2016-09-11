@@ -1443,6 +1443,8 @@ void VisualizeUniformity::storeListOfCanvasesHistoSegmented(TFile * file_InputRo
 
 TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int iEta, int iPhi, int iSlice){
     //Variable Declaration
+    string strFitStatus; (inputSlice.bFitAccepted) ? strFitStatus = "Passed" : strFitStatus = "Failed";
+
     TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", "clustADCfit").c_str(), "Cluster ADC Fit", 600, 600 );
     
     //Draw the histogram and slice
@@ -1463,6 +1465,20 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     latex_SlicePos.SetTextSize(0.03);
     latex_SlicePos.DrawLatexNDC(0.55, 0.7, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
     
+    //Setup the TLatex for Fit Status
+    //------------------------------------------------------
+    TLatex latex_FitStatus;
+    latex_FitStatus.SetTextSize(0.03);
+    latex_FitStatus.DrawLatexNDC(0.55, 0.65, ("Slice Fit = " + strFitStatus ).c_str() );
+
+    TLatex latex_MinuitCode;
+    latex_MinuitCode.SetTextSize(0.03);
+    latex_MinuitCode.DrawLatexNDC(0.55, 0.6, ("Minuit Status Code = " + getString(inputSlice.iMinuitStatus) ).c_str() );
+
+    TLatex latex_NormChi2;
+    latex_NormChi2.SetTextSize(0.03);
+    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );	
+
     return ret_Canvas;
 } //End VisualizeUniformity::getCanvasSliceFit()
 
