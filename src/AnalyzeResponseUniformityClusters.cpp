@@ -242,10 +242,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                   /*&& isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth )*/ ) { //Case: Valid Fit!!!
                     (*iterPhi).second.fNFitSuccess++;
 		    (*iterSlice).second.bFitAccepted = true;
-
-                    //Record observables for the summary stat (Used for checking uniformity)
-                    inputDet.mset_fClustADC_Fit_PkPos.insert( fPkPos );
-                    inputDet.mset_fClustADC_Fit_PkRes.insert( fPkWidth / fPkPos );
                     
                     //Store Fit parameters - NormChi2
                     fNormChi2 = (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF();
@@ -261,6 +257,11 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                     //Store Fit parameters - Peak Resolution (from fit)
                     (*iterEta).second.gEta_ClustADC_Fit_PkRes->SetPoint(iPoint, (*iterSlice).second.fPos_Center, fPkWidth / fPkPos );
                     (*iterEta).second.gEta_ClustADC_Fit_PkRes->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, sqrt( pow( fPkWidthErr / fPkPos, 2) + pow( ( fPkPosErr * fPkWidth ) / ( fPkPos * fPkPos), 2 ) ) );
+
+                    //Record observables for the summary stat (Used for checking uniformity)
+                    inputDet.mset_fClustADC_Fit_NormChi2.insert( fNormChi2 );
+                    inputDet.mset_fClustADC_Fit_PkPos.insert( fPkPos );
+                    inputDet.mset_fClustADC_Fit_PkRes.insert( fPkWidth / fPkPos );
                 } //End Case: Valid Fit!!!
                 else{ //Case: Invalid Fit (minimizer did not find minumum)
                     //Store Fit parameters - Peak Position (from fit); when failing
@@ -272,6 +273,9 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
     } //End Loop Over iEta Sectors
     
     //Calculate statistics
+    if ( inputDet.mset_fClustADC_Fit_NormChi2.size() > 0 ) { //Check if stored fit positions exist
+        calcStatistics( inputDet.statClustADC_Fit_NormChi2, inputDet.mset_fClustADC_Fit_NormChi2, "ResponseFitNormChi2" );
+    } //End Check if stored fit positions exist
     if ( inputDet.mset_fClustADC_Fit_PkPos.size() > 0 ) { //Check if stored fit positions exist
         calcStatistics( inputDet.statClustADC_Fit_PkPos, inputDet.mset_fClustADC_Fit_PkPos, "ResponseFitPkPos" );
     } //End Check if stored fit positions exist

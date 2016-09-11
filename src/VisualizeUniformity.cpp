@@ -1483,7 +1483,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
             for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Sig.first;
                  i <= aSetup.histoSetup_clustADC.pair_iParamRange_Sig.second;
                  ++i) {
-                func_fitSig->SetParameter(i, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+                func_fitSig->SetParameter(i-aSetup.histoSetup_clustADC.pair_iParamRange_Sig.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
             }
             
             func_fitSig->SetLineStyle(2);
@@ -1496,7 +1496,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         
         //Draw the Background Only?
         if (aSetup.histoSetup_clustADC.strFit_Formula_Bkg.length() > 0) {
-            func_fitSig = new TF1(
+            func_fitBkg = new TF1(
                 "func_fitBkg",
                 aSetup.histoSetup_clustADC.strFit_Formula_Bkg.c_str(),
                 inputSlice.fitSlice_ClustADC->GetXmin(),
@@ -1507,7 +1507,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
             for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.first;
                  i <= aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.second;
                  ++i) {
-                func_fitBkg->SetParameter(i, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+                func_fitBkg->SetParameter(i-aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
             }
             
             func_fitBkg->SetLineStyle(2);
@@ -1526,7 +1526,9 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         //std::shared_ptr<TH1F> hDataOverFit = std::make_shared<TH1F>( *( (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() ) ) );
         hDataOverFit = (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() );
         
+	hDataOverFit->GetXaxis()->SetRangeUser(inputSlice.fitSlice_ClustADC->GetXmin(), inputSlice.fitSlice_ClustADC->GetXmax() );
         hDataOverFit->GetYaxis()->SetTitle("Data Over Fit #left(A.U.#right)");
+	hDataOverFit->GetYaxis()->SetRangeUser(0.5,1.5);
         hDataOverFit->Divide( inputSlice.fitSlice_ClustADC.get() );
         hDataOverFit->Draw();
         
@@ -1536,7 +1538,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         line_DataOverFit.SetLineStyle(2);
         line_DataOverFit.SetLineWidth(2);
         
-        line_DataOverFit.DrawLine( hDataOverFit->GetBinLowEdge(1), 1., hDataOverFit->GetBinLowEdge( hDataOverFit->GetNbinsX() +1 ), 1. );
+        line_DataOverFit.DrawLine( inputSlice.fitSlice_ClustADC->GetXmin(), 1., inputSlice.fitSlice_ClustADC->GetXmax(), 1. );
     } //End Case: Data / Fit
     
     //Setup the TLatex for "CMS Preliminary"
@@ -1575,7 +1577,10 @@ SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
     std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
     
     //=======================Fit Result Parameters=======================
-    if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
+    if (0 == strObsName.compare("RESPONSEFITCHI2") ) { //Case: Fit Pk Pos
+        ret_stat = detMPGD.getStatNormChi2();
+    } //End Case: Fit Pk Pos
+    else if (0 == strObsName.compare("RESPONSEFITPKPOS") ) { //Case: Fit Pk Pos
         ret_stat = detMPGD.getStatPkPos();
     } //End Case: Fit Pk Pos
     else if (0 == strObsName.compare("RESPONSEFITPKRES") ) { //Case: Fit Pk Resolution

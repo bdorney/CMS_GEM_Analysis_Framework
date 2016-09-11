@@ -53,12 +53,11 @@ namespace QualityControl {
                 strDetName                  = other.strDetName;
                 strDetNameNoSpecChar        = other.strDetNameNoSpecChar;
                 
-                //vec_allADCPeaks           = other.vec_allADCPeaks;
-                
+                mset_fClustADC_Fit_NormChi2 = other.mset_fClustADC_Fit_NormChi2;                
                 mset_fClustADC_Fit_PkPos    = other.mset_fClustADC_Fit_PkPos;
                 mset_fClustADC_Fit_PkRes    = other.mset_fClustADC_Fit_PkRes;
-                //mset_fClustADC_Spec_PkPos   = other.mset_fClustADC_Spec_PkPos;
-                
+
+                statClustADC_Fit_NormChi2   = other.statClustADC_Fit_NormChi2;                
                 statClustADC_Fit_PkPos      = other.statClustADC_Fit_PkPos;
                 statClustADC_Fit_PkRes      = other.statClustADC_Fit_PkRes;
 
@@ -84,13 +83,12 @@ namespace QualityControl {
                     this->map_sectorsEta            = other.map_sectorsEta;
                     this->strDetName                = other.strDetName;
                     this->strDetNameNoSpecChar      = other.strDetNameNoSpecChar;
-                    
-                    //this->vec_allADCPeaks         = other.vec_allADCPeaks;
-                    
+
+                    this->mset_fClustADC_Fit_NormChi2=other.mset_fClustADC_Fit_NormChi2;                    
                     this->mset_fClustADC_Fit_PkPos  = other.mset_fClustADC_Fit_PkPos;
                     this->mset_fClustADC_Fit_PkRes  = other.mset_fClustADC_Fit_PkRes;
-                    //this->mset_fClustADC_Spec_PkPos = other.mset_fClustADC_Spec_PkPos;
                     
+                    this->statClustADC_Fit_NormChi2 = other.statClustADC_Fit_NormChi2;                    
                     this->statClustADC_Fit_PkPos    = other.statClustADC_Fit_PkPos;
                     this->statClustADC_Fit_PkRes    = other.statClustADC_Fit_PkRes;
 
@@ -106,25 +104,29 @@ namespace QualityControl {
             //wipes all stored information
             virtual void reset(){
                 map_sectorsEta.clear();
-                //vec_allADCPeaks.clear();
+
+                mset_fClustADC_Fit_NormChi2.clear();
                 mset_fClustADC_Fit_PkPos.clear();
                 mset_fClustADC_Fit_PkRes.clear();
-                //mset_fClustADC_Spec_PkPos.clear();
-                
+
+                statClustADC_Fit_NormChi2.clear();                
                 statClustADC_Fit_PkPos.clear();
                 statClustADC_Fit_PkRes.clear();
+
                 return;
             } //End reset()
             virtual void resetClusters();
             virtual void resetHits();
             virtual void resetPhysObj();
             virtual void resetResults(){
-                mset_fClustADC_Fit_PkPos.clear();
+		mset_fClustADC_Fit_NormChi2.clear();                
+		mset_fClustADC_Fit_PkPos.clear();
                 mset_fClustADC_Fit_PkRes.clear();
-                //mset_fClustADC_Spec_PkPos.clear();
-                
+
+                statClustADC_Fit_NormChi2.clear();                
                 statClustADC_Fit_PkPos.clear();
                 statClustADC_Fit_PkRes.clear();
+
                 return;
             };
             
@@ -171,9 +173,8 @@ namespace QualityControl {
             virtual ReadoutSectorPhi getPhiSector(int iEta, int iPhi);
             
             //returns the summary statistics
-            //virtual QualityControl::Uniformity::SummaryStatistics getStatPkPos(){ return statClustADC_Fit_PkPos; };
+            virtual SummaryStatistics getStatNormChi2(){ return statClustADC_Fit_NormChi2; };
             virtual SummaryStatistics getStatPkPos(){ return statClustADC_Fit_PkPos; };
-            //virtual QualityControl::Uniformity::SummaryStatistics getStatPkRes(){ return statClustADC_Fit_PkRes; };
             virtual SummaryStatistics getStatPkRes(){ return statClustADC_Fit_PkRes; };
             
             //Printers - Methods that Print Something
@@ -256,10 +257,11 @@ namespace QualityControl {
             
             std::map<int, ReadoutSectorEta> map_sectorsEta;
             
+            std::multiset<float> mset_fClustADC_Fit_NormChi2;
             std::multiset<float> mset_fClustADC_Fit_PkPos;
             std::multiset<float> mset_fClustADC_Fit_PkRes;
-            //std::multiset<float> mset_fClustADC_Spec_PkPos;
             
+            SummaryStatistics statClustADC_Fit_NormChi2;
             SummaryStatistics statClustADC_Fit_PkPos;
             SummaryStatistics statClustADC_Fit_PkRes;
             
