@@ -19,6 +19,7 @@
 
 //Framework Includes
 #include "TimingUtilityFunctions.h"
+#include "UniformityUtilityFunctions.h"
 #include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
 
@@ -38,20 +39,23 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Opens a text file set by the user and loads the requested parameters
             //Over-written by inherited classes
-            virtual void loadRunParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
+            virtual void loadParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
             
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            //Returns an open file stream
+            virtual std::ifstream getFileStream(std::string strInputSetupFile, bool bVerboseMode);
+            
             //As loadRunParameters() above but does not need an AnalysisSetupUniformity argument
             virtual RunSetup getRunParameters(std::ifstream &file_Input, bool bVerboseMode){
                 Uniformity::RunSetup rSetup;
-                loadRunParameters(file_Input, bVerboseMode, rSetup);
+                loadParameters(file_Input, bVerboseMode, rSetup);
                 return rSetup;
             };
             
             //Gets the list of input runs from the input config file
-            std::vector<std::pair<int, std::string> > getPairedRunList(std::ifstream &file_Input, bool bVerboseMode);
+            std::vector<std::pair<int, std::string> > getPairedRunList(std::ifstream &file_Input, std::string strIdent, bool bVerboseMode);
             std::vector<std::string> getRunList(std::ifstream &file_Input, bool bVerboseMode);
             
             //Printers - Methods that Print Something
@@ -59,6 +63,10 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual void setVerboseMode(bool bInput){
+                m_bVerboseMode_IO = bInput;
+                return;
+            }
             
             //Data Memebers
             
@@ -66,10 +74,12 @@ namespace QualityControl {
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Gets the run number from an input run name
-            int getRunNumber(std::string strRunName);
+            int getRunNumber(std::string strRunName, std::string strIdent);
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
+            bool m_bVerboseMode_IO;
+            
             std::string m_strSecBegin_RunList, m_strSecEnd_RunList;
         }; //End class ParameterLoader
     } //End namespace Uniformity

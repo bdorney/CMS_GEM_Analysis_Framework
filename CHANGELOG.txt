@@ -7,6 +7,16 @@
 *                                                *
 **************************************************
 
+Update: September 11th 2016
+==================================================
+->Honor their memory
+->Added new class QualityControl::Uniformity::VisualizeComparison for making comparison plots across different framework output files
+->Added new class QualityControl::Uniformity::ParameterLoaderComparison for setting necessary inputs in the QualityControl::Uniformity::RunSetp struct
+->QualityControl::Uniformity::VisualizeComparison inherits from QualityControl::Uniformity::Visualizer
+->Public method QualityControl::Uniformity::ParameterLoaderRun::loadParametersRun() renamed to loadParameters()
+->QualityControl::Uniformity::ParameterLoaderRun has two new private methods loadParametersRun() & loadParametersCompare() for setting up different run modes
+->Updated QualityControl::Uniformity::RunSetup to have additional data members for setting up VisualizeComparison
+
 Update: September 10th 2016
 ==================================================
 ->Added QualityControl::Timing::HistoSetup::fHisto_BinWidth for storing bin width of histograms

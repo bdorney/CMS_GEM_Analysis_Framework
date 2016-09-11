@@ -17,19 +17,23 @@ using std::vector;
 
 using QualityControl::Timing::getCharSeparatedList;
 using QualityControl::Timing::getlineNoSpaces;
+
+using QualityControl::Timing::printStreamStatus;
 using QualityControl::Timing::stoiSafe;
 
 using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoader::ParameterLoader(){
-    m_strSecBegin_RunList = "[BEGIN_RUN_LIST]";
-    m_strSecEnd_RunList   = "[END_RUN_LIST]";
+    m_bVerboseMode_IO       = false;
+    
+    m_strSecBegin_RunList   = "[BEGIN_RUN_LIST]";
+    m_strSecEnd_RunList     = "[END_RUN_LIST]";
 }
 
 //Opens a text file set by the user and loads the requested parameters
 //Over-written by inherited classes
-void ParameterLoader::loadRunParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
+void ParameterLoader::loadParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
     
     cout<<"Brian it doesn't work\n";
     cout<<"Press Ctrl+C Now\n";
@@ -40,12 +44,30 @@ void ParameterLoader::loadRunParameters(std::ifstream &file_Input, bool bVerbose
     return;
 } //End
 
+ifstream ParameterLoader::getFileStream(std::string strInputSetupFile, bool bVerboseMode){
+    //Open the Data File
+    //------------------------------------------------------
+    if (bVerboseMode) { //Case: User Requested Verbose Error Messages - I/O
+        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParameters", ("trying to open and read: " + strInputSetupFile).c_str() );
+    } //End Case: User Requested Verbose Error Messages - I/O
+    
+    ifstream ret_fStream( strInputSetupFile.c_str() );
+    
+    //Check to See if Data File Opened Successfully
+    //------------------------------------------------------
+    if (!ret_fStream.is_open() && bVerboseMode) {
+        perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while opening file: " + strInputSetupFile).c_str() );
+        printStreamStatus(ret_fStream);
+    }
+    
+    return ret_fStream;
+} //End ParameterLoader::getFileStream()
 
 //Maps a run number, found in an input filename, to an input run found in the input config file
 //Only those input files having a run number will be returned
 //  ->First is run number
 //  ->Second is run name
-std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream &file_Input, bool bVerboseMode){
+std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream &file_Input, string strIdent, bool bVerboseMode){
     //Variable Declaration
     bool bHeaderEnd = false;
     
@@ -85,7 +107,7 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
                 } //End Case: End of run list header
                 
                 //Get the run number from the file name
-                iNum_Run = getRunNumber(strLine);
+                iNum_Run = getRunNumber(strLine, strIdent);
                 
                 //Set the run or inform the user of a problem
                 if (iNum_Run > -1 ) { //Case: Success, Run Set!
@@ -170,40 +192,24 @@ vector<string> ParameterLoader::getRunList(ifstream &file_Input, bool bVerboseMo
     return vec_strRetRuns;
 } //End ParameterLoader::getRunList()
 
-int ParameterLoader::getRunNumber(std::string strRunName){
+int ParameterLoader::getRunNumber(std::string strRunName, string strIdent){
     //Variable Declaration
     int iRetVal;
     
-    //cout<<"getRunNumber() strRunName = " << strRunName.c_str() << endl;
-    
     std::transform(strRunName.begin(), strRunName.end(), strRunName.begin(), toupper);
-    
-    //cout<<"getRunNumber() post transfer strRunName = " << strRunName.c_str() << endl;
+    std::transform(strIdent.begin(), strIdent.end(), strIdent.begin(), toupper);
     
     vector<string> vec_strParsedName = getCharSeparatedList(strRunName, '_');
     
-    /*cout<<"i\tParsedInput\tContains\n";
-     for(int i=0; i < vec_strParsedName.size(); ++i){
-     contains cont("RUN");
-     cout<<i<<"\t"<<vec_strParsedName[i]<<"\t"<<cont(vec_strParsedName[i])<<endl;
-     }*/
-    
-    auto iterStr = std::find_if(vec_strParsedName.begin(), vec_strParsedName.end(), QualityControl::Uniformity::contains("RUN") );
-    
-    //cout<<"getRunNumber() - iterStr =
+    //auto iterStr = std::find_if(vec_strParsedName.begin(), vec_strParsedName.end(), QualityControl::Uniformity::contains("RUN") );
+    auto iterStr = std::find_if(vec_strParsedName.begin(), vec_strParsedName.end(), QualityControl::Uniformity::contains(strIdent) );
     
     //Input file name did not contain the phrase "RUN"
     if ( iterStr == vec_strParsedName.end() ) {
         return -1;
     }
     
-    //cout<<"getRunNumber() - iterStr = " << (*iterStr).c_str() << endl;
-    
-    //(*iterStr).erase(remove((*iterStr).begin(), (*iterStr).end(), "RUN"), (*iterStr).end() );
-    
-    //cout<<"getRunNumber() - (*iterStr).find('RUN') = " << (*iterStr).find("RUN") << endl;
-    
-    (*iterStr).erase( (*iterStr).find("RUN"), 3);
+    (*iterStr).erase( (*iterStr).find(strIdent), 3);
     iRetVal = stoiSafe( (*iterStr) );
     
     return iRetVal;

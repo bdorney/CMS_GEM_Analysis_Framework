@@ -96,49 +96,76 @@ namespace QualityControl {
         
         //Run Setup
         struct RunSetup{
-            bool bAnaStep_Clusters;         //true -> perform the cluster analysis; false -> do not
-            bool bAnaStep_Fitting;          //true -> run fitting on output histo's; false -> do not
-            bool bAnaStep_Hits;             //true -> perform the hit analysis (NOTE if bAnaStep_Reco is true this must also be true); false -> do not
-            bool bAnaStep_Reco;             //true -> reconstruct clusters from input hits; false -> use clusters provided in amoreSRS output file;
-            bool bAnaStep_Visualize;        //true -> make summary plots at end of analysis; false -> do not
+            //Setup - Master Mode
+            std::string strRunMode;
             
-            bool bInputFromFrmwrk;          //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
+            //Setup - Analyzer
+            bool bAnaStep_Clusters;             //true -> perform the cluster analysis; false -> do not
+            bool bAnaStep_Fitting;              //true -> run fitting on output histo's; false -> do not
+            bool bAnaStep_Hits;                 //true -> perform the hit analysis (NOTE if bAnaStep_Reco is true this must also be true); false -> do not
+            bool bAnaStep_Reco;                 //true -> reconstruct clusters from input hits; false -> use clusters provided in amoreSRS output file;
+            bool bAnaStep_Visualize;            //true -> make summary plots at end of analysis; false -> do not
             
+            //Setup - Comparison
+            bool bDrawNormalized;               //Comparison plots drawn normalized
+            
+            std::string strIdent;               //Unique identifier in input runs
+            std::string strObsName;             //Name of Observable to be compared across inputs
+            
+            //Setup - Detector
+            int iEta, iPhi, iSlice;             //Position within the detector
+            
+            std::string strDetName;             //Name of the detector
+
+            //Setup - I/O
+            bool bInputFromFrmwrk;              //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
             bool bLoadSuccess;
+            bool bMultiOutput;                  //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
             
-            bool bMultiOutput;              //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
-            bool bVisPlots_PhiLines;        //true -> summary plots have phi lines segmenting sectors; false -> they do not
-            bool bVisPlots_AutoSaving;      //true -> automatically save canvases during visualize step; false -> do not
+            std::string strFile_Config_Ana;     //Name of analysis config file
+            std::string strFile_Config_Map;     //Name of mapping file
             
-            std::string strFile_Config_Ana;      //Name of analysis config file
-            std::string strFile_Config_Map;      //Name of mapping file
+            std::string strFile_Output_Name;    //Name of output TFile to be created
+            std::string strFile_Output_Option;  //Option for TFile: CREATE, RECREATE, UPDATE, etc...
             
-            std::string strFile_Output_Name;     //Name of output TFile to be created
-            std::string strFile_Output_Option;   //Option for TFile: CREATE, RECREATE, UPDATE, etc...
-            
-            std::string strDetName;              //Name of the detector
+            //Setup - Visualizer
+            bool bVisPlots_PhiLines;            //true -> summary plots have phi lines segmenting sectors; false -> they do not
+            bool bVisPlots_AutoSaving;          //true -> automatically save canvases during visualize step; false -> do not
             
             //Default constructor
             RunSetup(){
+                //Setup - Master Mode
+                strRunMode = "ANALYSIS";
+                
+                //Setup - Analyzer
                 bAnaStep_Reco = false;
                 bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
                 
-                bInputFromFrmwrk = false;
+                //Setup - Comparison
+                bDrawNormalized = false;
+                strIdent = "RUN";
+                strObsName = "CLUSTADC";
                 
+                //Setup - Detector
+                iEta = 4;
+                iPhi = 2;
+                iSlice = -1;
+                
+                strDetName = "Detector";
+
+                //Setup - I/O
+                bInputFromFrmwrk = bMultiOutput = false;
                 bLoadSuccess = false;   //This is set to true if the struct is loaded successfully
-                
-                bMultiOutput = false;
-                
-                bVisPlots_PhiLines = true;
-                bVisPlots_AutoSaving = false;
-                
+
                 strFile_Config_Ana = "config/configAnalysis.cfg";
-                strFile_Config_Map = "config/GE7MappingCMScernData2016.cfg";
+                strFile_Config_Map = "config/Mapping_GE11-VII-L.cfg";
                 
                 strFile_Output_Name = "FrameworkOutput.root";
                 strFile_Output_Option = "RECREATE";
                 
-                strDetName = "Detector";
+                //Setup - Visualizer
+                bVisPlots_PhiLines = true;
+                bVisPlots_AutoSaving = false;
             } //End Default constructor
         }; //End RunSetup
         

@@ -70,9 +70,8 @@ namespace QualityControl {
             //Called by loadAnalysisParameters(), loading parameters relative to the uniformity analysis
             virtual void loadAnalysisParametersUniformity(std::ifstream &inputFileStream, AnalysisSetupUniformity &aSetupUniformity);
             
-            //Data Members
-            bool bVerboseMode_IO;
-            
+            //Attributes
+            //------------------------------------------------------------------------------------------------------------------------------------------
             std::string strSecBegin_Analysis;       //Defines how the file will look
             std::string strSecBegin_Timing;         //Hard coded section headers
             std::string strSecBegin_Uniformity;     //Staring point

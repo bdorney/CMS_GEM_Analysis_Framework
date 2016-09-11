@@ -53,7 +53,8 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             
         private:
-            bool bVerbose_IO;   //Flag for printing additional output to the user; concerns file input/output operations
+            
+            //Placeholder
             
         }; //End class ParameterLoaderAmore
     } //End namespace Uniformity

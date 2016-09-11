@@ -31,6 +31,8 @@ using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
+    m_bVerboseMode_IO       = false;
+    
     strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
     strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
     strSecBegin_Uniformity  = "[BEGIN_UNIFORMITY_INFO]";
@@ -48,7 +50,7 @@ ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
 //Opens a text file set by the user and loads the requested parameters
 void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, AnalysisSetupUniformity &aSetupUniformity){
     //Variable Declaration
-    bool bExitSuccess = false;
+    //bool bExitSuccess = false;
     
     pair<string,string> pair_strParam; //Input file is setup in <Field, Value> pairs; not used here yet but placeholder
     
@@ -59,7 +61,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     
     //Open the Data File
     //------------------------------------------------------
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParameters", ("trying to open and read: " + strInputSetupFile).c_str() );
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -67,10 +69,12 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     
     //Check to See if Data File Opened Successfully
     //------------------------------------------------------
-    if (!fStream.is_open() && bVerboseMode_IO) {
+    if (!fStream.is_open() && m_bVerboseMode_IO) {
         perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while opening file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
-    }
+    }*/
+    
+    ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
     
     ////Loop Over data Input File
     //------------------------------------------------------
@@ -80,7 +84,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     //See: http://gehrcke.de/2011/06/reading-files-in-c-using-ifstream-dealing-correctly-with-badbit-failbit-eofbit-and-perror/
     while ( getlineNoSpaces(fStream, strLine) ) {
         //Reset exit flag used in string manipulation
-        bExitSuccess = false;
+        //bExitSuccess = false;
         
         //Does the user want to comment out this line?
         if ( 0 == strLine.compare(0,1,"#") ) continue;
@@ -121,7 +125,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     } //End Loop Over Input File
     
     //Check to see if we had problems while reading the file
-    if (fStream.bad() && bVerboseMode_IO) {
+    if (fStream.bad() && m_bVerboseMode_IO) {
         perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while reading file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
     }
@@ -137,10 +141,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
     pair<string,string> pair_strParam; //Input file is setup in <Field, Value> pairs; not used here yet but placeholder
     
     string strLine = "";    //Line taken from the input file
+    string strTmp = "";
     
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits", "Found Fit Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -158,9 +163,8 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
         pair_strParam = getParsedLine(strLine,bExitSuccess);
         
         if (bExitSuccess) { //Case: Parameter Fetched Correctly
-            //transform(pair_strParam.first.begin(), pair_strParam.second.end(),pair_strParam.first.begin(),toupper);
-            
-            string strTmp = pair_strParam.first;
+            //Change to all capitals;
+            strTmp = pair_strParam.first;
             transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
             
             pair_strParam.first = strTmp;
@@ -205,6 +209,12 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits",("\tCurrent line: " + strLine).c_str() );
         } //End Case: Parameter Failed to fetch correctly
     } //End Loop through Fit Heading
+    if ( inputFileStream.bad() && m_bVerboseMode_IO) {
+        perror( "ParameterLoaderRun::loadParametersRun(): error while reading config file" );
+        printStreamStatus(inputFileStream);
+    }
+    
+    return;
 } //End ParameterLoaderAnaysis::loadAnalysisParametersFits
 
 //Called when loading analysis parameters; relative to histograms
@@ -461,7 +471,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
     
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity", "Found Uniformity Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
