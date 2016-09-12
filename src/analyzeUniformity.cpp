@@ -329,30 +329,18 @@ int main( int argc_, char * argv_[] ){
     
     file_Config.close();
     
-	cout<<"main() - No Fault 1" << endl;
-
     //Check the Run Mode
     //------------------------------------------------------
     if ( 0 == rSetup.strRunMode.compare("ANALYSIS") ) { //Run Mode: Analysis
         //Load the requested amore parameters & setup the detector
         //------------------------------------------------------
-
-	cout<<"main() - No Fault 1_a" << endl;
-
         loaderAmore.loadAmoreMapping( rSetup.strFile_Config_Map  );
-
-	cout<<"main() - No Fault 1_b" << endl;
-
         detMPGD = loaderAmore.getDetector();
         detMPGD.setName( rSetup.strDetName );
-        
-	cout<<"main() - No Fault 1_c" << endl;
 
         //Load the requested analysis parameters
         //------------------------------------------------------
         aSetup = loaderAnalysis.getAnalysisParameters( rSetup.strFile_Config_Ana );
-        
-	cout<<"main() - No Fault 1_d" << endl;
 
         //Setup the analysis interface
         //------------------------------------------------------
@@ -361,8 +349,6 @@ int main( int argc_, char * argv_[] ){
         anaInterface.setRunParameters(rSetup);
         anaInterface.setVerboseMode(bVerboseMode);
         
-	cout<<"main() - No Fault 1_e" << endl;
-
         //Perform the user defined analysis interface
         //------------------------------------------------------
         if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
