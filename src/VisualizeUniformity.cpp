@@ -427,6 +427,7 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
     //Draw mgraph_Obs
     //------------------------------------------------------
     canv_DetSum.cd();
+    hFitSucess2D->GetZaxis()->SetRangeUser(0.,1.0);
     hFitSucess2D->Draw( strDrawOption.c_str() );
     
     //Setup the TLatex for "CMS Preliminary"
@@ -1553,7 +1554,7 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     latex_SlicePos.SetTextSize(0.03);
     latex_SlicePos.DrawLatexNDC(0.55, 0.7, ("Slice Pos #left(mm#right) = " + getString(inputSlice.fPos_Center) ).c_str() );
     
-    //Setup the TLatex for Fit Status
+    //Setup the TLatex's for Fit Status
     //------------------------------------------------------
     TLatex latex_FitStatus;
     latex_FitStatus.SetTextSize(0.03);
@@ -1563,9 +1564,31 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     latex_MinuitCode.SetTextSize(0.03);
     latex_MinuitCode.DrawLatexNDC(0.55, 0.6, ("Minuit Status Code = " + getString(inputSlice.iMinuitStatus) ).c_str() );
 
+    //Setup the TLatex's for Our Internal Checks
+    //------------------------------------------------------
     TLatex latex_NormChi2;
     latex_NormChi2.SetTextSize(0.03);
-    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );	
+    latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );
+
+    //Get the Peak Position            
+    auto iterParamPEAK = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "PEAK");
+    int iIdxPk = std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamPEAK);
+    float fPkPos = inputSlice.fitSlice_ClustADC->GetParameter(iIdxPk);
+    float fPkPosErr = inputSlice.fitSlice_ClustADC->GetParError(iIdxPk);
+
+    TLatex latex_PkPos;
+    latex_PkPos.SetTextSize(0.03);
+    latex_PkPos.DrawLatexNDC(0.55, 0.50, ("Fitted PkPos = " + getString(fPkPos) + " #pm " + getString(fPkPosErr) ).c_str() );	
+
+    //TLatex latex_PkPerErr;
+    //latex_PkPerErr.SetTextSize(0.03);
+    //latex_PkPerErr.DrawLatexNDC(0.55,0.45, ("Percent Error = " + getString( fPkPosErr / fPkPos ) ).c_str() );
+
+    double dPkLimit_Min, dPkLimit_Max;
+    inputSlice.fitSlice_ClustADC->GetParLimits(iIdxPk, dPkLimit_Min, dPkLimit_Max);
+    TLatex latex_PkLimits;
+    latex_PkLimits.SetTextSize(0.03);
+    latex_PkLimits.DrawLatexNDC(0.55,0.45, ("PkPos Limits #epsilon #left(" + getString( dPkLimit_Min ) + "," + getString( dPkLimit_Max ) + "#right)" ).c_str() );
 
     return ret_Canvas;
 } //End VisualizeUniformity::getCanvasSliceFit()
