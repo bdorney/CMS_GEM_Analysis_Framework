@@ -856,10 +856,12 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
         
         canv_DetSum.cd();
         if( 1 == iEta ){
-            vec_hObs.back()->Draw( strDrawOption.c_str() );
+            //vec_hObs.back()->Draw( strDrawOption.c_str() );
+            vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         }
         else{
-            vec_hObs.back()->Draw( (strDrawOption + "same").c_str() );
+            //vec_hObs.back()->Draw( (strDrawOption + "same").c_str() );
+            vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
         }
     } //End Loop Over Detector's Eta Sector
     
@@ -1028,12 +1030,16 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
         
         canv_DetSum.cd();
-        vec_padSectorObs.back()->Draw();
-        vec_padSectorObs.back()->cd();
+        //vec_padSectorObs.back()->Draw();
+        //vec_padSectorObs.back()->cd();
+        vec_padSectorObs[iEta-1]->Draw();
+        vec_padSectorObs[iEta-1]->cd();
         
         //Draw the histogram
-        vec_hObs.back()->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
-        vec_hObs.back()->Draw( strDrawOption.c_str() );
+        //vec_hObs.back()->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
+        //vec_hObs.back()->Draw( strDrawOption.c_str() );
+        vec_hObs[iEta-1]->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
+        vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         
         //Setup the TLatex for "CMS Preliminary"
         TLatex latex_CMSPrelim;
@@ -1051,7 +1057,8 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
             for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
                 //Ensure the pad is the active pad (it should be already but who knows...)
-                vec_padSectorObs.back()->cd();
+                //vec_padSectorObs.back()->cd();
+                vec_padSectorObs[iEta-1]->cd();
                 
                 //Declare the TLatex
                 TLatex latex_PhiSector;
@@ -1227,8 +1234,10 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
             vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
             
             canv_DetSum.cd();
-            vec_padSectorObs.back()->Draw();
-            vec_padSectorObs.back()->cd();
+            //vec_padSectorObs.back()->Draw();
+            //vec_padSectorObs.back()->cd();
+            vec_padSectorObs[vec_padSectorObs.size()-1]->Draw();
+            vec_padSectorObs[vec_padSectorObs.size()-1]->cd();
             (*iterPhi).second->GetZaxis()->SetRangeUser(1e-1,fMaxBinVal);
             (*iterPhi).second->Draw( strDrawOption.c_str() );
             
