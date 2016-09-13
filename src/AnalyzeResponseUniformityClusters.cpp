@@ -232,21 +232,23 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                     fPkWidth      = 2. * sqrt( 2. * log( 2. ) ) * (*iterSlice).second.fitSlice_ClustADC->GetParameter(iIdxWidth);
                 	fPkWidthErr   = 2. * sqrt( 2. * log( 2. ) ) * (*iterSlice).second.fitSlice_ClustADC->GetParError(iIdxWidth);
                 } //End Case: Fit Parameter List Has Meaning SIGMA
-                    
+                
+		//Get NormChi2 value
+		fNormChi2 = (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF();
+
                 //Was the Fit Valid?
                 //i.e. did the minimizer succeed in finding the minimm
-                //bIsQuality = ( isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPkPos ) && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth ) );
 		(*iterSlice).second.iMinuitStatus  = fitRes_ADC.Status();
                 if ( fitRes_ADC.IsValid()
                     && isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxPk )
-                  /*&& isQualityFit( (*iterSlice).second.fitSlice_ClustADC, iIdxWidth )*/ ) { //Case: Valid Fit!!!
+                    && !std::isinf(fNormChi2) 
+		    && !std::isnan(fNormChi2) ) { //Case: Valid Fit!!!
                     (*iterPhi).second.fNFitSuccess++;
 		    (*iterSlice).second.bFitAccepted = true;
                     
                     //Store Fit parameters - NormChi2
-                    fNormChi2 = (*iterSlice).second.fitSlice_ClustADC->GetChisquare() / (*iterSlice).second.fitSlice_ClustADC->GetNDF();
-                    if ( std::isinf(fNormChi2) ){ fNormChi2 = -1; }
-                    if ( std::isnan(fNormChi2) ){ fNormChi2 = -1; }
+                    //if ( std::isinf(fNormChi2) ){ fNormChi2 = -1; }
+                    //if ( std::isnan(fNormChi2) ){ fNormChi2 = -1; }
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center,  fNormChi2  );
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
                     

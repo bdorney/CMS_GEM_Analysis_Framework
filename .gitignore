@@ -55,3 +55,4 @@ data/*
 #setup_files/Production_ConfigFile.txt
 *DeadStripList.txt
 config/*.cfg_*
+config/configAnalysis_Slices*.cfg
