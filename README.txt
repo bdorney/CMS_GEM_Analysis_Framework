@@ -27,68 +27,69 @@
     2. Installation Instructions
     3. Usage
         3.a. analyzeUniformity
-            3.a.i           Helper Script - Run Mode: Grid
-            3.a.ii          Helper Script - Run Mode: Rerun
-            3.a.iii         Helper Script - Run Mode: Series
-	    3.a.iv	    Helper Script - Run Mode: Comparison
-	    3.a.v	    Helper Script - Merge Selected Files
+            3.a.i               Helper Script - Run Mode: Grid
+            3.a.ii              Helper Script - Run Mode: Rerun
+            3.a.iii             Helper Script - Run Mode: Series
+            3.a.iv              Helper Script - Run Mode: Comparison
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
-            4.b.i.          Analyzers
-                4.b.i.I     AnalyzeResponseUniformity
-                4.b.i.II    AnalyzeResponseUniformityClusters
-                4.b.i.III   AnalyzeResponseUniformityHits
-            4.b.ii.         Selectors
-                4.b.ii.I    Selector
-                4.b.ii.II   SelectorClusters
-                4.b.ii.III  SelectorHits
-            4.b.iii.        DetectorMPGD
-            4.b.iv.         InterfaceAnalysis
-            4.b.v.          Loaders
-                4.b.v.I     ParameterLoaderAmoreSRS
-                4.b.v.II    ParameterLoaderAnalysis
-                4.b.v.III   ParameterLoaderRun
-            4.b.vi.         VisualizeUniformity
+            4.b.i.              Analyzers
+                4.b.i.I         AnalyzeResponseUniformity
+                4.b.i.II        AnalyzeResponseUniformityClusters
+                4.b.i.III       AnalyzeResponseUniformityHits
+            4.b.ii.             Selectors
+                4.b.ii.I        Selector
+                4.b.ii.II       SelectorClusters
+                4.b.ii.III      SelectorHits
+            4.b.iii.            DetectorMPGD
+            4.b.iv.             InterfaceAnalysis
+            4.b.v.              Loaders
+                4.b.v.I         ParameterLoaderAmoreSRS
+                4.b.v.II    	ParameterLoaderAnalysis
+                4.b.v.III       ParameterLoaderRun
+            4.b.vi.             VisualizeUniformity
         4.c. Utilities
             4.c.i   Timing
             4.c.ii  Uniformity
         4.d. Types
             4.d.i   Timing
             4.d.ii  Uniformity
-                4.d.ii.I    AnalysisSetupUniformity
-                4.d.ii.II   Cluster
-                4.d.ii.III  HistosPhysObj
-                4.d.ii.IV   Hit
-                4.d.ii.V    RunSetup
-                4.d.ii.VI   SectorEta
-                4.d.ii.VII  SectorPhi
-                4.d.ii.VIII SectorSlice
-                4.d.ii.IX   SelParam
-                4.d.ii.X    SummaryStatistics
+                4.d.ii.I        AnalysisSetupUniformity
+                4.d.ii.II       Cluster
+                4.d.ii.III      HistosPhysObj
+                4.d.ii.IV       Hit
+                4.d.ii.V        RunSetup
+                4.d.ii.VI       SectorEta
+                4.d.ii.VII      SectorPhi
+                4.d.ii.VIII     SectorSlice
+                4.d.ii.IX       SelParam
+                4.d.ii.X        SummaryStatistics
         4.e. Configuration Files
             4.e.i   amoreSRS Mapping Config File
             4.e.ii  Analysis Config File
-                4.e.ii.I    HEADER PARAMETERS - ANALYSIS_INFO
-                4.e.ii.II   HEADER PARAMETERS - TIMING_INFO
-                4.e.ii.III  HEADER PARAMETERS - UNIFORMITY_INFO
-                4.e.ii.IV   HEADER PARAMETERS - ADC_FIT_INFO
-                4.e.ii.V    HEADER PARAMETERS - HISTO_INFO
-                4.e.ii.VI   Example Config File
+                4.e.ii.I        HEADER PARAMETERS - ANALYSIS_INFO
+                4.e.ii.II       HEADER PARAMETERS - TIMING_INFO
+                4.e.ii.III      HEADER PARAMETERS - UNIFORMITY_INFO
+                4.e.ii.IV       HEADER PARAMETERS - ADC_FIT_INFO
+                4.e.ii.V        HEADER PARAMETERS - HISTO_INFO
+                4.e.ii.VI       Example Config File
             4.e.iii Run Config File
-                4.e.iii.I   HEADER PARAMETERS - RUN_INFO
-                4.e.iii.II  HEADER PARAMETERS - RUN_LIST
-                4.e.iii.III Configuration Options
-                4.e.iii.IV  Example Config File - Mode: Series
-                4.e.iii.V   Example Config File - Mode: Grid
-                4.e.iii.VI  Example Config File - Mode: Re-Run
+                4.e.iii.I       HEADER PARAMETERS - RUN_INFO
+                4.e.iii.II      HEADER PARAMETERS - RUN_LIST
+                4.e.iii.III     HEADER PARAMETERS - COMP_INFO
+                4.e.iii.IV      Configuration Options
+                4.e.iii.V       Example Config File - Mode: Series
+                4.e.iii.VI      Example Config File - Mode: Grid
+                4.e.iii.VII     Example Config File - Mode: Re-Run
+                4.e.iii.VIII    Example Config File - Mode: Comparison
         4.f. Output Files
-            4.f.i           Output ROOT File
-                4.f.i.I     "Segmented" Plots Stored in "Summary" folder
-                4.f.i.II    "Dataset" Plots Stored in "Summary" folder
-                4.f.i.III   1D Fit Summary Plots Stored in "Summary" folder
-                4.f.i.IV    2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-            4.f.ii          Output Text File
+            4.f.i               Output ROOT File
+                4.f.i.I         "Segmented" Plots Stored in "Summary" folder
+                4.f.i.II        "Dataset" Plots Stored in "Summary" folder
+                4.f.i.III       1D Fit Summary Plots Stored in "Summary" folder
+                4.f.i.IV        2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+            4.f.ii              Output Text File
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -207,6 +208,10 @@
     but for a specific detector run 1 is unique).  The framework expects that you provide a run number,
     form "_RunX_" for X some integer, in each of the input files defined in your config/configRun.cfg
     (see Section 4.e.iii).
+
+    In addition to analyzing raw data to produce a framework output ROOT file it is also possible to
+    analyze a series of framework outpt files to plot comparisons of any TH1F object stored in the
+    output ROOT file.  For More details on running in this mode see Sections 3.a.iv and 4.e.iii.
 
             # 3.a.i Helper Script - Run Mode: Grid
             # --------------------------------------------------------
@@ -337,9 +342,78 @@
             # 3.a.iv  Helper Script - Run Mode: Comparison
             # --------------------------------------------------------
 
-            # 3.a.v   Helper Script - Merge Selected Files
-            # --------------------------------------------------------
+            The script:
 
+                scripts/runMode_Comparison.sh
+
+            is for running the framework over a set of framework output files and creating a single output TFile
+            containing a TCanvas with a set of TH1F objects drawn on it (and also stored in the ROOT file).  The
+            expected syntax is:
+
+                source runMode_Comparison.sh <Data File Directory> <Output Data Filename> <Obs Name> <iEta,iPhi,iSlice> <Identifier>
+
+            Where: "Data File Directory" is as above; "Output Data Filename" is the name of the output TFile;
+            "Obs Name" is a regular expression found in the TName of the TH1F objects you wish to compare from your
+            set of input files; "iEta,iPhi,iSlice" is a comma separated triplet of the (iEta,iPhi,iSlice) coordinate
+            within the detector; and "Identifier" is a regular expression contained in the filenames of each of your
+            input files found in the "Data File Directory."
+
+            When giving the "Obs Name" this is the "ObservableNameX" referred to in Section 4.f.i. To familiarize
+            yourself with the possible inputs it is suggestion to run the framework in one of the above outputs and
+            study the produced TFile.
+
+            For the "iEta,iPhi,iSlice" field you must always enter a set of three integers.  However, you can access
+            observables created at either the "Summary," "SectorEta," "SectorPhi," or "Slice" level (Again see
+            Section 4.f.i) based on the input that is given.  The following table shows how to access observables at
+            each level:
+
+                                            Obs Level       "iEta,iPhi,iSlice"
+
+                                            Summary         -1,-1,-1
+                                            SectorEta       iEta,-1,-1
+                                            SectorPhi       iEta,iPhi,-1
+                                            Slice           iEta,iPhi,iSlice
+
+            As you can see by placing "-1" in the relevant coordinate point you can select the level you are interested in.
+
+            Since this is a different run mode, to prevent any previous Run Config file from being over-written, this
+            script will produce a Run Config file called:
+
+                config/configComp.cfg
+
+            This should help you distinguish your different configurations.
+
+            After calling this script it is recommended to cross-check the created config/configRun.cfg file
+            before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
+
+            Example:
+
+                source runMode_Comparison.sh data/clustSelStudy/GE11-VII-L-CERN-0002 GE11-VII-L-CERN-0002_ClustSize_Comparison.root clustADC 4,2,-1 ClustSize
+
+            In this example the contents of my Data File Directory are:
+
+                ls data/clustSelStudy/GE11-VII-L-CERN-0002
+
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize2_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize3_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize4_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize5_Ana.root
+                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize6_Ana.root
+
+            You can see the "Identifier" regular expression is "ClustSize" which is contained in each filename as
+            "ClustSizeX" for X = {"1to20","1","2",...,"5","6"}.  And the observable I will be comparing across these
+            files is the clustADC TH1F found in the (iEta,iPhi) = (4,2) sector.  Since "iSlice = -1" the full SectorPhi
+            is considered.
+
+            Right now this mode is somewhat primitive.  If you enter an "Obs Name" and "iEta,iPhi,iSlice" combination
+            that does not exist it will crash and seg-fault.  If this occurs please double-check your input file.
+            Note that there is a difference between "clustADC" and "ClustADC" with the former working, and the latter
+            causing a seg fault (i.e. the "c" is not capitalized).
+
+            NOTE: Modications to config/configComp_Template.cfg may lead to undefined behavior or failures;
+            it is recommended to not modify the template config file.
 
 # 4. Documentation
 # ========================================================
@@ -1045,6 +1119,31 @@
                                         e.g. "[0]*x^2+[1]" or "gaus(0)+pol2(3)" or "[1]*TMath::Erf(x) + [2]"
                                         are all supported.
 
+                Fit_Formula_Sig         string, as Fit_Formula but this is understood to be the portion of the
+                                        formula which describes the signal peak.  Note the parameters here must
+                                        be indexed from 0 and follow the same order as they due in Fit_Formula.
+                                        E.g. if your Fit_Formula is "pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])"
+                                        with the CauchyDist describing your signal peak then Fit_Formula_Sig
+                                        would be written as "[0]*TMath::CauchyDist(x,[1],[2])".  Here the index
+                                        of the parameters has been restarted at [0] but the order is preserved.
+                                        This, in conjunction with Fit_Formula_Sig_Param_Idx_Range, will ensure
+                                        the parameter determined for [3] in Fit_Formula is assigned to [0] in
+                                        Fit_Formula_Sig.
+
+                Fit_Formula_BKG         string, as Fit_Formula_Sig but for the background.
+
+                Fit_Formula_Sig_Param_Idx_Range     integers, two comma separated integers.  This gives the range
+                                                    of the parameters that correspond to the signal peak in Fit_Formula.
+                                                    E.g. if your Fit_Formula is "pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])"
+                                                    with the CauchyDist describing your signal peak then
+                                                    Fit_Formula_Sig_Param_Idx_Range is "3,5" which, in conjunction
+                                                    with Fit_Formula_Sig, will ensure the parameter determined for
+                                                    [3] in Fit_Formula is assigned to [0] in Fit_Formula_Sig.
+
+
+                Fit_Formula_Sig_Param_Idx_Range     integers, as Fit_Formula_Sig_Param_Idx_Range but for the
+                                                    background.
+
                 Fit_Option              string, the fit option to be used for fitting the ADC spectrums made
                                         from each slice.
 
@@ -1147,12 +1246,16 @@
                     [BEGIN_ADC_FIT_INFO]
                         #ADC Spectrum Fit Parameters - Brian (Lorentz + Poly BKG; Lorentz = CauchyDist in ROOT)
                         Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol4(3)';
+                        Fit_Formula_Sig = '[0]*TMath::CauchyDist(x, [1], [2])';
+                        Fit_Formula_Sig_Param_Idx_Range = '0,2';
+                        Fit_Formula_Bkg = 'pol4';
+                        Fit_Formula_Bkg_Param_Idx_Range = '3,7';
                         Fit_Option = 'QM';
                         Fit_Param_Map = 'AMPLITUDE, PEAK, HWHM';
                         Fit_Param_IGuess = '127898, PEAK, 200';
                         Fit_Param_Limit_Min = '10, PEAK-0.1*PEAK, 0.1*PEAK';
                         Fit_Param_Limit_Max = '700000, PEAK+0.1*PEAK, 0.75*PEAK';
-                        Fit_Range = '800, 6000';
+                        Fit_Range = '800, 3*PEAK';
                     [END_ADC_FIT_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustADC';
@@ -1270,6 +1373,8 @@
                 Detector_Name               string, the serial number of the detector (do not include special
                                             characters such as '/' but dashes '-' are allowed)
 
+                Input_Identifier            string, a regular expression found in each input filename, separated by underscores '_', that is understood to have the run number after the expression. e.g. if the filename contains "_RunX_" for some set of integers X then this field should be set to "Run" then the inte
+
                 Input_Is_Frmwrk_Output      boolean, set to true (false) if the input file/files is/are created
                                             by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
                                             option is set to true then Output_Individual must also be set to true.
@@ -1339,7 +1444,11 @@
                 ...
             [END_RUN_LIST]
 
-        # 4.e.iii.III  Configuration Options
+        # 4.e.iii.III  HEADER PARAMETERS - COMP_INFO
+        # --------------------------------------------------------
+
+
+        # 4.e.iii.IV  Configuration Options
         # --------------------------------------------------------
 
         There are three modes that the analyzeUniformity executable can be used to analyze raw data taken
@@ -1378,7 +1487,7 @@
         template config files and helper scripts are provided in the framework to run in each mode.  For details
         on this functionality see Sections 3.a.i through 3.a.iii.
 
-        # 4.e.iii.IV  Example Config File - Mode: Series
+        # 4.e.iii.V  Example Config File - Mode: Series
         # --------------------------------------------------------
 
         Two example files here are presented.
@@ -1477,7 +1586,7 @@
         Pay special attention to the fact that these files will not necessarily be found in the directory you
         are calling the executable from but in the directory the input file is found in.
 
-        # 4.e.iii.V  Example Config File - Mode: Grid
+        # 4.e.iii.VI  Example Config File - Mode: Grid
         # --------------------------------------------------------
 
         Grid mode is really designed for running the analysis on multiple input TFiles, created by amoreSRS,
@@ -1517,7 +1626,7 @@
 
         Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
 
-        # 4.e.iii.VI  Example Config File - Mode: Re-Run
+        # 4.e.iii.VII  Example Config File - Mode: Re-Run
         # --------------------------------------------------------
 
         The re-run mode is designed to allow a user to change the fit parameters defined in their analysis
@@ -1601,6 +1710,20 @@
         Uniformity::SectorSlice will be stored directly in this "SliceZ" TDirectory; they will only
         represent distributions from this (iEta, iPhi, Slice) value.  Again, the TName's for each TObject
         here will include the string "_iEtaXiPhiYSliceZ_" to ensure tehy are unique.
+
+        In general all TObjcets stored in the output ROOT file will follow a convention for their TNames.
+        For one dimensional TObjects we use the following convention/regular expression:
+
+            <TypePrefix>_<Coordinate>_<ObservableNameX>
+
+        For two dimensional TObjects we use the following convention:
+
+            <TypePrefix>_<Coordinate>_<ObservableNameY>_v_<ObservableNameX>
+
+        Where: the "TypePrefix" is described in Section 4.g.i (e.g. for TH1F objcets it is "h"); the
+        "Coordinate" is the (iEta,iPhi,iSlice) point of the histogram as described above; the
+        "ObservableNameX," and "ObservableNameY" fields are respectively what is plotted on the X & Y access
+        of the TObject.
 
         One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
         for each cluster/hit observable.  The contents of these histograms is simply the sum of the

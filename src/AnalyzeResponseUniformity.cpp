@@ -88,13 +88,39 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     } //End Loop Over input multiset
     
     //Fit distribution
-    inputStatObs.fitDist = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
-    inputStatObs.fitDist->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
-    inputStatObs.fitDist->SetParameter(1, inputStatObs.hDist->GetMean() );
-    inputStatObs.fitDist->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    //inputStatObs.fitDist = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    //inputStatObs.fitDist->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    //inputStatObs.fitDist->SetParameter(1, inputStatObs.hDist->GetMean() );
+    //inputStatObs.fitDist->SetParameter(2, inputStatObs.hDist->GetRMS() );
     
-    inputStatObs.hDist->Fit(inputStatObs.fitDist.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+    //inputStatObs.hDist->Fit(inputStatObs.fitDist.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
 
+    shared_ptr<TF1> fitDist_Gaus = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    fitDist_Gaus->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    fitDist_Gaus->SetParameter(1, inputStatObs.hDist->GetMean() );
+    fitDist_Gaus->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    inputStatObs.hDist->Fit(fitDist_Gaus.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+
+    shared_ptr<TF1> fitDist_Landau = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "landau(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    fitDist_Landau->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    fitDist_Landau->SetParameter(1, inputStatObs.hDist->GetMean() );
+    fitDist_Landau->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    inputStatObs.hDist->Fit(fitDist_Landau.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+    
+    float fNormChi2_Gaus = fitDist_Gaus->GetChisquare() / fitDist_Gaus->GetNDF();
+    float fNormChi2_Landau = fitDist_Landau->GetChisquare() / fitDist_Landau->GetNDF();
+    //bool bNormChi2Bad_Gaus = (std::isinf(fNormChi2_Gaus) || std::isnan(fNormChi2_Gaus) );
+    //bool bNormChi2Bad_Landau = (std::isinf(fNormChi2_Landau) || std::isnan(fNormChi2_Landau) );
+    
+    if (fNormChi2_Gaus < fNormChi2_Landau) {
+        inputStatObs.fitDist = fitDist_Gaus;
+    }
+    else{
+        inputStatObs.fitDist = fitDist_Landau;
+    }
+    
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
 

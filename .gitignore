@@ -38,6 +38,9 @@ AnalysisCode_GE4_V1.cpp
 AnalysisCode_GE6_V1.cpp
 loopdir.C
 *.tar
+*.xls
+*.xlsx
+*.xlsm
 
 # ROOT Files #
 ##############
