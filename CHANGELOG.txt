@@ -3,9 +3,14 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.1.4                               *
-*	LAST UPDATE: Sept 10 2016                    *
+*	LAST UPDATE: Sept 16 2016                    *
 *                                                *
 **************************************************
+
+Update: September 16th 2016
+==================================================
+->Fixed a bug that was causing the slice i to be taking data from slice (i+1)
+->Fixed a bug where the Segmented histograms were always being drawn with the last ieta/iphi sector in all pads
 
 Update: September 11th 2016
 ==================================================

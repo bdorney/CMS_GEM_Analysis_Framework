@@ -142,13 +142,14 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
             
             //Loop Over Stored Slices
             for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
+		cout<<"=======================================================================\n";
                 cout<<"Attempting to Fit (iEta, iPhi, iSlice) = (" << (*iterEta).first << ", " << (*iterPhi).first << ", " << (*iterSlice).first << ")\n";
                 
                 //Check if the slice histogram does not exist, get it if it doesn't
                 if ( (*iterSlice).second.hSlice_ClustADC == nullptr ){
 			if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr ) continue;
 
-			(*iterSlice).second.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString((*iterSlice).first+1) + "_clustADC").c_str(),(*iterSlice).first+1,(*iterSlice).first+1,"") ) );
+			(*iterSlice).second.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString((*iterSlice).first) + "_clustADC").c_str(),(*iterSlice).first,(*iterSlice).first,"") ) );
 		}
 
 		//Skip this slice if the histogram has zero entries

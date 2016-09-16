@@ -7,7 +7,7 @@
 #	iSlice must be an interger greater than 0, or for only the (iEta,iPhi) or iEta cases -1
 #
 # Example:
-#	source runMode_Comparison.sh data/clustSelStudy/GE11-VII-L-CERN-0002 GE11-VII-L-CERN-0002_ClustSize_Comparison.root ClustADC 4,2,-1 ClustSize
+#	source runMode_Comparison.sh data/clustSelStudy/GE11-VII-L-CERN-0002 GE11-VII-L-CERN-0002_ClustSize_Comparison.root clustADC 4,2,-1 ClustSize
 #
 
 #store the original directory
