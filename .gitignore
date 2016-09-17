@@ -1,10 +1,22 @@
 # Back-Up Files #
 #################
 *~
+*.swp
 
 # Binary Files #
 ################
 .DS_Store
+
+# Cluster Computing #
+#####################
+config/configRun_RunNo*.cfg
+stderr/
+stderr/*
+stdlog/
+stdlog/*
+stdout/
+stdout/*
+scripts/submitFrameworkJob_RunNo*.sh
 
 # Compiled source #
 ###################
@@ -17,6 +29,7 @@
 #figures/
 #figures/*
 *.png
+*.pdf
 
 # Misc #
 ########
@@ -24,15 +37,25 @@ AnalysisCode.cpp
 AnalysisCode_GE4_V1.cpp
 AnalysisCode_GE6_V1.cpp
 loopdir.C
+*.tar
+*.xls
+*.xlsx
+*.xlsm
 
 # ROOT Files #
 ##############
 *.root
 #TestBeamDataset_*.root
-#data/
-#data/*
+data/
+data/*
 
 # Text Files #
 ##############
 #*PFP.txt
 #setup_files/Production_ConfigFile.txt
+*DeadStripList.txt
+config/*.cfg_*
+config/configAnalysis_Slices*.cfg
+config/mapping_imaging_4APV.cfg
+config/GE7MappingCMScernData2016.cfg
+config/GE7MappingCMScernData2016_v2.cfg

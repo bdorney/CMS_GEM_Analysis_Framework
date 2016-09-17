@@ -8,14 +8,14 @@
 
 #include "Selector.h"
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Defaul Constructor
 Selector::Selector(){
-    
+    bVerboseMode = false;
 } //End Default Constructor
 
 //With Analysis Setup File Given at time of construction
-Selector::Selector(Uniformity::AnalysisSetupUniformity &inputSetup){
-    aSetupUniformity = inputSetup;
+Selector::Selector(QualityControl::Uniformity::AnalysisSetupUniformity &inputSetup){
+    aSetup = inputSetup;
 } //End Constructor

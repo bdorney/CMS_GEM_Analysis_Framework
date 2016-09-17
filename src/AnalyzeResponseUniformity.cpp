@@ -17,12 +17,12 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printROOTFileStatus;
-using Timing::HistoSetup;
-using Timing::stofSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printROOTFileStatus;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::stofSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
@@ -30,7 +30,7 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(){
 } //End Default Constructor
 
 //Set inputs at construction
-AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inputSetup, DetectorMPGD inputDet){
+AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inputSetup, DetectorMPGD & inputDet){
     strAnalysisName = "analysis";
     
     //Store Analysis Parameters
@@ -40,195 +40,139 @@ AnalyzeResponseUniformity::AnalyzeResponseUniformity(AnalysisSetupUniformity inp
     detMPGD = inputDet;
 } //End Constructor
 
-//Checks to see if the detector's uniformity is within requested amount
-void AnalyzeResponseUniformity::checkUniformity(){
-    //Check to make sure at least one peak exists
-    if(detMPGD.vec_allADCPeaks.size() == 0){
-	cout<<"============Analysis Summary============\n";
-    	cout<<"No Stored ADC Peaks; All Fits Failed!?\n";
-	cout<<"You should Investigate the output data file\n";
-	return;
-    }
-
-    //Variable Declaration
-    float fResponse_Max = *(std::max_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
-    float fResponse_Min = *(std::min_element(detMPGD.vec_allADCPeaks.begin(), detMPGD.vec_allADCPeaks.end() ) );
-    float fResponse_Var = (fResponse_Max - fResponse_Min) / fResponse_Max;
-    
-    //Output Above Info to User
-    cout<<"============Analysis Summary============\n";
-    cout<<"Detector's Minimum Response: " << fResponse_Min << endl;
-    cout<<"Detector's Maximum Response: " << fResponse_Max << endl;
-    cout<<"Calculated Difference: " << fResponse_Var << endl;
-
-    //Check if Detector is within tolerance
-    if ( fabs(fResponse_Var) <= aSetup.fUniformityTolerance ) { //Case: Detector Within Tolerance
-        cout<<"This is found to be within Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER PASSES!!!\n";
-        cout<<"You should Investigate the output data file\n";
-    } //End Case: Detector Within Tolerance
-    else{ //Case: Detector OUTSIDE Tolerance
-        cout<<"This is found to be OUTSIDE Tolerance (" << aSetup.fUniformityTolerance << "); CHAMBER FAILS!!!\n";
-        cout<<"You should Investigate the output data file\n";
-    } //End Case: Detector OUTSIDE Tolerance
-    
-    return;
-} //check AnalyzeResponseUniformity::Uniformity
-
-//Loads a ROOT file previously created by an instance of AnalyzeResponseUniformity
-//Loads all TObjects found in the input ROOT file into detMPGD;
-//Any previously stored information in detMPGD is lost.
-/*void AnalyzeResponseUniformity::loadHistosFromFile( std::string & strInputMappingFileName, std::string & strInputROOTFileName ){
-    //Variable Declaration
-    TFile *ptr_fileInput = nullptr;
-    
-    //This method will be called when the user wants to re-run the fitting on a previously created batch of histograms
-    //The user will directly supply an AMORE mapping file, this will make the DetectorMPGD structure so that it matches the one created when the histograms where first booked
-    //The user will indirectly supply an analysis config file because they want to re-run the fits and need to give new information
-    //Use previously existing framework code to setup the detector MPGD, then this method behaves as the reverse of storeHistos()
-    
-    //Setup the MPGD object
-    //------------------------------------------------------
-    ParameterLoaderAmoreSRS amoreLoader;
-    amoreLoader.loadAmoreMapping(strInputMappingFileName);
-    detMPGD = amoreLoader.getDetector();
-    
-    //Open the requested ROOT file
-    //------------------------------------------------------
-    ptr_fileInput = new TFile(strInputROOTFileName.c_str(),"READ","",1);
-    
-    //Check to see if data file opened successfully, if so load the tree
-    //------------------------------------------------------
-    if ( !ptr_fileInput->IsOpen() || ptr_fileInput->IsZombie() ) { //Case: failed to load ROOT file
-        perror( ("Uniformity::AnalyzeResponseUniformity::loadHistosFromFile() - error while opening file: " + strInputROOTFileName ).c_str() );
-        Timing::printROOTFileStatus(ptr_fileInput);
-        std::cout << "Exiting!!!\n";
-        
-        return;
-    } //End Case: failed to load ROOT file
-    
-    //Loop Through the file and load all stored TObjects
-    //------------------------------------------------------
-    //Loop Over Stored iEta Sectors
-    for (auto iterEta = detMPGD.map_sectorsEta.begin(); iterEta != detMPGD.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
-        
-        //Get Directory
-        //-------------------------------------
-        //Check to see if the directory exists already
-        TDirectory *dir_SectorEta = ptr_fileInput->GetDirectory( ( "SectorEta" + getString( (*iterEta).first ) ).c_str(), false, "GetDirectory" );
-        
-        //If the above pointer is null the directory does NOT exist, skip this Eta Sector
-        if (dir_SectorEta == nullptr) continue;
-        
-        //Debugging
-        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
-        
-        //Load Histograms - SectorEta Level
-        //-------------------------------------
-        dir_SectorEta->cd();
-        //Placeholder No fits performed on these histos for now
-        
-        //Loop Over Stored iPhi Sectors within this iEta Sector
-        for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over Stored iPhi Sectors
-            //Get Directory
-            //-------------------------------------
-            //Check to see if the directory exists already
-            TDirectory *dir_SectorPhi = dir_SectorEta->GetDirectory( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str(), false, "GetDirectory"  );
-            
-            //If the above pointer is null the directory does NOT exist, skip this Phi Sector
-            if (dir_SectorPhi == nullptr) continue;
-            
-            //Debugging
-            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
-            
-            //Load Histograms - SectorPhi Level
-            //-------------------------------------
-            dir_SectorPhi->cd();
-            (*iterPhi).second.clustHistos.hADC_v_Pos = make_shared<TH2F>( *((TH2F*) dir_SectorPhi->Get( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "_ClustADC_v_ClustPos").c_str() ) ) );
-            
-            //Check to see if 2D histo retrieved successfully
-            if ( (*iterPhi).second.clustHistos.hADC_v_Pos == nullptr) continue;
-            
-            //Set to Global Directory - SectorPhi Level
-            //-------------------------------------
-            //Prevents seg faulting when closing ptr_fileInput
-            (*iterPhi).second.clustHistos.hADC_v_Pos->SetDirectory(gROOT);
-            
-            //Slices
-            //Trickery, detMPGD now has eta and phi sectors setup.
-            //Slices are NOT setup
-            //Here loop from 1 to aSetup.iUniformityGranularity and either:
-            //      Option 1: Load slices from the file (slower?)
-            //      Option 2: project out from SectorPhi::clustHistos::hADC_v_Pos
-            //Implemented Option 2; faster many large number of I/O operations??
-            for (int i=1; i <= aSetup.iUniformityGranularity; ++i ) { //Loop Over Slices
-                //Set Histograms - Slice Level
-                //-------------------------------------
-                //Creat the slice
-                SectorSlice slice;
-                
-                slice.hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("hiEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_ClustADC").c_str(),i,i,"") ) );
-                
-                //Make sure to set this histo to the global directory
-                slice.hSlice_ClustADC->SetDirectory(gROOT);
-                
-                //Store position information for this slice
-                slice.fPos_Center = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinCenter(i);
-                slice.fWidth = (*iterPhi).second.clustHistos.hADC_v_Pos->GetXaxis()->GetBinWidth(i);
-                
-                //Store the slice
-                (*iterPhi).second.map_slices[i] = slice;
-            } //End Loop Over Slices
-        } //End Loop Over Stored iPhi Sectors
-    } //End Loop Over Stored iEta Sectors
-
-    //Close the file
-    //------------------------------------------------------
-    ptr_fileInput->Close();
-    
-    return;
-}*/ //End AnalyzeResponseUniformity::loadHistosFromFile()
-
-void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs){
+void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, string strObsName){
     //Variable Declaration;
+    std::vector<float> vec_fInputObsVariance;
+    
     std::multiset<float>::iterator iterQ1 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ2 = mset_fInputObs.begin();
     std::multiset<float>::iterator iterQ3 = mset_fInputObs.begin();
 
-	cout<<"mset_fInputObs.size() = " << mset_fInputObs.size() << endl;
-    
     //Determine max, min, & mean
     inputStatObs.fMax   = *mset_fInputObs.rbegin();   //Last member of the multiset
     inputStatObs.fMin   = *mset_fInputObs.begin();    //First member of the multiset
     inputStatObs.fMean  = std::accumulate( mset_fInputObs.begin(), mset_fInputObs.end(), 0. ) / mset_fInputObs.size();
+    
+    //Determine standard deviation
+    float fAvg = inputStatObs.fMean;
+    vec_fInputObsVariance.resize( mset_fInputObs.size() );
+    std::transform(mset_fInputObs.begin(), mset_fInputObs.end(), vec_fInputObsVariance.begin(), [fAvg](float x) { return x - fAvg; });
+    inputStatObs.fStdDev = std::sqrt( std::inner_product(vec_fInputObsVariance.begin(), vec_fInputObsVariance.end(), vec_fInputObsVariance.begin(), 0.0) / vec_fInputObsVariance.size() );
     
     //Determine Q1, Q2, & Q3
     std::advance(iterQ1, (int)std::ceil( mset_fInputObs.size() * 0.25 ) );  inputStatObs.fQ1 = *iterQ1;
     std::advance(iterQ2, (int)std::ceil( mset_fInputObs.size() * 0.50 ) );  inputStatObs.fQ2 = *iterQ2;
     std::advance(iterQ3, (int)std::ceil( mset_fInputObs.size() * 0.75 ) );  inputStatObs.fQ3 = *iterQ3;
     
-    //if (iterQ1 != nullptr && iterQ1 != mset_fInputObs.end() )
-    //if (iterQ2 != nullptr && iterQ2 != mset_fInputObs.end() )
-    //if (iterQ3 != nullptr && iterQ3 != mset_fInputObs.end() )
-    
     //Determine IQR
     inputStatObs.fIQR = inputStatObs.fQ3 - inputStatObs.fQ1;
     
-    //Determine all outliers
+    //Make distribution
+    inputStatObs.hDist = std::make_shared<TH1F>( TH1F( getNameByIndex(-1, -1, -1, "h", strObsName + "Dataset" ).c_str(), "", 40, inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    inputStatObs.hDist->Sumw2();
+    inputStatObs.hDist->GetXaxis()->SetTitle( strObsName.c_str() );
+    inputStatObs.hDist->GetYaxis()->SetTitle( "N" );
+    
+    //Fill distribution & determine all outliers
     float fLowerBound = inputStatObs.fQ1 - 1.5 * inputStatObs.fIQR;
     float fUpperBound = inputStatObs.fQ3 + 1.5 * inputStatObs.fIQR;
     inRange inDataRange(fLowerBound, fUpperBound);
     
     inputStatObs.mset_fOutliers = mset_fInputObs;
     for (auto iterSet = inputStatObs.mset_fOutliers.begin(); iterSet != inputStatObs.mset_fOutliers.end(); ++iterSet) { //Loop Over input multiset
+        inputStatObs.hDist->Fill( (*iterSet) );
         
-        if (inDataRange( (*iterSet) ) ) {
+        /*if (inDataRange( (*iterSet) ) ) {
             iterSet = inputStatObs.mset_fOutliers.erase(iterSet);
-        }
-        
+        }*/
     } //End Loop Over input multiset
+    
+    //Fit distribution
+    //inputStatObs.fitDist = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    //inputStatObs.fitDist->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    //inputStatObs.fitDist->SetParameter(1, inputStatObs.hDist->GetMean() );
+    //inputStatObs.fitDist->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    //inputStatObs.hDist->Fit(inputStatObs.fitDist.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+
+    shared_ptr<TF1> fitDist_Gaus = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    fitDist_Gaus->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    fitDist_Gaus->SetParameter(1, inputStatObs.hDist->GetMean() );
+    fitDist_Gaus->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    inputStatObs.hDist->Fit(fitDist_Gaus.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+
+    shared_ptr<TF1> fitDist_Landau = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "landau(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
+    fitDist_Landau->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
+    fitDist_Landau->SetParameter(1, inputStatObs.hDist->GetMean() );
+    fitDist_Landau->SetParameter(2, inputStatObs.hDist->GetRMS() );
+    
+    inputStatObs.hDist->Fit(fitDist_Landau.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
+    
+    float fNormChi2_Gaus = fitDist_Gaus->GetChisquare() / fitDist_Gaus->GetNDF();
+    float fNormChi2_Landau = fitDist_Landau->GetChisquare() / fitDist_Landau->GetNDF();
+    //bool bNormChi2Bad_Gaus = (std::isinf(fNormChi2_Gaus) || std::isnan(fNormChi2_Gaus) );
+    //bool bNormChi2Bad_Landau = (std::isinf(fNormChi2_Landau) || std::isnan(fNormChi2_Landau) );
+    
+    if (fNormChi2_Gaus < fNormChi2_Landau) {
+        inputStatObs.fitDist = fitDist_Gaus;
+    }
+    else{
+        inputStatObs.fitDist = fitDist_Landau;
+    }
     
     return;
 } //End AnalyzeResponseUniformity::calcStatistics()
+
+bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput){
+    //Variable Declaration
+    bool bIsQuality = true;
+
+    for( int i=0; i < fitInput->GetNpar(); i++){
+	bIsQuality = isQualityFit(fitInput, i);
+
+	if(!bIsQuality) break;
+    }    
+
+    return bIsQuality;
+} //End AnalyzeResponseUniformity::isQualityFit()
+
+bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput, int iPar){
+    //Variable Declaration
+    double dPar, dPar_Err;
+    double dParLimit_Lower, dParLimit_Upper;
+
+	dPar = fitInput->GetParameter(iPar);
+	dPar_Err = fitInput->GetParError(iPar);
+	fitInput->GetParLimits(iPar,dParLimit_Lower,dParLimit_Upper);
+
+	if (dPar == 0) {
+		//cout<<"Failed, Parameter " << iPar << " is zero\n";
+		//cout<<"dPar = " << dPar << endl;
+		return false;
+	}
+	else if ( ( fabs(dPar - dParLimit_Lower) / dPar ) < 0.001 ){
+		//cout<<"Failed, Parameter " << iPar << " is too close to lower boundary\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dParLimit_Lower = " << dParLimit_Lower << endl;
+		return false;
+	}
+	else if ( ( fabs(dPar - dParLimit_Upper) / dPar) < 0.001 ){
+		//cout<<"Failed, Parameter " << iPar << " is too close to upper boundary\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dParLimit_Upper = " << dParLimit_Upper << endl;		
+		return false;
+	}
+	else if ( ( dPar_Err / dPar ) > 0.1 ) {
+		//cout<<"Failed, Parameter " << iPar << " has too large of an uncertainty\n";
+		//cout<<"dPar = " << dPar << endl;
+		//cout<<"dPar_Err = " << dPar_Err << endl;
+		//cout<<"Percent Error = " << dPar_Err / dPar << endl;
+		return false;
+	}
+
+    return true;
+} //End AnalyzeResponseUniformity::isQualityFit()
 
 TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
@@ -238,7 +182,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     vector<float> vec_fFitRange;
     
     for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
-        vec_fFitRange.push_back( getFitBoundary( (*iterRange), hInput, specInput ) );
+        vec_fFitRange.push_back( getParsedInput( (*iterRange), hInput, specInput ) );
     } //End Loop Over Fit Range
     
     if (vec_fFitRange.size() > 1) {
@@ -250,7 +194,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     
     //Check to see if the number of parameters in the TF1 meets the expectation
     if ( ret_Func.GetNpar() < setupHisto.vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
-        
+
         printClassMethodMsg("AnalyzeResponseUniformity","getFit","Error! Number of Parameters in Function Less Than Requested Initial Guess Parameters!");
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Parameter: " + getString( ret_Func.GetNpar() ) ).c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guesses: " + getString( setupHisto.vec_strFit_ParamIGuess.size() ) ).c_str() );
@@ -263,16 +207,9 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     
     //Set Fit Parameters - Initial Value
     //------------------------------------------------------
-    //Keywords are AMPLITUDE, MEAN, PEAK, SIGMA
+    //Keywords are defined in vec_strSupportedKeywords
     for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
-        iterVec_IGuess = std::find(vec_strSupportedKeywords.begin(), vec_strSupportedKeywords.end(), setupHisto.vec_strFit_ParamIGuess[i]);
-        
-        if ( iterVec_IGuess == vec_strSupportedKeywords.end() ) { //Case: No Keyword Found; Try to set a Numeric Value
-            ret_Func.SetParameter(i, stofSafe( setupHisto.vec_strFit_ParamIGuess[i] ) );
-        } //End Case: No Keyword Found; Try to set a Numeric Value
-        else{ //Case: Keyword Found; Set Value based on Keyword
-            ret_Func.SetParameter(i, getValByKeyword( (*iterVec_IGuess), hInput, specInput ) );
-        } //End Case: Keyword Found; Set Value based on Keyword
+        ret_Func.SetParameter(i, getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) );
     } //End Loop over parameters - Initial Guess
     
     //Set Fit Parameters - Boundaries
@@ -282,10 +219,8 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
         //Here we use vec_strFit_ParamLimit_Min but we know it has the same number of parameters as vec_strFit_ParamLimit_Max
         //For each fit parameter, set the boundary
         for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
-            fLimit_Min = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
-            fLimit_Max = getFitBoundary(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
-            
-		//cout<<"(fLimit_Min, fLimit_Max) = (" << fLimit_Min << ", " << fLimit_Max << ")\n";
+            fLimit_Min = getParsedInput(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
+            fLimit_Max = getParsedInput(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
 
             (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimits(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimits(i, fLimit_Max, fLimit_Min );
         } //End Loop over boundary parameters
@@ -306,7 +241,7 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     return ret_Func;
 } //End AnalyzeResponseUniformity::getFit()
 
-float AnalyzeResponseUniformity::getFitBoundary(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput){
+float AnalyzeResponseUniformity::getParsedInput(std::string &strInputExp, std::shared_ptr<TH1F> hInput, TSpectrum &specInput){
     //Variable Declaration
     map<string, float> map_key2Val;
     
@@ -343,7 +278,7 @@ float AnalyzeResponseUniformity::getFitBoundary(std::string &strInputExp, std::s
     else{ //Case: Numeric Input
         return stofSafe( strInputExp );
     } //End Case: Numeric Input
-} //End AnalyzeResponseUniformity::getFitBoundary()
+} //End AnalyzeResponseUniformity::getParsedInput()
 
 TGraphErrors AnalyzeResponseUniformity::getGraph(int iEta, int iPhi, HistoSetup & setupHisto){
     //Variable Declaration
@@ -374,9 +309,33 @@ TH1F AnalyzeResponseUniformity::getHistogram(int iEta, int iPhi, HistoSetup &set
     
     ret_Histo.Sumw2();
     
+    //Set Directory to the global directory
+    ret_Histo.SetDirectory(gROOT);
+
     //Return Histogram
     return ret_Histo;
 } //End AnalyzeResponseUniformity::getHistogram()
+
+TH2F AnalyzeResponseUniformity::getHistogram2D(int iEta, int iPhi, HistoSetup &setupHisto_X, HistoSetup &setupHisto_Y){
+    //Variable Declaration
+    string strPrefix = "h";
+    string strName = getNameByIndex(iEta, iPhi, -1, strPrefix, setupHisto_Y.strHisto_Name + "_v_" + setupHisto_X.strHisto_Name );
+    
+    //Histo Declaration
+    TH2F ret_Histo(strName.c_str(), "", setupHisto_X.iHisto_nBins, setupHisto_X.fHisto_xLower, setupHisto_X.fHisto_xUpper, setupHisto_Y.iHisto_nBins, setupHisto_Y.fHisto_xLower, setupHisto_Y.fHisto_xUpper);
+    
+    //Set Histo Data Members
+    ret_Histo.SetXTitle( setupHisto_X.strHisto_Title_X.c_str() );
+    ret_Histo.SetYTitle( setupHisto_Y.strHisto_Title_X.c_str() );
+    
+    ret_Histo.Sumw2();
+    
+    //Set Directory to the global directory
+    ret_Histo.SetDirectory(gROOT);
+    
+    //Return Histogram
+    return ret_Histo;
+} //End AnalyzeResponseUniformity::getHistogram2D
 
 //Formats a given input string such that it follows the iEta, iPhi, iSlice naming convention
 string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice, std::string & strInputPrefix, std::string & strInputName){
@@ -389,8 +348,11 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
-    else{ //Case: iEta Sector, sum over sector's iPhi
+    else if (iEta > -1){
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+    }
+    else{ //Case: iEta Sector, sum over sector's iPhi
+        ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
     
     return ret_Name;
@@ -408,26 +370,25 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
     else if (iPhi > -1){ //Case: Specific (iEta,iPhi) sector
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "iPhi" + getString(iPhi) + "_" + strInputName;
     } //End Case: Specific (iEta,iPhi) sector
-    else{ //Case: iEta Sector, sum over sector's iPhi
+    else if (iEta > -1){
         ret_Name = strInputPrefix + "_iEta" + getString(iEta) + "_" + strInputName;
+    }
+    else{ //Case: iEta Sector, sum over sector's iPhi
+        ret_Name = strInputPrefix + "_Summary_" + strInputName;
     } //End Case: iEta Sector, sum over sector's iPhi
-
+    
     return ret_Name;
 } //End AnalyzeResponseUniformity::getNameByIndex()
 
-float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    //Search the peak parameter meaning vector for "PEAK"
-    //If found return this parameter
-    
-    //If not found, return -1;
-    //warn the user
-    
+//Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
+//This parameter is then returned to the user
+float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
     //Variable Declaration
     int iParamPos = -1;
     
     float ret_Val = -1;
     
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
     
     if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
         
@@ -436,29 +397,22 @@ float AnalyzeResponseUniformity::getPeakPos( shared_ptr<TF1> fitInput, HistoSetu
         ret_Val = fitInput->GetParameter(iParamPos);
     } //End Case: Parameter Found!!!
     else{ //Case: Parameter NOT Found
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getParam",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
     } //End Case: Parameter NOT Foun
     
     return ret_Val;
-} //End AnalyzeResponseUniformity::getPeakPos
+} //End AnalyzeResponseUniformity::getParam
 
-float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto ){
-    //Search the peak parameter meaning vector for "PEAK"
-    //If found return this parameter
-    
-    //If not found, return -1;
-    //warn the user
-    
+//Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
+//The error on this parameter is then returned to the user
+float AnalyzeResponseUniformity::getParamError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
     //Variable Declaration
     int iParamPos = -1;
     
     float ret_Val = -1;
     
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), "PEAK");
+    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
     
     if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
         
@@ -467,23 +421,28 @@ float AnalyzeResponseUniformity::getPeakPosError( shared_ptr<TF1> fitInput, Hist
         ret_Val = fitInput->GetParError(iParamPos);
     } //End Case: Parameter Found!!!
     else{ //Case: Parameter NOT Found
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","Error! - I Do not know which parameter in your fit function represents the peak!\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tPlease Cross-check input analysis config file.\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tEnsure the field 'Fit_Param_Map' has a value 'PEAK' and the posi 'PEAK' matches\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\tThe position of 'PEAK' in the list must match the numeric index of the parameter\n");
-        printClassMethodMsg("AnalyzeResponseUniformity","getPeakPos","\te.g. if Parameter [2] represents the spectrum peak than 'PEAK' should be the third member in the list given to 'Fit_Param_Map'\n");
+        printClassMethodMsg("AnalyzeResponseUniformity","getParamError",("Error! - I did not find your requested parameter: " + strParam + "!\n").c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getParamError","\tPlease Cross-check input analysis config file.\n");
     } //End Case: Parameter NOT Foun
     
     return ret_Val;
-} //End AnalyzeResponseUniformity::getPeakPosError
+} //End AnalyzeResponseUniformity::getParamError
 
 //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
 float AnalyzeResponseUniformity::getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput){
     
     //Try to automatically assign a value
-    if (0 == strInputKeyword.compare("AMPLITUDE") ) { //Case: Histo Amplitude
+    if ( 0 == strInputKeyword.compare("AMPLITUDE") ) { //Case: Histo Amplitude
         return hInput->GetBinContent( hInput->GetMaximumBin() );
     } //End Case: Histo Amplitude
+    else if( 0 == strInputKeyword.compare("FWHM") ){ //Case: Full Width Half Max
+        //Right now as estimate we just use the histo RMS
+        return hInput->GetRMS();
+    } //End Case: Full Width Half Max
+    else if( 0 == strInputKeyword.compare("HWHM") ){ //Case: Half Width Half Max
+        //Right now as estimate we just use half the histo RMS
+        return 0.5 * hInput->GetRMS();
+    } //End Case: Half Width Half Max
     else if (0 == strInputKeyword.compare("MEAN") ) { //Case: Histo Mean
         return hInput->GetMean();
     } //End Case: Histo Mean

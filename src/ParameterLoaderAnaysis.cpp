@@ -17,20 +17,22 @@ using std::transform;
 using std::vector;
 
 //using namespace Timing;
-using Timing::convert2bool;
-using Timing::getCharSeparatedList;
-using Timing::getlineNoSpaces;
-using Timing::getParsedLine;
-using Timing::getString;
-using Timing::HistoSetup;
-using Timing::printStreamStatus;
-using Timing::stofSafe;
-using Timing::stoiSafe;
+using QualityControl::Timing::convert2bool;
+using QualityControl::Timing::getCharSeparatedList;
+using QualityControl::Timing::getlineNoSpaces;
+using QualityControl::Timing::getParsedLine;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::HistoSetup;
+using QualityControl::Timing::printStreamStatus;
+using QualityControl::Timing::stofSafe;
+using QualityControl::Timing::stoiSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
+    m_bVerboseMode_IO       = false;
+    
     strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
     strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
     strSecBegin_Uniformity  = "[BEGIN_UNIFORMITY_INFO]";
@@ -48,7 +50,7 @@ ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
 //Opens a text file set by the user and loads the requested parameters
 void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, AnalysisSetupUniformity &aSetupUniformity){
     //Variable Declaration
-    bool bExitSuccess = false;
+    //bool bExitSuccess = false;
     
     pair<string,string> pair_strParam; //Input file is setup in <Field, Value> pairs; not used here yet but placeholder
     
@@ -59,7 +61,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     
     //Open the Data File
     //------------------------------------------------------
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParameters", ("trying to open and read: " + strInputSetupFile).c_str() );
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -67,11 +69,15 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     
     //Check to See if Data File Opened Successfully
     //------------------------------------------------------
-    if (!fStream.is_open() && bVerboseMode_IO) {
+    if (!fStream.is_open() && m_bVerboseMode_IO) {
         perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while opening file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
-    }
+    }*/
     
+    //ifstream fStream = getFileStream(strInputSetupFile, m_bVerboseMode_IO);
+    ifstream fStream;
+    setFileStream(strInputSetupFile, fStream, m_bVerboseMode_IO);    
+
     ////Loop Over data Input File
     //------------------------------------------------------
     //Read the file via std::getline().  Obey good coding practice rules:
@@ -80,19 +86,19 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     //See: http://gehrcke.de/2011/06/reading-files-in-c-using-ifstream-dealing-correctly-with-badbit-failbit-eofbit-and-perror/
     while ( getlineNoSpaces(fStream, strLine) ) {
         //Reset exit flag used in string manipulation
-        bExitSuccess = false;
+        //bExitSuccess = false;
         
         //Does the user want to comment out this line?
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Debugging
-        cout<<"strLine = " << strLine.c_str() << endl;
+        //cout<<"strLine = " << strLine.c_str() << endl;
         
         //Identify Section Headers
         if ( 0 == strLine.compare(strSecEnd_Analysis) ) { //Case: Reached End of File
             
             //Debugging
-            cout<<"Found End of Analysis Section"<<endl;
+            //cout<<"Found End of Analysis Section"<<endl;
             
             break;
         } //End Case: Reached End of File
@@ -103,13 +109,13 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         } //End Case: Analysis Header
         else if ( 0 == strLine.compare(strSecBegin_Timing) ) { //Case: Timing Parameters
             //Debugging
-            cout<<"Found Start of Timing Section"<<endl;
+            //cout<<"Found Start of Timing Section"<<endl;
             
             loadAnalysisParametersTiming(fStream, aSetupUniformity);
         } //End Case: Timing Parameters
         else if ( 0 == strLine.compare(strSecBegin_Uniformity) ) { //Case: Uniformity Parameters
             //Debugging
-            cout<<"Found Start of Uniformity Section"<<endl;
+            //cout<<"Found Start of Uniformity Section"<<endl;
             
             loadAnalysisParametersUniformity(fStream, aSetupUniformity);
         } //End Case: Uniformity Parameters
@@ -121,7 +127,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     } //End Loop Over Input File
     
     //Check to see if we had problems while reading the file
-    if (fStream.bad() && bVerboseMode_IO) {
+    if (fStream.bad() && m_bVerboseMode_IO) {
         perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while reading file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
     }
@@ -134,13 +140,16 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
     //Variable Declaration
     bool bExitSuccess = false;
     
+    int iMin, iMax;
+    
     pair<string,string> pair_strParam; //Input file is setup in <Field, Value> pairs; not used here yet but placeholder
     
     string strLine = "";    //Line taken from the input file
+    string strTmp = "";
     
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits", "Found Fit Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -152,15 +161,14 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
         if ( 0 == strLine.compare(strSecEnd_Uniformity_Fit ) ) break;
         
         //Debugging
-        cout<<"strLine: = " << strLine.c_str() << endl;
+        //cout<<"strLine: = " << strLine.c_str() << endl;
         
         //Parse the line
         pair_strParam = getParsedLine(strLine,bExitSuccess);
         
         if (bExitSuccess) { //Case: Parameter Fetched Correctly
-            //transform(pair_strParam.first.begin(), pair_strParam.second.end(),pair_strParam.first.begin(),toupper);
-            
-            string strTmp = pair_strParam.first;
+            //Change to all capitals;
+            strTmp = pair_strParam.first;
             transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
             
             pair_strParam.first = strTmp;
@@ -170,6 +178,28 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             if( 0 == pair_strParam.first.compare("FIT_FORMULA") ){ //Case: ADC Spectrum Fit Equation
                 hSetup.strFit_Formula = pair_strParam.second;
             } //End Case: ADC Spectrum Fit Equation
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_SIG") ){ //Case: ADC Spectrum Fit Equation Signal
+                hSetup.strFit_Formula_Sig = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation Signal
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_SIG_PARAM_IDX_RANGE") ){ //Case: ADC Spectrum Fit Equation Bkg Range
+                vec_strList = getCharSeparatedList(pair_strParam.second,',');
+                
+                iMin = stoiSafe(pair_strParam.first, (*std::min_element(vec_strList.begin(), vec_strList.end() ) ) );
+                iMax = stoiSafe(pair_strParam.first, (*std::max_element(vec_strList.begin(), vec_strList.end() ) ) );
+                
+                hSetup.pair_iParamRange_Sig = std::make_pair(iMin, iMax);
+            } //End Case: ADC Spectrum Fit Equation Bkg Range
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_BKG") ){ //Case: ADC Spectrum Fit Equation Background
+                hSetup.strFit_Formula_Bkg = pair_strParam.second;
+            } //End Case: ADC Spectrum Fit Equation Background
+            else if( 0 == pair_strParam.first.compare("FIT_FORMULA_BKG_PARAM_IDX_RANGE") ){ //Case: ADC Spectrum Fit Equation Bkg Range
+                vec_strList = getCharSeparatedList(pair_strParam.second,',');
+                
+                iMin = stoiSafe(pair_strParam.first, (*std::min_element(vec_strList.begin(), vec_strList.end() ) ) );
+                iMax = stoiSafe(pair_strParam.first, (*std::max_element(vec_strList.begin(), vec_strList.end() ) ) );
+                
+                hSetup.pair_iParamRange_Bkg = std::make_pair(iMin, iMax);
+            } //End Case: ADC Spectrum Fit Equation Bkg Range
             else if( 0 == pair_strParam.first.compare("FIT_OPTION") ){ //Case: ADC Spectrum Fit Equation
                 hSetup.strFit_Option = pair_strParam.second;
                 
@@ -188,7 +218,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
                 hSetup.vec_strFit_ParamLimit_Min = getCharSeparatedList(pair_strParam.second, ',');
             }
             else if( 0 == pair_strParam.first.compare("FIT_PARAM_MAP") ){
-                hSetup.vec_strFit_ParamMeaning = Timing::getCharSeparatedList(pair_strParam.second,',');
+                hSetup.vec_strFit_ParamMeaning = getCharSeparatedList(pair_strParam.second,',');
             }
             else if( 0 == pair_strParam.first.compare("FIT_RANGE") ){
                 hSetup.vec_strFit_Range = getCharSeparatedList(pair_strParam.second, ',');
@@ -205,6 +235,12 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits",("\tCurrent line: " + strLine).c_str() );
         } //End Case: Parameter Failed to fetch correctly
     } //End Loop through Fit Heading
+    if ( inputFileStream.bad() && m_bVerboseMode_IO) {
+        perror( "ParameterLoaderRun::loadParametersRun(): error while reading config file" );
+        printStreamStatus(inputFileStream);
+    }
+    
+    return;
 } //End ParameterLoaderAnaysis::loadAnalysisParametersFits
 
 //Called when loading analysis parameters; relative to histograms
@@ -304,6 +340,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitADC);
         } //End Case: Hit ADC
+        else if (0 == strTmp.compare("HITMULTI") ) { //Case: Cluster Multi
+            aSetupUniformity.histoSetup_hitMulti.strHisto_Name = strName;
+            
+            loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitMulti);
+        } //End Case: Cluster Multi
         else if (0 == strTmp.compare("HITPOS") ) { //Case: Hit Position
             aSetupUniformity.histoSetup_hitPos.strHisto_Name = strName;
             
@@ -313,7 +354,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
             aSetupUniformity.histoSetup_hitTime.strHisto_Name = strName;
             
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity.histoSetup_hitTime);
-        } //End Case: Cluster Time
+        } //End Case: Hit Time
         //=======================Unrecognized Parameters=======================
         else{ //Case: Undefined Behavior
             printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
@@ -425,6 +466,10 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
         } //End Case: Parameter was NOT fetched Successfully
     } //End Loop through Section
     
+    if( hSetup.iHisto_nBins > 0 ){
+	hSetup.fHisto_BinWidth = (hSetup.fHisto_xUpper - hSetup.fHisto_xLower) / hSetup.iHisto_nBins;
+    }
+
     return;
 } //End ParameterLoaderAnalysis::loadAnalysisParametersHistograms() - Histogram specific
 
@@ -452,7 +497,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
     
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
-    if (bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity", "Found Uniformity Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -466,15 +511,15 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         //Should we be storing histogram/fit setup parameters?
         if ( 0 == strLine.compare(strSecBegin_Uniformity_Fit) ) { //Case: Fit Setup
             loadAnalysisParametersFits(inputFileStream, aSetupUniformity.histoSetup_clustADC);
-	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
+            continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Fit Setup
         else if( 0 == strLine.compare(strSecBegin_Uniformity_Histo) ){ //Case: Histo Setup
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity);
-	    continue; //Tell it to move to the next loop iteration (e.g. line in file)
+            continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Histo Setup
         
         //Debugging
-        cout<<"strLine: = " << strLine.c_str() << endl;
+        //cout<<"strLine: = " << strLine.c_str() << endl;
         
         //Parse the line
         pair_strParam = getParsedLine(strLine,bExitSuccess);
@@ -553,9 +598,6 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             else if( 0 == pair_strParam.first.compare("UNIFORMITY_GRANULARITY") ){ //Case: Uniformity Granularity
                 aSetupUniformity.iUniformityGranularity = stoiSafe(pair_strParam.first,pair_strParam.second);
             } //End Case: Uniformity Granularity
-            else if( 0 == pair_strParam.first.compare("UNIFORMITY_TOLERANCE") ){ //Case: Uniformity Granularity
-                aSetupUniformity.fUniformityTolerance = stofSafe(pair_strParam.first,pair_strParam.second);
-            } //End Case: Uniformity Granularity
             //=======================Unrecognized Parameters=======================
             else{ //Case: Parameter Not Recognized
                 printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
@@ -572,9 +614,9 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
     return;
 } //End ParameterLoaderAnaysis::loadAnalysisParametersUniformity()
 
-Uniformity::AnalysisSetupUniformity ParameterLoaderAnaysis::getAnalysisParameters(string & strInputSetupFile){
+QualityControl::Uniformity::AnalysisSetupUniformity ParameterLoaderAnaysis::getAnalysisParameters(string & strInputSetupFile){
     //Variable Declaration
-    Uniformity::AnalysisSetupUniformity aSetupUniformity;
+    QualityControl::Uniformity::AnalysisSetupUniformity aSetupUniformity;
     
     loadAnalysisParameters(strInputSetupFile, aSetupUniformity);
     

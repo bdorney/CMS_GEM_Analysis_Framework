@@ -15,16 +15,16 @@ using std::ifstream;
 using std::string;
 using std::vector;
 
-using Timing::getString;
-using Timing::printStreamStatus;
-using Timing::stofSafe;
-using Timing::stoiSafe;
+using QualityControl::Timing::getString;
+using QualityControl::Timing::printStreamStatus;
+using QualityControl::Timing::stofSafe;
+using QualityControl::Timing::stoiSafe;
 
-using namespace Uniformity;
+using namespace QualityControl::Uniformity;
 
 //Default Constructor
 ParameterLoaderAmoreSRS::ParameterLoaderAmoreSRS(){
-    bVerbose_IO = false;
+    m_bVerboseMode_IO = false;
 } //End default constructor
 
 //Load the amore mapping file and extract the detector parameters
@@ -36,7 +36,7 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
     
     //Open the Mapping File
     //------------------------------------------------------
-    if (bVerbose_IO) { //Case: User Requested Verbose Error Messages - I/O
+    /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         cout<< "treeProducerTDC::readRuns(): trying to open and read: " << strInputMappingFileName << endl;
     } //End Case: User Requested Verbose Error Messages - I/O
     
@@ -44,11 +44,15 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
     
     //Check to See if Mapping File Opened Successfully
     //------------------------------------------------------
-    if (!file_AmoreMapping.is_open() && bVerbose_IO) {
+    if (!file_AmoreMapping.is_open() && m_bVerboseMode_IO) {
         perror( ("treeProducerTDC::readRuns(): error while opening file: " + strInputMappingFileName).c_str() );
         printStreamStatus(file_AmoreMapping);
-    }
+    }*/
     
+    //ifstream file_AmoreMapping = getFileStream(strInputMappingFileName, m_bVerboseMode_IO);
+    ifstream file_AmoreMapping;
+    setFileStream(strInputMappingFileName, file_AmoreMapping, m_bVerboseMode_IO);    
+
     //Loop Over data Input File
     //------------------------------------------------------
     //Read the file via std::getline().  Obey good coding practice rules:
@@ -66,10 +70,11 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
             //Parse the input line
             vec_strParam = Timing::getCharSeparatedList(strLine,',');
             
-            cout<<"Lines from " << strInputMappingFileName << endl;
-            for (int i=0; i < vec_strParam.size(); ++i) {
+            //Debugging
+            //cout<<"Lines from " << strInputMappingFileName << endl;
+            /*for (int i=0; i < vec_strParam.size(); ++i) {
                 cout<<i<<"\t"<<vec_strParam[i]<<endl;
-            }
+            }*/
             
             //expecting a tab+comma separated list ordered as:
             //#Header   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
@@ -94,7 +99,7 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
     } //End Loop Over input mapping file
     
     //Check to see if we had problems while reading the file
-    if (file_AmoreMapping.bad() && bVerbose_IO) {
+    if (file_AmoreMapping.bad() && m_bVerboseMode_IO) {
         perror( ("Uniformity::ParameterLoaderAmoreSRS::loadAmoreMapping(): error while reading file: " + strInputMappingFileName).c_str() );
         printStreamStatus(file_AmoreMapping);
     }

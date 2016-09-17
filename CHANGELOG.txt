@@ -2,10 +2,372 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 1.0.1                               *
-*	LAST UPDATE: Apr 11 2016                     *
+*	VERSION: 2.2.0                               *
+*	LAST UPDATE: Sept 17 2016                    *
 *                                                *
 **************************************************
+
+Update: September 17th 2016
+==================================================
+->Updated README.txt
+->Issuing release_v2.2
+
+Update: September 16th 2016
+==================================================
+->Fixed a bug that was causing the slice i to be taking data from slice (i+1)
+->Fixed a bug where the Segmented histograms were always being drawn with the last ieta/iphi sector in all pads
+
+Update: September 11th 2016
+==================================================
+->Honor their memory
+->Added new class QualityControl::Uniformity::VisualizeComparison for making comparison plots across different framework output files
+->Added new class QualityControl::Uniformity::ParameterLoaderComparison for setting necessary inputs in the QualityControl::Uniformity::RunSetp struct
+->QualityControl::Uniformity::VisualizeComparison inherits from QualityControl::Uniformity::Visualizer
+->Public method QualityControl::Uniformity::ParameterLoaderRun::loadParametersRun() renamed to loadParameters()
+->QualityControl::Uniformity::ParameterLoaderRun has two new private methods loadParametersRun() & loadParametersCompare() for setting up different run modes
+->Updated QualityControl::Uniformity::RunSetup to have additional data members for setting up VisualizeComparison
+
+Update: September 10th 2016
+==================================================
+->Added QualityControl::Timing::HistoSetup::fHisto_BinWidth for storing bin width of histograms
+->QualityControl::Uniformity::ParameterLoaderAnalysis::loadAnalysisParametersHistograms() will calculate the histogram bin width for each HistoSetup identified
+->Adding overloaded method QualityControl::Uniformity::AnalyzeResponseUniformity::isQualityFit() for accepting/rejecting a fit
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will now only attempt a fit if the histogram integral is non-zero in the fit range
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will only accept fits that have TFitResultsPtr::IsValid() and the peak parameter must not be: zero, within 0.1% of the limits, or having a percent error > 10%
+->Added data member QualityControl::Uniformity::ReadoutSectorPhi::fNFitSuccess for tracking number of successful slice fits per sector
+->Added private method QualityControl::Uniformity::VisualizeUniformity::getCanvasSliceFit() for making a canvas of the slice histo & fit
+->Added overloaded method QualityControl::Uniformity::VisualizeUniformity::storeCanvasFits() for calling getCanvasSliceFit() for all slices and making a summary of the success rate of fitting
+->QualityControl::Uniformity::InterfaceAnalysis::storeResults() will now call VisualizeUniformity::storeCanvasFits()
+->QualityControl::Uniformity::AnalyzeResponseUniformity::calcStatistics() will no longer attempt to discard "outliers" when determining uniformity
+->Fixed a bug in series & re-run mode in which the clusters in each slice were being over-counted progressively as number of input files increased
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will now also create the slice histograms
+->QualityControl::Uniformity::VisualizeUniformity now inherits from QualityControl::Uniformity::Visualizer, future functionality foreseen
+->All QualityControl::Uniformity::ParameterLoaderX classes now inherit from QualityControl::Uniformity::ParameterLoader, future functionality foreseen
+
+Update: September 9th 2016
+==================================================
+->Dataset distributions will now display the normalized chi^2 value of the fit applied to the dataset
+->Dataset distributions will now display the error on the mean, sigma, and percent error of the dataset
+
+Update: September 5th 2016
+==================================================
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters will now fill and store a run history for the cluster time vs. evt number
+->Added new private method QualityControl::Uniformity::VisualizeUniformity::getMapObsHisto2D for selecting() the run history distribution of interest (e.g. ADC vs. Evt Num for all runs)
+->Added new private method QualityControl::Uniformity::VisualizeUniformity::getSummarizedRunHistoryHisto2D() for transforming obs vs. evt number to obs vs. run number
+->Renamed QualityControl::Uniformity::VisualizeUniformity::storeCanvasHisto2D() to QualityControl::Uniformity::VisualizeUniformity::makeAndStoreCanvasHisto2D()
+->Added new method QualityControl::Uniformity::VisualizeUniformity::storeCanvasHisto2DHistorySegmented() for storing run history plots segmented by Eta or Phi
+->Added new private methods QualityControl::Uniformity::VisualizeUniformity::getPadEta() and QualityControl::Uniformity::VisualizeUniformity::getPadPhi()
+
+Update: September 2nd 2016
+==================================================
+->struct's SectorEta & SectorPhi (in QualityControl::Uniformity) being converted into classes ReadoutSectorEta & ReadoutSectorPhi which inherit from ReadoutSector (in QualityControl::Uniformity)
+->Updated Makefile.clang & Makefile.gpp to compile new classes: ReadoutSector, ReadoutSectorPhi, and ReadoutSectorEta
+->QualityControl::Uniformity::VisualizeUniformity::getObsX() methods, for X={Data,Histo} being changed to take a ReadoutSector object as input instead of a ReadoutSectorEta object
+
+Update: August 31 2016
+==================================================
+->Fixed a bug where fitting in QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() could be performed on a histogram with 0 entries thus leading to a seg fault with a null TFitResultPtr being returned.
+->Fitting done in QualityControl::Uniformity::AnalyzeResponseUniformityClusters::fitHistos() will only consider slice histograms that are not null pointers themselves, and with at least 1 entry
+->Changed int main() in src/analyzeUniformity.cpp to exit if no input files are found rather than continue and crash (due to no valid input...)
+
+Update: August 26 2016
+==================================================
+->Updated default GE1/1-VII-L & GE1/1-VII-S mapping again, now origin is in center of detector's local coordinate (matches DPG)
+
+Update: August 24 2016
+==================================================
+->Removed AnalysisSetupUniformity::fUniformityTolerance and all associated functionality
+
+Update: August 23 2016
+==================================================
+->Added method AnalyzeResponseUniformityHits::findDeadStrips(), produces a text file including tabular data of dead strips in eta/phi
+->Added function QualityControl::Uniformity::getPhiStripNum() for converting strip number in iEta row to iPhi sector
+->Added function QualityControl::Uniformity::getPhiSectorVal() for determining which phi sector an iEta strip is in
+->Added overloaded function QualityControl::Timing::printStreamStatus() for dealing with std::fstream objects
+->Changed InterfaceAnalysis::storeResults to take 2 arguments, the second being the file name of the input TFile
+->InterfaceAnalysis::storeResults will now call AnalyzeResponseUniformityHits::findDeadStrips()
+
+Update: August 19th 2016
+==================================================
+->Fixed an error in VisualizeUniformity where iphi was drawn in the wrong order on the summary canvases
+
+Update: August 18th 2016
+==================================================
+->Changed the mapping files, config/Mapping_GE11-VII-S.cfg and config/Mapping_GE11-VII-L.cfg, to have the width & height matching the CMS Geometry
+->Note the CMS Geometry for GE1/1 is found in table 2 of https://twiki.cern.ch/twiki/bin/viewauth/CMS/GEMGeometryStatusNew#GE_1_1_Global_Position
+
+Update: July 7th 2016
+==================================================
+->Removed InterfaceRun workflow, class still exists but is no longer used
+->Added std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run to QualityControl::Uniformity::HistosPhysObj; here key is a run number and the value is the histogram
+
+Update: July 6th 2016
+==================================================
+->Performance is abysmal in this new mode.  Trying to improve.
+->Changed fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityClusters to take as input a DetectorMPGD object by reference and work with this object instead of the stored DetectorMPGD class attribute inherited from FrameworkBase.
+->Changed QualityControl::Uniformity::SectorPhi::vec_clusters and vec_hits to std::multimap<int,Cluster> and std::multimap<int,Hit>, respectively.  Here the key value is the event number
+->Changed DetectorMPGD get/set methods to work mostly with std::multimap<int, X> for X = {Cluster, Hit} instead of with std::vector<X>
+->Changed fillHistos(), fitHistos(), initGraphClusters(), initHistosClusters(), storeHistos() and storeFits() in QualityControl::Uniformity::AnalyzeResponseUniformityHits to take as input a DetectorMPGD object by reference and work with this object instead of the stored DetectorMPGD class attribute inherited from FrameworkBase.
+->QualityControl::Uniformity::VisualizeUniformity::getObsHisto() may now also return multiplicity histograms
+->QualityControl::Uniformity::InterfaceAnalysis::storeResults() will now produce segmented multiplicity plots for hits and clusters
+->Added method QualityControl::Uniformity::ParameterLoaderRun::getRunNumber() for determining the run number from an input filename
+->Added method QualityControl::Uniformity::ParameterLoaderRun::getPairedRunList() for determing the requested input runs paired to a run number
+
+Update: July 5th 2016
+==================================================
+->Added overloaded method Uniformity::SelectorCluster::filterClusters() for filtering an input vector<Cluster> based on selection criterion stored in the stored/provided Uniformity::AnalysisSetupUniformity
+->Added overloaded method Uniformity::SelectorHit::filterHits() for filtering an input vector<Hit> based on selection criterion stored in the stored/provided Uniformity::AnalysisSetupUniformity
+->Added smart pointers hMulti_Clust & hMulti_Hit to DetectorMPGD; these serve as summary plots showing the hit & cluster multiplicity per event over the entire detector
+->Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() will now initialize detMPGD.hMulti_Clust
+->Uniformity::AnalyzeResponseUniformityHits::initHistosHits() will now initialize detMPGD.hMulti_Hit
+->Added attribute Timing::HistoSetup histoSetup_hitMulti to Uniformity::AnalysisSetupUniformity
+->Uniformity::ParameterLoaderAnalysis::loadAnalysisParametersHistograms() will now also load a Timing::HistoSetup object for hit multiplicity
+->Default config/configAnalysis.cfg now has a histogram field for hit multiplicity
+->Added method Uniformity::DetectorMPGD::SetEvent() for taking an input event, filling event level distributions, and then setting the Physics Objects in the detector
+->Added function Uniformity::getEventRange() in include/UniformityUtilityFunctions.h
+->Uniformity::SelectorCluster::setClusters() now uses Uniformity::getEventRange() to determine event range
+->Uniformity::SelectorCluster::clusterPassesSelection() changed to public
+->Uniformity::SelectorHit::setHits() now uses Uniformity::getEventRange() to determine event range
+->Uniformity::SelectorHit::hitPassesSelection() changed to public
+->Added method Uniformity::InterfaceAnalysis::initialize() for initializing all stored classes, histograms, graphs, etc...
+->The Uniformity & Timing namespaces have been moved inside the QualityControl namespace
+->Added new class QualityControl::Uniformity::FrameworkBase
+->QualityControl::Uniformity::Selector, QualityControl::Uniformity::AnalyzeResponseUniformity, QualityControl::Uniformity::Interface now inherit from QualityControl::Uniformity::FrameworkBase
+->The setDetector, getDetector, setAnalysisParameter, setVerboseMode methods have all been moved from all other classes to QualityControl::Uniformity::FrameworkBase
+->Added new class QualityControl::Uniformity::Interface from which QualityControl::Uniformity::InterfaceAnalysis inherits
+->Makefile.clang and Makefile.gpp will now compile additional classes
+
+Update: July 4th 2016
+==================================================
+->Adding event struct to include/UniformityUtilityTypes.h
+
+Update: July 3rd 2016
+==================================================
+->Updates to README.txt
+->White space and depreciated commented items clean-up on include/AnalyzeResponseUniformity.h and src/AnalyzeResponseUniformity.cpp
+->Changed AnalyzeResponseUniformity::calcStatistics() to take 3 arguments instead of 2, e.g. calcStatistics(Uniformity::SummaryStatistics &inputStatObs, std::multiset<float> &mset_fInputObs, std::string strObsName);
+->AnalyzeResponseUniformity::calcStatistics() will now fill inputStatObs::hDist from the input mset_fInputObs
+->Removed mset_fClustADC_Fit_PkPos, mset_fClustADC_Spec_PkPos, statClustADC_Fit_PkPos, and statClustADC_Spec_PkPos attributes from Uniformity::SectorEta
+->Added attribute fitDist to Uniformity::SummaryStatistics
+->Added method Uniformity::SummaryStatistics::clear() for wiping stored data (numbers set to -1, stl containers cleared, pointers deleted)
+->Added private attributes mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes to Uniformity::DetectorMPGD; these represent the sum over the PkPos & PkRes observables over all stored SectorEta objects
+->Added method DetectorMPGD::resetResults() for clearing mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->Added method DetectorMPGD::reset() now also clears mset_fClustADC_Fit_PkPos, mset_fClustADC_Fit_PkRes, statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->Added method DetectorMPGD::getStatPkPos() and DetectorMPGD::getStatPkRes() for accessing private attributes statClustADC_Fit_PkPos, and statClustADC_Fit_PkRes
+->VisualizeUniformity::storeCanvasData will no longer create a TH1F or TF1 for the requested strObsName; nor perform the fitting.  Instead this is done in AnalyzeResponseUniformity::calcStatistics()
+->VisualizeUniformity::storeCanvasData still makes the same TCanvas as before, now stores the TF1 in addition to the TH1F stored on this TCanvas
+->InterfaceAnalysis will now make dataset distributions for both PkPos and PkRes (before was only PkPos)
+
+Update: June 30th 2016
+==================================================
+->Updates to README.txt
+->Updated configRun_Template_Rerun.cfg files to have the "Detector_Name" name field by default
+->Adding config/Mapping_GE11-VII-L.cfg and config/Mapping_GE11-VII-S.cfg to the repository to serve as the geometry for the long and short generation VII detectors, respectively.
+
+Update: June 28th 2016
+==================================================
+->Added functionality for energy resolution to be determined when the user has given the "SIGMA" meaning to a parameter instead of FWHM (gaussian relation used)
+->Overloaded Uniformity::ceilPowerTen() in include/UniformityFunctions.h to increment by scalar multiples of powers of 10; also just powers of 10 still avaliable
+->Segmented summary TCanvas objects prepared by Uniformity::VisualizeUniformity::storeCanvasHistoSegmented() no longer use Uniformity::ceilPowerTen() to set the Y-axis range.
+->Changed Uniformity::divides in include/UniformityUtilityOperators.h to only divide the third element of a tuple; this fixes a bug where the normalized trapezoidal maps X & Y axis were also modified (in addition to the z-axis values)
+->Added private Uniformity::VisualizeUniformity::getObsData() for returning a vector whose elements are the value of an inout strObsName from an input Uniformity::SectorEta
+->Added overloaded method Uniformity::VisualizeUniformity::storeCanvasData() for plotting an input strObsName as a histogram and saving the canvas
+->Uniformity::InterfaceAnalysis::storeResults() now calls VisualizeUniformity::storeCanvasData() for strObsName = "ResponseFitPkPos"
+->Uniformity::VisualizeUniformity::getObsX for X = {Data, Graph, Histo} changed such that input strObsName is no longer passed by reference (since there is a conversion toupper that is sometimes not desired elsehwere)
+
+Update: June 23rd 2016
+==================================================
+->Tweaking Uniformity::VisualizeUniformity::storeCanvasHisto2D() such that the produced trapezoidal map defaults to "top view"
+->However TCanvas::SetTheta() and TCanvas::SetPhi() don't seem to be working correctly in the code but only in the ROOT environment
+
+Update: June 22nd 2016
+==================================================
+->Added method Uniformity::VisualizeUniformity::save2png() for saving produced TCanvas objects to *.png files
+->Added new data member Uniformity::RunSetup::bVisPlots_AutoSaving for user to toggle call to VisualizeUniformity::save2png() on/off
+->Updated Uniformity::ParameterLoaderRun::loadRunParameters() to search for field Visualize_AutoSaveImages to set RunSetup::bVisPlots_AutoSaving with
+->Updated config/configRun.cfg, config/configRun_Template_Rerun.cfg, and config/configRun_Template_Series.cfg to have the Visualize_AutoSaveImages present
+
+Update: June 21st 2016
+==================================================
+->Changed Uniformity::VisualizeUniformity::storeCanvasGraph2D from 3 arguments to 4 arguments; last argument is a boolean which allows user to choose to normalize the output (normalization to average of the obserable)
+->Added templated operator: template<typename T1, typename T2, typename T3>std::tuple<T1, T2, T3> operator+ to include/UniformityUtilityOperators.h
+->Added BinaryOperation Uniformity::addTuple which makes use of new tuple addition operator and can be used by stl algorithms (e.g. std::accumulate) in include/UniformityUtilityFunctions.h (implemented in src//UniformityUtilityFunctions.cpp )
+->Added UnaryPredicate Uniformity::divides for tuple scalar division to include/UniformityUtilityOperators.h
+->Added functionality in Uniformity::VisualizeUniformity::storeCanvasGraph2D to produce a normalized plot (to the observable average) in addition to standard plot
+->Updated Uniformity::InterfaceAnalysis::storeResults() to create both the regular and normalized 3D plots for the requested observables
+
+Update: May 23rd 2016
+==================================================
+->Renaming Uniformity::AnalyzeResponseUniformity::getFitBoundary() to getParsedInput() since this method is not explicit to the fit boundary but has multiple use cases
+->Fixed a bug where Uniformity::AnalyzeResponseUniformity::getFit() was not properly setting the intial guess of a fit for the case where the user enters a complex expression
+->Fixed a bug which was causing a crash in re-run mode Uniformity::AnalyzeResponseUniformity::loadHistosFromFile was not loading the SectorEta(Phi)::clustHistos::hADC_v_Time cause a seg fault due to nullptr later on
+->Fixed a bug in config/configRun_Template_Rerun.cfg which was causing the framework to attempt to load histograms corresponding to hits during rerun mode and was causing a segmentation fault
+
+Update: May 20th 2016
+==================================================
+->Bug fix implemented in Uniformity::SelectorHit::setHits(); all hits in an event were incorrectly being assigned the ADC values of the 1st hit in the event.  A terrible hack has been implemented to resolve this...hopefully an elegant solution can be found...  Many thanks to M. Maggi for catching this!!!
+->Added short type data member Uniformity::Hit::sADCIntegral to Hit struct to represent the integral of the ADC values
+->Uniformity::SelectorHit::setHits now loads ADC of all time bins not just user requested window;
+->Uniformity::SelectorHit::setHits now integrates ADC from all time bins and sets value to Uniformity::Hit::sADCIntegral;
+->Added new histogram Uniformity::HistosPhysObj::hADCMax_v_ADCInt for tracking peak ADC value (in time) vs. intergarl of adc values (in time) to identify saturated hits
+->Uniformity::AnalyzeResponseUniformityHits() now initializes, fills, and stores SectorEta(Phi)::hitHistos::hADCMax_v_ADCInt
+
+Update: May 19th 2016
+==================================================
+->Observed a few cases where the normalized chi^2 (normchi2) value of a slice fit was INF or NaN, now code checks for this and sets normchi2 = -1 if this occurs.  This ensures the normchi2 distribution can always be drawn in ROOT.
+->Added new utility function Uniformity::ceilPowerTen for recursively determining the smallest power of 10 larger than an input variable
+->Uniformity::VisualizeUniformity::storeCanvasHistoSegmented() will now create a TCanvas where the y-axis is the same for every pad using the range [1e-1, Uniformity::ceilPowerTen]
+->Fixed a bug where Uniformity::InterfaceAnalysis::analyzeInputFrmwrk() was not initializing the TGraphError objects used in a cluster fitting
+->Fixed two bugs in config/configRun_Template_Rerun.cfg and config/configRun_Template_Series.cfg
+->Added data member Uniformity::HistosPhysObj::hADC_v_Time showing ADC vs time bin for an input physics object
+->Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() now initializes SectorEta(Phi)::clustHistos::hADC_v_Time
+->Uniformity::AnalyzeResponseUniformityClusters::fillHistos() now fills SectorEta(Phi)::clustHistos::hADC_v_Time
+->Uniformity::AnalyzeResponseUniformityClusters::storeHistos() now writes SectorEta(Phi)::clustHistos::hADC_v_Time to output TFile
+
+Update: May 18th 2016
+==================================================
+->Fixed a bug where the copy ctor and assignment operators of Uniformity::DetectorMPGD were not correctly setting the strDetName and strDetNameNoSpecChar data members
+->Updated config/configRun_Template_Series.cfg and scripts/runMode_Series.sh to take a detector name as user input
+->Changed Uniformity::AnalyzeResponseUniformity::vec_strSupportedKeywords to also include "FWHM" and "HWHM"
+->Changing Uniformity::AnalyzeResponseUniformity::getValByKeyword() to try provide an initial fit guess for the (HWHM) FWHM based on (1/2) the rms of the input histogram
+->Changing Uniformity::AnalyzeResponseUniformity::getPeakPos() and getPeakPosError() to getParam() and getParamError() for any input string to be compared with AnalyzeResponseUniformity::vec_strSupportedKeywords
+->Adding method Uniformity::AnalyzerResponseUniformityClusters::initGraphsClusters() for initializing TGraph objects (and inherited objects) used in the cluster analysis
+->Uniformity::InterfaceAnalysis now calls AnalyzerResponseUniformityClusters::initGraphsClusters()
+->Added shared_ptr<TGraphErrors> data member Uniformity::SectorEta::gEta_ClustADC_Fit_PkRes for storing peak resolution
+->The Peak resolution (PkWidth / PkPos) is now calculated by Uniformity::AnalyzerResponseUniformityClusters::fitHistos()
+->Uniformity::VisualizeUniformity::getObsGraph now supports getting Uniformity::SectorEta::gEta_ClustADC_Fit_PkRes
+->Summary TCanvas objects are now prepared in Uniformity::InterfaceAnalysis::storeResults()
+->Fixed a bug where the computing environment was not set correctly for the "hadd" command in root
+->Added two new template files config/configRun_Template_Grid.cfg and config/config_Template_Rerun.cfg for run modes Grid and Rerun (see README.txt)
+->Added two new run mode scripts at scripts/runMode_Grid.sh and scripts/runMode_Rerun.sh for Grid and Rerun modes, respectively (see README.txt)
+->Added one script for cleaning up Grid mode output at scripts/cleanGridFiles.sh
+->Fixed a bug in Uniformity::AnalyzeResponseUniformity::getHistogram2D() in which the TName of the output TH2F was not set correctly and causing AnalyzeResponseUniformityClusters::loadHistosFromFile() to seg fault
+
+Update: May 17th 2016
+==================================================
+->Disabled Uniformity::VisualizeUniformity::storeCanvasHisto2D() for now, doesn't seem to draw the detector properly
+->Run config file now asks the user for which detector they are processing.  The detector name is now included in the TName's of all TCanvas objects in the output TFile.
+->Added data member for storing detector name in Uniformity::RunSetup called strDetName
+->Added data members and methods to Uniformity::DetectorMPGD for detector name (DetectorMPGD::strDetName), getting the name ( DetectorMPGD::getName(), DetectorMPGF::getNameNoSpecial() ), and setting the name ( DetectorMPGD::setName() )
+->Added method AnalyzeResponseUniformity::getHistogram2D(), now 2D histograms that plot 1D observables defined by the user will follow user input for parameters (e.g. binning, names, etc...);
+->Fixed a bug where the number of bins in the cluster position histogram (or axis representing this in 2D histograms) was not following the requested granularity of the user
+->Fixed a bug where Uniformity::DetectorMPGD::strDetName and strDetNameNoSpecChar were not copied on assignment
+
+Update: May 13th 2016
+==================================================
+->Added method Uniformity::VisualizeUniformity::storeCanvasGraph2D() for making 2D plots from TGraph's of each SectorEta in DetectorMPGD
+->Uniformity::InterfaceAnalysis::storeResults() now calls VisualizeUniformity::storeCanvasGraph2D()
+->Added method Uniformity::VisualizeUniformity::storeCanvasHisto2D() for making 2D plots from TGraph's of each SectorEta in DetectorMPGD
+
+Update: May 10th 2016
+==================================================
+->Added a template run config file for running in "series mode" found in: config/configRun_Template_Series.cfg
+->Added a script to automatically configure a "series mode" run using the above template file for a list of input files found in a given directory, script found in scripts/runMode_Series.sh
+->Updated the mapping configuration file to the reflect the updated, and hopefully correct, APV-to-FEC mapping: config/GE7MappingCMScernData2016_v2.cfg 
+
+Update: May 6th 2016
+==================================================
+->Added new data member to Uniformity::HistosPhysObj called std::shared_ptr<TH2F> hADC_v_Size; also added to list of objects which undergo a deep copy.
+->Uniformity::AnalyzeResponseUniformityClusters::fillHistos now filles HistosPhysObj.hADC_v_Size for clusters at both SectorEta and SectorPhi level
+->Uniformity::AnalyzeResponseUniformityClusters::loadHistosFromFile now filles HistosPhysObj.hADC_v_Size for clusters at both SectorEta and SectorPhi level
+->Uniformity::AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, ... ) now just calls AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile) instead of duplicating the method
+->Uniformity::SelectorCluster::setClusters(std::string &strInputRootFileName, ... ) now just calls SelectorCluster::setClusters(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::SelectorHit::setHits(std::string &strInputRootFileName, ... ) now just calls SelectorHit::setHits(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasGraph(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasGraph(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, ... ) instead of duplicating the method
+->Uniformity::VisualizeUniformity::storeCanvasHistoSegmented(std::string & strOutputROOTFileName, ... ) now just calls VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, ... ) instead of duplicating the method
+
+Update: May 5th 2016
+==================================================
+->Updated README.txt file to reflect changes
+->Merged feature_UpdatedExec into develop
+
+Update: May 4th 2016
+==================================================
+->Uniformity::InterfaceAnalysis methods for running analysis on TFile's created by amoreSRS have been implemented
+->Uniformity::InterfaceAnalysis methods for running analysis on TFile's created by CMS_GEM_Analysis_Framework have been implemented
+->AnalyzeResponseUniformityClusters::loadHistosFromFile() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->Updating src/analyzeUniformity.cpp to use InterfaceAnalysis and ParameterLoaderRun
+->RunSetup struct now has a flag for if the struct was set correctly
+->ParameterLoaderRun::getRunParameters now takes an input std::ifstream instead of a std::string
+->Updated Makefile.clang and Makefile.gpp to compile InterfaceAnalysis and ParameterLoaderRun
+->AnalyzeResponseUniformityClusters::loadHistosFromFile() methods have been updated to load all histograms, not just those involved in fitting
+->Corrected an improper naming convention in AnalyzeResponseUniformityClusters, rare instances of "hiEta" changed to "h_iEta" in TH1 & TH2 TName fields.
+->May the force by with you.
+
+Update: May 3rd 2016
+==================================================
+->HitSelector::setHits() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->ClusterSelector::setClusters() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityHits::storeHistos() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityClusters::storeHistos() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->AnalyzeResponseUniformityClusters::storeFits() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasGraph() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasHisto() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity::storeCanvasHistoSegmented() has been overloaded to either take a std::string (storing the physical filename) or an open TFile * object
+->VisualizeUniformity has three new sets of overloaded methods called storeListOfCanvasesGraph, storeListOfCanvasesHisto, and storeListOfCanvasesHistoSegmented which either take a std::string (storing the physical filename) or an open TFile * object and a map<string,string> of observable (key) and draw option (value) to make the summary plots for
+->VisualizeUniformity::storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::vector<std::string> vec_strObsName, std::string strDrawOption, bool bShowPhiSegmentation) is depreciated, instead use VisualizeUniformity::storeListOfCanvasesHisto( ... )
+
+->Added new class Uniformity::ParameterLoaderRun for loading the RunSetup struct and determining the input file list
+->Moved the RunSetup struct from src/analyzeUniformity.cpp to include/UniformityUtilityTypes.h
+
+->Added new class Uniformity::InterfaceAnalysis for being the single access point for the analysis
+
+Update: Apr 30th 2016
+==================================================
+->DetectorMPGD has three new methods resetClusters, resetHits, and resetPhysObj
+->DetectorMPGD::resetClusters clears all stored clusters, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->DetectorMPGD::resetHits clears all stored hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->DetectorMPGD::resetPhysObj clears all stored clusters and hits, but leaves all other data members (e.g. geometry, histograms, etc...) intact
+->AnalyzeUniformityClusters has new method initHistosClusters
+->This method will initialize all histograms once, before looping through input clusters
+->Changed the way the slice histograms in AnalyzeUniformityClusters were made, now they will properly reflcet the aggregate of a multi run analysis (instead of being overwritten for each new run);
+->AnalyzeUniformityHits has new method initHistosHits
+->This method will initialize all histograms once, before looping through input hits
+->Fixed a bug in AnalyzeUniformityHits where the number of bins of hit position histogram did not equal the number of strips
+->Reduced message spam to terminal from all classes
+->Uniformity::Cluster now has a placeholder data member map_hits to represent the hits used to reconstruct this cluster.  Placeholder for now; will be null.
+
+Update: Apr 29th 2016
+==================================================
+->New configuration file template exists referred to as the Run Config: config/configRun.cfg
+->analyzeUniformity Executable now takes a two argumenta, the run config file to be used and a true/false verbose mode flag
+->analyzeUniformity can now read in multiple input files
+
+Update: Apr 27th 2016
+==================================================
+->Updating README file
+->Merging a first version of feature_VisualizeUniformity into the develop branch
+
+Update: Apr 26th 2016
+==================================================
+->Fixed crash where invalid histogram pointer in Uniformity::VisualizeUniformity was causing a seg fault, need to use Uniformity::AnalyzeResponseUniformity::getDetector() in executable
+->Added copy constructor and assignment operator to Uniformity::DetectorMPGD
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with a physics observable drawn on a unique pad for each SectorEta
+->Implemented method for Uniformity::VisualizeUniformity in which a TCanvas is drawn with all physics observables drawn on the same for each SectorEta
+
+Update: Apr 25th 2016
+==================================================
+->Added copy constructor and assignment operator to Uniformity::HistosPhysObj
+->Added copy constructor and assignment operator to Uniformity::SummaryStatistics
+->Added copy constructor and assignment operator to Uniformity::SectorSlice
+->Added copy constructor and assignment operator to Uniformity::SectorPhi
+->Added copy constructor and assignment operator to Uniformity::SectorEta
+
+Update: Apr 24th 2016
+==================================================
+->Added new class Uniformity::VisualizeUniformity which inherits from Uniformity::AnalyzeResponseUniformity
+->Class Uniformity::VisualizeUniformity makes a TCanvas for an input observable, the TCanvas has one pad for each SectorEta, the observable is drawn on the TCanvas
+
+Update: Apr 22th 2016
+==================================================
+->Removing AnalysisCode.cpp, AnalysisCodeGE6_V1_fast_cl.cpp, AnalysisCodeGE6_V2.cpp, AnalysisCode_GE4_V1.cpp, and AnalysisCode_GE6_V1.cpp from repo
+->Removing Makefile_SingleSpecAna.clang and Makefile_SingleSpecAna.gpp from repo
+->Removing src/SingleSpectrumAnalyzer.cpp from repo
+->AnalyzeResponseUniformityClusters will now store a "Summary" set of of histograms (sum of all SectorEta) when AnalyzeResponseUniformityClusters::StoreHistos is called
+->AnalyzeResponseUniformityHits will now store a "Summary" set of of histograms (sum of all SectorEta) when AnalyzeResponseUniformityHits::StoreHistos is called
 
 Update: Apr 11th 2016
 ==================================================

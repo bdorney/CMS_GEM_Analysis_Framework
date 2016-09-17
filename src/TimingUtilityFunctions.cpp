@@ -17,7 +17,7 @@ using namespace Timing;
 //========================================================================================
 //boolean
 //----------------------------------------------------------------------------------------
-bool Timing::convert2bool(std::string str, bool &bExitSuccess){
+bool QualityControl::Timing::convert2bool(std::string str, bool &bExitSuccess){
     //convert to upper case
     std::transform(str.begin(), str.end(), str.begin(), toupper);
     
@@ -41,7 +41,7 @@ bool Timing::convert2bool(std::string str, bool &bExitSuccess){
 
 //file I/O
 //----------------------------------------------------------------------------------------
-std::istream & Timing::getlineNoSpaces(std::istream & stream, std::string & str){
+std::istream & QualityControl::Timing::getlineNoSpaces(std::istream & stream, std::string & str){
     //get the line
     std::getline(stream, str);
     
@@ -74,18 +74,18 @@ std::istream & Timing::getlineNoSpaces(std::istream & stream, std::string & str)
 //T -> Type; A -> Allocator
 //Determines the difference in mean between two datasets
 //template<typename T, typename A>
-//float Timing::deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2){
+//float QualityControl::Timing::deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2){
 //    float fMean1 = (std::accumulate(vec1.begin(), vec1.end(), 0.0) / (float) vec1.size() );
 //    float fMean2 = (std::accumulate(vec2.begin(), vec2.end(), 0.0) / (float) vec2.size() );
 //
 //    return fMean1 - fMean2;
 //} //End deltaMean
 
-int Timing::getDeltaTForChannel(std::map<std::string, int> inputMap){
+int QualityControl::Timing::getDeltaTForChannel(std::map<std::string, int> inputMap){
     int max = getMaxForChannelAND(inputMap);
     int min = getMinForChannelOR(inputMap);
     
-	//cout<<"Timing::getDeltaTForChannel() - max = " << max << "; min = " << min << endl;
+	//cout<<"QualityControl::Timing::getDeltaTForChannel() - max = " << max << "; min = " << min << endl;
 
     if (max > 0 && min > 0 ) {
         return abs(max - min);
@@ -96,7 +96,7 @@ int Timing::getDeltaTForChannel(std::map<std::string, int> inputMap){
 } //End getDeltaTForChannel()
 
 //Gets the maximum value for two channels (both channels required to be nonzero)
-int Timing::getMaxForChannelAND(std::map<std::string, int> inputMap){
+int QualityControl::Timing::getMaxForChannelAND(std::map<std::string, int> inputMap){
     //Variable Declaration
     //int iRetVal;
     
@@ -122,7 +122,7 @@ int Timing::getMaxForChannelAND(std::map<std::string, int> inputMap){
 } //End getMaxForChannel
 
 //Gets the minimum value for two channels
-int Timing::getMinForChannelOR(std::map<std::string, int> inputMap){
+int QualityControl::Timing::getMinForChannelOR(std::map<std::string, int> inputMap){
     //Variable Declaration
     std::map<std::string, int>::iterator iterMap = inputMap.begin();
     std::map<std::string, int>::iterator iterMapEnd = inputMap.end();
@@ -151,7 +151,7 @@ int Timing::getMinForChannelOR(std::map<std::string, int> inputMap){
 //printers
 //----------------------------------------------------------------------------------------
 //Prints the status bits of an input TFile
-void Timing::printROOTFileStatus(TFile * file_ROOT){
+void QualityControl::Timing::printROOTFileStatus(TFile * file_ROOT){
     std::cout << "Input ROOT File Status:\n";
     std::cout << "\tIsOpen() = " << file_ROOT->IsOpen() << std::endl;
     std::cout << "\tIsZombie() = " << file_ROOT->IsZombie() << std::endl;
@@ -161,7 +161,7 @@ void Timing::printROOTFileStatus(TFile * file_ROOT){
 
 //Prints an error message to the user if a specific pattern (strPatternNotFound) is not found during file I/O
 //Also informs the user which calling method and file the pattern is not found under
-void Timing::printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename){
+void QualityControl::Timing::printStringNotFoundMsg(std::string strCallingMethod, std::string strPatternNotFound, std::string strLine, std::string strFilename){
     std::cout<<"String '" << strPatternNotFound << "' Not Found in line:\n";
     std::cout<< strLine <<std::endl;
     std::cout<<"Exiting " << strCallingMethod << ", Cross-Check input File:\n";
@@ -171,7 +171,18 @@ void Timing::printStringNotFoundMsg(std::string strCallingMethod, std::string st
 } //End printStringNotFoundMsg()
 
 //Prints All Bit Flags for an input ifstream
-void Timing::printStreamStatus(std::ifstream &inputStream){
+void QualityControl::Timing::printStreamStatus(std::ifstream &inputStream){
+    std::cout << "Input File Stream Bit Status:\n";
+    std::cout << " good()=" << inputStream.good() << std::endl;
+    std::cout << " eof()=" << inputStream.eof() << std::endl;
+    std::cout << " fail()=" << inputStream.fail() << std::endl;
+    std::cout << " bad()=" << inputStream.bad() << std::endl;
+    
+    return;
+} //End treeProducerTDC::printStreamStatus()
+
+//Prints All Bit Flags for an input fstream
+void QualityControl::Timing::printStreamStatus(std::fstream &inputStream){
     std::cout << "Input File Stream Bit Status:\n";
     std::cout << " good()=" << inputStream.good() << std::endl;
     std::cout << " eof()=" << inputStream.eof() << std::endl;
@@ -185,7 +196,7 @@ void Timing::printStreamStatus(std::ifstream &inputStream){
 //----------------------------------------------------------------------------------------
 //Safe conversion to float
 //Scientific notation not supported
-float Timing::stofSafe(std::string strInputValue){
+float QualityControl::Timing::stofSafe(std::string strInputValue){
     bool bInputUnderstood = false;
     bool bManualEntry = false;
     
@@ -197,7 +208,7 @@ float Timing::stofSafe(std::string strInputValue){
         ret_float =  std::stof(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
-        std::cout<<"Timing::stofSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"QualityControl::Timing::stofSafe() - Sorry numeric conversion failed\n";
         std::cout<<"\tValue = " << strInputValue << std::endl;
         std::cout<<"\tNonumeric characters present (sorry scientific notation not supported)\n";
         std::cout<<"\tWould you like to enter a value manually [y/N]?\n";
@@ -232,9 +243,9 @@ float Timing::stofSafe(std::string strInputValue){
     } //End Case: non numeric data entered
     
     return ret_float;
-} //End Timing::stofSafe()
+} //End QualityControl::Timing::stofSafe()
 
-float Timing::stofSafe(std::string strInputField, std::string strInputValue){
+float QualityControl::Timing::stofSafe(std::string strInputField, std::string strInputValue){
     bool bInputUnderstood = false;
     bool bManualEntry = false;
     
@@ -246,7 +257,7 @@ float Timing::stofSafe(std::string strInputField, std::string strInputValue){
         ret_float =  std::stof(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
-        std::cout<<"Timing::stofSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"QualityControl::Timing::stofSafe() - Sorry numeric conversion failed\n";
         std::cout<<"\tField = " << strInputField << std::endl;
         std::cout<<"\tValue = " << strInputValue << std::endl;
         std::cout<<"\tNonumeric characters present (sorry scientific notation not supported)\n";
@@ -281,9 +292,9 @@ float Timing::stofSafe(std::string strInputField, std::string strInputValue){
     } //End Case: non numeric data entered
     
     return ret_float;
-} //End Timing::stofSafe()
+} //End QualityControl::Timing::stofSafe()
 
-int Timing::stoiSafe(std::string strInputValue){
+int QualityControl::Timing::stoiSafe(std::string strInputValue){
     bool bInputUnderstood = false;
     bool bManualEntry = false;
     
@@ -295,7 +306,7 @@ int Timing::stoiSafe(std::string strInputValue){
         ret_int =  std::stoi(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
-        std::cout<<"Timing::stoiSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"QualityControl::Timing::stoiSafe() - Sorry numeric conversion failed\n";
         std::cout<<"\tValue = " << strInputValue << std::endl;
         std::cout<<"\tNonumeric characters present (or maybe you gave a floating point number instead?)\n";
         std::cout<<"\tWould you like to enter a value manually [y/N]?\n";
@@ -329,9 +340,9 @@ int Timing::stoiSafe(std::string strInputValue){
     } //End Case: non numeric data entered
     
     return ret_int;
-} //End Timing::stoiSafe()
+} //End QualityControl::Timing::stoiSafe()
 
-int Timing::stoiSafe(std::string strInputField, std::string strInputValue){
+int QualityControl::Timing::stoiSafe(std::string strInputField, std::string strInputValue){
     bool bInputUnderstood = false;
     bool bManualEntry = false;
     
@@ -343,7 +354,7 @@ int Timing::stoiSafe(std::string strInputField, std::string strInputValue){
         ret_int =  std::stoi(strInputValue);
     } //End Case: only numeric data
     else{ //Case: non numeric data entered
-        std::cout<<"Timing::stoiSafe() - Sorry numeric conversion failed\n";
+        std::cout<<"QualityControl::Timing::stoiSafe() - Sorry numeric conversion failed\n";
         std::cout<<"\tField = " << strInputField << std::endl;
         std::cout<<"\tValue = " << strInputValue << std::endl;
         std::cout<<"\tNonumeric characters present (or maybe you gave a floating point number instead?)\n";
@@ -378,9 +389,9 @@ int Timing::stoiSafe(std::string strInputField, std::string strInputValue){
     } //End Case: non numeric data entered
     
     return ret_int;
-} //End Timing::stoiSafe()
+} //End QualityControl::Timing::stoiSafe()
 
-std::pair<std::string,std::string> Timing::getParsedLine(std::string strInputLine, bool &bExitSuccess){
+std::pair<std::string,std::string> QualityControl::Timing::getParsedLine(std::string strInputLine, bool &bExitSuccess){
     //Variable Declaration
     int iPos_Equals = strInputLine.find("=",0);
     int iPos_End    = strInputLine.find(";",0);
@@ -440,14 +451,14 @@ std::pair<std::string,std::string> Timing::getParsedLine(std::string strInputLin
 
 //template method must be defined in the header file
 //template<class TConversion>
-//std::string Timing::getString(TConversion input){
+//std::string QualityControl::Timing::getString(TConversion input){
 //    std::stringstream sstream;
 //    sstream<<input;
 //    return sstream.str();
 //} //End getString()
 
 //Returns a vector of strings taken from a comma separated list; ignores whitespaces in between elements
-std::vector<std::string> Timing::getCharSeparatedList(std::string strInput, char cDelimiter){
+std::vector<std::string> QualityControl::Timing::getCharSeparatedList(std::string strInput, char cDelimiter){
     //Variable Declaration
     std::vector<std::string> vec_retStrings;
     
@@ -477,7 +488,7 @@ std::vector<std::string> Timing::getCharSeparatedList(std::string strInput, char
 } //End getCommaSeparatedList()
 
 //Returns a vector of strings taken from a comma separated list; ignores whitespaces in between elements
-/*std::vector<std::string> Timing::getCommaSeparatedList(std::string strInput){
+/*std::vector<std::string> QualityControl::Timing::getCommaSeparatedList(std::string strInput){
     //Variable Declaration
     std::vector<std::string> vec_retStrings;
     
@@ -509,7 +520,7 @@ std::vector<std::string> Timing::getCharSeparatedList(std::string strInput, char
 //Unsorted
 //----------------------------------------------------------------------------------------
 
-int Timing::getCyclicColor(int iInput){
+int QualityControl::Timing::getCyclicColor(int iInput){
     int ret_int;
     
     switch (iInput % 7) {
