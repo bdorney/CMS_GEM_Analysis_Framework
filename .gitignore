@@ -56,3 +56,6 @@ data/*
 *DeadStripList.txt
 config/*.cfg_*
 config/configAnalysis_Slices*.cfg
+config/mapping_imaging_4APV.cfg
+config/GE7MappingCMScernData2016.cfg
+config/GE7MappingCMScernData2016_v2.cfg

@@ -2,10 +2,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.1.4                               *
-*	LAST UPDATE: Sept 16 2016                    *
+*	VERSION: 2.2.0                               *
+*	LAST UPDATE: Sept 17 2016                    *
 *                                                *
 **************************************************
+
+Update: September 17th 2016
+==================================================
+->Updated README.txt
+->Issuing release_v2.2
 
 Update: September 16th 2016
 ==================================================

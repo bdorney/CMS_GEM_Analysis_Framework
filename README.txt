@@ -34,21 +34,31 @@
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
-            4.b.i.              Analyzers
-                4.b.i.I         AnalyzeResponseUniformity
-                4.b.i.II        AnalyzeResponseUniformityClusters
-                4.b.i.III       AnalyzeResponseUniformityHits
-            4.b.ii.             Selectors
-                4.b.ii.I        Selector
-                4.b.ii.II       SelectorClusters
-                4.b.ii.III      SelectorHits
-            4.b.iii.            DetectorMPGD
-            4.b.iv.             InterfaceAnalysis
+            4.b.i.              FrameworkBase
+            4.b.ii.             Analyzers & Visualization
+                4.b.ii.I        AnalyzeResponseUniformity
+                4.b.ii.II       AnalyzeResponseUniformityClusters
+                4.b.ii.III      AnalyzeResponseUniformityHits
+                4.b.ii.IV       Visualizer
+                4.b.ii.V        VisualizerComparison
+                4.b.ii.VI       VisualizerUniformity
+            4.b.iii.            Interfaces
+                4.b.iii.I       Interface
+                4.b.iii.II      InterfaceAnalysis
+                4.b.iii.III     InterfaceRun
+            4.b.iv.             Selectors
+                4.b.iv.I        Selector
+                4.b.iv.II       SelectorCluster
+                4.b.iv.III      SelectorHit
             4.b.v.              Loaders
                 4.b.v.I         ParameterLoaderAmoreSRS
                 4.b.v.II    	ParameterLoaderAnalysis
                 4.b.v.III       ParameterLoaderRun
-            4.b.vi.             VisualizeUniformity
+            4.b.vi.             Readouts
+                4.b.vi.I        ReadoutSector
+                4.b.vi.II       ReadoutSectorEta
+                4.b.vi.III      ReadoutSectorPhi
+            4.b.vii.            DetectorMPGD
         4.c. Utilities
             4.c.i   Timing
             4.c.ii  Uniformity
@@ -57,14 +67,13 @@
             4.d.ii  Uniformity
                 4.d.ii.I        AnalysisSetupUniformity
                 4.d.ii.II       Cluster
-                4.d.ii.III      HistosPhysObj
-                4.d.ii.IV       Hit
-                4.d.ii.V        RunSetup
-                4.d.ii.VI       SectorEta
-                4.d.ii.VII      SectorPhi
-                4.d.ii.VIII     SectorSlice
-                4.d.ii.IX       SelParam
-                4.d.ii.X        SummaryStatistics
+                4.d.ii.III      Event
+                4.d.ii.IV       HistosPhysObj
+                4.d.ii.V        Hit
+                4.d.ii.VI       RunSetup
+                4.d.ii.VII      SectorSlice
+                4.d.ii.VIII     SelParam
+                4.d.ii.IX       SummaryStatistics
         4.e. Configuration Files
             4.e.i   amoreSRS Mapping Config File
             4.e.ii  Analysis Config File
@@ -84,12 +93,13 @@
                 4.e.iii.VII     Example Config File - Mode: Re-Run
                 4.e.iii.VIII    Example Config File - Mode: Comparison
         4.f. Output Files
-            4.f.i               Output ROOT File
+            4.f.i               Output ROOT File - Analysis Mode
                 4.f.i.I         "Segmented" Plots Stored in "Summary" folder
                 4.f.i.II        "Dataset" Plots Stored in "Summary" folder
                 4.f.i.III       1D Fit Summary Plots Stored in "Summary" folder
                 4.f.i.IV        2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-            4.f.ii              Output Text File
+            4.f.ii              Output ROOT File - Comparison Mode
+            4.f.iii             Output Text File
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -304,6 +314,8 @@
             before executing the framework.  This will let you ensure the correct set of input files will be
             re-analyzed.
 
+            The script will only consider files that end in *Ana.root, the output of each will be *NewAna.root.
+
             Example:
 
                 source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
@@ -441,10 +453,39 @@
 
     Inheritance relations:
 
-        AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits, and VisualizeUniformity all
-        inherit from AnalyzeResponseUniformity.
+        FrameworkBase
+            |
+            |--->AnalyzeResponseUniformity
+            |       |
+            |       |--->AnalyzeResponseUniformityClusters
+            |       |--->AnalyzerResponseUniformityHits
+            |       |--->Visualizer
+            |               |
+            |               |--->VisualizeComparison
+            |               |--->VisualizeUniformity
+            |
+            |--->Interface
+            |       |
+            |       |--->InterfaceAnalysis
+            |       |--->InterfaceRun   (Depreciated)
+            |
+            |--->Selector
+                    |
+                    |--->SelectorCluster
+                    |--->SelectorHit
 
-        SelectorHit and SelectorClusters all inherit from Selector.
+        ParameterLoader
+            |
+            |--->ParameterLoaderAmoreSRS
+            |--->ParameterLoaderAnalysis
+            |--->ParameterLoaderRun
+
+        ReadoutSector
+            |
+            |--->ReadoutSectorEta
+            |--->ReadoutSectorPhi
+
+        DetectorMPGD (no children presently)
 
     Friendship relations:
 
@@ -463,25 +504,57 @@
         ParameterLoaderAmoreSRS -> creates a DetectorMPGD object
         ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
         ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
+        ReadoutSector -> A single readout sector, used by DetectorMPGD to track distributions in a certain portion of the detector
+        ReadoutSectorEta -> As ReadoutSector, but for an iEta row inside the detector, stores the detectors ReadoutSectorPhi objects
+        ReadoutSectorPhi -> As ReadoutSectorEta, but for an iPhi sector within an iEta row, stores the detector's hits, clusters, and slices
         SelectorCluster -> Assigned an input DetectorMPGD object the opens an input root file and performs the cluster selection; selected clusters are stored based on their location in the DetectorMPGD object.
         SelectorHit -> As SelectorCluster but for hits (e.g. single strips).
         AnalyzeResponseUniformityCluster -> Acts on a DetectorMPGD object that has stored clusters and performs the user requested analysis
         AnalyzeResponseUniformityHit -> As AnalyzeResponseUniformityCluster but for hits.
         VisualizeUniformity -> Takes the raw plots produced by AnalyzeResponseUniformity and presents them in a user friendly manner.
+        VisualizeComparison -> Compares TH1F objects from different Framework output files and makes simple comparison plots
 
-        # 4.b.i. Analyzers
+        # 4.b.i. FrameworkBase
+        # --------------------------------------------------------
+
+        More coming "soon"
+
+        Defined in include/FrameworkBase.h
+        Non-inherited member attributes shown below.
+
+        Public Member Functions
+            FrameworkBase();
+
+            virtual Uniformity::DetectorMPGD getDetector();
+            virtual int getRunNum();
+
+            virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup);
+            virtual void setDetector(Uniformity::DetectorMPGD & inputDet);
+            virtual void setRunNum(int iInput);
+            virtual void setRunParameters(Uniformity::RunSetup inputSetup);
+            virtual void setVerboseMode(bool bInput);
+
+        Protected Attributes
+            bool bVerboseMode;
+            int iNum_Run;
+
+            QualityControl::Uniformity::RunSetup rSetup;
+            QualityControl::Uniformity::AnalysisSetupUniformity aSetup;
+            QualityControl::Uniformity::DetectorMPGD detMPGD;
+
+        # 4.b.ii. Analyzers & Visualization
         # --------------------------------------------------------
 
         Coming "soon"
 
-            # 4.b.i.I AnalyzeResponseUniformity
+            # 4.b.ii.I AnalyzeResponseUniformity
             # --------------------------------------------------------
 
-            Coming "soon"
+            More coming "soon"
 
-            Classes
-                struct Uniformity::AnalysisSetupUniformity aSetup
-                class Uniformity::DetectorMPGD detMPGD
+            Defined in include/AnalyzeResponseUniformity.h
+            Inherits from FrameworkBase.
+            Non-inherited member attributes shown below.
 
             Public Types
                 typedef exprtk::symbol_table<float> symbol_table_t;
@@ -492,12 +565,10 @@
                 AnalyzeResponseUniformity()
                 AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
 
-                virtual Uniformity::DetectorMPGD getDetector();
-                virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup);
-                virtual void setDetector(Uniformity::DetectorMPGD & inputDet);
-
             Protected Member Functions
                 void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, multiset<float> &mset_fInputObs, std::string strObsName);
+                bool isQualityFit(std::shared_ptr<TF1> fitInput);
+                bool isQualityFit(std::shared_ptr<TF1> fitInput, int iPar);
                 TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput );
                 float getParsedInput(string &strInputExp, shared_ptr<TH1F> hInput, TSpectrum &specInput);
                 TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
@@ -513,45 +584,70 @@
                 string strAnalysisName;
                 vector<string> vec_strSupportedKeywords;
 
-            # 4.b.i.II AnalyzeResponseUniformityClusters
+            # 4.b.ii.II AnalyzeResponseUniformityClusters
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.i.III AnalyzeResponseUniformityHits
+            # 4.b.ii.III AnalyzeResponseUniformityHits
             # --------------------------------------------------------
 
             Coming "soon"
 
-        # 4.b.ii. Selectors
+            # 4.b.ii.IV Visualizer
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.ii.V VisualizeComparison
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.ii.VI VisualizeUniformity
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+        # 4.b.iii. Interfaces
+        # --------------------------------------------------------
+
+        Coming "soon"
+
+            # 4.b.iii.I Interface
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.iii.II InterfaceAnalysis
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.iii.III InterfaceRun
+            # --------------------------------------------------------
+
+            Depreciated class, no longer used but kept in Framework.
+
+        # 4.b.iv. Selectors
         # --------------------------------------------------------
 
         These classes are for performing the cluster/event/hit selection specified by the user.
 
-            # 4.b.ii.I Selector
+            # 4.b.iv.I Selector
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.ii.II SelectorCluster
+            # 4.b.iv.II SelectorCluster
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.ii.III SelectorHit
+            # 4.b.iv.III SelectorHit
             # --------------------------------------------------------
 
             Coming "soon"
-
-        # 4.b.iii. DetectorMPGD
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-        # 4.b.iv. InterfaceAnalysis
-        # --------------------------------------------------------
-
-        Coming "soon"
 
         # 4.b.v. Loaders
         # --------------------------------------------------------
@@ -573,7 +669,134 @@
 
             Coming "soon"
 
-        # 4.b.vi. VisualizeUniformity
+        # 4.b.vi. Readouts
+        # --------------------------------------------------------
+
+        Coming "soon"
+
+            # 4.b.vi.I ReadoutSector
+            # --------------------------------------------------------
+
+            More coming "soon"
+
+            Defined in include/ReadoutSector.h
+            Non-inherited member attributes shown below.
+
+            Public Member Functions
+                ReadoutSector();
+                ReadoutSector(const ReadoutSector & other);
+
+            Public Attributs
+                float fWidth;
+
+                Uniformity::HistosPhysObj clustHistos;
+                Uniformity::HistosPhysObj hitHistos;
+
+
+            Each of these are described below:
+
+                fWidth      //Width of sector in mm along the x-dir at the sector's y-location;
+
+                clustHistos //Tracks observables for clusters
+                hitHistos   //Tracls observables for hits
+
+            # 4.b.vi.II ReadoutSectorEta
+            # --------------------------------------------------------
+
+            The Uniformity::ReadoutSectorEta represents one iEta row of a detector. Each instance of a
+            Uniformity::ReadoutSectorEta will store nbConnect objects of a Uniformity::ReadoutSectorPhi
+            class where nbConnect is a field found in the amoreSRS mapping file defining the number of
+            readout conncetors per iEta row. Each object of a Uniformity::ReadoutSectorPhi will store
+            Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice
+            struct objects.  An object of a Uniformity::DetectorMPGD class will store a number of objects
+            of Uniformity::ReadoutSectorEta as defined in the amoreSRS mapping file (e.g. number of "DET" rows).
+
+            Defined in include/ReadoutSectorEta.h
+            Inherits from ReadoutSector.
+            Non-inherited member attributes shown below.
+
+            Public Member Functions
+                ReadoutSectorEta();
+                ReadoutSectorEta(const ReadoutSectorEta & other);
+
+            Public Attributs
+                float fPos_Y;
+
+                std::map<int, Uniformity::ReadoutSectorPhi> map_sectorsPhi;
+
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkRes;
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_Failures;
+
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
+                std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
+
+            Operators
+                ReadoutSectorEta & operator=(const ReadoutSectorEta & other);
+
+            Each of these items are described below:
+
+
+                fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
+
+                map_sectorsPhi               //Container storing nbConnect instances of ReadoutSectorPhi objects
+
+                gEta_ClustADC_Fit_NormChi2   //NormChi2 of fits from all SectorSlice::hSlice_ClustADC
+                gEta_ClustADC_Fit_PkPos      //ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
+                gEta_ClustADC_Fit_PkRes      //ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC.  See Section 4.e.ii.IV for more details.
+
+                gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
+
+                gEta_ClustADC_Spec_NumPks    //Number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
+                gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
+
+            The copy constructor and one overloaded assignment operator perform a deep copy of the
+            std::shared_ptr objects above.
+
+            # 4.b.vi.III ReadoutSectorPhi
+            # --------------------------------------------------------
+
+            Defined in include/ReadoutSectorPhi.h
+            Inherits from ReadoutSector.
+            Non-inherited member attributes shown below.
+
+            Public Member Functions
+                ReadoutSectorPhi();
+                ReadoutSectorPhi(const ReadoutSectorPhi & other);
+
+            Public Attributs
+                float fNFitSuccess;
+                float fPos_Xlow;
+                float fPos_Xhigh;
+
+                int iStripNum_Min;
+                int iStripNum_Max;
+
+                std::map<int, Uniformity::SectorSlice> map_slices;
+
+                std::multimap<int, Uniformity::Cluster> map_clusters;
+                std::multimap<int, Uniformity::Hit> map_hits;
+
+            Operators
+                ReadoutSectorPhi & operator=(const ReadoutSectorPhi & other);
+
+            Each of these items are described below:
+
+                fNFitSuccess             //Tracks the number of slices that were successfully fit
+                fPos_Xlow                //X lower boundary of iPhi sector, in mm, at ReadoutSectorEta::fPos_Y
+                fPos_Xhigh               //X upper boundary of iPhi sector, in mm, at ReadoutSectorEta::fPos_Y
+                iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
+                iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
+
+                map_slices               //Stores Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
+                map_clusters             //Stores clusters located in this iPhi sector.  Here the key value is the event number the Cluster is associated with
+                map_hits                 //As map_clusters but for Hits
+
+            The copy constructor and overloaded assignment operator perform a deep copy of
+            the std::shared_ptr objects above.
+
+        # 4.b.vii. DetectorMPGD
         # --------------------------------------------------------
 
         Coming "soon"
@@ -727,7 +950,23 @@
             Note data types of Uniformity::Cluster (e.g. int, float, etc...) should closely match what amoreSRS stores
             in TCluster TTree; e.g. ADC is intrinscially integer physically, but it is defined as a float in amoreSRS.
 
-            # 4.d.ii.III HistosPhysObj
+            # 4.d.ii.III Event
+            # --------------------------------------------------------
+
+            The Uniformity::Event struct stores information relating to the physics objects contained
+            in an event.  Attributes of Uniformity::Event are:
+
+                Event::iNum_Evt         //Event number
+                Event::iNum_Run         //Run number
+
+                Event::vec_clusters     //Vector of Uniformity::Cluster objects
+                Event::vec_hits         //Vector of Uniformity::Hit objects
+
+                Event::clear()          //sets all ints to -1, and clears all stl containers
+
+            There is also one copy constructor
+
+            # 4.d.ii.IV HistosPhysObj
             # --------------------------------------------------------
 
             The Uniformity::HistosPhysObj struct is used as a container for ROOT histograms (i.e. TH1, TH2, etc...).
@@ -746,6 +985,7 @@
                 HistosPhysObj::hADCMax_v_ADCInt //Max ADC (from all latency bins) of an object vs Integral of object's ADC (sum of all latency bins)
 
                 HistosPhysObj::map_hADC_v_EvtNum_by_Run //map of TH2F objects, each TH2F shows ADC vs evt no. for a given run (i.e. input file)
+                HistosPhysObj::map_hTime_v_EvtNum_by_Run //As HistosPhysObj::map_hADC_v_EvtNum_by_Run but for Time
 
             For clusters hPos is the position along the detector trapezoid in mm with the detector axis being 0 mm in
             the iPhi=2 sector, negative (positive) position values occur in iPhi = 1 (3).  For hits the position is
@@ -754,7 +994,7 @@
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            # 4.d.ii.IV Hit
+            # 4.d.ii.V Hit
             # --------------------------------------------------------
 
             The Uniformity::Hit struct stores information relating to one reconstructed hit stored in the THit TTree
@@ -768,7 +1008,7 @@
 
             Again, data types of Uniformity::Hit should match what amoreSRS stores in the THit TTree.
 
-            # 4.d.ii.V RunSetup
+            # 4.d.ii.VI RunSetup
             # --------------------------------------------------------
 
             The Uniformity::RunSetup struct stores user input defined in the RUN_INFO header of the Run Config
@@ -778,20 +1018,26 @@
 
             Data members of Uniformity::RunSetup are:
 
+                RunSetup::strRunMode            //string, tracks whether executable is doing analysis or comparison
+
                 RunSetup::bAnaStep_Clusters     //True: perform the cluster analysis; false: do not.
                 RunSetup::bAnaStep_Fitting      //True: fit stored distributions; false: do not.  Note bAnaStep_Clusters (bAnaStep_Hits) must also be true for cluster (hit) distributions to be fitted.
                 RunSetup::bAnaStep_Hits         //True: perform the hit analysis; false: do not.
                 RunSetup::bAnaStep_Reco         //True: reconstruct clusters from hits; false: take clusters from input amoreSRS TTree.  Right now just a placeholder value.  Does nothing presently.
                 RunSetup::bAnaStep_Visualize    //True: make summary TCanvas objects after analyzing all input files; false: do not.
 
+                RunSetup::strIdent              //string, unique identifier in input filenames
+                RunSetup::strObsName            //string, name of observable to be compared across input files in comparsion mode
+
+                RunSetup::iEta                  //int, iEta index to be used in comparsion mode
+                RunSetup::iPhi                  //int, iPhi index to be used in comparsion mode
+                RunSetup::iSlice                //int, iSlice index to be used in comparsion mode
+
+                RunSetup::strDetName            //Stores a string acting as the unique detector serial number.  Resolves ambiguity in TObject TName data members when opening multiple output TFiles.
+
                 RunSetup::bInputFromFrmwrk      //True (false): input files are produced by the CMS_GEM_Analysis_Framework (amoreSRS)
-
                 RunSetup::bLoadSuccess          //True (false): the input parameters were (not) loaded successfully from the Run Config File. Defaults to false.  If after attempting to load these parameters from the Run Config File this is still false the analysis routine exits.
-
                 RunSetup::bMultiOutput          //True: one output file is made which represents the sum of all input files; false: one output file is made for each input file.  Note when bInputFromFrmwrk is true bMultiOutput must also be true.
-
-                RunSetup::bVisPlots_PhiLines    //True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
-                RunSetup::bVisPlots_AutoSaving  //True: automatically save TCanvas objects stored in the Summary folder of the output TFile as *.png and *.pdf files; false: do not.
 
                 RunSetup::strFile_Config_Ana    //PFN of input analysis config file
                 RunSetup::strFile_Config_Map    //PFN of input mapping config file
@@ -799,76 +1045,28 @@
                 RunSetup::strFile_Output_Name   //PFN of output TFile to be created when bMultiOutput is false
                 RunSetup::strFile_Output_Option //Option for TFile, e.g. CREATE, RECRATE, UPDATE, etc...
 
-                RunSetup::strDetName            //Stores a string acting as the unique detector serial number.  Resolves ambiguity in TObject TName data members when opening multiple output TFiles.
+                RunSetup::bDrawNormalized       //True: in comaprison mode TH1F objects are drawn to have area=1; false: no change
+                RunSetup::bVisPlots_PhiLines    //True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
+                RunSetup::bVisPlots_AutoSaving  //True: automatically save TCanvas objects stored in the Summary folder of the output TFile as *.png and *.pdf files; false: do not.
 
-            # 4.d.ii.VI SectorEta
-            # --------------------------------------------------------
+                RunSetup::strDrawOption         //string, draw option to be used in comparison mode
 
-            The Uniformity::SectorEta struct represents one iEta row of a detector. Each instance of a
-            Uniformity::SectorEta will store nbConnect objects of a Uniformity::SectorPhi struct where
-            nbConnect is a field found in the amoreSRS mapping file defining the number of readout conncetors
-            per iEta row. Each object of a Uniformity::SectorPhi struct will store
-            Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice
-            struct objects.  An object of a Uniformity::DetectorMPGD class will store a number of
-            objects of Uniformity::SectorEta as defined in the amoreSRS mapping file (e.g. number of "DET" rows).
-
-            The data members of the Uniformity::SectorEta struct are:
-
-                SectorEta::fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
-                SectorEta::fWidth                       //Width of iEta sector, in mm, at SectorEta::fPos_Y;
-
-                SectorEta::map_sectorsPhi               //Container storing three instances of SectorPhi objects
-
-                SectorEta::gEta_ClustADC_Fit_NormChi2   //std::shared_ptr of a TGraphErrors storing NormChi2 of fits from all SectorSlice::hSlice_ClustADC
-                SectorEta::gEta_ClustADC_Fit_PkPos      //std::shared_ptr of a TGraphErrors storing ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
-                SectorEta::gEta_ClustADC_Fit_PkRes      //std::shared_ptr of a TGraphErrors storing ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC.  See Section 4.e.ii.IV for more details.
-
-                SectorEta::gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
-
-                SectorEta::gEta_ClustADC_Spec_NumPks    //std::shared_ptr of a TGraphErrors storing number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
-                SectorEta::gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
-
-                SectorEta::clustHistos                  //An instance of the Uniformity::HistosPhysObj struct for Clusters; at present time all members of the struct are used except hMulti
-                SectorEta::hitHistos                    //An instance of the Uniformity::HistosPhysObj struct for Hits; at present time only hPos and hTime are used
-
-            There is also one copy constructor and one overloaded assignment operator.  These items perform a
-            deep copy of the std::shared_ptr objects above.
-
-            4.d.ii.VII SectorPhi
-            # --------------------------------------------------------
-
-            The data members of the Uniformity::SectorPhi struct are:
-
-                SectorPhi::fPos_Xlow                //X lower boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
-                SectorPhi::fPos_Xhigh               //X upper boundary of iPhi sector, in mm, at SectorEta::fPos_Y;
-                SectorPhi::fWidth                   //Width of iPhi sector, in mm, at SectorEta::fPos_Y;
-                SectorPhi::iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
-                SectorPhi::iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
-
-                SectorPhi::map_slices               //Container storing Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
-                SectorPhi::map_clusters             //std::multimap of stored Uniformity::Cluster located in this SectorPhi (iPhi value).  Here the key value is the event number the Cluster is associated with
-                SectorPhi::map_hits                 //std::multimap of stored Uniformity::Hit located in this SectorPhi (iPhi value).  Here the key value is the event number the Hit is associated with
-
-                SectorPhi::clustHistos              //As SectorEta::clustHistos but only for this SectorPhi (iPhi value)
-                SectorPhi::hitHistos                //As SectorEta::hitHistos but only for this SectorPhi (iPhi value)
-
-            There is also one copy constructor and one overloaded assignment operator.  These items perform a
-            deep copy of the std::shared_ptr objects above.
-
-            4.d.ii.VIII SectorSlice
+            4.d.ii.VII SectorSlice
             # --------------------------------------------------------
 
             The data members of the Uniformity::SectorSlice struct are:
 
+                SectorSlice::bFitAccepted       //True: fit of SectorSlice::hSlice_ClustADC passed quality checks
                 SectorSlice::fPos_Center        //Location of the center of the slice, in mm, within the SectorPhi (iPhi value)
                 SectorSlice::fWidth             //Width of the slice in mm
+                SectorSlice::iMinuitStatus      //Minuit status code after attempting to fit SectorSlice::hSlice_ClustADC
                 SectorSlice::fitSlice_ClustADC  //std::shared_ptr of a TF1; used to fit SectorSlice::hSlice_ClustADC
                 SectorSlice::hSlice_ClustADC    //As SectorEta::hEta_ClustADC but only for this SectorSlice
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
 
-            4.d.ii.IX SelParam
+            4.d.ii.VIII SelParam
             # --------------------------------------------------------
 
             Data members of Uniformity::SelParam are:
@@ -882,7 +1080,7 @@
                 SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
                 SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
 
-            4.d.ii.X SummaryStatistics
+            4.d.ii.IX SummaryStatistics
             # --------------------------------------------------------
 
             The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
@@ -1220,49 +1418,48 @@
                 [BEGIN_UNIFORMITY_INFO]
                     #Selection Cuts
                     ####################################
-                    Cut_ClusterADC_Min = '700';
+                    Cut_ClusterADC_Min = '300';
                     Cut_ClusterMulti_Min = '0';
                     Cut_ClusterMulti_Max = '20';
                     Cut_ClusterSize_Min = '2';
-                    Cut_ClusterSize_Max = '20';
-                    Cut_ClusterTime_Min = '1';
-                    Cut_ClusterTime_Max = '14';
+                    Cut_ClusterSize_Max = '10';
+                    Cut_ClusterTime_Min = '6';
+                    Cut_ClusterTime_Max = '27';
                     #Selection Cuts - Hit
                     ####################################
                     Cut_HitAdc_Min = '60';
-                    Cut_HitMulti_Min = '0';
-                    Cut_HitMulti_Max = '3072';
-                    Cut_HitTime_Min = '1';
-                    Cut_HitTime_Max = '14';
+                    Cut_HitAdc_Max = '3000';
+                    Cut_HitMulti_Min = '1';
+                    Cut_HitTime_Min = '2';
+                    Cut_HitTime_Max = '29';
                     #Event Range
                     ####################################
                     Event_First = '0';
                     Event_Total = '-1';
                     #Requested Granularity
                     ####################################
-                    Uniformity_Granularity = '8';
+                    Uniformity_Granularity = '64';
                     #Requested Tolerance on Uniformity
                     ####################################
                     [BEGIN_ADC_FIT_INFO]
-                        #ADC Spectrum Fit Parameters - Brian (Lorentz + Poly BKG; Lorentz = CauchyDist in ROOT)
-                        Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol4(3)';
+                        Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol5(3)';
                         Fit_Formula_Sig = '[0]*TMath::CauchyDist(x, [1], [2])';
                         Fit_Formula_Sig_Param_Idx_Range = '0,2';
-                        Fit_Formula_Bkg = 'pol4';
-                        Fit_Formula_Bkg_Param_Idx_Range = '3,7';
-                        Fit_Option = 'QM';
+                        Fit_Formula_Bkg = 'pol5';
+                        Fit_Formula_Bkg_Param_Idx_Range = '3,8';
                         Fit_Param_Map = 'AMPLITUDE, PEAK, HWHM';
-                        Fit_Param_IGuess = '127898, PEAK, 200';
-                        Fit_Param_Limit_Min = '10, PEAK-0.1*PEAK, 0.1*PEAK';
-                        Fit_Param_Limit_Max = '700000, PEAK+0.1*PEAK, 0.75*PEAK';
-                        Fit_Range = '800, 3*PEAK';
+                        Fit_Param_IGuess = '1000000,PEAK,PEAK*0.3';
+                        Fit_Param_Limit_Min = '10, PEAK-0.2*PEAK, 0.1*PEAK';
+                        Fit_Param_Limit_Max = '10000000, PEAK+0.2*PEAK, 0.70*PEAK';
+                        Fit_Range = 'PEAK-0.57*PEAK, 3*PEAK';
                     [END_ADC_FIT_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustADC';
                         Histo_XTitle = 'Cluster ADC';
                         Histo_YTitle = 'N';
                         Histo_BinRange = '0,10000';
-                        Histo_NumBins = '50';
+                        #Histo_NumBins = '150';
+                        Histo_NumBins = '100';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustMulti';'
@@ -1282,29 +1479,29 @@
                         Histo_Name = 'clustSize';
                         Histo_XTitle = 'Size #left(N_{strips}#right)';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,10';  #Expects two numbers separated by a comma
-                        Histo_NumBins = '10';
+                        Histo_BinRange = '0,20';
+                        Histo_NumBins = '20';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'clustTime';
                         Histo_XTitle = 'Time Bin';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,30';  #Expects two numbers separated by a comma
+                        Histo_BinRange = '0,30';
                         Histo_NumBins = '30';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'hitADC';
                         Histo_XTitle = 'Hit ADC';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,2000';  #Expects two numbers separated by a comma
+                        Histo_BinRange = '0,2000';
                         Histo_NumBins = '200';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'hitMulti';'
                         Histo_XTitle = 'Hit Multiplicity';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,20';  #Expects two numbers separated by a comma
-                        Histo_NumBins = '20';
+                        Histo_BinRange = '0,50';
+                        Histo_NumBins = '50';
                     [END_HISTO_INFO]
                     [BEGIN_HISTO_INFO]
                         Histo_Name = 'hitPos';
@@ -1317,8 +1514,8 @@
                         Histo_Name = 'hitTime';
                         Histo_XTitle = 'Time Bin';
                         Histo_YTitle = 'N';
-                        Histo_BinRange = '0,23';  #Expects two numbers separated by a comma
-                        Histo_NumBins = '23';
+                        Histo_BinRange = '0,30';
+                        Histo_NumBins = '30';
                     [END_HISTO_INFO]
                 [END_UNIFORMITY_INFO]
             [END_ANALYSIS_INFO]
@@ -1373,7 +1570,11 @@
                 Detector_Name               string, the serial number of the detector (do not include special
                                             characters such as '/' but dashes '-' are allowed)
 
-                Input_Identifier            string, a regular expression found in each input filename, separated by underscores '_', that is understood to have the run number after the expression. e.g. if the filename contains "_RunX_" for some set of integers X then this field should be set to "Run" then the inte
+                Input_Identifier            string, a regular expression found in each input filename, separated
+                                            by underscores '_', that is understood to have the run number after
+                                            the expression. e.g. if the filename contains "_RunX_" for some set
+                                            of integers X then this field should be set to "Run." This field must
+                                            always be set.
 
                 Input_Is_Frmwrk_Output      boolean, set to true (false) if the input file/files is/are created
                                             by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
@@ -1447,15 +1648,63 @@
         # 4.e.iii.III  HEADER PARAMETERS - COMP_INFO
         # --------------------------------------------------------
 
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>             <DATA TYPE, DESCRIPTION>
+
+                Obs_Name                    string, the "ObservableNameX" (See Section 4.f.i) found in the TName of the
+                                            TH1F object that you wish to compare across all input files.
+
+                Obs_Eta                     int, the iEta index you wish to comapre TH1F objects from.  This must be from
+                                            [1, iNumEta] or -1.  If set to -1 summary level TH1F objects are compared.
+
+                Obs_Phi                     int, as Obs_Eta but for phi index.
+
+                Obs_Slice                   int, as Obs_Eta but for slice index.
+
+                Input_Identifier            string, a regular expression found in each input filename, separated
+                                            by underscores '_'.  From each filename this expression will be drawn on a
+                                            TLegend to identify the TH1F object from the corresponding filename.
+
+                Output_File_Name            string, PFN of the output TFile.  Note that if Output_Individual is
+                                            set to true and Input_Is_Frmwrk_Output is set to false then the PFN
+                                            defined here is not used.  Instead the PFN of the input TFile, created
+                                            by amoreSRS, is used but the "dataTree.root" ending of the file name is
+                                            removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
+                                            to true then the PFN defined here is again not used.  Instead the PFN of
+                                            the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
+                                            filename is appended with "NewAna.root".  This could be potentially
+                                            improved in the future.
+
+                Output_File_Option          string, the option for the output TFile taken from the standard set
+                                            defined in the TFile documentation, e.g. "CREATE, NEW, READ,
+                                            RECREATE, UPDATE"
+
+                Visualize_AutoSaveImages    boolean, setting to true will tell the framework to automatically create
+                                            *.png and *.pdf files of all TCanvases stored in the "Summary" folder.
+                                            The name of these files will match the TName of the corresponding TCanvas.
+                                            They will be found in the working directory (the directory you execute
+                                            the framework executable from).  If these files already exist they will
+                                            be over-written.
+
+                Visualize_DrawNormalized    boolean, setting to true will tell the framework all distributions plotted
+                                            should be re-scaled to have an integral = 1.
+
+                Visualize_DrawOption        string, the draw option to use for the selected distributions.
+
 
         # 4.e.iii.IV  Configuration Options
         # --------------------------------------------------------
 
-        There are three modes that the analyzeUniformity executable can be used to analyze raw data taken
-        with RD51 Scaleable Readout System and unpacked amoreSRS.
+        The framework can run in an analysis mode, which has three configurations, and it can run in a
+        comparison mode which has one configuration. The three configurations of the analysis mode have
+        the analyzeUniformity executable analyze raw data taken with RD51 Scaleable Readout System and
+        unpacked amoreSRS. In the comparison mode the analyzeUniformity executable is used to compare
+        plots across multiple Framework output files.
 
-        The first mode is the "series" mode which will analyze all of the input files defined in the
-        "[BEGIN_RUN_LIST]" header, one after another, created by either amoreSRS or the
+        The 1st analysis configuration is the "series" mode which will analyze all of the input files
+        defined in the "[BEGIN_RUN_LIST]" header, one after another, created by either amoreSRS or the
         CMS_GEM_Analysis_Framework (but not a mix of both!).  The time of execution can vary depending on
         the number of input files and the number of events/slice granularity present in each of those files.
         However, care has been taken to maximimize performance while still maintaining modularity/flexibility
@@ -1466,7 +1715,7 @@
         but right now this functionality is not foreseen.  It is recommended to just do two runs of the
         executable after changing the configuration.
 
-        The second mode is the computing cluster mode; but to avoid confusion with charge clusters this is
+        The 2nd analysis config is the computing cluster mode; to avoid confusion w/charge clusters this is
         referred to as "grid" mode. Here the input run config file contains only a single input file in the
         "[BEGIN_RUN_LIST]" header and the "[BEGIN_RUN_INFO]" header is configured such that Ana_Fitting and
         Visualize_Plots are set to false.  The user uses a script/scheduler of their choice to launch their
@@ -1476,12 +1725,20 @@
         amoreSRS input files) using the "hadd" command in ROOT.  Then this merged file can be reprocessed
         in series mode with Input_Is_Frmwrk_Output, Ana_Fitting, and Visualize_Plots set to true.
 
-        The third mode is the "re-run" mode.  Here one can take a TFile that has been previously produced by
-        the CMS_GEM_Analysis_Framework and reanalyze it after changing the fit parameters defined in the
+        The third analysis config is the "re-run" mode.  Here a TFile that has been previously produced by
+        the CMS_GEM_Analysis_Framework is reanalyzed after changing the fit parameters defined in the
         analysis configuration file.  Each run will result in a new TFile (independent from the input) that
         has the updated results.  This allows the user to more rapidly study variations in parameters without
         having to waste time performing the base selection (which may not need to change).  Right now in
-        "re-run" mode only cluster level plots are propogated to the new TFile.
+        "re-run" mode only cluster level plots are propogated to the new TFile.  Additionally none of the
+        TH2F objects found in the RunHistory folder will be propogated to the new TFile.
+
+        In the "comparison" configuration one can take a set of TFiles that have been previously
+        produced by the CMS_GEM_Analysis_Framework and compare TH1F objects from the files against each other.
+        Here the input Run Config file should be configured to have a "[BEGIN_COMP_INFO]" header instead of the
+        "[BEGIN_RUN_HEADER]" that is used by the other modes.  The "[BEGIN_RUN_LIST]" header is still used
+        normally; however now the input files listed here must be Framework output files produced in one of the
+        three modes described above.
 
         Example configuration files illustrating these options are provided in the sections below.  Furthermore
         template config files and helper scripts are provided in the framework to run in each mode.  For details
@@ -1504,13 +1761,14 @@
                 Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
                 #Detector
                 ####################################
-                Detector_Name = 'DETECTORNAME';
+                Detector_Name = 'GE11-VII-L-CERN-0002';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                Input_Identifier = 'Run';
                 #Output Config
                 ####################################
-                Output_File_Name = 'myOutputFile.root';
+                Output_File_Name = 'GE11-VII-L-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_Ana.root';
                 Output_File_Option = 'RECREATE';
                 Output_Individual = 'false';        #indicates we are making one output file that represents results obtained from all inputs
                 #Analysis Steps
@@ -1526,11 +1784,9 @@
                 Visualize_DrawPhiLines = 'true';
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/filename1.root
-                /base_dir/sub_dir/sub_dir/filename2.root
-                /base_dir/sub_dir/sub_dir/filename3.root
-                /base_dir/different_dir/filename4.root
-                /different_base_dir/filename5.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run100_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run101_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run102_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
             [END_RUN_LIST]
 
         Here leading tabs are shown just for convenience and can be kept/or omitted without consequence.
@@ -1544,10 +1800,10 @@
                 #Config Files
                 ####################################
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-S.cfg';
                 #Detector
                 ####################################
-                Detector_Name = 'GE1/1-VII-L-CERN-0001';
+                Detector_Name = 'GE1/1-VII-S-CERN-0001';
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'true';    #indicates we are running on input created by the CMS_GEM_Analysis_Framework
@@ -1567,21 +1823,20 @@
                 Visualize_DrawPhiLines = 'true';
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1.root
-                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector2.root
-                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector3.root
-                /base_dir/different_dir/myPreviousFrmwrkOutput_Detector4.root
-                /different_base_dir/myPreviousFrmwrkOutput_Detector5.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_Ana.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_Ana.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_Ana.root
             [END_RUN_LIST]
 
         Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
         In this case the framework should create the following list of output files:
 
-            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1_NewAna.root
-            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector2_NewAna.root
-            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector3_NewAna.root
-            /base_dir/different_dir/myPreviousFrmwrkOutput_Detector4_NewAna.root
-            /different_base_dir/myPreviousFrmwrkOutput_Detector5_NewAna.root
+            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_NewAna.root
+            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_NewAna.root
+            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_NewAna.root
+
+        If you're filename ends with "*_Ana.root" the input file will not be overwritten and instead a new file
+        will be produced with the same PFN as the input but ending with *_NewAna.root instead.
 
         Pay special attention to the fact that these files will not necessarily be found in the directory you
         are calling the executable from but in the directory the input file is found in.
@@ -1606,6 +1861,7 @@
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                Input_Identifier = 'Run';
                 #Output Config
                 ####################################
                 Output_File_Option = 'RECREATE';
@@ -1677,7 +1933,43 @@
         Astute readers will note this is identical to the series mode example 2 with just one input file.
         This is true; however, I felt the explicit example could prove useful.
 
-    # 4.f. Output Files
+        # 4.e.iii.VII  Example Config File - Mode: Comparison
+        # --------------------------------------------------------
+
+        The comparison mode is designed to allow a user to quickly compare TH1F objects stored in different
+        framework output files from different detectors, different acquisition conditions, or produced with
+        different analysis parameters.  This can save signficant time for an analyst interested in performing
+        these comparisons.  The example config file is given below:
+
+            [BEGIN_COMP_INFO]
+                #Observable
+                ####################################
+                Obs_Name = 'clustADC';
+                Obs_Eta = '4';
+                Obs_Phi = '2';
+                Obs_Slice = '-1';
+                #Input Config
+                ####################################
+                Input_Identifier = 'ClustTime';
+                #Output Config
+                ####################################
+                Output_File_Name = 'GE11-VII-L-CERN-0002_ClustTime_Comparison.root';
+                Output_File_Option = 'UPDATE';
+                #Visualizer Config
+                ####################################
+                Visualize_AutoSaveImages = 'true';
+                Visualize_DrawNormalized = 'false';
+                Visualize_DrawOption = "E1"
+                Visualize_DrawPhiLines = 'false';
+            [END_COMP_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+            [END_RUN_LIST]
+
+        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+
+    # 4.f. Output File - Analysis Mode
     # --------------------------------------------------------
 
     The framework will produce a number of output ROOT files and text files depending
@@ -1687,7 +1979,7 @@
 
     The output (text) ROOT file is described in Section (4.f.ii) 4.f.i.
 
-        # 4.f.i Output ROOT File
+        # 4.f.i Output ROOT File - Analysis Mode
         # --------------------------------------------------------
 
         The output ROOT file produced by classes inheriting from AnalyzeResponseUniformity will contain the
@@ -1737,15 +2029,15 @@
 
             Several TCanvas objects with TNames of the form:
 
-                canv_<Detector_Name>_<Observable>_AllEta_Segmented
+                canv_<Detector_Name>_<Observable>_<ReadoutLevel>_Segmented
 
             will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
-            configRun.cfg file and "Observable" comes from the set {ClustADC, ClustMulti, ClustPos, ClustSize,
-            ClustTime, HitADC, HitMulti, HitPos, HitTime}.
+            configRun.cfg file; "Observable" comes from the set {ClustADC, ClustMulti, ClustPos, ClustSize,
+            ClustTime, HitADC, HitMulti, HitPos, HitTime}; and "ReadoutLevel" comes from the set {AllEta, AllPhi}.
 
-            These will show a TCanvas with an array of TPads placed in a 2x4 grid (columns-by-rows).  Each TPad
-            will have iEta index written in the upper left corner of the pad and have the corresponding TObject
-            from this iEta value drawn on the pad.
+            These will show a TCanvas with an array of TPads placed in a columns-by-row grid of (3x8) 2x4 grid
+            for (AllPhi) AllEta case.  Each TPad will have iEta index written in the upper left corner of the pad
+            and have the corresponding TObject from this ReadoutLevel (e.g. iEta or iPhi) drawn on the pad.
 
             # 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
             # --------------------------------------------------------
@@ -1768,10 +2060,11 @@
             of the observable in question over the entire detector.  The TH1F in question will always have the bin
             range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
             of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
-            fit with a Gaussian whose mean and sigma parameters will be written on the TPad.  The percent error of
-            the dataset, defined as sigma / mean from the Gaussian, will also be displayed on the TPad.  This offers
-            an "at a glance" look at the total distribution for a given observable and may help understand an immediate
-            pass/fail condition.
+            fit with both a Gaussian and a Landau distribution.  The Fit with the lowest Normalized Chi2 value will
+            be kept.  The whose mean (MPV) and sigma (scale) parameter of the stored Gaussian (Landau) will be written
+            on the TPad.  The percent error of the dataset, defined as sigma / mean (scale / MPV) from the Gaussian
+            (Landua), will also be displayed on the TPad.  This offers an "at a glance" look at the total distribution
+            for a given observable and may help understand an immediate pass/fail condition.
 
             # 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
             # --------------------------------------------------------
@@ -1813,7 +2106,37 @@
             the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
             of the detector and the Z-axis will be the FitObservable.
 
-        # 4.f.ii Output Text File
+        # 4.f.i Output ROOT File - Comparison Mode
+        # --------------------------------------------------------
+
+        Here the output ROOT file is produced by classes inheriting from VisualizeComparison.  The ROOT file will
+        contain a TDirectory whose TName is equal to the value of the "Input_Identifier" field at the time of
+        execution.  Inside this folder there will be a TDirectory whose TName is equal to the value of the "Obs_Name"
+        field at the time of execution.
+
+        If you have the "Output_File_Option" field equal to "UPDATE" then rather than over-writing the "Output_File_Name"
+        TFile everytime it will simply add TDirectories (or sub-TDirectories) to the file.  This is perfect if you
+        want to compare multiple "Obs_Name" distributions for the same "Input_Identifier" value.  Additionally you
+        could have one TFile store several different "Input_Identifier" top-level TDirectories each with multipler
+        "Obs_Name" sub-directories.
+
+        In each "Obs_Name" sub directory you will find a TH1F object from each of the input files you considered on
+        execution.  The TNames of these TH1F objects will be equivalent to what they are in their original TFile but
+        they will be appended with the "Input_Identifier" field specific to that TFile.  These TH1F objects will
+        automatically be drawn on a TCanvas, colored, and placed in a TLegend (also drawn on the TCanvas).  The TName
+        of this TCanvas will follow the convention:
+
+            canv_<Input_Identifier>_<Obs_Name>
+
+        Example if you have "Input_Identifier" = ClustTime and you are running over the following list of input files:
+
+            /some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
+            /some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+
+        The "Obs_Name" sub directory will contain two TH1F objects with their regular TNames appended with "_ClustTime1to30"
+        and "ClustTime6to27."  The TCanvas they are drawn on will be named "canv_ClustSize_<Obs_Name>"
+
+        # 4.f.iii Output Text File
         # --------------------------------------------------------
 
         An output text file will be created that will show in tabular form a table which
@@ -2005,3 +2328,10 @@
     This has been traced to your $SHELL environment.  It seems the setup_CMS_GEM.sh script does not
     execute properly if you are not using zsh.  While we explore solutions to this problem we recommend
     running the framework using zsh.  We apologize for this inconvenience.
+
+    ********ISSUE********
+    When attempting to run with the comparison configuration you get a segmentation violation.
+
+    Please double check that your "Obs_Name", "Obs_Eta", "Obs_Phi", and "Obs_Slice" result in a
+    valid location within your input TFiles.  Note the value set to "Obs_Name" is case-sensitive.
+    Then please try to re-run.

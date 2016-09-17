@@ -34,7 +34,7 @@ namespace QualityControl{
             
             //Data Members
             //------------------------------------------------------------------------------------------------------------------------------------------
-	    float fNFitSuccess;	//Number of successful fits;
+            float fNFitSuccess;	//Number of successful fits;
 
             float fPos_Xlow;    //Lower Bound X Position
             float fPos_Xhigh;   //Upper Bound X Position
@@ -52,7 +52,7 @@ namespace QualityControl{
             //Assignment operator
             ReadoutSectorPhi & operator=(const ReadoutSectorPhi & other){
                 if (this != &other ){ //Protects against invalid self-assignment
-		    fNFitSuccess = other.fNFitSuccess;
+                    fNFitSuccess = other.fNFitSuccess;
 
                     fPos_Xlow  = other.fPos_Xlow;
                     fPos_Xhigh = other.fPos_Xhigh;
