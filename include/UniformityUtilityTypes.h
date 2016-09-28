@@ -262,6 +262,8 @@ namespace QualityControl {
             std::shared_ptr<TH2F> hADC_v_Time;      //ADC vs Time for all physics objects
             std::shared_ptr<TH2F> hADCMax_v_ADCInt;	//Max ADC of an object (from all time bins) vs. Integral of object's ADC (summing all time bins)
             
+            std::shared_ptr<TH2F> hSize_v_Pos;      //Size vs. Position for all physics objects
+            
             //Run Histograms dimensional histograms
             std::map<int, std::shared_ptr<TH2F> > map_hADC_v_EvtNum_by_Run; //ADC vs Event Number for all physics objects (time series) for a given run (map_hADC_v_EvtNum_by_Run.first)
             std::map<int, std::shared_ptr<TH2F> > map_hTime_v_EvtNum_by_Run; //Time vs Event Number for all physics objects (time series) for a given run (map_hTime_v_EvtNum_by_Run.first)
@@ -285,6 +287,8 @@ namespace QualityControl {
                 if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                 if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
                 
+                if( other.hSize_v_Pos != NULL ) hSize_v_Pos = std::make_shared<TH2F>( *other.hSize_v_Pos.get() );
+                
                 map_hADC_v_EvtNum_by_Run    = other.map_hADC_v_EvtNum_by_Run;
                 map_hTime_v_EvtNum_by_Run   = other.map_hTime_v_EvtNum_by_Run;
             } //End Copy Constructor
@@ -303,6 +307,8 @@ namespace QualityControl {
                     if( other.hADC_v_Size != NULL ) hADC_v_Size = std::make_shared<TH2F>( *other.hADC_v_Size.get() );
                     if( other.hADC_v_Time != NULL ) hADC_v_Time = std::make_shared<TH2F>( *other.hADC_v_Time.get() );
                     if( other.hADCMax_v_ADCInt != NULL ) hADCMax_v_ADCInt = std::make_shared<TH2F>( *other.hADCMax_v_ADCInt.get() );
+                    
+                    if( other.hSize_v_Pos != NULL ) hSize_v_Pos = std::make_shared<TH2F>( *other.hSize_v_Pos.get() );
                     
                     map_hADC_v_EvtNum_by_Run    = other.map_hADC_v_EvtNum_by_Run;
                     map_hTime_v_EvtNum_by_Run   = other.map_hTime_v_EvtNum_by_Run;

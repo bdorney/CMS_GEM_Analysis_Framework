@@ -262,7 +262,7 @@ int main( int argc_, char * argv_[] ){
         //------------------------------------------------------
         //file_Config.open( vec_strInputArgs[1].c_str() );
         //file_Config = loaderRun.getFileStream( vec_strInputArgs[1], bVerboseMode );
-	loaderRun.setFileStream( vec_strInputArgs[1], file_Config, bVerboseMode );
+        loaderRun.setFileStream( vec_strInputArgs[1], file_Config, bVerboseMode );
 
         //Check to see if the config file opened successfully
         if (!file_Config.is_open()) {
