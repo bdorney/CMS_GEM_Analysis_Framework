@@ -2,10 +2,17 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.0                               *
+*	VERSION: 2.2.1                               *
 *	LAST UPDATE: Sept 17 2016                    *
 *                                                *
 **************************************************
+
+Update: September 28th 2016
+==================================================
+->Added to QualityControl::Uniformity::HistoPhysObj a new TH2F called hSize_v_Pos
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() will now initialize hSize_v_Pos mentioned above
+->QualityControl::Uniformity::AnalyzeResponseUniformityClusters::initHistosClusters() will now initialize hSize_v_Pos mentioned above
+
 
 Update: September 17th 2016
 ==================================================
