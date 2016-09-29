@@ -30,7 +30,7 @@ sed -i -- "s@OUTPUTFILE@$FILE_OUT@g" $FILE_RUN
 
 #Determine which files should be analyzed
 sed -i '$ a [BEGIN_RUN_LIST]' $FILE_RUN
-for f in *dataTree.root
+for f in *dataTree*.root
 do
 	INPUTFILENAME=$DIR_DATA/$f
 	sed -i "$ a $INPUTFILENAME" $FILE_RUN
