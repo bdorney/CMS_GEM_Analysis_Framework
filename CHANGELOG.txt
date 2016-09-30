@@ -2,10 +2,14 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.1                               *
-*	LAST UPDATE: Sept 17 2016                    *
+*	VERSION: 2.2.2                               *
+*	LAST UPDATE: Sept 30 2016                    *
 *                                                *
 **************************************************
+
+Update: September 30th 2016
+==================================================
+->Changed QualityControl::Uniformity::DetectorMPGD::setHit() & setCluster() to be compatible with both positive and negative iEta sector y-positions
 
 Update: September 28th 2016
 ==================================================

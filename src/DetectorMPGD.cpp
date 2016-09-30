@@ -258,9 +258,21 @@ ReadoutSectorPhi DetectorMPGD::getPhiSector(int iEta, int iPhi){
 void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
     //Check if the DetectorMPGD is initialized!
     if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
+        int iEtaLim_Low, iEtaLim_High;
+        
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
+            //Setup Evaluation Limits
+            if ( (*iterEta).second.fPos_Y > 0 ){ //Case: iEta Y-Pos > 0
+                iEtaLim_Low = (*iterEta).second.fPos_Y - (0.1 * (*iterEta).second.fPos_Y);
+                iEtaLim_High = (*iterEta).second.fPos_Y + (0.1 * (*iterEta).second.fPos_Y);
+            } //End Case: iEta Y-Pos > 0
+            else{ //Case: iEta Y-Pos <= 0
+                iEtaLim_Low = (*iterEta).second.fPos_Y + (0.1 * (*iterEta).second.fPos_Y);
+                iEtaLim_High = (*iterEta).second.fPos_Y - (0.1 * (*iterEta).second.fPos_Y);
+            } //End Case: Case: iEta Y-Pos <= 0
+            
             //Find matching eta sector
-            if ( ( (*iterEta).second.fPos_Y - 0.1 * (*iterEta).second.fPos_Y ) < inputCluster.iPos_Y && inputCluster.iPos_Y < ( (*iterEta).second.fPos_Y + 0.1 * (*iterEta).second.fPos_Y ) ) { //Case: Matching Eta Sector Found!
+            if ( iEtaLim_Low < inputCluster.iPos_Y && inputCluster.iPos_Y < iEtaLim_High ) { //Case: Matching Eta Sector Found!
                 
                 //Find matching phi sector within this eta sector
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
@@ -288,9 +300,21 @@ void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
 void DetectorMPGD::setHit(int iNum_Evt, Hit &inputHit){
     //Check if the DetectorMPGD is initialized!
     if ( map_sectorsEta.size() > 0 ) { //Case: Eta Sectors Defined
+        int iEtaLim_Low, iEtaLim_High;
+        
         for (auto iterEta = map_sectorsEta.begin(); iterEta != map_sectorsEta.end(); ++iterEta) {
+            //Setup Evaluation Limits
+            if ( (*iterEta).second.fPos_Y > 0 ){ //Case: iEta Y-Pos > 0
+                iEtaLim_Low = (*iterEta).second.fPos_Y - (0.1 * (*iterEta).second.fPos_Y);
+                iEtaLim_High = (*iterEta).second.fPos_Y + (0.1 * (*iterEta).second.fPos_Y);
+            } //End Case: iEta Y-Pos > 0
+            else{ //Case: iEta Y-Pos <= 0
+                iEtaLim_Low = (*iterEta).second.fPos_Y + (0.1 * (*iterEta).second.fPos_Y);
+                iEtaLim_High = (*iterEta).second.fPos_Y - (0.1 * (*iterEta).second.fPos_Y);
+            } //End Case: Case: iEta Y-Pos <= 0
+            
             //Find matching eta sector
-            if ( ( (*iterEta).second.fPos_Y - 0.1 * (*iterEta).second.fPos_Y ) < inputHit.iPos_Y && inputHit.iPos_Y < ( (*iterEta).second.fPos_Y + 0.1 * (*iterEta).second.fPos_Y ) ) { //Case: Matching Eta Sector Found!
+            if ( iEtaLim_Low < inputHit.iPos_Y && inputHit.iPos_Y < iEtaLim_High ) { //Case: Matching Eta Sector Found!
                 
                 //Find matching phi sector within this eta sector
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
