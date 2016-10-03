@@ -78,6 +78,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     Int_t iClustTimeBin[3072];
     
     Float_t fClustPos_X[3072];
+    //Float_t fClustPos_Y[3072];
     Float_t fClustADC[3072];
     
     Cluster clust;
@@ -113,7 +114,8 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     tree_Clusters->SetBranchAddress("clustADCs",&fClustADC);
     tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
     tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
-    
+    //tree_Clusters->SetBranchAddress("planeID",&fClustPos_Y);    
+
     //Determine Event Range
     //------------------------------------------------------
     pair_iEvtRange = getEventRange( aSetup.iEvt_First, aSetup.iEvt_Total, tree_Clusters->GetEntries() );
@@ -151,7 +153,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
         //For each element create a cluster, and check if it passes the selection
         for (int j=0; j < iClustMulti; ++j) { //Loop Over Number of Clusters
             //Set the cluster info
-            clust.iPos_Y = iClustPos_Y[j];
+            clust.fPos_Y = iClustPos_Y[j];
             clust.fPos_X = fClustPos_X[j];
             
             clust.fADC = fClustADC[j];

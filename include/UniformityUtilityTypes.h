@@ -173,8 +173,10 @@ namespace QualityControl {
         }; //End RunSetup
         
         struct Hit{
-            int iPos_Y; //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
-            
+	    float fPos_Y; //distance from detector origin; e.g. etaSector from amoreSRS
+
+            //int iPos_Y; //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS            
+
             int iStripNum;  //Strip number; e.g. strip from amoreSRS in range [0,384)?
             
             int iTimeBin;   //Time bin with the maximum ADC value; e.g. hitTimebin from amoreSRS in range [1,30]? Corresponds to tree adcX where X is an integer iTimeBin - 1;
@@ -186,8 +188,11 @@ namespace QualityControl {
             
             //Set Initial Values
             Hit(){
-                iPos_Y = iStripNum = iTimeBin = -1;
-                
+		fPos_Y = -1.;
+
+                //iPos_Y = iStripNum = iTimeBin = -1;
+		iStripNum = iTimeBin = -1;                
+
                 sADCIntegral = 0;
                 
                 vec_sADC.resize(30);
@@ -196,7 +201,8 @@ namespace QualityControl {
         
         //Cluster of strips
         struct Cluster{
-            int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
+            //int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
+	    float fPos_Y;  //distance from detector origin; e.g. etaSector from amoreSRS
             float fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
             
             float fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
@@ -209,9 +215,10 @@ namespace QualityControl {
             
             //Set Initial Values
             Cluster(){
-                iPos_Y = iSize = iTimeBin = -1;
-                
-                fPos_X = fADC = -1.;
+                //iPos_Y = iSize = iTimeBin = -1;
+		iSize = iTimeBin = -1;                
+
+                fPos_X = fPos_Y = fADC = -1.;
             } //End initialization
         }; //End Cluster
         

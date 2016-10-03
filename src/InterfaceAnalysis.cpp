@@ -356,6 +356,7 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
 
     //Store Histograms After Analyzing all input files
     //------------------------------------------------------
+    cout<<"<<<<<<<< Storing Hit Histograms >>>>>>>>\n";
     if ( rSetup.bAnaStep_Hits){ //Case: Hits
         //Store Hit Histograms
         hitAnalyzer.storeHistos(file_Results, detMPGD);
@@ -374,15 +375,21 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
         } //End Case: Other ROOT file
         
         //Store Dead Strip List
+        cout<<"<<<<<<<< Making Dead Strip List >>>>>>>>\n";
         hitAnalyzer.findDeadStrips(detMPGD, strTempRunName);
     } //End Case: Hits
+
+    cout<<"<<<<<<<< Storing Cluster Histograms >>>>>>>>\n";
     if ( rSetup.bAnaStep_Clusters) clustAnalyzer.storeHistos(file_Results, detMPGD);
     
     //Fit Histograms After Analyzing all input files
     //------------------------------------------------------
     if ( rSetup.bAnaStep_Fitting){ //Case: Fitting Stored Distributions
         if ( rSetup.bAnaStep_Clusters){ //Case: Cluster Analysis
+            cout<<"<<<<<<<< Fitting Cluster Histograms >>>>>>>>\n";
             clustAnalyzer.fitHistos(detMPGD);
+
+            cout<<"<<<<<<<< Storing Cluster Fits >>>>>>>>\n";
             clustAnalyzer.storeFits(file_Results, detMPGD);
         } //End Case: Cluster Analysis
     } //End Case: Fitting Stored Distributions
@@ -395,6 +402,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
         visualizeUni.setDetector(detMPGD);
         
         if (rSetup.bAnaStep_Hits) { //Case: Hit Analysis
+            cout<<"<<<<<<<< Making Hit Summary Plots >>>>>>>>\n";
+
             map_hit_ObsAndDrawOpt["HitADC"]="E1";
             map_hit_ObsAndDrawOpt["HitMulti"]="E1";
             map_hit_ObsAndDrawOpt["HitTime"]="E1";
@@ -404,6 +413,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
         } //End Case: Hit Analysis
         
         if (rSetup.bAnaStep_Clusters) { //Case: Cluster Analysis
+            cout<<"<<<<<<<< Making Cluster Summary Plots >>>>>>>>\n";
+
             map_clust_ObsAndDrawOpt["ClustADC"]="E1";
             map_clust_ObsAndDrawOpt["ClustMulti"]="E1";
             map_clust_ObsAndDrawOpt["ClustSize"]="E1";
@@ -413,6 +424,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             visualizeUni.storeListOfCanvasesHistoSegmented(file_Results, map_clust_ObsAndDrawOpt, false);
             
             if( !rSetup.bInputFromFrmwrk ) {
+		    cout<<"<<<<<<<< Making Cluster Run History Summary Plots >>>>>>>>\n";
+
                     visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", true); //Eta Level
                     visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustADC", "COLZ", false); //Phi Level
                     visualizeUni.storeCanvasHisto2DHistorySegmented(file_Results, "HistoryClustTime", "COLZ", true); //Eta Level
@@ -420,6 +433,8 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
             }            
 
             if (rSetup.bAnaStep_Fitting) { //Case: Fitting
+	        cout<<"<<<<<<<< Making Uniformity Summary Plots >>>>>>>>\n";
+
                 map_res_ObsAndDrawOpt["ResponseFitChi2"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";

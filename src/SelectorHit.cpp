@@ -78,9 +78,11 @@ void SelectorHit::setHits(std::string &strInputRootFileName, Uniformity::Detecto
 //Input is a TFile *
 void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
+    //Float_t fHitPos_Y[3072];
+    
     //int iFirstEvt = aSetup.iEvt_First;
     //int iNEvt = aSetup.iEvt_Total;
-    
+
     Int_t iHitMulti;  //I cry a little inside because of this
     Int_t iHitPos_Y[3072];
     Int_t iHitStrip[3072];
@@ -145,6 +147,7 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     //------------------------------------------------------
     tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
+    //tree_Hits->SetBranchAddress("planeID",&fHitPos_Y);
     tree_Hits->SetBranchAddress("planeID",&iHitPos_Y);
     tree_Hits->SetBranchAddress("strip",&iHitStrip);
     
@@ -220,7 +223,7 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
             Hit hitStrip;
 
             //Set the Hit info
-            hitStrip.iPos_Y     = iHitPos_Y[j];
+            hitStrip.fPos_Y     = iHitPos_Y[j];
             hitStrip.iStripNum  = iHitStrip[j];
             hitStrip.iTimeBin   = iHitTimeBin[j];
             
