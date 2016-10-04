@@ -32,13 +32,15 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/Selector.cpp \
             src/SelectorCluster.cpp \
             src/SelectorHit.cpp \
-            src/SRSConfiguration.cpp \
-            src/SRSMapping.cpp \
-            src/SRSHit.cpp \
             src/SRSAPVEvent.cpp \
-            src/SRSFECDecoder.cpp \
+            src/SRSCluster.cpp \
+            src/SRSConfiguration.cpp \
             src/SRSEventBuilder.cpp \
-            src/SRSOutputROOT.h \
+            src/SRSFECDecoder.cpp \
+            src/SRSHit.cpp \
+            src/SRSMain.cpp \
+            src/SRSMapping.cpp \
+            src/SRSOutputROOT.cpp \
             src/AnalyzeResponseUniformity.cpp \
             src/AnalyzeResponseUniformityClusters.cpp \
             src/AnalyzeResponseUniformityHits.cpp \

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vector>
 #include <iostream>
 #include "SRSFECDecoder.h"
@@ -115,7 +116,7 @@ SRSFECDecoder::BuildHits(std::vector<unsigned long int> data32bits, int fec_id, 
   fActiveFecChannels = fActiveFecChannelsMap[fec_id] ;
 
   int apvID = (fec_id << 4) | adc_channel ;
-  if (find(fActiveFecChannels.begin(), fActiveFecChannels.end(), adc_channel) != fActiveFecChannels.end() ) {
+  if (std::find(fActiveFecChannels.begin(), fActiveFecChannels.end(), adc_channel) != fActiveFecChannels.end() ) {
     int zeroSupCut = -999;
     SRSAPVEvent * apvEvent = new SRSAPVEvent(fec_id, adc_channel, apvID, zeroSupCut, fPacketSize) ;
     apvEvent->SetHitMaxOrTotalADCs(eventBuilder->GetHitMaxOrTotalADCs()) ;

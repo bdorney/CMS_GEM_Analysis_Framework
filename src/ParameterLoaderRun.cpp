@@ -205,11 +205,22 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
     //The case of Reco and Analysis is probably going to need some refinement
     //e.g.  Right now it will reconstruct the *.raw file with both hits & clusters
     //      and then it will perform the analysis of either hits or clusters
+	//Debugging
+	/*cout<<"==================Individual==================\n";
+	cout<<"inputRunSetup.bRecoStep_All = " << ((inputRunSetup.bRecoStep_All) ? "true" : "false") << endl;
+	cout<<"inputRunSetup.bAnaStep_Hits = " << ((inputRunSetup.bAnaStep_Hits) ? "true" : "false") << endl;
+	cout<<"inputRunSetup.bAnaStep_Clusters = " << ((inputRunSetup.bRecoStep_All) ? "true" : "false") << endl;
+
+	cout<<"==================Ana Only Case==================\n";
+	cout<<"!inputRunSetup.bRecoStep_All = " << ((!inputRunSetup.bRecoStep_All) ? "true" : "false") << endl;	
+	cout<<"(inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters) = " << ((inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters) ? "true" : "false") << endl;
+	cout<<"!inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters)  = " << ((!inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters) ) ? "true" : "false") << endl;*/
+
     if (!inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters) ) { //Case: ONLY ANALYSIS
         inputRunSetup.strRunMode = m_modes_run.m_strOnlyAna;
     } //End Case: ONLY ANALYSIS
     else if ( inputRunSetup.bRecoStep_All && !inputRunSetup.bAnaStep_Hits && !inputRunSetup.bAnaStep_Clusters ){ //Case: ONLY RECONSTRUCTION
-        inputRunSetup.strRunMode = m_modes_run.m_strOnlyAna;
+        inputRunSetup.strRunMode = m_modes_run.m_strOnlyReco;
     } //End Case: ONLY RECONSTRUCTION
     else if ( inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits ||  inputRunSetup.bAnaStep_Clusters) ){ //Case: Reconstruction & Analysis
         inputRunSetup.strRunMode = m_modes_run.m_strRecoNAna;

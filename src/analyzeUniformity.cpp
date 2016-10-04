@@ -318,6 +318,10 @@ int main( int argc_, char * argv_[] ){
     //Check the Analysis Run Mode
     //------------------------------------------------------
     RunModes m_modes_run;
+
+	//Debugging
+	cout<<"rSetup.strRunMode = " << rSetup.strRunMode.c_str() << endl;
+
     if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyAna ) ) { //Run Mode: Analysis
         //Load the requested amore parameters & setup the detector
         //------------------------------------------------------
@@ -361,16 +365,19 @@ int main( int argc_, char * argv_[] ){
             rSetup.strObsName
         );
     } //End Run Mode: Comparison
-    else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyAna ) ) { //Run Mode: Reconstruction
+    else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyReco ) ) { //Run Mode: Reconstruction
         for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
             //C++14 only
             //unique_ptr<SRSMain> recoInterface = make_unique<SRSMain>(& SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             
-            //std::unique_ptr<Foo> p1(new Foo);  // p1 owns Foo
+		cout<<"=============New File=============\n";
+		
             unique_ptr<SRSMain> recoInterface( SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             recoInterface->Reprocess();
             
             recoInterface.reset();
+
+		cout<"SRS Main Reset()\n";
         } //End Loop Over input Runs
     } //End Run Mode: Reconstruction
     else{ //Run Mode: Unrecognized
@@ -381,7 +388,7 @@ int main( int argc_, char * argv_[] ){
         return -5;
     } //End Run Mode: Unrecognized
     
-    cout<<"Success!"<<endl;
+    cout<<"Finished!"<<endl;
     
     return 0;
 } //End main()
