@@ -1,12 +1,19 @@
 #include "SRSOutputROOT.h"
 
+SRSOutputROOT::SRSOutputROOT() {
+    fRunName = "SRSOutputROOT.root";
+    fRunType = "PHYSICS" ;    
+    fZeroSupCut = 10 ;
+    fROOTDataType = "HITS_AND_CLUSTERS" ;
+    //    std::cout <<" ++++ Initialized SRSOutputROOT "<<std::endl;
+}
 
 //SRSOutputROOT::SRSOutputROOT(const char * cfgname, TString zeroSupCutStr, TString rootDataType) {
-SRSOutputROOT::SRSOutputROOT(const std::string& zeroSupCutStr, const std::string& rootDataType) {
-    fRunName = "toto";
+SRSOutputROOT::SRSOutputROOT(const std::string& zeroSupCutStr, const std::string& rootdatatype) {
+    fRunName = "SRSOutputROOT.root";
     fRunType = "PHYSICS" ;    
     fZeroSupCut = this->atoi(zeroSupCutStr);
-    fROOTDataType = rootDataType ;
+    fROOTDataType = rootdatatype ;
     //    std::cout <<" ++++ Initialized SRSOutputROOT "<<std::endl;
 }
 

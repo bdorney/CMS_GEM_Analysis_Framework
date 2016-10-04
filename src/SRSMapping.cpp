@@ -3,6 +3,24 @@
 SRSMapping * SRSMapping::instance = 0 ;
 
 //======================================================================================================================================
+SRSMapping::~SRSMapping(){
+    Clear() ;
+    ClearMapOfList(fDetectorListFromDetectorTypeMap) ;
+    ClearMapOfList(fDetectorListFromReadoutBoardMap) ;
+    ClearMapOfList(fDetectorPlaneListFromDetectorMap) ;
+    ClearMapOfList(fFECIDListFromDetectorPlaneMap) ;
+    ClearMapOfList(fAPVIDListFromFECIDMap) ;
+    ClearMapOfList(fAPVIDListFromDetectorPlaneMap) ;
+    ClearMapOfList(fAPVIDListFromDetectorMap) ;
+    ClearMapOfList(fAPVToPadChannelMap) ;
+    ClearMapOfList(fPadDetectorMap) ;
+    ClearMapOfList(f1DStripsPlaneMap) ;
+    ClearMapOfList(fCartesianPlaneMap) ;
+    ClearMapOfList(fCMSGEMDetectorMap) ;
+    ClearMapOfList(fUVangleReadoutMap);
+  }
+
+//======================================================================================================================================
 /**
  void SRSMapping::Set2DStripsDetectorMap(std::string readoutBoard, std::string detectorType, std::string detector, int detID, std::string planeX,  Float_t sizeX, int connectorsX, int orientX, std::string planeY,  Float_t sizeY, int connectorsY, int orientY) {
  
@@ -524,7 +542,8 @@ void SRSMapping::Clear() {
     
     fAPVIDFromAPVNoMap.clear() ; 
     fAPVIDFromNameMap.clear() ; 
-    fAPVIDListFromDetectorMap.clear() ; 
+    //fAPVIDListFromDetectorMap.clear() ;
+	ClearMapOfList( fAPVIDListFromDetectorMap ) ;
     fAPVIDListFromDetectorPlaneMap.clear() ; 
     fAPVNoFromIDMap.clear() ; 
     fAPVFromIDMap.clear() ; 
@@ -552,12 +571,12 @@ void SRSMapping::Clear() {
 }
 
 //============================================================================================
-template <typename M> void ClearMapOfList( M & amap ) {
+/*template <typename M> void SRSMapping::ClearMapOfList( M & amap ) {
     for ( typename M::iterator it = amap.begin(); it != amap.end(); ++it ) {
         ((*it).second).clear();
     }
     amap.clear() ;
-}
+}*/
 
 std::list<std::string> 
 SRSMapping::tokenize(const std::string& line, const char * p){

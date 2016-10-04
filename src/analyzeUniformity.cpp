@@ -372,7 +372,7 @@ int main( int argc_, char * argv_[] ){
             
 		cout<<"=============New File=============\n";
 		
-            unique_ptr<SRSMain> recoInterface( SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
+            unique_ptr<SRSMain> recoInterface(new SRSMain( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             recoInterface->Reprocess();
             
             recoInterface.reset();

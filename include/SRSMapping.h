@@ -19,8 +19,9 @@
 class SRSMapping{ 
   
  public:
-  
-  ~SRSMapping(){
+  //SRSMapping() {fNbOfAPVs = 0;}
+  ~SRSMapping();
+  /*~SRSMapping(){
     Clear() ;
     ClearMapOfList(fDetectorListFromDetectorTypeMap) ;
     ClearMapOfList(fDetectorListFromReadoutBoardMap) ;
@@ -35,7 +36,7 @@ class SRSMapping{
     ClearMapOfList(fCartesianPlaneMap) ;
     ClearMapOfList(fCMSGEMDetectorMap) ;
     ClearMapOfList(fUVangleReadoutMap);
-  }
+  }*/
 
   template <typename M> void ClearMapOfList( M & amap ) ;
 
@@ -267,7 +268,13 @@ private:
 
 };
 
+template <typename M> void SRSMapping::ClearMapOfList( M & amap ) {
+    for (auto iterList = amap.begin(); iterList != amap.end(); ++iterList ) {
+        ((*iterList).second).clear();
+    }
+    amap.clear() ;
+
+    return;
+}
+
 #endif
-
-
-

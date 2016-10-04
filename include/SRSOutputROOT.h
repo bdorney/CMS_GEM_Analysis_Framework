@@ -29,7 +29,7 @@
 class SRSOutputROOT {
     
 public:
-    
+    SRSOutputROOT();
     SRSOutputROOT(const std::string& zeroSupCut,const std::string& rootdatatype);
     ~SRSOutputROOT();
     
@@ -42,6 +42,7 @@ public:
     
     void SetRunName(std::string runname)     {fRunName = runname;}
     void SetRunType(std::string runtype)     {fRunType = runtype;}
+    void SetROOTDataType(const std::string& rootdatatype){ fROOTDataType = rootdatatype ; }
     void SetZeroSupCut(Int_t zeroSupCut) {fZeroSupCut = zeroSupCut;}
     
     

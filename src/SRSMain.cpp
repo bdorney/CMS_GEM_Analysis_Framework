@@ -1,3 +1,4 @@
+//Framework Includes
 #include "SRSMain.h"
 #include "SRSConfiguration.h"
 #include "SRSMapping.h"
@@ -7,17 +8,17 @@
 #include "SRSEventBuilder.h"
 #include "SRSOutputROOT.h"
 
-SRSMain* SRSMain::_repro = 0;
+//SRSMain* SRSMain::_repro = 0;
 
 SRSMain::~SRSMain(){
   this->Close();
 };
  
-SRSMain* 
+/*SRSMain* 
 SRSMain::Reprocessor(const std::string& rawfile, const std::string& config){
   if (_repro == 0) _repro = new SRSMain(rawfile,config);
   return _repro;
-}
+}*/
 
 
 void 
@@ -157,23 +158,36 @@ SRSMain::Reprocess(){
 
 
 
-SRSMain::SRSMain(const std::string& rawfile, const std::string& config) : _rawfile(rawfile), _config(config)  {
+SRSMain::SRSMain(const std::string& rawfile, const std::string& config) : 
+	_rawfile(rawfile), 
+	_config(config),
+	_conf(new SRSConfiguration),
+	//_maps(new SRSMapping),
+	_maps( SRSMapping::GetInstance() ),
+	_root(new SRSOutputROOT)
+  {
   this->Init();
 }
 
 void 
 SRSMain::Init(){
- _conf = new SRSConfiguration(_config.c_str());
- _maps = SRSMapping::GetInstance();
+ //_conf = new SRSConfiguration(_config.c_str());
+ _conf->Init(_config.c_str());
+ //_maps = SRSMapping::GetInstance();
  _maps->LoadDefaultMapping(_conf->GetMappingFile());
  _maps->LoadAPVtoPadMapping(_conf->GetPadMappingFile());
  _maps->PrintMapping();
- _root = new SRSOutputROOT(_conf->GetZeroSupCut(), _conf->GetROOTDataType());
+ //_root = new SRSOutputROOT(_conf->GetZeroSupCut(), _conf->GetROOTDataType());
  _root->InitRootFile();
+ _root->SetZeroSupCut(std::stoi(_conf->GetZeroSupCut()));
+ _root->SetROOTDataType(_conf->GetROOTDataType());
 }
 
 void SRSMain::Close(){
   _root->WriteRootFile();
-  delete _root;
-  delete _conf;
+  //delete _root;
+  _root.reset();
+  //delete _conf;
+  _conf.reset();
+  _maps.reset();
 }
