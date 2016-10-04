@@ -2,10 +2,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.2                               *
-*	LAST UPDATE: Sept 30 2016                    *
+*	VERSION: 2.2.3                               *
+*	LAST UPDATE: Oct 3 2016                      *
 *                                                *
 **************************************************
+
+Update: October 3rd 2016
+==================================================
+->Added new file include/QualityControlSectionNames.h for providing a single point of access for config file name headers
+->Added new file include/PlotterUtilityTypes.h for defining plotting struct's DataPoint, InfoPlot, and InfoCanvas in the QualityControl::Plotter namespace
 
 Update: September 30th 2016
 ==================================================
