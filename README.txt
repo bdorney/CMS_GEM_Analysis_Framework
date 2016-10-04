@@ -110,11 +110,8 @@
 
     Contributors: B. Dorney, M. Maggi
 
-    This analysis and visualization portion of this package has been designed by B. Dorney with input
-    from J. Merlin & S. Colafranceschi.  The event unpacking/decoding and reconstruction classes were
-    adapted from amoreSRS, designed by K. Gnanvo et al., by M. Maggi.
-
-    The original selection & analysis algorithms are based off work done by J. Merlin.  This
+    This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi. The
+    original selection & analysis algorithms are based off work done by J. Merlin.  This
     package makes use of several features from the CMS_GEM_TB_Timing repository (also by B. Dorney).
     Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this
     repository.
