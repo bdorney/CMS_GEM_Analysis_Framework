@@ -21,18 +21,11 @@
 #include "TimingUtilityTypes.h"
 
 //ROOT Includes
-//#include "FitResult.h"
 #include "TFile.h"
-//#include "TFitResultPtr.h"
 #include "TGraphErrors.h"
 #include "TH1F.h"
 #include "TH2F.h"
-//#include "TPolyMarker.h"
 #include "TROOT.h"
-//#include "TSpectrum.h"
-//#include "TTree.h"
-
-//using namespace ROOT;
 
 namespace QualityControl {
     namespace Uniformity {
@@ -106,8 +99,8 @@ namespace QualityControl {
             bool bAnaStep_Visualize;            //true -> make summary plots at end of analysis; false -> do not
             
             bool bRecoStep_All;                 //true -> reconstruct hits & clusters; false -> do not;
-            bool bRecoStep_Clusters;
-            bool bRecoStep_Hits;
+            //bool bRecoStep_Clusters;
+            //bool bRecoStep_Hits;
             
             //Setup - Comparison
             std::string strIdent;               //Unique identifier in input runs
@@ -120,10 +113,11 @@ namespace QualityControl {
 
             //Setup - I/O
             bool bInputFromFrmwrk;              //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
-            bool bInputIsRaw;                   //true -> input is a raw file; false -> it is a root file
+            //bool bInputIsRaw;                   //true -> input is a raw file; false -> it is a root file
             bool bLoadSuccess;
             bool bMultiOutput;                  //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
             
+            std::string strFile_Config_Reco;    //Name of reco config file
             std::string strFile_Config_Ana;     //Name of analysis config file
             std::string strFile_Config_Map;     //Name of mapping file
             
@@ -140,14 +134,15 @@ namespace QualityControl {
             //Default constructor
             RunSetup(){
                 //Setup - Master Mode
-                strRunMode = "ANALYSIS";
+                strRunMode = "UNRECOGNIZED";
                 
                 //Setup - Analyzer
                 bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
                 
                 //Setup - Reconstruction
-                bInputIsRaw = false;
-                bRecoStep_All = bRecoStep_Clusters = bRecoStep_Hits = false;
+                //bInputIsRaw = false;
+                bRecoStep_All = false;
+                //bRecoStep_All = bRecoStep_Clusters = bRecoStep_Hits = false;
                 
                 //Setup - Comparison
                 strIdent = "RUN";
@@ -164,8 +159,9 @@ namespace QualityControl {
                 bInputFromFrmwrk = bMultiOutput = false;
                 bLoadSuccess = false;   //This is set to true if the struct is loaded successfully
 
-                strFile_Config_Ana = "config/configAnalysis.cfg";
-                strFile_Config_Map = "config/Mapping_GE11-VII-L.cfg";
+                strFile_Config_Reco = "config/configReco.cfg";
+                strFile_Config_Ana  = "config/configAnalysis.cfg";
+                strFile_Config_Map  = "config/Mapping_GE11-VII-L.cfg";
                 
                 strFile_Output_Name = "FrameworkOutput.root";
                 strFile_Output_Option = "RECREATE";
@@ -180,7 +176,7 @@ namespace QualityControl {
         }; //End RunSetup
         
         struct Hit{
-	    float fPos_Y; //distance from detector origin; e.g. etaSector from amoreSRS
+            float fPos_Y; //distance from detector origin; e.g. etaSector from amoreSRS
 
             //int iPos_Y; //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS            
 
@@ -195,10 +191,10 @@ namespace QualityControl {
             
             //Set Initial Values
             Hit(){
-		fPos_Y = -1.;
+                fPos_Y = -1.;
 
                 //iPos_Y = iStripNum = iTimeBin = -1;
-		iStripNum = iTimeBin = -1;                
+                iStripNum = iTimeBin = -1;
 
                 sADCIntegral = 0;
                 
@@ -209,7 +205,7 @@ namespace QualityControl {
         //Cluster of strips
         struct Cluster{
             //int iPos_Y;  //distance from base of trapezoid (in mm); e.g. planeID from amoreSRS
-	    float fPos_Y;  //distance from detector origin; e.g. etaSector from amoreSRS
+            float fPos_Y;  //distance from detector origin; e.g. etaSector from amoreSRS
             float fPos_X;  //position within eta sector (in mm); e.g. clustPos from amoreSRS
             
             float fADC;       //ADC value of cluster; e.g. clustADCs from amoreSRS
@@ -223,7 +219,7 @@ namespace QualityControl {
             //Set Initial Values
             Cluster(){
                 //iPos_Y = iSize = iTimeBin = -1;
-		iSize = iTimeBin = -1;                
+                iSize = iTimeBin = -1;
 
                 fPos_X = fPos_Y = fADC = -1.;
             } //End initialization

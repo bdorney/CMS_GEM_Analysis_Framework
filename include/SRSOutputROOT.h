@@ -55,7 +55,6 @@ private:
     TTree * fHitTree ;
     TTree * fClusterTree ;
 
-    
     std::string fRunType, fRunName;
     std::string fROOTDataType;
     

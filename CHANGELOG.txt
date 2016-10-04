@@ -12,10 +12,11 @@ Update: October 4th 2016
 ->Adding event unpacking/decoding and reconstruction classes from amoreSRS
 ->The Run Config file field of "Ana_Reco_Clusters" is renamed to "Reco_All"
 ->QualityControl::Uniformity::RunSetup::bAnaStep_Reco renamed to bRecoStep_All
-->Added new members bRecoStepClusters, bRecoStepHits, and bInputIsRaw to QualityControl::Uniformity::RunSetup
 ->Minor bug fixes to SRSMapping methods: GetPlaneOrientation(), GetNbOfAPVs(), GetSizeOfPlane(), and GetPlaneIDorEtaSector()
 ->Minor bug fixes to SRSOutputROOT::WriteRootFile() and SRSOutputROOT::InitRootFile()
 ->Renamed QualityControl::Uniformity::ParameterLoaderAmoreSRS to ParameterLoaderDetector
+->Added new struct QualityControl::Uniformity::RunModes to include/QualityControlSectionNames.h
+->QualityControlUniformity::ParameterLoaderRun now determines the possible running modes {Ana, Comp, Reco, RecoPlusAna} and stores them using RunModes
 
 Update: October 3rd 2016
 ==================================================

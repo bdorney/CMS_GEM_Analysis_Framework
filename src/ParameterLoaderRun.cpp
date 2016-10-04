@@ -101,7 +101,7 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
     
     //Set Defaults
     //------------------------------------------------------
-    inputRunSetup.strRunMode            = "ANALYSIS";
+    //inputRunSetup.strRunMode            = m_modes_run.m_strOnlyAna;
     
     //Loop through input file
     //Check for faults immediately afterward
@@ -141,12 +141,12 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             }
             else if ( pair_strParam.first.compare("RECO_ALL") == 0 ) {
                 inputRunSetup.bRecoStep_All = convert2bool(pair_strParam.second, bExitSuccess);
-                inputRunSetup.bInputIsRaw = inputRunSetup.bRecoStep_All;
+                //inputRunSetup.bInputIsRaw = inputRunSetup.bRecoStep_All;
             }
             else if ( pair_strParam.first.compare("VISUALIZE_PLOTS") == 0 ) {
                 inputRunSetup.bAnaStep_Visualize = convert2bool(pair_strParam.second, bExitSuccess);
             }
-	    else if ( pair_strParam.first.compare("INPUT_IDENTIFIER") == 0 ) {
+            else if ( pair_strParam.first.compare("INPUT_IDENTIFIER") == 0 ) {
                 inputRunSetup.strIdent = pair_strParam.second;
             }
             else if ( pair_strParam.first.compare("INPUT_IS_FRMWRK_OUTPUT") == 0 ) {
@@ -160,6 +160,9 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             }
             else if ( pair_strParam.first.compare("VISUALIZE_AUTOSAVEIMAGES") == 0 ) {
                 inputRunSetup.bVisPlots_AutoSaving = convert2bool(pair_strParam.second, bExitSuccess);
+            }
+            else if ( pair_strParam.first.compare("CONFIG_RECO") == 0 ) {
+                inputRunSetup.strFile_Config_Reco = pair_strParam.second;
             }
             else if ( pair_strParam.first.compare("CONFIG_ANALYSIS") == 0 ) {
                 inputRunSetup.strFile_Config_Ana = pair_strParam.second;
@@ -188,14 +191,29 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             cout<<"ParameterLoaderRun::loadParametersRun(): did not parse correctly, please cross-check input file\n";
         } //End Case: Input line did NOT parse correctly
 
-	//Store previous stream position so main loop over file exits 
-	//After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly 
-	spos_Previous = file_Input.tellg();
+        //Store previous stream position so main loop over file exits
+        //After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly 
+        spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && bVerboseMode) {
         perror( "ParameterLoaderRun::loadParametersRun(): error while reading config file" );
         printStreamStatus(file_Input);
     }
+    
+    //Determine the Run Mode
+    //------------------------------------------------------
+    //The case of Reco and Analysis is probably going to need some refinement
+    //e.g.  Right now it will reconstruct the *.raw file with both hits & clusters
+    //      and then it will perform the analysis of either hits or clusters
+    if (!inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits || inputRunSetup.bAnaStep_Clusters) ) { //Case: ONLY ANALYSIS
+        inputRunSetup.strRunMode = m_modes_run.m_strOnlyAna;
+    } //End Case: ONLY ANALYSIS
+    else if ( inputRunSetup.bRecoStep_All && !inputRunSetup.bAnaStep_Hits && !inputRunSetup.bAnaStep_Clusters ){ //Case: ONLY RECONSTRUCTION
+        inputRunSetup.strRunMode = m_modes_run.m_strOnlyAna;
+    } //End Case: ONLY RECONSTRUCTION
+    else if ( inputRunSetup.bRecoStep_All && (inputRunSetup.bAnaStep_Hits ||  inputRunSetup.bAnaStep_Clusters) ){ //Case: Reconstruction & Analysis
+        inputRunSetup.strRunMode = m_modes_run.m_strRecoNAna;
+    } //End Case: Reconstrcution & Analysis
     
 	//cout<<"ParameterLoaderRun::loadParametersRun() - strLine = " << strLine << endl;
 
@@ -219,7 +237,7 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
     
     //Set Defaults
     //------------------------------------------------------
-    inputRunSetup.strRunMode            = "COMPARISON";
+    inputRunSetup.strRunMode            = m_modes_run.m_strOnlyCompare;
     inputRunSetup.bAnaStep_Visualize    = true;
     inputRunSetup.bInputFromFrmwrk      = true;
     inputRunSetup.bMultiOutput          = false;

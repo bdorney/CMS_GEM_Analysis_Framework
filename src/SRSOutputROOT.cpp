@@ -701,9 +701,7 @@ void SRSOutputROOT::WriteRootFile() {
     
     std::string fileName  = fRunName + "_dataTree.root";
     
-    if (fRunFilePrefix == "BeamPosition") fileName = fRunName + "_BP" + fRunFileValue + "_dataTree.root";
-    if (fRunFilePrefix == "HVScan")       fileName = fRunName + "_HV" + fRunFileValue + "_dataTree.root";
-    printf("  SRSOutputROOT::WriteRootFile() ==> Init Root file %s \n",fileName.Data());
+    printf("\tSRSOutputROOT::WriteRootFile() ==> Init Root file %s \n",fileName.c_str() );
     
     fFile = new TFile(fileName.c_str(), "RECREATE","",1);
     //TDirectory *dir_Hits = fFile->mkdir("Hits");

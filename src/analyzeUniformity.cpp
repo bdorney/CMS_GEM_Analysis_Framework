@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <stdio.h>
 #include <string>
 #include <utility>
@@ -22,6 +23,8 @@
 #include "ParameterLoaderDetector.h"
 #include "ParameterLoaderAnaysis.h"
 #include "ParameterLoaderRun.h"
+#include "QualityControlSectionNames.h"
+#include "SRSMain.h"
 #include "UniformityUtilityTypes.h"
 #include "VisualizeComparison.h"
 
@@ -34,9 +37,11 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::ifstream;
+//using std::make_unique; //requires C++14
 using std::map;
 using std::pair;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 using QualityControl::Timing::convert2bool;
@@ -198,38 +203,17 @@ void printHelpMenu(){
 //  Help menu: ./analyzeUniformity -h
 //  Analysis: ./analyzeUniformity config/configRun.cfg true
 int main( int argc_, char * argv_[] ){
-    //Variable Declaration
-    AnalysisSetupUniformity aSetup;
-    
-    bool bVerboseMode = false;
-    
-    DetectorMPGD detMPGD;
-    
-    ifstream file_Config;
-    
-    InterfaceAnalysis anaInterface;
-    
-    ParameterLoaderDetector loadDetector;
-    ParameterLoaderAnaysis loaderAnalysis;
-    ParameterLoaderRun loaderRun;
-    
-    RunSetup rSetup;
-    
-    //string strFile_Config_Run = "";
-    
-    vector<string> vec_strInputArgs;
-    vector<string> vec_strInputFiles;
-    vector<pair<int, string> > vec_pairedRunList;
-
-    VisualizeComparison visualizeComp;
-    
     //Transfer Input Arguments into vec_strInputArgs
     //------------------------------------------------------
+    vector<string> vec_strInputArgs;
     vec_strInputArgs.resize(argc_);
     std::copy(argv_, argv_ + argc_, vec_strInputArgs.begin() );
 
-    //Check input Arguments
+    //Check input Arguments, load parameters on good input
     //------------------------------------------------------
+    bool bVerboseMode = false;
+    ifstream file_Config;
+    ParameterLoaderRun loaderRun;
     if(vec_strInputArgs.size() == 1 ){ //Case: Usage
         printHelpMenu();
         
@@ -289,7 +273,7 @@ int main( int argc_, char * argv_[] ){
     
     //Set the Run Info and get input file(s)
     //------------------------------------------------------
-    rSetup = loaderRun.getRunParameters(file_Config, bVerboseMode);
+    RunSetup rSetup = loaderRun.getRunParameters(file_Config, bVerboseMode);
     
     if (!rSetup.bLoadSuccess) {
         perror( ("main() - error while setting Run Setup config from file: " + vec_strInputArgs[1]).c_str() );
@@ -300,6 +284,8 @@ int main( int argc_, char * argv_[] ){
         return -1;
     }
     
+    vector<string> vec_strInputFiles;
+    vector<pair<int, string> > vec_pairedRunList;
     if( rSetup.bInputFromFrmwrk ){ //Case: Framework Input
         vec_strInputFiles = loaderRun.getRunList(file_Config, bVerboseMode);
         
@@ -315,7 +301,7 @@ int main( int argc_, char * argv_[] ){
     else { //Case: amoreSRS Input
         vec_pairedRunList = loaderRun.getPairedRunList(file_Config, rSetup.strIdent, bVerboseMode);
         
-	//Check if
+        //Check if
         if (vec_pairedRunList.size() == 0) {
             cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
             cout<<"\tMaybe you forgot to have a field 'RunX' in the input filenames?\n";
@@ -329,21 +315,27 @@ int main( int argc_, char * argv_[] ){
     
     file_Config.close();
     
-    //Check the Run Mode
+    //Check the Analysis Run Mode
     //------------------------------------------------------
-    if ( 0 == rSetup.strRunMode.compare("ANALYSIS") ) { //Run Mode: Analysis
+    RunModes m_modes_run;
+    if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyAna ) ) { //Run Mode: Analysis
         //Load the requested amore parameters & setup the detector
         //------------------------------------------------------
+        ParameterLoaderDetector loadDetector;
         loadDetector.loadAmoreMapping( rSetup.strFile_Config_Map  );
+        
+        DetectorMPGD detMPGD;
         detMPGD = loadDetector.getDetector();
         detMPGD.setName( rSetup.strDetName );
 
         //Load the requested analysis parameters
         //------------------------------------------------------
-        aSetup = loaderAnalysis.getAnalysisParameters( rSetup.strFile_Config_Ana );
+        ParameterLoaderAnaysis loaderAnalysis;
+        AnalysisSetupUniformity aSetup = loaderAnalysis.getAnalysisParameters( rSetup.strFile_Config_Ana );
 
         //Setup the analysis interface
         //------------------------------------------------------
+        InterfaceAnalysis anaInterface;
         anaInterface.setAnalysisParameters(aSetup);
         anaInterface.setDetector(detMPGD);
         anaInterface.setRunParameters(rSetup);
@@ -354,8 +346,10 @@ int main( int argc_, char * argv_[] ){
         if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
         else {                          anaInterface.analyzeInput(vec_pairedRunList); }
     } //End Run Mode: Analysis
-    else if ( 0 == rSetup.strRunMode.compare("COMPARISON") ){ //Run Mode: Comparison
-	visualizeComp.setDrawOption(rSetup.strDrawOption);
+    else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyCompare ) ){ //Run Mode: Comparison
+        VisualizeComparison visualizeComp;
+        
+        visualizeComp.setDrawOption(rSetup.strDrawOption);
         visualizeComp.setIdentifier(rSetup.strIdent);
         visualizeComp.setInputFiles(vec_strInputFiles);
         visualizeComp.setNormalize(rSetup.bDrawNormalized);
@@ -367,6 +361,25 @@ int main( int argc_, char * argv_[] ){
             rSetup.strObsName
         );
     } //End Run Mode: Comparison
+    else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyAna ) ) { //Run Mode: Reconstruction
+        for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
+            //C++14 only
+            //unique_ptr<SRSMain> recoInterface = make_unique<SRSMain>(& SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
+            
+            //std::unique_ptr<Foo> p1(new Foo);  // p1 owns Foo
+            unique_ptr<SRSMain> recoInterface( SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
+            recoInterface->Reprocess();
+            
+            recoInterface.reset();
+        } //End Loop Over input Runs
+    } //End Run Mode: Reconstruction
+    else{ //Run Mode: Unrecognized
+        cout<<"main() - Run Mode: " << rSetup.strRunMode << " not recognized!\n";
+        cout<<"\tPlease double check input run config file.\n";
+        cout<<"\tExiting\n";
+        
+        return -5;
+    } //End Run Mode: Unrecognized
     
     cout<<"Success!"<<endl;
     

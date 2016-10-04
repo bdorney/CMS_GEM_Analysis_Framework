@@ -22,6 +22,7 @@
 
 //Framework Includes
 #include "ParameterLoader.h"
+#include "QualityControlSectionNames.h"
 #include "TimingUtilityFunctions.h"
 #include "UniformityUtilityOperators.h"
 #include "UniformityUtilityTypes.h"
@@ -68,6 +69,7 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
+            QualityControl::Uniformity::RunModes m_modes_run;
             
             //std::string m_strSecBegin_CompInfo, m_strSecEnd_CompInfo;
             //std::string m_strSecBegin_RunInfo, m_strSecEnd_RunInfo;

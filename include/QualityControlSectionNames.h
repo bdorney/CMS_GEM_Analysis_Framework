@@ -19,6 +19,21 @@
 
 namespace QualityControl {
     namespace Uniformity{
+        struct RunModes{
+            std::string m_strOnlyAna;       //Analyze *.root input
+            std::string m_strOnlyCompare;   //Compare *.root input
+            std::string m_strOnlyReco;      //Reconstruct *.raw input
+            std::string m_strRecoNAna;      //Analyze & Reconstruct from *.raw (note *.root file will be made in process)
+            
+            //Constructor
+            RunModes(){
+                m_strOnlyAna = "ONLY_ANALYSIS";
+                m_strOnlyCompare = "ONLY_COMPARISON";
+                m_strOnlyReco = "ONLY_RECONSTRUCTION";
+                m_strRecoNAna = "RECO_AND_ANA";
+            }
+        }; //End RunModes
+        
         struct SecNamesAna{
             std::string m_strSecBegin_Analysis;       //Defines how the file will look
             //std::string m_strSecBegin_Timing;         //Hard coded section headers
