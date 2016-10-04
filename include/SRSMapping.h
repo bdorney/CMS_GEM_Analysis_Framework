@@ -132,6 +132,8 @@ class SRSMapping{
   float GetPlaneIDorEtaSector(std::string planeName) {
     std::string readoutType = GetReadoutBoardFromDetector(GetDetectorFromPlane(planeName))  ;
     float planeIDorEtaSector=0;
+    
+    if(readoutType == "CARTESIAN")	planeIDorEtaSector = (fCartesianPlaneMap[planeName])[0];
     if(readoutType == "1DSTRIPS") planeIDorEtaSector = (f1DStripsPlaneMap[planeName])[0];
     if(readoutType == "CMSGEM")  {
       planeIDorEtaSector = (fCMSGEMDetectorMap[planeName])[0];
@@ -143,6 +145,7 @@ class SRSMapping{
   float GetSizeOfPlane(std::string planeName) {
     std::string readoutType = GetReadoutBoardFromDetector(GetDetectorFromPlane(planeName))  ;
     float planeSize = 0;
+    if(readoutType == "CARTESIAN") planeSize = (fCartesianPlaneMap[planeName])[1] ;
     if(readoutType == "1DSTRIPS") planeSize = (f1DStripsPlaneMap[planeName])[1] ;
     if(readoutType == "CMSGEM")   planeSize = (fCMSGEMDetectorMap[planeName])[1];
     return planeSize ;
@@ -152,6 +155,7 @@ class SRSMapping{
     std::string readoutType = GetReadoutBoardFromDetector(GetDetectorFromPlane(planeName))  ;
     std::string detectorType = GetDetectorTypeFromDetector(GetDetectorFromPlane(planeName))  ;
     int nbOfAPVs=0;
+    if(readoutType == "CARTESIAN") nbOfAPVs = (int) (fCartesianPlaneMap[planeName])[2];
     if(readoutType == "1DSTRIPS") nbOfAPVs = (int) (f1DStripsPlaneMap[planeName])[2];
     if(readoutType == "CMSGEM")   nbOfAPVs = (int) (fCMSGEMDetectorMap[planeName])[2];
     if ((readoutType == "UV_ANGLE") &&  (detectorType == "EICPROTO1"))  nbOfAPVs =  (int) (((fUVangleReadoutMap[planeName])[2]) /2 ); ;
@@ -161,6 +165,7 @@ class SRSMapping{
   int GetPlaneOrientation(std::string planeName)  {
     std::string readoutType = GetReadoutBoardFromDetector(GetDetectorFromPlane(planeName))  ;
     int orient=-1;
+    if(readoutType == "CARTESIAN") orient = (int) (fCartesianPlaneMap[planeName])[3];
     if(readoutType == "1DSTRIPS") orient = (int) (f1DStripsPlaneMap[planeName])[3];
     if(readoutType == "CMSGEM")   orient = (int) (fCMSGEMDetectorMap[planeName])[3];
     if(readoutType == "UV_ANGLE") orient = (int) (fUVangleReadoutMap[planeName])[2];

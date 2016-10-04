@@ -101,7 +101,7 @@ namespace QualityControl {
             //Constructor
             ColNamesPlotter(){
                 m_strColX = "VAR_INDEP";
-                m_strColX_Err "VAR_INDEP_ERR";
+                m_strColX_Err = "VAR_INDEP_ERR";
                 m_strColY = "VAR_DEP";
                 m_strColY_Err = "VAR_DEP_ERR";
             } //End Constructor

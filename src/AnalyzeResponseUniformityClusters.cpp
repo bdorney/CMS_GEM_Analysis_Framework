@@ -490,9 +490,9 @@ void AnalyzeResponseUniformityClusters::loadHistosFromFile(std::string & strInpu
     
     //Setup the MPGD object
     //------------------------------------------------------
-    ParameterLoaderAmoreSRS amoreLoader;
-    amoreLoader.loadAmoreMapping(strInputMappingFileName);
-    detMPGD = amoreLoader.getDetector();
+    ParameterLoaderDetector loadDetector;
+    loadDetector.loadAmoreMapping(strInputMappingFileName);
+    detMPGD = loadDetector.getDetector();
 
     //Check to see if data file opened successfully, if so load the tree
     //------------------------------------------------------

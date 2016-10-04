@@ -353,20 +353,20 @@ void SRSOutputROOT::FillTrackingTree(SRSEventBuilder * eventbuilder, SRSTrack * 
 //void SRSOutputROOT::InitRootFile(const char * cfgname) {
 void SRSOutputROOT::InitRootFile() {
     
-  std::string fileName  = fRunName + std::string("_dataTree.root");
+  /*std::string fileName  = fRunName + std::string("_dataTree.root");
   
-  printf("  SRSOutputROOT::InitRootFile() ==> Init Root file %s \n",fileName.c_str());
+  printf("  SRSOutputROOT::InitRootFile() ==> Init Root file %s \n",fileName.c_str());*/
     
   m_evtID = 0 ;
   m_chID = 0 ;
   m_nclust = 0 ;
   
-  fFile = TFile::Open(fileName.c_str(),"RECREATE");
+  //fFile = TFile::Open(fileName.c_str(),"RECREATE");
     
   if (fZeroSupCut == 0) {
     printf("  SRSOutputROOT::InitRootFile() ==> Creating the Hit Tree: fHitTree \n") ;
     fHitTree = new TTree("THit","GEM Hit Data Rootfile") ;
-    fHitTree->SetDirectory(fFile) ;
+    //fHitTree->SetDirectory(fFile) ;
     
     m_strip         = new int[10000] ;
     m_hit_detID     = new int[10000] ;
@@ -451,44 +451,44 @@ void SRSOutputROOT::InitRootFile() {
     if (fROOTDataType == "HITS_ONLY") {
       printf("  SRSOutputROOT::InitRootFile() ==> Creating the Hit Tree: fHitTree \n") ;
       fHitTree = new TTree("THit","GEM Hit Data Rootfile") ;
-      fHitTree->SetDirectory(fFile) ;
+      //fHitTree->SetDirectory(fFile) ;
       
-      m_hit_detID     = new int[2000] ;
-      m_hit_planeID   = new int[2000] ;
-      m_hit_timeBin   = new int[2000] ;
-      m_hit_etaSector = new short[2000] ;
+      m_hit_detID     = new int[10000] ;
+      m_hit_planeID   = new int[10000] ;
+      m_hit_timeBin   = new int[10000] ;
+      m_hit_etaSector = new short[10000] ;
       
-      m_adc0  = new short[2000] ;
-      m_adc1  = new short[2000] ;
-      m_adc2  = new short[2000] ;
-      m_adc3  = new short[2000] ;
-      m_adc4  = new short[2000] ;
-      m_adc5  = new short[2000] ;
-      m_adc6  = new short[2000] ;
-      m_adc7  = new short[2000] ;
-      m_adc8  = new short[2000] ;
-      m_adc9  = new short[2000] ;
-      m_adc10 = new short[2000] ;
-      m_adc11 = new short[2000] ;
-      m_adc12 = new short[2000] ;
-      m_adc13 = new short[2000] ;
-      m_adc14 = new short[2000] ;
-      m_adc15 = new short[2000] ;
-      m_adc16 = new short[2000] ;
-      m_adc17 = new short[2000] ;
-      m_adc18 = new short[2000] ;
-      m_adc19 = new short[2000] ;
-      m_adc20 = new short[2000] ;
-      m_adc21 = new short[2000] ;
-      m_adc22 = new short[2000] ;
-      m_adc23 = new short[2000] ;
-      m_adc24 = new short[2000] ;
-      m_adc25 = new short[2000] ;
-      m_adc26 = new short[2000] ;
-      m_adc27 = new short[2000] ;
-      m_adc28 = new short[2000] ;
-      m_adc29 = new short[2000] ;
-      m_strip   = new int[2000] ;
+      m_adc0  = new short[10000] ;
+      m_adc1  = new short[10000] ;
+      m_adc2  = new short[10000] ;
+      m_adc3  = new short[10000] ;
+      m_adc4  = new short[10000] ;
+      m_adc5  = new short[10000] ;
+      m_adc6  = new short[10000] ;
+      m_adc7  = new short[10000] ;
+      m_adc8  = new short[10000] ;
+      m_adc9  = new short[10000] ;
+      m_adc10 = new short[10000] ;
+      m_adc11 = new short[10000] ;
+      m_adc12 = new short[10000] ;
+      m_adc13 = new short[10000] ;
+      m_adc14 = new short[10000] ;
+      m_adc15 = new short[10000] ;
+      m_adc16 = new short[10000] ;
+      m_adc17 = new short[10000] ;
+      m_adc18 = new short[10000] ;
+      m_adc19 = new short[10000] ;
+      m_adc20 = new short[10000] ;
+      m_adc21 = new short[10000] ;
+      m_adc22 = new short[10000] ;
+      m_adc23 = new short[10000] ;
+      m_adc24 = new short[10000] ;
+      m_adc25 = new short[10000] ;
+      m_adc26 = new short[10000] ;
+      m_adc27 = new short[10000] ;
+      m_adc28 = new short[10000] ;
+      m_adc29 = new short[10000] ;
+      m_strip   = new int[10000] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fHitTree \n") ;
       fHitTree->Branch("evtID",&m_evtID,"evtID/I") ;
@@ -536,7 +536,7 @@ void SRSOutputROOT::InitRootFile() {
       
       printf("  SRSOutputROOT::InitRootFile() ==> Creating the Cluster tree: fClusterTree \n") ;
       fClusterTree = new TTree("TCluster","GEM Cluster Data Rootfile") ;
-      fClusterTree->SetDirectory(fFile) ;
+      //fClusterTree->SetDirectory(fFile) ;
       
       m_clustSize    = new int[200] ;
       m_clustTimeBin = new int[200] ;
@@ -588,44 +588,44 @@ void SRSOutputROOT::InitRootFile() {
     else {
       printf("  SRSOutputROOT::InitRootFile() ==> Creating the Hit Tree: fHitTree \n") ;
       fHitTree = new TTree("THit","GEM Hit Data Rootfile") ;
-      fHitTree->SetDirectory(fFile) ;
+      //fHitTree->SetDirectory(fFile) ;
       
-      m_hit_detID     = new int[2000] ;
-      m_hit_planeID   = new int[2000] ;
-      m_hit_etaSector = new short[2000] ;
-      m_hit_timeBin   = new int[2000] ;
+      m_hit_detID     = new int[10000] ;
+      m_hit_planeID   = new int[10000] ;
+      m_hit_etaSector = new short[10000] ;
+      m_hit_timeBin   = new int[10000] ;
       
-      m_adc0  = new short[2000] ;
-      m_adc1  = new short[2000] ;
-      m_adc2  = new short[2000] ;
-      m_adc3  = new short[2000] ;
-      m_adc4  = new short[2000] ;
-      m_adc5  = new short[2000] ;
-      m_adc6  = new short[2000] ;
-      m_adc7  = new short[2000] ;
-      m_adc8  = new short[2000] ;
-      m_adc9  = new short[2000] ;
-      m_adc10 = new short[2000] ;
-      m_adc11 = new short[2000] ;
-      m_adc12 = new short[2000] ;
-      m_adc13 = new short[2000] ;
-      m_adc14 = new short[2000] ;
-      m_adc15 = new short[2000] ;
-      m_adc16 = new short[2000] ;
-      m_adc17 = new short[2000] ;
-      m_adc18 = new short[2000] ;
-      m_adc19 = new short[2000] ;
-      m_adc20 = new short[2000] ;
-      m_adc21 = new short[2000] ;
-      m_adc22 = new short[2000] ;
-      m_adc23 = new short[2000] ;
-      m_adc24 = new short[2000] ;
-      m_adc25 = new short[2000] ;
-      m_adc26 = new short[2000] ;
-      m_adc27 = new short[2000] ;
-      m_adc28 = new short[2000] ;
-      m_adc29 = new short[2000] ;
-      m_strip   = new int[2000] ;
+      m_adc0  = new short[10000] ;
+      m_adc1  = new short[10000] ;
+      m_adc2  = new short[10000] ;
+      m_adc3  = new short[10000] ;
+      m_adc4  = new short[10000] ;
+      m_adc5  = new short[10000] ;
+      m_adc6  = new short[10000] ;
+      m_adc7  = new short[10000] ;
+      m_adc8  = new short[10000] ;
+      m_adc9  = new short[10000] ;
+      m_adc10 = new short[10000] ;
+      m_adc11 = new short[10000] ;
+      m_adc12 = new short[10000] ;
+      m_adc13 = new short[10000] ;
+      m_adc14 = new short[10000] ;
+      m_adc15 = new short[10000] ;
+      m_adc16 = new short[10000] ;
+      m_adc17 = new short[10000] ;
+      m_adc18 = new short[10000] ;
+      m_adc19 = new short[10000] ;
+      m_adc20 = new short[10000] ;
+      m_adc21 = new short[10000] ;
+      m_adc22 = new short[10000] ;
+      m_adc23 = new short[10000] ;
+      m_adc24 = new short[10000] ;
+      m_adc25 = new short[10000] ;
+      m_adc26 = new short[10000] ;
+      m_adc27 = new short[10000] ;
+      m_adc28 = new short[10000] ;
+      m_adc29 = new short[10000] ;
+      m_strip   = new int[10000] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fHitTree \n") ;
       fHitTree->Branch("evtID",&m_evtID,"evtID/I") ;
@@ -670,7 +670,7 @@ void SRSOutputROOT::InitRootFile() {
      
       printf("  SRSOutputROOT::InitRootFile() ==> Creating the Cluster Tree: fClusterTree \n") ;
       fClusterTree = new TTree("TCluster","GEM Cluster Data Rootfile") ;
-      fClusterTree->SetDirectory(fFile) ;
+      //fClusterTree->SetDirectory(fFile) ;
             
       m_clustSize    = new int[200] ;
       m_clustTimeBin = new int[200] ;
@@ -699,6 +699,15 @@ void SRSOutputROOT::InitRootFile() {
 //====================================================================================================================
 void SRSOutputROOT::WriteRootFile() {
     
+    std::string fileName  = fRunName + "_dataTree.root";
+    
+    if (fRunFilePrefix == "BeamPosition") fileName = fRunName + "_BP" + fRunFileValue + "_dataTree.root";
+    if (fRunFilePrefix == "HVScan")       fileName = fRunName + "_HV" + fRunFileValue + "_dataTree.root";
+    printf("  SRSOutputROOT::WriteRootFile() ==> Init Root file %s \n",fileName.Data());
+    
+    fFile = new TFile(fileName.c_str(), "RECREATE","",1);
+    //TDirectory *dir_Hits = fFile->mkdir("Hits");
+    
     if (fZeroSupCut == 0) {
         fHitTree->Write() ;
     }
@@ -710,14 +719,14 @@ void SRSOutputROOT::WriteRootFile() {
 
         }
         else if (fROOTDataType == "CLUSTERS_ONLY") {
-	  fClusterTree->Write(); 
+          fClusterTree->Write();
         } 
         else if (fROOTDataType == "TRACKING_ONLY") {
 	  //            fTrackingTree->Write(); 
         } 
         else {
             fHitTree->Write() ;
-	    fClusterTree->Write();
+            fClusterTree->Write();
         }
     }
     fFile->Write();

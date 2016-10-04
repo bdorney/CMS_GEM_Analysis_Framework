@@ -17,9 +17,9 @@
 #include <vector>
 
 //Framework Includes
-#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterLoaderAmoreSRS.h
+#include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterloadDetectorSRS.h
 #include "InterfaceAnalysis.h"
-#include "ParameterLoaderAmoreSRS.h"
+#include "ParameterLoaderDetector.h"
 #include "ParameterLoaderAnaysis.h"
 #include "ParameterLoaderRun.h"
 #include "UniformityUtilityTypes.h"
@@ -209,7 +209,7 @@ int main( int argc_, char * argv_[] ){
     
     InterfaceAnalysis anaInterface;
     
-    ParameterLoaderAmoreSRS loaderAmore;
+    ParameterLoaderDetector loadDetector;
     ParameterLoaderAnaysis loaderAnalysis;
     ParameterLoaderRun loaderRun;
     
@@ -334,8 +334,8 @@ int main( int argc_, char * argv_[] ){
     if ( 0 == rSetup.strRunMode.compare("ANALYSIS") ) { //Run Mode: Analysis
         //Load the requested amore parameters & setup the detector
         //------------------------------------------------------
-        loaderAmore.loadAmoreMapping( rSetup.strFile_Config_Map  );
-        detMPGD = loaderAmore.getDetector();
+        loadDetector.loadAmoreMapping( rSetup.strFile_Config_Map  );
+        detMPGD = loadDetector.getDetector();
         detMPGD.setName( rSetup.strDetName );
 
         //Load the requested analysis parameters

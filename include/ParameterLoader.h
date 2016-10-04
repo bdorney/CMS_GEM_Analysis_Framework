@@ -18,6 +18,7 @@
 #include <vector>
 
 //Framework Includes
+#include "QualityControlSectionNames.h"
 #include "TimingUtilityFunctions.h"
 #include "UniformityUtilityFunctions.h"
 #include "UniformityUtilityOperators.h"
@@ -83,7 +84,8 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             bool m_bVerboseMode_IO;
             
-            std::string m_strSecBegin_RunList, m_strSecEnd_RunList;
+            QualityControl::Uniformity::SecNamesRun m_headers_Run;
+            //std::string m_strSecBegin_RunList, m_strSecEnd_RunList;
         }; //End class ParameterLoader
     } //End namespace Uniformity
 } //End namespace QualityControl

@@ -24,7 +24,7 @@
 //Framework Includes
 #include "AnalyzeResponseUniformity.h"
 //#include "DetectorMPGD.h"
-#include "ParameterLoaderAmoreSRS.h"
+#include "ParameterLoaderDetector.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityOperators.h"

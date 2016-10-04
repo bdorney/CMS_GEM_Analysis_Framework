@@ -26,13 +26,13 @@ using namespace QualityControl::Uniformity;
 ParameterLoaderRun::ParameterLoaderRun(){
     m_bVerboseMode_IO       = false;
     
-    m_strSecBegin_CompInfo  = "[BEGIN_COMP_INFO]";
-    m_strSecBegin_RunInfo   = "[BEGIN_RUN_INFO]";
-    m_strSecBegin_RunList   = "[BEGIN_RUN_LIST]";
+    //m_strSecBegin_CompInfo  = "[BEGIN_COMP_INFO]";
+    //m_strSecBegin_RunInfo   = "[BEGIN_RUN_INFO]";
+    //m_strSecBegin_RunList   = "[BEGIN_RUN_LIST]";
     
-    m_strSecEnd_CompInfo    = "[END_COMP_INFO]";
-    m_strSecEnd_RunInfo     = "[END_RUN_INFO]";
-    m_strSecEnd_RunList     = "[END_RUN_LIST]";
+    //m_strSecEnd_CompInfo    = "[END_COMP_INFO]";
+    //m_strSecEnd_RunInfo     = "[END_RUN_INFO]";
+    //m_strSecEnd_RunList     = "[END_RUN_LIST]";
 } //End Default Constructor
 
 void ParameterLoaderRun::loadParameters(ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup){
@@ -50,14 +50,14 @@ void ParameterLoaderRun::loadParameters(ifstream &file_Input, bool bVerboseMode,
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Identify Section Headers
-        if ( 0 == strLine.compare(m_strSecEnd_CompInfo) || 0 == strLine.compare(m_strSecEnd_RunInfo) ) { //Case: Reached End of Interest
+        if ( 0 == strLine.compare(m_headers_Run.m_strSecEnd_CompInfo) || 0 == strLine.compare(m_headers_Run.m_strSecEnd_RunInfo) ) { //Case: Reached End of Interest
             break;
         } //End Case: Reached End of Interest
-        else if ( 0 == strLine.compare(m_strSecBegin_RunInfo ) ){ //Case: Run Info Header
+        else if ( 0 == strLine.compare(m_headers_Run.m_strSecBegin_RunInfo ) ){ //Case: Run Info Header
             loadParametersRun(file_Input, bVerboseMode, inputRunSetup);
 	    continue;
         } //End Case: Run Info Header
-        else if ( 0 == strLine.compare(m_strSecBegin_CompInfo ) ){ //Case: Comp Info Header
+        else if ( 0 == strLine.compare(m_headers_Run.m_strSecBegin_CompInfo ) ){ //Case: Comp Info Header
             loadParametersCompare(file_Input, bVerboseMode, inputRunSetup);
 	    continue;
         } //End Case: Comp Info Header
@@ -111,7 +111,7 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Do we reach the end of the section?
-        if ( 0 == strLine.compare( m_strSecEnd_RunInfo ) ) {
+        if ( 0 == strLine.compare( m_headers_Run.m_strSecEnd_RunInfo ) ) {
             if (bVerboseMode) { //Case: User Requested Verbose Input/Output
                 cout<<"ParameterLoaderRun::loadParametersRun(): End of run info header reached!\n";
             } //End Case: User Requested Verbose Input/Output
@@ -139,8 +139,9 @@ void ParameterLoaderRun::loadParametersRun(std::ifstream &file_Input, bool bVerb
             else if ( pair_strParam.first.compare("ANA_HITS") == 0 ) {
                 inputRunSetup.bAnaStep_Hits = convert2bool(pair_strParam.second, bExitSuccess);
             }
-            else if ( pair_strParam.first.compare("ANA_RECO_CLUSTERS") == 0 ) {
-                inputRunSetup.bAnaStep_Reco = convert2bool(pair_strParam.second, bExitSuccess);
+            else if ( pair_strParam.first.compare("RECO_ALL") == 0 ) {
+                inputRunSetup.bRecoStep_All = convert2bool(pair_strParam.second, bExitSuccess);
+                inputRunSetup.bInputIsRaw = inputRunSetup.bRecoStep_All;
             }
             else if ( pair_strParam.first.compare("VISUALIZE_PLOTS") == 0 ) {
                 inputRunSetup.bAnaStep_Visualize = convert2bool(pair_strParam.second, bExitSuccess);
@@ -231,7 +232,7 @@ void ParameterLoaderRun::loadParametersCompare(std::ifstream &file_Input, bool b
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Do we reach the end of the section?
-        if ( 0 == strLine.compare( m_strSecEnd_CompInfo ) ) {
+        if ( 0 == strLine.compare( m_headers_Run.m_strSecEnd_CompInfo ) ) {
             if (bVerboseMode) { //Case: User Requested Verbose Input/Output
                 cout<<"ParameterLoaderRun::loadParametersRun(): End of compare info header reached!\n";
             } //End Case: User Requested Verbose Input/Output

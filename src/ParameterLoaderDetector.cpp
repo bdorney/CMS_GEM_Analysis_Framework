@@ -1,5 +1,5 @@
 //
-//  parameterLoaderAmoreSRS.cpp
+//  ParameterLoaderDetector.cpp
 //  
 //
 //  Created by Brian L Dorney on 26/01/16.
@@ -7,7 +7,7 @@
 //
 
 #include "DetectorMPGD.h"
-#include "ParameterLoaderAmoreSRS.h"
+#include "ParameterLoaderDetector.h"
 
 using std::cout;
 using std::endl;
@@ -23,12 +23,12 @@ using QualityControl::Timing::stoiSafe;
 using namespace QualityControl::Uniformity;
 
 //Default Constructor
-ParameterLoaderAmoreSRS::ParameterLoaderAmoreSRS(){
+ParameterLoaderDetector::ParameterLoaderDetector(){
     m_bVerboseMode_IO = false;
 } //End default constructor
 
 //Load the amore mapping file and extract the detector parameters
-void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName){
+void ParameterLoaderDetector::loadAmoreMapping(string & strInputMappingFileName){
     //Variable Declaration
     string strLine; //Input Line from File
     
@@ -85,9 +85,9 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
                 det_GE11.setEtaSector(iEta, stofSafe( vec_strParam[5]), stofSafe( vec_strParam[6] ), stoiSafe( vec_strParam[7] ) );
             } //End Case: Correct Number of Parameters
             else{ //Case: Incorrect Number of Parameters
-                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("Error! - Found only " + getString(vec_strParam.size() ) + " Parameters (Expected 9) for line:").c_str() );
-                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("\t" + strLine).c_str() );
-                printClassMethodMsg("ParameterLoaderAmoreSRS","loadAmoreMapping",("\tPlease Cross-Check Amore SRS Mapping File: " + strInputMappingFileName ).c_str() );
+                printClassMethodMsg("ParameterLoaderDetector","loadAmoreMapping",("Error! - Found only " + getString(vec_strParam.size() ) + " Parameters (Expected 9) for line:").c_str() );
+                printClassMethodMsg("ParameterLoaderDetector","loadAmoreMapping",("\t" + strLine).c_str() );
+                printClassMethodMsg("ParameterLoaderDetector","loadAmoreMapping",("\tPlease Cross-Check Amore SRS Mapping File: " + strInputMappingFileName ).c_str() );
                 
                 continue;
             } //End Case: Incorrect Number of Parameters
@@ -100,7 +100,7 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
     
     //Check to see if we had problems while reading the file
     if (file_AmoreMapping.bad() && m_bVerboseMode_IO) {
-        perror( ("Uniformity::ParameterLoaderAmoreSRS::loadAmoreMapping(): error while reading file: " + strInputMappingFileName).c_str() );
+        perror( ("Uniformity::ParameterLoaderDetector::loadAmoreMapping(): error while reading file: " + strInputMappingFileName).c_str() );
         printStreamStatus(file_AmoreMapping);
     }
     
@@ -108,4 +108,4 @@ void ParameterLoaderAmoreSRS::loadAmoreMapping(string & strInputMappingFileName)
     file_AmoreMapping.close();
     
     return;
-} //End ParameterLoaderAmoreSRS::loadAmoreMapping()
+} //End ParameterLoaderDetector::loadAmoreMapping()

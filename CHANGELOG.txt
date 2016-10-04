@@ -2,10 +2,20 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.3                               *
-*	LAST UPDATE: Oct 3 2016                      *
+*	VERSION: 2.2.4                               *
+*	LAST UPDATE: Oct 5 2016                      *
 *                                                *
 **************************************************
+
+Update: October 4th 2016
+==================================================
+->Adding event unpacking/decoding and reconstruction classes from amoreSRS
+->The Run Config file field of "Ana_Reco_Clusters" is renamed to "Reco_All"
+->QualityControl::Uniformity::RunSetup::bAnaStep_Reco renamed to bRecoStep_All
+->Added new members bRecoStepClusters, bRecoStepHits, and bInputIsRaw to QualityControl::Uniformity::RunSetup
+->Minor bug fixes to SRSMapping methods: GetPlaneOrientation(), GetNbOfAPVs(), GetSizeOfPlane(), and GetPlaneIDorEtaSector()
+->Minor bug fixes to SRSOutputROOT::WriteRootFile() and SRSOutputROOT::InitRootFile()
+->Renamed QualityControl::Uniformity::ParameterLoaderAmoreSRS to ParameterLoaderDetector
 
 Update: October 3rd 2016
 ==================================================

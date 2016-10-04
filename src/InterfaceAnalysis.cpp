@@ -117,7 +117,7 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
-        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+        if ( rSetup.bAnaStep_Hits ) { //Case: Hit Analysis
             //Hit Selection
             hitSelector.setRunNum(vec_pairedRunList[i].first);
             hitSelector.setHits(file_ROOTInput, detMPGD, aSetup);
@@ -136,14 +136,6 @@ void InterfaceAnalysis::analyzeInputAmoreSRS(){
             hitAnalyzer.fillHistos(detMPGD);
         } //End Case: Hit Analysis
         
-        //Cluster Reconstruction
-        //------------------------------------------------------
-        if (rSetup.bAnaStep_Reco) { //Case: Cluster Reconstruction
-            
-            //Place holder for now
-            
-        } //End Case: Cluster Reconstruction
-      
         //Cluster Analysis
         //------------------------------------------------------
         if ( rSetup.bAnaStep_Clusters ) { //Case: Cluster Analysis
@@ -270,19 +262,11 @@ void InterfaceAnalysis::analyzeInputFrmwrk(){
         //Hit Analysis
         //------------------------------------------------------
         //Force the hit analysis if the user requested cluster reconstruction
-        if ( rSetup.bAnaStep_Hits || rSetup.bAnaStep_Reco) { //Case: Hit Analysis
+        if ( rSetup.bAnaStep_Hits ) { //Case: Hit Analysis
         
             //Placeholder
             
         } //End Case: Hit Analysis
-        
-        //Cluster Reconstruction
-        //------------------------------------------------------
-        if (rSetup.bAnaStep_Reco) { //Case: Cluster Reconstruction
-            
-            //Place holder for now
-            
-        } //End Case: Cluster Reconstruction
         
         //Cluster Analysis
         //------------------------------------------------------

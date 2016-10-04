@@ -103,8 +103,11 @@ namespace QualityControl {
             bool bAnaStep_Clusters;             //true -> perform the cluster analysis; false -> do not
             bool bAnaStep_Fitting;              //true -> run fitting on output histo's; false -> do not
             bool bAnaStep_Hits;                 //true -> perform the hit analysis (NOTE if bAnaStep_Reco is true this must also be true); false -> do not
-            bool bAnaStep_Reco;                 //true -> reconstruct clusters from input hits; false -> use clusters provided in amoreSRS output file;
             bool bAnaStep_Visualize;            //true -> make summary plots at end of analysis; false -> do not
+            
+            bool bRecoStep_All;                 //true -> reconstruct hits & clusters; false -> do not;
+            bool bRecoStep_Clusters;
+            bool bRecoStep_Hits;
             
             //Setup - Comparison
             std::string strIdent;               //Unique identifier in input runs
@@ -117,6 +120,7 @@ namespace QualityControl {
 
             //Setup - I/O
             bool bInputFromFrmwrk;              //true -> input file is a framework output file, not from amoreSRS; false -> input file(s) are from amoreSRS
+            bool bInputIsRaw;                   //true -> input is a raw file; false -> it is a root file
             bool bLoadSuccess;
             bool bMultiOutput;                  //true -> one output file per input run; false -> one output file representing the "sum" of the input runs
             
@@ -139,8 +143,11 @@ namespace QualityControl {
                 strRunMode = "ANALYSIS";
                 
                 //Setup - Analyzer
-                bAnaStep_Reco = false;
                 bAnaStep_Clusters = bAnaStep_Fitting = bAnaStep_Hits = bAnaStep_Visualize = true;
+                
+                //Setup - Reconstruction
+                bInputIsRaw = false;
+                bRecoStep_All = bRecoStep_Clusters = bRecoStep_Hits = false;
                 
                 //Setup - Comparison
                 strIdent = "RUN";

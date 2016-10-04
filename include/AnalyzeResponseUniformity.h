@@ -25,7 +25,7 @@
 //Framework Includes
 //#include "DetectorMPGD.h"
 #include "FrameworkBase.h"
-#include "ParameterLoaderAmoreSRS.h"
+//#include "ParameterLoaderDetector.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityOperators.h"

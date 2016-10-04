@@ -1,47 +1,49 @@
 //
-//  ParameterLoaderRun.h
+//  InterfaceReco.h
 //  
 //
-//  Created by Brian L Dorney on 03/05/16.
+//  Created by Brian L Dorney on 04/10/16.
 //
 //
 
-#ifndef ____ParameterLoaderRun__
-#define ____ParameterLoaderRun__
+#ifndef ____InterfaceReco__
+#define ____InterfaceReco__
 
 //C++ Includes
-#include <algorithm>
-#include <ios>
-#include <iostream>
-#include <fstream>
 #include <map>
 #include <stdio.h>
-#include <string>
 #include <utility>
 #include <vector>
 
 //Framework Includes
-#include "ParameterLoader.h"
-#include "TimingUtilityFunctions.h"
-#include "UniformityUtilityOperators.h"
-#include "UniformityUtilityTypes.h"
+#include "FrameworkBase.h"
 
 //ROOT Includes
 
 namespace QualityControl {
-    namespace Uniformity {
-        class ParameterLoaderRun : public ParameterLoader {
+    namespace Uniformity{
+        class InterfaceReco : public FrameworkBase {
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderRun();
+            InterfaceReco();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Opens a text file set by the user and loads the requested parameters
-            virtual void loadParameters(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
+            virtual void reconstruct();
+            virtual void reconstruct(int iNum_Run, std::string strInputRun){
+                m_vec_pairedRunList.clear();
+                m_vec_pairedRunList.push_back(std::make_pair(iNum_Run, strInputRun ) );
+                reconstruct();
+                return;
+            }
+            virtual void reconstruct(std::vector<std::pair<int, std::string> > vec_inputPairedRunList){
+                m_vec_pairedRunList = vec_inputPairedRunList;
+                reconstruct();
+                return;
+            }
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,27 +54,23 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //Data Memebers
             
-        private:
+        protected:
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets up inputRunSetup for running in analysis mode
-            virtual void loadParametersRun(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
-            
-            //Sets up inputRunSetup for running in comparison mode
-            virtual void loadParametersCompare(std::ifstream &file_Input, bool bVerboseMode, RunSetup & inputRunSetup);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //Attributes
+            //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-            //std::string m_strSecBegin_CompInfo, m_strSecEnd_CompInfo;
-            //std::string m_strSecBegin_RunInfo, m_strSecEnd_RunInfo;
-        }; //End ParameterLoaderRun
+            //Setters - Methods that Set Something
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            std::vector<std::pair<int, std::string> > m_vec_pairedRunList;
+            
+        }; //End class InterfaceReco
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____ParameterLoaderRun__) */
+#endif /* defined(____InterfaceReco__) */
