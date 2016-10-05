@@ -23,7 +23,8 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
         
         //Set the TName
         graphPtr->SetName( plotInfo.m_strName.c_str() );
-        
+        graphPtr->SetTitle( "" );        
+
         //Fill the data
         int iPos;
         for (auto iterDataPt = plotInfo.m_vec_DataPts.begin(); iterDataPt != plotInfo.m_vec_DataPts.end(); ++iterDataPt) { //Loop Over Data

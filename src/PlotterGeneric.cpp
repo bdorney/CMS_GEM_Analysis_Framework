@@ -49,21 +49,19 @@ void PlotterGeneric::plotAndStore(){
     for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.end(); ++iterPlot) {
         
         //Add "same" to the draw option if it is not present already
-        if (iterPlot != m_canvInfo.m_map_infoPlot.begin()
-            && (*iterPlot).second.m_strOptionDraw.find("same") == std::string::npos ) {
+        if ( std::distance(m_canvInfo.m_map_infoPlot.begin(), iterPlot) > 0 
+            && ( (*iterPlot).second.m_strOptionDraw.find("same") == std::string::npos 
+		|| (*iterPlot).second.m_strOptionDraw.find("SAME") == std::string::npos ) ) {
             (*iterPlot).second.m_strOptionDraw = "same" + (*iterPlot).second.m_strOptionDraw;
         }
+
+	cout<<"(*iterPlot).second.m_strOptionDraw = " << (*iterPlot).second.m_strOptionDraw << endl;
         
         makePlot(leg, (*iterPlot).second);
     } //End Loop Over Input Plots
 
     //Draw legend    
     leg.Draw("same");
-
-    //Draw each latex line
-    for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
-        drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
-    }
     
     //Draw "CMS"
     drawCMS();
@@ -72,6 +70,11 @@ void PlotterGeneric::plotAndStore(){
     m_canv->Update();
     m_canv->RedrawAxis();
     m_canv->GetFrame()->Draw();
+
+    //Draw each latex line
+    for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
+        drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
+    }
 
     //Save output
     write2RootFile();
