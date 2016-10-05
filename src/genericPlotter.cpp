@@ -49,28 +49,13 @@ void printInfoPlot(InfoPlot & inputPlotInfo){
     //Size
     cout<<"\tplotSetup.m_fSizeLine = " << inputPlotInfo.m_fSizeLine << endl;
     cout<<"\tplotSetup.m_fSizeMarker = " << inputPlotInfo.m_fSizeMarker << endl;
-    
-    //Range - X
-    cout<<"\tplotSetup.m_fXAxis_Min = " << inputPlotInfo.m_fXAxis_Min << endl;
-    cout<<"\tplotSetup.m_fXAxis_Max = " << inputPlotInfo.m_fXAxis_Max << endl;
-    
-    //Range - Y
-    cout<<"\tplotSetup.m_fYAxis_Min = " << inputPlotInfo.m_fYAxis_Min << endl;
-    cout<<"\tplotSetup.m_fYAxis_Max = " << inputPlotInfo.m_fYAxis_Max << endl;
-    
+        
     //Legend Entry
     cout<<"\tplotSetup.m_strLegEntry = " << inputPlotInfo.m_strLegEntry << endl;
     
     //Name
     cout<<"\tplotSetup.m_strName = " << inputPlotInfo.m_strName << endl;
-    
-    //Draw Option
-    cout<<"\tplotSetup.m_strOptionDraw = " << inputPlotInfo.m_strOptionDraw << endl;
-    
-    //Titles
-    cout<<"\tplotSetup.m_strTitle_X = " << inputPlotInfo.m_strTitle_X << endl;
-    cout<<"\tplotSetup.m_strTitle_Y = " << inputPlotInfo.m_strTitle_Y << endl;
-    
+        
     //Data
     cout<<"\t\tX\tX_Err\tY\tY_Err\n";
     for (int i=0; i<inputPlotInfo.m_vec_DataPts.size(); ++i) {
@@ -97,6 +82,14 @@ void printInfoCanv(InfoCanvas & inputCanvInfo){
     cout<<"canvSetup.m_bGrid_X = " << inputCanvInfo.m_bGrid_X << endl;
     cout<<"canvSetup.m_bGrid_Y = " << inputCanvInfo.m_bGrid_Y << endl;
     
+    //Range - X
+    cout<<"canvSetup.m_fXAxis_Min = " << inputCanvInfo.m_fXAxis_Min << endl;
+    cout<<"canvSetup.m_fXAxis_Max = " << inputCanvInfo.m_fXAxis_Max << endl;
+    
+    //Range - Y
+    cout<<"canvSetup.m_fYAxis_Min = " << inputCanvInfo.m_fYAxis_Min << endl;
+    cout<<"canvSetup.m_fYAxis_Max = " << inputCanvInfo.m_fYAxis_Max << endl;
+
     //Size
     cout<<"canvSetup.m_iSize_X = " << inputCanvInfo.m_iSize_X << endl;
     cout<<"canvSetup.m_iSize_Y = " << inputCanvInfo.m_iSize_Y << endl;
@@ -113,19 +106,23 @@ void printInfoCanv(InfoCanvas & inputCanvInfo){
     cout<<"canvSetup.m_fMargin_Rt = " << inputCanvInfo.m_fMargin_Rt << endl;
     cout<<"canvSetup.m_fMargin_Top = " << inputCanvInfo.m_fMargin_Top << endl;
 
-
     //Latex Lines
     cout<<"Tex_X\tTex_Y\tString\n";
     for (auto iterTexLine = inputCanvInfo.m_vec_LatexNPos.begin(); iterTexLine != inputCanvInfo.m_vec_LatexNPos.end(); ++iterTexLine) {
         cout<<get<0>(*iterTexLine)<<"\t"<<get<1>(*iterTexLine)<<"\t"<<get<2>(*iterTexLine)<<endl;
     } //End Loop Over Defined Latex Lines
     
+    //Draw Option
+    cout<<"canvSetup.m_strOptionDraw = " << inputCanvInfo.m_strOptionDraw << endl;
+
     //Name
     cout<<"canvSetup.m_strName = " << inputCanvInfo.m_strName << endl;
     
     //Title
     cout<<"canvSetup.m_strTitle = " << inputCanvInfo.m_strTitle << endl;
-    
+    cout<<"canvSetup.m_strTitle_X = " << inputCanvInfo.m_strTitle_X << endl;
+    cout<<"canvSetup.m_strTitle_Y = " << inputCanvInfo.m_strTitle_Y << endl;
+
     //Defined Plots
     for (auto iterPlot = inputCanvInfo.m_map_infoPlot.begin(); iterPlot != inputCanvInfo.m_map_infoPlot.end(); ++iterPlot) {
         printInfoPlot( (*iterPlot).second );

@@ -47,12 +47,6 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     graphPtr->SetMarkerStyle(plotInfo.m_iStyleMarker);
     graphPtr->SetMarkerSize(plotInfo.m_fSizeMarker);
     
-    graphPtr->GetXaxis()->SetTitle(plotInfo.m_strTitle_X.c_str() );
-    graphPtr->GetXaxis()->SetRangeUser(plotInfo.m_fXAxis_Min, plotInfo.m_fXAxis_Max);
-    
-    graphPtr->GetYaxis()->SetTitle(plotInfo.m_strTitle_Y.c_str() );
-    graphPtr->GetYaxis()->SetRangeUser(plotInfo.m_fYAxis_Min, plotInfo.m_fYAxis_Max);
-    
     //Add to the multigraph
     mgraph_Obs->Add( graphPtr.get() );
     
@@ -67,9 +61,24 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 } //End PlotterGraph::addPlot()
 
 void PlotterGraph::drawPlots(){
+    //Draw (root hack)
     m_canv->cd();
-    //(*m_map_graphs.begin()).second->Draw("AP");
-    mgraph_Obs->Draw("samePE1");
+    mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+
+    //Set the style
+    mgraph_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
+	if( m_canvInfo.m_bXAxis_UserRange ){
+	    mgraph_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
+	}    
+
+    mgraph_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
+    	if( m_canvInfo.m_bYAxis_UserRange ){
+	    mgraph_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
+	}    
+
+    //Draw (for realz)
+    m_canv->cd();
+    mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
     
     return;
 } //End PlotterGraph::drawPlots()

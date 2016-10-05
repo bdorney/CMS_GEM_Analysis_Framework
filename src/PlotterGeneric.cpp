@@ -92,10 +92,10 @@ void PlotterGeneric::drawLatex(std::tuple<float, float, std::string> tupleTexLin
     TLatex latex;
     
     //Set the Latex style
-    latex.SetTextFont(26);
+    latex.SetTextFont(42);
     latex.SetTextAngle(0);
     latex.SetTextColor(kBlack);
-    latex.SetTextSize(0.05);
+    latex.SetTextSize(0.04);
     latex.SetTextAlign(12);
     
     //Draw
