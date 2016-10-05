@@ -15,6 +15,64 @@ using std::shared_ptr;
 
 using namespace QualityControl::Plotter;
 
+//Constructor
+PlotterGraph::PlotterGraph() : mgraph_Obs(new TMultiGraph) {
+    
+    mgraph_Obs->SetName("mgraph_Obs");
+} //End
+
+void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
+    //Initialize
+    initPlot(plotInfo);
+    
+    //Check to make sure it initialized successfully
+    if ( !(m_map_graphs.count(plotInfo.m_strName) > 0 ) ) {
+        cout<<"PlotterGraph::makePlots() - Plot:\n";
+        cout<<"\t"<<plotInfo.m_strName<<endl;
+        cout<<"\tDid not initialize correctly, please cross-check input!\n";
+        cout<<"\tExiting!!!\n";
+        
+        return;
+    }
+    
+    //Get this plot
+    auto graphPtr = m_map_graphs[plotInfo.m_strName];
+    
+    //Set the Style
+    graphPtr->SetLineColor(plotInfo.m_iColor);
+    graphPtr->SetLineStyle(plotInfo.m_iStyleLine);
+    graphPtr->SetLineWidth(plotInfo.m_fSizeLine);
+    
+    graphPtr->SetMarkerColor(plotInfo.m_iColor);
+    graphPtr->SetMarkerStyle(plotInfo.m_iStyleMarker);
+    graphPtr->SetMarkerSize(plotInfo.m_fSizeMarker);
+    
+    graphPtr->GetXaxis()->SetTitle(plotInfo.m_strTitle_X.c_str() );
+    graphPtr->GetXaxis()->SetRangeUser(plotInfo.m_fXAxis_Min, plotInfo.m_fXAxis_Max);
+    
+    graphPtr->GetYaxis()->SetTitle(plotInfo.m_strTitle_Y.c_str() );
+    graphPtr->GetYaxis()->SetRangeUser(plotInfo.m_fYAxis_Min, plotInfo.m_fYAxis_Max);
+    
+    //Add to the multigraph
+    mgraph_Obs->Add( graphPtr.get() );
+    
+    //Add to the Legend
+    inputLegend.AddEntry(graphPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
+    
+    //Draw the plot
+    //m_canv->cd();
+    //graphPtr->Draw(plotInfo.m_strOptionDraw.c_str() );
+    
+    return;
+} //End PlotterGraph::addPlot()
+
+void PlotterGraph::drawPlots(){
+    m_canv->cd();
+    mgraph_Obs->Draw("AP");
+    
+    return;
+} //End PlotterGraph::drawPlots()
+
 //Intializes the plots defined in m_canvInfo
 void PlotterGraph::initPlot(InfoPlot & plotInfo){
     if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
@@ -55,48 +113,6 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
     
     return;
 } //End PlotterGraph::initPlots()
-
-void PlotterGraph::makePlot(TLegend & inputLegend, InfoPlot & plotInfo){
-    //Initialize
-    initPlot(plotInfo);
-    
-    //Check to make sure it initialized successfully
-    if ( !(m_map_graphs.count(plotInfo.m_strName) > 0 ) ) {
-        cout<<"PlotterGraph::makePlots() - Plot:\n";
-        cout<<"\t"<<plotInfo.m_strName<<endl;
-        cout<<"\tDid not initialize correctly, please cross-check input!\n";
-        cout<<"\tExiting!!!\n";
-        
-        return;
-    }
-
-    //Get this plot
-    auto graphPtr = m_map_graphs[plotInfo.m_strName];
-    
-    //Set the Style
-    graphPtr->SetLineColor(plotInfo.m_iColor);
-    graphPtr->SetLineStyle(plotInfo.m_iStyleLine);
-    graphPtr->SetLineWidth(plotInfo.m_fSizeLine);
-    
-    graphPtr->SetMarkerColor(plotInfo.m_iColor);
-    graphPtr->SetMarkerStyle(plotInfo.m_iStyleMarker);
-    graphPtr->SetMarkerSize(plotInfo.m_fSizeMarker);
-    
-    graphPtr->GetXaxis()->SetTitle(plotInfo.m_strTitle_X.c_str() );
-    graphPtr->GetXaxis()->SetRangeUser(plotInfo.m_fXAxis_Min, plotInfo.m_fXAxis_Max);
-    
-    graphPtr->GetYaxis()->SetTitle(plotInfo.m_strTitle_Y.c_str() );
-    graphPtr->GetYaxis()->SetRangeUser(plotInfo.m_fYAxis_Min, plotInfo.m_fYAxis_Max);
-    
-    //Add to the Legend
-    inputLegend.AddEntry(graphPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
-    
-    //Draw the plot
-    m_canv->cd();
-    graphPtr->Draw(plotInfo.m_strOptionDraw.c_str() );
-    
-    return;
-} //End PlotterGraph::makePlots()
 
 void PlotterGraph::write2RootFile(){
     //TFile does not manage objects

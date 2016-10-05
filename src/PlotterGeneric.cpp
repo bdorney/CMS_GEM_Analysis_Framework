@@ -45,22 +45,28 @@ void PlotterGeneric::plotAndStore(){
     //Make the Legend
     TLegend leg(m_canvInfo.m_fLegNDCPos_X1, m_canvInfo.m_fLegNDCPos_Y1, m_canvInfo.m_fLegNDCPos_X2, m_canvInfo.m_fLegNDCPos_Y2 );
     
-    //Loop over defined plots and draw each of them
+    //Add all defined plots
     for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.end(); ++iterPlot) {
         
         //Add "same" to the draw option if it is not present already
-        if ( std::distance(m_canvInfo.m_map_infoPlot.begin(), iterPlot) > 0 
+        /*if ( std::distance(m_canvInfo.m_map_infoPlot.begin(), iterPlot) > 0
             && ( (*iterPlot).second.m_strOptionDraw.find("same") == std::string::npos 
-		|| (*iterPlot).second.m_strOptionDraw.find("SAME") == std::string::npos ) ) {
+                || (*iterPlot).second.m_strOptionDraw.find("SAME") == std::string::npos ) ) {
             (*iterPlot).second.m_strOptionDraw = "same" + (*iterPlot).second.m_strOptionDraw;
-        }
+        }*/
 
-	cout<<"(*iterPlot).second.m_strOptionDraw = " << (*iterPlot).second.m_strOptionDraw << endl;
-        
-        makePlot(leg, (*iterPlot).second);
+        addPlot(leg, (*iterPlot).second);
     } //End Loop Over Input Plots
 
-    //Draw legend    
+    //Draw plots
+    drawPlots();
+    
+    //Draw each latex line
+    for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
+        drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
+    }
+
+    //Draw legend
     leg.Draw("same");
     
     //Draw "CMS"
@@ -71,10 +77,6 @@ void PlotterGeneric::plotAndStore(){
     m_canv->RedrawAxis();
     m_canv->GetFrame()->Draw();
 
-    //Draw each latex line
-    for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
-        drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
-    }
 
     //Save output
     write2RootFile();
@@ -156,21 +158,30 @@ void PlotterGeneric::initCanv(){
 
 //Makes the plots defined in m_canvInfo
 //To be over-ridded by inherited classes
+void PlotterGeneric::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
+    
+    cout<<"Brian it doesn't work, this method should be over-ridden\n";
+    
+    return;
+} //End PlotterGeneric::addPlot
+
+//Makes the plots defined in m_canvInfo
+//To be over-ridded by inherited classes
+void PlotterGeneric::drawPlots(){
+    
+    cout<<"Brian it doesn't work, this method should be over-ridden\n";
+    
+    return;
+} //End PlotterGeneric::drawPlots
+
+//Makes the plots defined in m_canvInfo
+//To be over-ridded by inherited classes
 void PlotterGeneric::initPlot(InfoPlot & plotInfo){
     
     cout<<"Brian it doesn't work, this method should be over-ridden\n";
     
     return;
-} //End PlotterGeneric::makePlots
-
-//Makes the plots defined in m_canvInfo
-//To be over-ridded by inherited classes
-void PlotterGeneric::makePlot(TLegend & inputLegend, InfoPlot & plotInfo){
-    
-    cout<<"Brian it doesn't work, this method should be over-ridden\n";
-    
-    return;
-} //End PlotterGeneric::makePlots
+} //End PlotterGeneric::initPlot
 
 //Saves inputCanv as a *.png file
 //The file is placed in the working directory

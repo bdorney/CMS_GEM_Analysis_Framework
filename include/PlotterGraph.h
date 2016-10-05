@@ -23,6 +23,7 @@
 #include "TFile.h"
 #include "TGraphErrors.h"
 #include "TLegend.h"
+#include "TMultiGraph.h"
 #include "TROOT.h"
 
 namespace QualityControl {
@@ -32,7 +33,7 @@ namespace QualityControl {
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            //PlotterGraph();
+            PlotterGraph();
             
             //Destructor
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,6 +41,7 @@ namespace QualityControl {
                 //m_canv.reset();
                 //m_tdrStyle.reset();
                 m_map_graphs.clear();
+                mgraph_Obs.reset();
             }
             
             //Actions - Methods that Do Something
@@ -63,8 +65,10 @@ namespace QualityControl {
             
             //Makes the plots defined in m_canvInfo
             //To be over-ridded by inherited classes
-            //virtual void makePlots(TCanvas & inputCanvas, TLegend & inputLegend, InfoPlot & plotInfo);
-            void makePlot(TLegend & inputLegend, InfoPlot & plotInfo);
+            void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
+            
+            //To be over-ridded by inherited classes
+            virtual void drawPlots();
             
             //Saves all TObjects to an output ROOT file
             //To be over-ridded by inherited classes
@@ -82,6 +86,8 @@ namespace QualityControl {
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
             std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            
+            std::shared_ptr<TMultiGraph> mgraph_Obs;
         };
     } //End namespace Plotter
 } //End namespace QualityControl

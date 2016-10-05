@@ -119,21 +119,25 @@ namespace QualityControl {
             virtual void initCanv();
             
             //In inherited class developer should:
+            //  Immediately initPlot(InfoPlot & plotInfo)
+            //  Check to make sure plot init'd successfully
+            //  Set the style of the plot
+            //  Add it to the legend
+            //To be over-ridded by inherited classes
+            virtual void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
+
+            //In inherited class developer should:
+            //  Draw all plots added with addPlot()
+            //To be over-ridded by inherited classes
+            virtual void drawPlots();
+
+            //In inherited class developer should:
             //  Check if user is supply data or a TFile
             //  Initialize a pointer for the appropriate TObject
             //  TObject's constructor should be used or loaded from the TFile
             //To be over-ridded by inherited classes
             virtual void initPlot(InfoPlot & plotInfo);
-            
-            //In inherited class developer should:
-            //  Immediately initPlot(InfoPlot & plotInfo)
-            //  Check to make sure plot init'd successfully
-            //  Set the style of the plot
-            //  Add it to the legend
-            //  Draw the plot
-            //To be over-ridded by inherited classes
-            virtual void makePlot(TLegend & inputLegend, InfoPlot & plotInfo);
-            
+
             //Saves the canvas as a *.png and a *.pdf file
             virtual void save2ImgFile(std::shared_ptr<TCanvas> inputCanvas);
             
