@@ -15,6 +15,7 @@
 
 //Framework Includes
 #include "ParameterLoaderPlotter.h"
+#include "PlotterGraph.h"
 #include "PlotterUtilityTypes.h"
 
 //ROOT Includes
@@ -195,10 +196,22 @@ int main( int argc_, char * argv_[] ){
         return -3;
     } //End Case: Input Not Understood
     
+    //Load the canvas info & print stored info if requested
+    //------------------------------------------------------
     InfoCanvas canvSetup;
     loaderPlots.loadParameters(file_Config, bVerboseMode, canvSetup);
+    if (bVerboseMode) { printInfoCanv(canvSetup); }
     
-    printInfoCanv(canvSetup);
+    //Setup the plotter
+    //------------------------------------------------------
+    PlotterGraph graphPlotter;
+    graphPlotter.setCanvasParameters(canvSetup);
+    graphPlotter.setLogoPos(0);
+    graphPlotter.setPreliminary(true);
+    graphPlotter.setOutputNameNOption("test.root","RECRATE");
+    graphPlotter.plotAndStore();
+    
+    cout<<"Finieshed\n";
     
     return 0;
 } //End main()

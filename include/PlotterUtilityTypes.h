@@ -11,6 +11,7 @@
 
 
 //C++ Includes
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -72,6 +73,7 @@ namespace QualityControl {
             float m_fYAxis_Max;       //Max Y-Axis Value
             //float m_fYAxis_TitleOffset;
             
+            std::string m_strFileName;      //Input ROOT File where data is found
             std::string m_strLegEntry;      //Legend Entry
             std::string m_strName;          //TName of TGraph
             std::string m_strOptionDraw;    //Draw Option
@@ -93,8 +95,8 @@ namespace QualityControl {
                 m_fSizeLine = 1.;
                 m_fSizeMarker = 0.7;
                 
+                m_strFileName = "";
                 m_strOptionDraw = "E1";
-                
                 m_strTitle_Y = "N";
             }
             

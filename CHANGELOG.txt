@@ -14,7 +14,9 @@ Update: October 5th 2016
 ->Adding new utility functions for the QualityControl::Plotter namespace found in include/PlotterUtilityFunctions.h & src/PlotterUtilityFunctions.cpp
 ->New utility function QualityControl::Plotter::conver2Color
 ->New int main() for generic executable found in src/genericPlotter.cpp
-->QualityControl::Plotter::ParameterLoaderPlotter class implemented
+->QualityControl::Plotter::ParameterLoaderPlotter class implemented and tested
+->Added new class QualityControl::Plotter::PlotterGeneric for making plots
+->Added new class QualityControl::Plotter::PlotterGraph for making plots of TGraphError objects
 
 Update: October 3rd 2016
 ==================================================

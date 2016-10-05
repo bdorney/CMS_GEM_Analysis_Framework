@@ -22,6 +22,9 @@ SOURCES =   src/ParameterLoader.cpp \
             src/TimingUtilityFunctions.cpp \
             src/UniformityUtilityFunctions.cpp \
             src/ParameterLoaderPlotter.cpp \
+            src/CMS_lumi.cpp \
+            src/PlotterGeneric.cpp \
+            src/PlotterGraph.cpp \
             src/genericPlotter.cpp
 
 # Define object files
