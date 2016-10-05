@@ -68,7 +68,8 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 
 void PlotterGraph::drawPlots(){
     m_canv->cd();
-    mgraph_Obs->Draw("AP");
+    //(*m_map_graphs.begin()).second->Draw("AP");
+    mgraph_Obs->Draw("samePE1");
     
     return;
 } //End PlotterGraph::drawPlots()
