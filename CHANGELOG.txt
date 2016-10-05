@@ -17,6 +17,9 @@ Update: October 4th 2016
 ->Renamed QualityControl::Uniformity::ParameterLoaderAmoreSRS to ParameterLoaderDetector
 ->Added new struct QualityControl::Uniformity::RunModes to include/QualityControlSectionNames.h
 ->QualityControlUniformity::ParameterLoaderRun now determines the possible running modes {Ana, Comp, Reco, RecoPlusAna} and stores them using RunModes
+->SRSOutputROOT will no longer create a TBranch called etaSector in either THit or TCluster
+->SRSOutputROOT will now store the planeID TBranch as type float in both THit and TCluster
+->Standalone reconstruction mode is now implemented
 
 Update: October 3rd 2016
 ==================================================

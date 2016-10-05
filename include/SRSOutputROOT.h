@@ -61,15 +61,15 @@ private:
     
     int m_evtID, m_chID, m_nclust, fZeroSupCut;            //
     
-    int * m_planeID;      // Plane Number
+    float * m_planeID;      // Plane Number
     int * m_strip;        // Strip Number
     int * m_detID;        // Detector Number
-    short * m_etaSector;  // Detector Number
+    //short * m_etaSector;  // Detector Number
     
-    int * m_hit_planeID;     // Plane Number
+    float * m_hit_planeID;     // Plane Number
     int * m_hit_detID;       // Detector Number
     int * m_hit_timeBin;     // time sample of the strip with maximum ADCs
-    short * m_hit_etaSector; // Detector Number
+    //short * m_hit_etaSector; // Detector Number
     
     float * m_clustPos;    // Cluster position
     float * m_clustADCs;   // cluster charge

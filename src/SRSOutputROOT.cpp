@@ -1,7 +1,7 @@
 #include "SRSOutputROOT.h"
 
 SRSOutputROOT::SRSOutputROOT() {
-    fRunName = "SRSOutputROOT.root";
+    fRunName = "SRSOutputROOT";
     fRunType = "PHYSICS" ;    
     fZeroSupCut = 10 ;
     fROOTDataType = "HITS_AND_CLUSTERS" ;
@@ -10,7 +10,7 @@ SRSOutputROOT::SRSOutputROOT() {
 
 //SRSOutputROOT::SRSOutputROOT(const char * cfgname, TString zeroSupCutStr, TString rootDataType) {
 SRSOutputROOT::SRSOutputROOT(const std::string& zeroSupCutStr, const std::string& rootdatatype) {
-    fRunName = "SRSOutputROOT.root";
+    fRunName = "SRSOutputROOT";
     fRunType = "PHYSICS" ;    
     fZeroSupCut = this->atoi(zeroSupCutStr);
     fROOTDataType = rootdatatype ;
@@ -80,7 +80,7 @@ void SRSOutputROOT::DeleteHitsTree() {
     if (m_strip)         delete[] m_strip ;
     if (m_hit_planeID)   delete[] m_hit_planeID ;
     if (m_hit_detID)     delete[] m_hit_detID ;
-    if (m_hit_etaSector) delete[] m_hit_etaSector ;
+    //if (m_hit_etaSector) delete[] m_hit_etaSector ;
     //    if (fHitTree)        delete fHitTree ;
 
 }
@@ -93,7 +93,7 @@ void SRSOutputROOT::DeleteClustersTree() {
     if(m_clustADCs)    delete[] m_clustADCs ;
     if(m_planeID)      delete[] m_planeID ;
     if(m_detID)        delete[] m_detID ;
-    if(m_etaSector)    delete[] m_etaSector ;
+    //if(m_etaSector)    delete[] m_etaSector ;
     //    if(fClusterTree)   delete fClusterTree ;
 }
 
@@ -171,16 +171,16 @@ void SRSOutputROOT::FillHitsTree(SRSEventBuilder * eventbuilder) {
       //      std::cout <<" Det plane name "<<detPlaneName<<std::endl;
         // Assign Detector ID
         Int_t detID = 0 ;
-        Int_t  planeID = 0;
-        Float_t etaSector = 0.0;
+        Float_t  planeID = 0;
+        //Float_t etaSector = 0.0;
         
 	std::string detName = mapping->GetDetectorFromPlane(detPlaneName) ;
 	//	std::cout <<" DETNAME "<<detName<<std::endl;
         detID = mapping->GetDetectorIDFromDetector(detName) ;
 	//std::cout <<" DETID "<<detID<<std::endl;
-        planeID   = (Int_t) (mapping->GetPlaneIDorEtaSector(detPlaneName)) ;
+        planeID   = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
 	//std::cout << " Plane ID "<<planeID<<std::endl;
-        etaSector = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
+        //etaSector = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
 	//std::cout << " detName "<<detName<<" planeID "<<planeID<<" etaSector " <<etaSector<<std::endl;
 
 	std::list <SRSHit * > listOfHits = hitsInDetectorPlaneMap[detPlaneName] ;
@@ -196,7 +196,7 @@ void SRSOutputROOT::FillHitsTree(SRSEventBuilder * eventbuilder) {
             
             m_hit_detID[m_chID]     = detID ;
             m_hit_planeID[m_chID]   = planeID ;
-            m_hit_etaSector[m_chID] = (Short_t) etaSector ;
+            //m_hit_etaSector[m_chID] = (Short_t) etaSector ;
             
             Int_t nbOfTimeBin = hit->GetTimeBinADCs().size() ;
             if (nbOfTimeBin <= NbADCTimeFrames) {
@@ -268,14 +268,14 @@ void SRSOutputROOT::FillClustersTree(SRSEventBuilder * eventbuilder) {
         
         //Assign Detector ID
         Int_t detID = 0 ;
-        Int_t  planeID = 0 ;
-        Float_t etaSector = 0.0;
+        Float_t  planeID = 0 ;
+        //Float_t etaSector = 0.0;
         
 	std::string detName = mapping->GetDetectorFromPlane(detPlaneName) ;
         detID = mapping->GetDetectorIDFromDetector(detName) ;
         
-        planeID   = (int) (mapping->GetPlaneIDorEtaSector(detPlaneName)) ;
-        etaSector = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
+        planeID   = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
+        //etaSector = mapping->GetPlaneIDorEtaSector(detPlaneName) ;
         
 	std::list <SRSCluster * > listOfClusters = detPlane_itr->second  ;
 	std::list <SRSCluster * >::const_iterator cluster_itr ;
@@ -290,7 +290,7 @@ void SRSOutputROOT::FillClustersTree(SRSEventBuilder * eventbuilder) {
             
             m_planeID[m_nclust]   = planeID ;
             m_detID[m_nclust]     = detID ;
-            m_etaSector[m_nclust] = (short) etaSector ;
+            //m_etaSector[m_nclust] = (short) etaSector ;
             m_nclust++ ;
         }
         listOfClusters.clear() ;
@@ -377,9 +377,9 @@ void SRSOutputROOT::InitRootFile() {
     
     m_strip         = new int[10000] ;
     m_hit_detID     = new int[10000] ;
-    m_hit_planeID   = new int[10000] ;
+    m_hit_planeID   = new float[10000] ;
     m_hit_timeBin   = new int[10000] ;
-    m_hit_etaSector = new short[10000] ;
+    //m_hit_etaSector = new short[10000] ;
     
     m_adc0  = new short[10000] ;
     m_adc1  = new short[10000] ;
@@ -450,8 +450,8 @@ void SRSOutputROOT::InitRootFile() {
     fHitTree->Branch("adc29", m_adc29, "adc29[nch]/S");
     
     fHitTree->Branch("detID", m_hit_detID, "detID[nch]/I");
-    fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/I");
-    fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
+    fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/F");
+    //fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
   }
     
   else {
@@ -461,9 +461,9 @@ void SRSOutputROOT::InitRootFile() {
       //fHitTree->SetDirectory(fFile) ;
       
       m_hit_detID     = new int[10000] ;
-      m_hit_planeID   = new int[10000] ;
+      m_hit_planeID   = new float[10000] ;
       m_hit_timeBin   = new int[10000] ;
-      m_hit_etaSector = new short[10000] ;
+      //m_hit_etaSector = new short[10000] ;
       
       m_adc0  = new short[10000] ;
       m_adc1  = new short[10000] ;
@@ -535,8 +535,8 @@ void SRSOutputROOT::InitRootFile() {
       fHitTree->Branch("adc29", m_adc29, "adc29[nch]/S");
       
       fHitTree->Branch("detID", m_hit_detID, "detID[nch]/I");
-      fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/I");
-      fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
+      fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/F");
+      //fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
     }
     
     else if (fROOTDataType == "CLUSTERS_ONLY") {
@@ -550,8 +550,8 @@ void SRSOutputROOT::InitRootFile() {
       m_clustPos     = new float[200] ;
       m_clustADCs    = new float[200] ;
       m_detID        = new int[200] ;
-      m_planeID      = new int[200] ;
-      m_etaSector    = new short[200] ;
+      m_planeID      = new float[200] ;
+      //m_etaSector    = new short[200] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fClusterTree \n") ;
       fClusterTree->Branch("evtID",&m_evtID,"evtID/I");
@@ -562,8 +562,8 @@ void SRSOutputROOT::InitRootFile() {
       fClusterTree->Branch("clustTimebin", m_clustTimeBin, "clustTimebin[nclust]/I");
       
       fClusterTree->Branch("detID", m_detID, "detID[nclust]/I");
-      fClusterTree->Branch("planeID", m_planeID, "planeID[nclust]/I");
-      fClusterTree->Branch("etaSector", m_etaSector, "etaSector[nclust]/S");
+      fClusterTree->Branch("planeID", m_planeID, "planeID[nclust]/F");
+      //fClusterTree->Branch("etaSector", m_etaSector, "etaSector[nclust]/S");
       
     }
         
@@ -598,8 +598,8 @@ void SRSOutputROOT::InitRootFile() {
       //fHitTree->SetDirectory(fFile) ;
       
       m_hit_detID     = new int[10000] ;
-      m_hit_planeID   = new int[10000] ;
-      m_hit_etaSector = new short[10000] ;
+      m_hit_planeID   = new float[10000] ;
+      //m_hit_etaSector = new short[10000] ;
       m_hit_timeBin   = new int[10000] ;
       
       m_adc0  = new short[10000] ;
@@ -672,8 +672,8 @@ void SRSOutputROOT::InitRootFile() {
       fHitTree->Branch("adc29", m_adc29, "adc29[nch]/S");
       
       fHitTree->Branch("detID", m_hit_detID, "detID[nch]/I");
-      fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/I");
-      fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
+      fHitTree->Branch("planeID", m_hit_planeID, "planeID[nch]/F");
+      //fHitTree->Branch("etaSector", m_hit_etaSector, "etaSector[nch]/S");
      
       printf("  SRSOutputROOT::InitRootFile() ==> Creating the Cluster Tree: fClusterTree \n") ;
       fClusterTree = new TTree("TCluster","GEM Cluster Data Rootfile") ;
@@ -684,8 +684,8 @@ void SRSOutputROOT::InitRootFile() {
       m_clustPos     = new float[200] ;
       m_clustADCs    = new float[200] ;
       m_detID        = new int[200] ;
-      m_planeID      = new int[200] ;
-      m_etaSector    = new short[200] ;
+      m_planeID      = new float[200] ;
+      //m_etaSector    = new short[200] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fClusterTree \n") ;
       fClusterTree->Branch("evtID",&m_evtID,"evtID/I");
@@ -696,8 +696,8 @@ void SRSOutputROOT::InitRootFile() {
       fClusterTree->Branch("clustTimebin", m_clustTimeBin, "clustTimeBin[nclust]/I");
       
       fClusterTree->Branch("detID", m_detID, "detID[nclust]/I");
-      fClusterTree->Branch("planeID", m_planeID, "planeID[nclust]/I");
-      fClusterTree->Branch("etaSector", m_etaSector, "etaSector[nclust]/S");
+      fClusterTree->Branch("planeID", m_planeID, "planeID[nclust]/F");
+      //fClusterTree->Branch("etaSector", m_etaSector, "etaSector[nclust]/S");
       
     }
   }

@@ -184,6 +184,13 @@ SRSMain::Init(){
 }
 
 void SRSMain::Close(){
+  std::string strRunName = _rawfile;
+
+  if( strRunName.find(".raw") != std::string::npos){
+	strRunName.erase(strRunName.find(".raw"), strRunName.length() - strRunName.find(".raw") );
+  }
+
+  _root->SetRunName(strRunName);
   _root->WriteRootFile();
   //delete _root;
   _root.reset();

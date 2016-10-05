@@ -366,18 +366,15 @@ int main( int argc_, char * argv_[] ){
         );
     } //End Run Mode: Comparison
     else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyReco ) ) { //Run Mode: Reconstruction
+	//Right now this is only supported for one input file
         for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
             //C++14 only
             //unique_ptr<SRSMain> recoInterface = make_unique<SRSMain>(& SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             
-		cout<<"=============New File=============\n";
-		
             unique_ptr<SRSMain> recoInterface(new SRSMain( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             recoInterface->Reprocess();
             
             recoInterface.reset();
-
-		cout<"SRS Main Reset()\n";
         } //End Loop Over input Runs
     } //End Run Mode: Reconstruction
     else{ //Run Mode: Unrecognized
