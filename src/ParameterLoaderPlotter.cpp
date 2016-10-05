@@ -151,6 +151,9 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 //Set the dimensions
                 setParameters(vec_strCommaSepList, inputCanvInfo.m_iSize_X, inputCanvInfo.m_iSize_Y);
             }
+            else if ( pair_strParam.first.compare("CANV_DRAWOPT") == 0 ) {
+                inputCanvInfo.m_strOptionDraw = pair_strParam.second;
+            }
             else if ( pair_strParam.first.compare("CANV_GRID_XY") == 0 ) {
                 //Get the comma separated list
                 vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
@@ -218,6 +221,46 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 
                 //Placeholder
                 
+            }
+            else if ( pair_strParam.first.compare("CANV_RANGE_X") == 0 ) {
+                //Get the comma separated list
+                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
+                
+                //Set the dimensions
+                setParameters(vec_strCommaSepList, inputCanvInfo.m_fXAxis_Min, inputCanvInfo.m_fXAxis_Max);
+                
+                //Check max & min are set correctly
+                if(inputCanvInfo.m_fXAxis_Max < inputCanvInfo.m_fXAxis_Min){
+                    float fTemp = inputCanvInfo.m_fXAxis_Min;
+                    inputCanvInfo.m_fXAxis_Min = inputCanvInfo.m_fXAxis_Max;
+                    inputCanvInfo.m_fXAxis_Max = fTemp;
+                }
+                
+                //Update the flag
+                inputPlotInfo.m_bXAxis_UserRange = true;
+            }
+            else if ( pair_strParam.first.compare("CANV_RANGE_Y") == 0 ) {
+                //Get the comma separated list
+                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
+                
+                //Set the dimensions
+                setParameters(vec_strCommaSepList, inputCanvInfo.m_fYAxis_Min, inputCanvInfo.m_fYAxis_Max);
+                
+                //Check max & min are set correctly
+                if(inputCanvInfo.m_fYAxis_Max < inputCanvInfo.m_fYAxis_Min){
+                    float fTemp = inputCanvInfo.m_fYAxis_Min;
+                    inputCanvInfo.m_fYAxis_Min = inputCanvInfo.m_fYAxis_Max;
+                    inputCanvInfo.m_fYAxis_Max = fTemp;
+                }
+                
+                //Update the flag
+                inputPlotInfo.m_bXAxis_UserRange = true;
+            }
+            else if ( pair_strParam.first.compare("CANV_TITLE_X") == 0 ) {
+                inputCanvInfo.m_strTitle_X = pair_strParam.second;
+            }
+            else if ( pair_strParam.first.compare("CANV_TITLE_Y") == 0 ) {
+                inputCanvInfo.m_strTitle_Y = pair_strParam.second;
             }
             else{ //Case: Parameter Not Recognized
                 cout<<"ParameterLoaderPlotter::loadParametersCanvas(): input field name:\n";
@@ -295,9 +338,6 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
             if ( pair_strParam.first.compare("PLOT_COLOR") == 0 ) {
                 inputPlotInfo.m_iColor = convert2Color(pair_strParam.second);
             }
-            else if ( pair_strParam.first.compare("PLOT_DRAWOPT") == 0 ) {
-                inputPlotInfo.m_strOptionDraw = pair_strParam.second;
-            }
             else if ( pair_strParam.first.compare("PLOT_LEGENTRY") == 0 ) {
                 inputPlotInfo.m_strLegEntry = pair_strParam.second;
             }
@@ -315,46 +355,6 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
             }
             else if ( pair_strParam.first.compare("PLOT_NAME") == 0 ) {
                 inputPlotInfo.m_strName = pair_strParam.second;
-            }
-            else if ( pair_strParam.first.compare("PLOT_RANGE_X") == 0 ) {
-                //Get the comma separated list
-                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
-                
-                //Set the dimensions
-                setParameters(vec_strCommaSepList, inputPlotInfo.m_fXAxis_Min, inputPlotInfo.m_fXAxis_Max);
-                
-                //Check max & min are set correctly
-                if(inputPlotInfo.m_fXAxis_Max < inputPlotInfo.m_fXAxis_Min){
-                    float fTemp = inputPlotInfo.m_fXAxis_Min;
-                    inputPlotInfo.m_fXAxis_Min = inputPlotInfo.m_fXAxis_Max;
-                    inputPlotInfo.m_fXAxis_Max = fTemp;
-                }
-                
-                //Update the flag
-                inputPlotInfo.m_bXAxis_UserRange = true;
-            }
-            else if ( pair_strParam.first.compare("PLOT_RANGE_Y") == 0 ) {
-                //Get the comma separated list
-                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
-                
-                //Set the dimensions
-                setParameters(vec_strCommaSepList, inputPlotInfo.m_fYAxis_Min, inputPlotInfo.m_fYAxis_Max);
-                
-                //Check max & min are set correctly
-                if(inputPlotInfo.m_fYAxis_Max < inputPlotInfo.m_fYAxis_Min){
-                    float fTemp = inputPlotInfo.m_fYAxis_Min;
-                    inputPlotInfo.m_fYAxis_Min = inputPlotInfo.m_fYAxis_Max;
-                    inputPlotInfo.m_fYAxis_Max = fTemp;
-                }
-                
-                //Update the flag
-                inputPlotInfo.m_bXAxis_UserRange = true;
-            }
-            else if ( pair_strParam.first.compare("PLOT_TITLE_X") == 0 ) {
-                inputPlotInfo.m_strTitle_X = pair_strParam.second;
-            }
-            else if ( pair_strParam.first.compare("PLOT_TITLE_Y") == 0 ) {
-                inputPlotInfo.m_strTitle_Y = pair_strParam.second;
             }
             else{ //Case: Parameter Not Recognized
                 cout<<"ParameterLoaderPlotter::loadParametersPlot(): input field name:\n";

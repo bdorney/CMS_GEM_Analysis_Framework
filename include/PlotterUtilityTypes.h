@@ -55,8 +55,8 @@ namespace QualityControl {
         }; //End DataPoint
         
         struct InfoPlot{
-            bool m_bXAxis_UserRange;  //Use Range Specified by User
-            bool m_bYAxis_UserRange;  //Use Range Specified by User
+            //bool m_bXAxis_UserRange;  //Use Range Specified by User
+            //bool m_bYAxis_UserRange;  //Use Range Specified by User
             
             int m_iColor;             //Line and Marker Color
             
@@ -66,26 +66,25 @@ namespace QualityControl {
             float m_fSizeLine;          //Line Width
             float m_fSizeMarker;        //Marker Size
             
-            float m_fXAxis_Min;       //Min X-Axis Value
-            float m_fXAxis_Max;       //Max X-Axis Value
+            //float m_fXAxis_Min;       //Min X-Axis Value
+            //float m_fXAxis_Max;       //Max X-Axis Value
             
-            float m_fYAxis_Min;       //Min Y-Axis Value
-            float m_fYAxis_Max;       //Max Y-Axis Value
-            //float m_fYAxis_TitleOffset;
+            //float m_fYAxis_Min;       //Min Y-Axis Value
+            //float m_fYAxis_Max;       //Max Y-Axis Value
             
             std::string m_strFileName;      //Input ROOT File where data is found
             std::string m_strLegEntry;      //Legend Entry
             std::string m_strName;          //TName of TGraph
-            std::string m_strOptionDraw;    //Draw Option
-            std::string m_strTitle_X;       //X-Axis Title
-            std::string m_strTitle_Y;       //Y-Axis Title
+            //std::string m_strOptionDraw;    //Draw Option
+            //std::string m_strTitle_X;       //X-Axis Title
+            //std::string m_strTitle_Y;       //Y-Axis Title
             
             std::vector<DataPoint> m_vec_DataPts;
             
             //Constructor
             InfoPlot(){
-                m_bXAxis_UserRange    = false;
-                m_bYAxis_UserRange    = false;
+                //m_bXAxis_UserRange    = false;
+                //m_bYAxis_UserRange    = false;
                 
                 m_iColor = kBlack;
                 
@@ -96,8 +95,8 @@ namespace QualityControl {
                 m_fSizeMarker = 0.7;
                 
                 m_strFileName = "";
-                m_strOptionDraw = "E1";
-                m_strTitle_Y = "N";
+                //m_strOptionDraw = "E1";
+                //m_strTitle_Y = "N";
             }
             
             //Destructor
@@ -116,7 +115,10 @@ namespace QualityControl {
             bool m_bGrid_X, m_bGrid_Y;//, bGrid_Z;      //Grid
             bool m_bIsPrelim;                   	//Write "Preliminary" after CMS
 
-            int m_iLogoPos;                   		//Position of "CMS" or "CMS Preliminary"           
+            bool m_bXAxis_UserRange;  //Use Range Specified by User
+            bool m_bYAxis_UserRange;  //Use Range Specified by User
+            
+            int m_iLogoPos;                   		//Position of "CMS" or "CMS Preliminary"
             int m_iSize_X, m_iSize_Y;                   //Canvas Size
             
             float m_fLegNDCPos_X1, m_fLegNDCPos_X2;     //NDC X-Position of Legend
@@ -125,10 +127,19 @@ namespace QualityControl {
             float m_fMargin_Top, m_fMargin_Bot;     	//Pad Margins
             float m_fMargin_Lf, m_fMargin_Rt;     	//
             
+            float m_fXAxis_Min;       //Min X-Axis Value
+            float m_fXAxis_Max;       //Max X-Axis Value
+            
+            float m_fYAxis_Min;       //Min Y-Axis Value
+            float m_fYAxis_Max;       //Max Y-Axis Value
+            
             std::vector<std::tuple<float, float, std::string> > m_vec_LatexNPos;
             
             std::string m_strName;                      //TName
             std::string m_strTitle;                     //Canvas Title
+            std::string m_strOptionDraw;    //Draw Option
+            std::string m_strTitle_X;       //X-Axis Title
+            std::string m_strTitle_Y;       //Y-Axis Title
             
             std::map<std::string, InfoPlot> m_map_infoPlot;
             
@@ -138,19 +149,24 @@ namespace QualityControl {
                 m_bGrid_X=m_bGrid_Y=false;
                 m_bIsPrelim=true;
 
+                m_bXAxis_UserRange    = false;
+                m_bYAxis_UserRange    = false;
+                
                 m_iLogoPos=11;                
                 m_iSize_X=m_iSize_Y=700;
                 
                 m_fLegNDCPos_X1=m_fLegNDCPos_X2=-1;
                 m_fLegNDCPos_Y1=m_fLegNDCPos_Y2=-1;
                 
-		m_fMargin_Top=0.08;
-		m_fMargin_Bot=0.12;
-		m_fMargin_Lf=0.15;
-		m_fMargin_Rt=0.04;
+                m_fMargin_Top=0.08;
+                m_fMargin_Bot=0.12;
+                m_fMargin_Lf=0.15;
+                m_fMargin_Rt=0.04;
 
                 //strName="";
-                //strTitle="";
+                m_strOptionDraw = "E1";
+                m_strTitle_Y = "N";
+                strTitle="";
             }
             
             //Destructor
