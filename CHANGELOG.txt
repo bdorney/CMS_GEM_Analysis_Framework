@@ -3,9 +3,18 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.2.3                               *
-*	LAST UPDATE: Oct 3 2016                      *
+*	LAST UPDATE: Oct 5 2016                      *
 *                                                *
 **************************************************
+
+Update: October 5th 2016
+==================================================
+->New make file for genericPlotter executable: MakefilePlotter.clang & MakefilePlotter.gpp
+->New config file for use with genericPlotter executable: config/configPlot.cfg
+->Adding new utility functions for the QualityControl::Plotter namespace found in include/PlotterUtilityFunctions.h & src/PlotterUtilityFunctions.cpp
+->New utility function QualityControl::Plotter::conver2Color
+->New int main() for generic executable found in src/genericPlotter.cpp
+->QualityControl::Plotter::ParameterLoaderPlotter class implemented
 
 Update: October 3rd 2016
 ==================================================

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <utility>
 
 //Framework Includes
 
@@ -25,29 +26,30 @@ using namespace ROOT;
 namespace QualityControl {
     namespace Plotter {
         struct DataPoint{
-            float fX;
-            float fX_Err;
+            float m_fX;
+            float m_fX_Err;
             
-            float fY;
-            float fY_Err;
+            float m_fY;
+            float m_fY_Err;
             
             //Constructor
             DataPoint(){
-                fX = fX_Err = fY = fY_Err = 0.;
+                m_fX = m_fX_Err = m_fY = m_fY_Err = 0.;
             }
             
             //Copy Constructor
             DataPoint(const DataPoint & other){
-                fX      = other.fX;
-                fX_Err  = other.fX_Err;
+                m_fX      = other.m_fX;
+                m_fX_Err  = other.m_fX_Err;
                 
-                fY      = other.fY;
-                fY_Err  = other.fY_Err;
+                m_fY      = other.m_fY;
+                m_fY_Err  = other.m_fY_Err;
             } //End Copy Constructor
             
             //Clear container
-            clear(){
-                fX = fX_Err = fY = fY_Err = 0.;
+            void clear(){
+                m_fX = m_fX_Err = m_fY = m_fY_Err = 0.;
+                return;
             }
         }; //End DataPoint
         
@@ -68,16 +70,13 @@ namespace QualityControl {
             
             float m_fYAxis_Min;       //Min Y-Axis Value
             float m_fYAxis_Max;       //Max Y-Axis Value
-            float m_fYAxis_TitleOffset;
+            //float m_fYAxis_TitleOffset;
             
-            string m_strLegEntry;     //Legend Entry
-            
-            //string m_strName;         //TName of TGraph
-            
-            string m_strOptionDraw;   //Draw Option
-            
-            string m_strTitle_X;  //X-Axis Title
-            string m_strTitle_Y;  //Y-Axis Title
+            std::string m_strLegEntry;      //Legend Entry
+            std::string m_strName;          //TName of TGraph
+            std::string m_strOptionDraw;    //Draw Option
+            std::string m_strTitle_X;       //X-Axis Title
+            std::string m_strTitle_Y;       //Y-Axis Title
             
             std::vector<DataPoint> m_vec_DataPts;
             
@@ -100,7 +99,7 @@ namespace QualityControl {
             }
             
             //Destructor
-            InfoPlot(){
+            ~InfoPlot(){
                 m_strLegEntry.clear();
                 //m_strName.clear();
                 m_strOptionDraw.clear();
@@ -111,7 +110,7 @@ namespace QualityControl {
         }; //End InfoPlot
         
         struct InfoCanvas{
-            bool m_bLog_X, m_bLog_Y, m_bLog_Z;         //Logarithmic Axis
+            bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;         //Logarithmic Axis
             bool m_bGrid_X, m_bGrid_Y;//, bGrid_Z;      //Grid
             
             int m_iSize_X, m_iSize_Y;                   //Canvas Size
@@ -119,34 +118,29 @@ namespace QualityControl {
             float m_fLegNDCPos_X1, m_fLegNDCPos_X2;     //NDC X-Position of Legend
             float m_fLegNDCPos_Y1, m_fLegNDCPos_Y2;     //NDC Y-Position of Legend
             
-            //std::vector<float> vec_fLatexNDCPos_X;  //NDC X-Position of TLatex
-            //std::vector<float> vec_fLatexNDCPos_Y;  //NDC Y-Position of TLatex
             std::vector<std::tuple<float, float, std::string> > m_vec_LatexNPos;
             
-            //string m_strName;                         //TName
+            std::string m_strName;                      //TName
+            std::string m_strTitle;                     //Canvas Title
             
-            string m_strTitle;                        //Canvas Title
-            
-            //std::vector<string> vec_strLatexLine;   //String Container
-            
-            std::map<string, InfoPlot> m_map_infoPlot;
+            std::map<std::string, InfoPlot> m_map_infoPlot;
             
             //Constructor
             InfoCanvas(){
-                bLog_X=bLog_Y=false;
-                bGrid_X=bGrid_Y=false;
+                m_bLog_X=m_bLog_Y=false;
+                m_bGrid_X=m_bGrid_Y=false;
                 
-                //iSize_X=iSize_Y=700;
+                m_iSize_X=m_iSize_Y=700;
                 
-                //fLegNDCPos_X1=fLegNDCPos_X2=0;
-                //fLegNDCPos_Y1=fLegNDCPos_Y2=0;
+                m_fLegNDCPos_X1=m_fLegNDCPos_X2=-1;
+                m_fLegNDCPos_Y1=m_fLegNDCPos_Y2=-1;
                 
                 //strName="";
                 //strTitle="";
             }
             
             //Destructor
-            InfoCanvas(){
+            ~InfoCanvas(){
                 m_vec_LatexNPos.clear();
                 m_strTitle.clear();
                 m_map_infoPlot.clear();

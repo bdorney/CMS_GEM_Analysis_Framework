@@ -1,5 +1,5 @@
 # Define the compiler
-CC = g++
+CC = clang++ #For Mac OSX > 10.9 ???
 
 # Define root-config 
 ROOTCONFIG = $(ROOTSYS)/bin/root-config
@@ -17,7 +17,12 @@ LPATHS = -L $(ROOTSYS)/lib/
 LIBS = -lSpectrum
 
 # Define source files
-SOURCES = src/DetectorMPGD.cpp src/FrameworkBase.cpp src/ReadoutSector.cpp src/ReadoutSectorPhi.cpp src/ReadoutSectorEta.cpp src/Interface.cpp src/InterfaceAnalysis.cpp src/ParameterLoader.cpp src/ParameterLoaderAmoreSRS.cpp src/ParameterLoaderAnaysis.cpp src/ParameterLoaderRun.cpp src/Selector.cpp src/SelectorCluster.cpp src/SelectorHit.cpp src/AnalyzeResponseUniformity.cpp src/AnalyzeResponseUniformityClusters.cpp src/AnalyzeResponseUniformityHits.cpp src/UniformityUtilityFunctions.cpp src/TimingUtilityFunctions.cpp src/Visualizer.cpp src/VisualizeUniformity.cpp src/VisualizeComparison.cpp src/analyzeUniformity.cpp
+SOURCES =   src/ParameterLoader.cpp \
+            src/PlotterUtilityFunctions.cpp \
+            src/TimingUtilityFunctions.cpp \
+            src/UniformityUtilityFunctions.cpp \
+            src/ParameterLoaderPlotter.cpp \
+            src/genericPlotter.cpp
 
 # Define object files
 #	We use Suffix Replacement
@@ -27,7 +32,7 @@ SOURCES = src/DetectorMPGD.cpp src/FrameworkBase.cpp src/ReadoutSector.cpp src/R
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Define the executable
-EXEC = analyzeUniformity
+EXEC = genericPlotter
 
 # Define default behavior
 #default: $(EXEC)
