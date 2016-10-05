@@ -40,17 +40,13 @@ PlotterGeneric::PlotterGeneric() :
 //If m_canvInfo isn't set this is gonna be a short trip...
 void PlotterGeneric::plotAndStore(){
     //Initialize the canvas
-    //m_canv = make_shared<TCanvas>( getCanvas()->Clone() );
-    //std::shared_ptr<TCanvas> canvPtr = getCanvas();
-    //TCanvas canv(get)
     initCanv();
     
     //Make the Legend
-    //std::shared_ptr<TLegend> leg(new TLegend(m_canvInfo.m_fLegNDCPos_X1, m_canvInfo.m_fLegNDCPos_X2, m_canvInfo.m_fLegNDCPos_Y1, m_canvInfo.m_fLegNDCPos_Y2 ) );
-    TLegend leg(m_canvInfo.m_fLegNDCPos_X1, m_canvInfo.m_fLegNDCPos_X2, m_canvInfo.m_fLegNDCPos_Y1, m_canvInfo.m_fLegNDCPos_Y2 );
+    TLegend leg(m_canvInfo.m_fLegNDCPos_X1, m_canvInfo.m_fLegNDCPos_Y1, m_canvInfo.m_fLegNDCPos_X2, m_canvInfo.m_fLegNDCPos_Y2 );
     
     //Loop over defined plots and draw each of them
-    for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.begin(); ++iterPlot) {
+    for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.end(); ++iterPlot) {
         
         //Add "same" to the draw option if it is not present already
         if (iterPlot != m_canvInfo.m_map_infoPlot.begin()
@@ -58,10 +54,12 @@ void PlotterGeneric::plotAndStore(){
             (*iterPlot).second.m_strOptionDraw = "same" + (*iterPlot).second.m_strOptionDraw;
         }
         
-        //M
         makePlot(leg, (*iterPlot).second);
     } //End Loop Over Input Plots
-    
+
+    //Draw legend    
+    leg.Draw("same");
+
     //Draw each latex line
     for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
         drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
@@ -74,7 +72,7 @@ void PlotterGeneric::plotAndStore(){
     m_canv->Update();
     m_canv->RedrawAxis();
     m_canv->GetFrame()->Draw();
-    
+
     //Save output
     write2RootFile();
     if (m_bSaveCanvases) {
@@ -89,10 +87,10 @@ void PlotterGeneric::drawLatex(std::tuple<float, float, std::string> tupleTexLin
     TLatex latex;
     
     //Set the Latex style
-    latex.SetTextFont(42);
+    latex.SetTextFont(26);
     latex.SetTextAngle(0);
     latex.SetTextColor(kBlack);
-    latex.SetTextSize(0.25);
+    latex.SetTextSize(0.05);
     latex.SetTextAlign(12);
     
     //Draw
@@ -122,7 +120,8 @@ void PlotterGeneric::initCanv(){
     else if( m_iLogoPos%10==3 ){    strTempName += "_right"; }
     
     m_canv = make_shared<TCanvas>(new TCanvas(strTempName.c_str(),m_canvInfo.m_strTitle.c_str(),m_canvInfo.m_iSize_X,m_canvInfo.m_iSize_Y ) );
-    
+    m_canv->SetName( strTempName.c_str() );
+
     //Grid
     m_canv->cd()->SetGridx(m_canvInfo.m_bGrid_X);
     m_canv->cd()->SetGridy(m_canvInfo.m_bGrid_Y);
@@ -132,20 +131,20 @@ void PlotterGeneric::initCanv(){
     m_canv->cd()->SetLogy(m_canvInfo.m_bLog_Y);
     
     //Determine values for margins
-    float fMargin_Top   = 0.08;// * m_canvInfo.m_iSize_Y;
+    /*float fMargin_Top   = 0.08;// * m_canvInfo.m_iSize_Y;
     float fMargin_Bot   = 0.12;// * m_canvInfo.m_iSize_Y;
     float fMargin_Lf    = 0.12;// * m_canvInfo.m_iSize_X;
-    float fMargin_Rt    = 0.04;// * m_canvInfo.m_iSize_X;
+    float fMargin_Rt    = 0.04;// * m_canvInfo.m_iSize_X;*/
     
     //Set additional style:
     m_canv->SetFillColor(0);
     m_canv->SetBorderMode(0);
     m_canv->SetFrameFillStyle(0);
     m_canv->SetFrameBorderMode(0);
-    m_canv->SetLeftMargin( fMargin_Lf );
-    m_canv->SetRightMargin( fMargin_Rt );
-    m_canv->SetTopMargin( fMargin_Top );
-    m_canv->SetBottomMargin( fMargin_Bot );
+    m_canv->SetLeftMargin( m_canvInfo.m_fMargin_Lf );
+    m_canv->SetRightMargin( m_canvInfo.m_fMargin_Rt );
+    m_canv->SetTopMargin( m_canvInfo.m_fMargin_Top );
+    m_canv->SetBottomMargin( m_canvInfo.m_fMargin_Bot );
     m_canv->SetTickx(0);
     m_canv->SetTicky(0);
     

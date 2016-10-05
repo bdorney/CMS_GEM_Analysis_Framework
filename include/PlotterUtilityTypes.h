@@ -112,13 +112,18 @@ namespace QualityControl {
         }; //End InfoPlot
         
         struct InfoCanvas{
-            bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;         //Logarithmic Axis
+            bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;       //Logarithmic Axis
             bool m_bGrid_X, m_bGrid_Y;//, bGrid_Z;      //Grid
-            
+            bool m_bIsPrelim;                   	//Write "Preliminary" after CMS
+
+            int m_iLogoPos;                   		//Position of "CMS" or "CMS Preliminary"           
             int m_iSize_X, m_iSize_Y;                   //Canvas Size
             
             float m_fLegNDCPos_X1, m_fLegNDCPos_X2;     //NDC X-Position of Legend
             float m_fLegNDCPos_Y1, m_fLegNDCPos_Y2;     //NDC Y-Position of Legend
+
+            float m_fMargin_Top, m_fMargin_Bot;     	//Pad Margins
+            float m_fMargin_Lf, m_fMargin_Rt;     	//
             
             std::vector<std::tuple<float, float, std::string> > m_vec_LatexNPos;
             
@@ -131,12 +136,19 @@ namespace QualityControl {
             InfoCanvas(){
                 m_bLog_X=m_bLog_Y=false;
                 m_bGrid_X=m_bGrid_Y=false;
-                
+                m_bIsPrelim=true;
+
+                m_iLogoPos=11;                
                 m_iSize_X=m_iSize_Y=700;
                 
                 m_fLegNDCPos_X1=m_fLegNDCPos_X2=-1;
                 m_fLegNDCPos_Y1=m_fLegNDCPos_Y2=-1;
                 
+		m_fMargin_Top=0.08;
+		m_fMargin_Bot=0.12;
+		m_fMargin_Lf=0.15;
+		m_fMargin_Rt=0.04;
+
                 //strName="";
                 //strTitle="";
             }

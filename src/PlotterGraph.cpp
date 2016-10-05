@@ -68,7 +68,7 @@ void PlotterGraph::makePlot(TLegend & inputLegend, InfoPlot & plotInfo){
         
         return;
     }
-    
+
     //Get this plot
     auto graphPtr = m_map_graphs[plotInfo.m_strName];
     

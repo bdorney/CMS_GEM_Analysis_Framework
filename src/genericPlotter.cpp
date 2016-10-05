@@ -107,6 +107,13 @@ void printInfoCanv(InfoCanvas & inputCanvInfo){
     cout<<"canvSetup.m_fLegNDCPos_Y1 = " << inputCanvInfo.m_fLegNDCPos_Y1 << endl;
     cout<<"canvSetup.m_fLegNDCPos_Y2 = " << inputCanvInfo.m_fLegNDCPos_Y2 << endl;
     
+    //Margins
+    cout<<"canvSetup.m_fMargin_Bot = " << inputCanvInfo.m_fMargin_Bot << endl;
+    cout<<"canvSetup.m_fMargin_Lf = " << inputCanvInfo.m_fMargin_Lf << endl;
+    cout<<"canvSetup.m_fMargin_Rt = " << inputCanvInfo.m_fMargin_Rt << endl;
+    cout<<"canvSetup.m_fMargin_Top = " << inputCanvInfo.m_fMargin_Top << endl;
+
+
     //Latex Lines
     cout<<"Tex_X\tTex_Y\tString\n";
     for (auto iterTexLine = inputCanvInfo.m_vec_LatexNPos.begin(); iterTexLine != inputCanvInfo.m_vec_LatexNPos.end(); ++iterTexLine) {
@@ -206,12 +213,12 @@ int main( int argc_, char * argv_[] ){
     //------------------------------------------------------
     PlotterGraph graphPlotter;
     graphPlotter.setCanvasParameters(canvSetup);
-    graphPlotter.setLogoPos(0);
-    graphPlotter.setPreliminary(true);
-    graphPlotter.setOutputNameNOption("test.root","RECRATE");
+    graphPlotter.setLogoPos(canvSetup.m_iLogoPos);
+    graphPlotter.setPreliminary(canvSetup.m_bIsPrelim);
+    graphPlotter.setOutputNameNOption("test.root","RECREATE");
     graphPlotter.plotAndStore();
     
-    cout<<"Finieshed\n";
+    cout<<"Finished\n";
     
     return 0;
 } //End main()

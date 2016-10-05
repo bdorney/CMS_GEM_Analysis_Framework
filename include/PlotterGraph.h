@@ -59,13 +59,12 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Intializes the plots defined in m_canvInfo
             //To be over-ridded by inherited classes
-            //virtual void makePlots(TCanvas & inputCanvas, TLegend & inputLegend, InfoPlot & plotInfo);
-            virtual void initPlot(InfoPlot & plotInfo);
+            void initPlot(InfoPlot & plotInfo);
             
             //Makes the plots defined in m_canvInfo
             //To be over-ridded by inherited classes
             //virtual void makePlots(TCanvas & inputCanvas, TLegend & inputLegend, InfoPlot & plotInfo);
-            virtual void makePlot(TLegend & inputLegend, InfoPlot & plotInfo);
+            void makePlot(TLegend & inputLegend, InfoPlot & plotInfo);
             
             //Saves all TObjects to an output ROOT file
             //To be over-ridded by inherited classes

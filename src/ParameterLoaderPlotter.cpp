@@ -188,6 +188,24 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 //Set the grid case
                 setParameters(vec_strCommaSepList, inputCanvInfo.m_bLog_X, inputCanvInfo.m_bLog_Y);
             }
+            else if ( pair_strParam.first.compare("CANV_LOGO_POS") == 0 ) {
+                inputCanvInfo.m_iLogoPos = stoi(pair_strParam.second);
+            }
+            else if ( pair_strParam.first.compare("CANV_LOGO_PRELIM") == 0 ) {
+                inputCanvInfo.m_bIsPrelim = convert2bool(pair_strParam.second,bExitSuccess);
+            }
+            else if ( pair_strParam.first.compare("CANV_MARGIN_TOP") == 0 ) {
+                inputCanvInfo.m_fMargin_Top = stof(pair_strParam.second);
+            }
+            else if ( pair_strParam.first.compare("CANV_MARGIN_BOT") == 0 ) {
+                inputCanvInfo.m_fMargin_Bot = stof(pair_strParam.second);
+            }
+            else if ( pair_strParam.first.compare("CANV_MARGIN_LF") == 0 ) {
+                inputCanvInfo.m_fMargin_Lf = stof(pair_strParam.second);
+            }
+            else if ( pair_strParam.first.compare("CANV_MARGIN_RT") == 0 ) {
+                inputCanvInfo.m_fMargin_Rt = stof(pair_strParam.second);
+            }
             else if ( pair_strParam.first.compare("CANV_NAME") == 0 ) {
                 inputCanvInfo.m_strName = pair_strParam.second;
             }
