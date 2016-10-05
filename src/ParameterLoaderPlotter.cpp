@@ -32,7 +32,8 @@ ParameterLoaderPlotter::ParameterLoaderPlotter(){
 }
 
 void ParameterLoaderPlotter::loadParameters(std::ifstream &file_Input, bool bVerboseMode, InfoCanvas &inputCanvInfo){
-    
+    //Set Defaults
+    //------------------------------------------------------
     m_bVerboseMode_IO = bVerboseMode;
     loadParametersCanvas(file_Input, inputCanvInfo);
     
@@ -48,13 +49,11 @@ void ParameterLoaderPlotter::loadParameters(std::ifstream &file_Input, bool bVer
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Identify Section Headers
-        if ( 0 == strLine.compare(m_headers_plots.m_strSecEnd_Canv ) { //Case: Reached End of Interest
-            
-            //Placeholder
-            
+        if ( 0 == strLine.compare(m_headers_plots.m_strSecEnd_Canv ) ) { //Case: Reached End of Interest
+            break;
         } //End Case: Reached End of Interest
         else if ( 0 == strLine.compare(m_headers_plots.m_strSecBegin_Canv ) ){ //Case: Run Info Header
-            loadParametersCanvas(file_Input, bVerboseMode, inputCanvInfo);
+            loadParametersCanvas(file_Input, inputCanvInfo);
             continue;
         } //End Case: Run Info Header
         else { //Case: Unsorted Parameters
@@ -81,9 +80,9 @@ void ParameterLoaderPlotter::loadParameters(std::ifstream &file_Input, bool bVer
 } //End ParameterLoaderPlotter::loadParameters()
 
 void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, InfoCanvas &inputCanvInfo){
-    if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
+    /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
         printClassMethodMsg("ParameterLoaderPlotter","loadParametersCanvas", "Found Canvas Heading");
-    } //End Case: User Requested Verbose Error Messages - I/O
+    }*/ //End Case: User Requested Verbose Error Messages - I/O
     
     //Set Defaults
     //------------------------------------------------------
@@ -96,7 +95,7 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
     
     std::pair<string,string> pair_strParam;
     
-    streampos spos_Previous; //previous stream position
+    //streampos spos_Previous; //previous stream position
     
     string strLine = "";
     
@@ -106,23 +105,38 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Do we reach the end of the section or anther section?
-        if ( 0 == strLine.compare( m_headers_plots.m_strSecEnd_Canv ) ) { //Case: End of Canvas Section
+	if ( 0 == strLine.compare(m_headers_plots.m_strSecBegin_Canv ) ){ //Case: Run Info Header
+            if (m_bVerboseMode_IO) { //Case: User Requested Verbose Input/Output
+                cout<<"ParameterLoaderPlotter::loadParametersCanvas(): Start of canvas header reached!\n";
+            } //End Case: User Requested Verbose Input/Output
+
+            continue;
+        } //End Case: Run Info Header
+        else if ( 0 == strLine.compare( m_headers_plots.m_strSecEnd_Canv ) ) { //Case: End of Canvas Section
             if (m_bVerboseMode_IO) { //Case: User Requested Verbose Input/Output
                 cout<<"ParameterLoaderPlotter::loadParametersCanvas(): End of canvas header reached!\n";
             } //End Case: User Requested Verbose Input/Output
             
-            file_Input.seekg(spos_Previous);
+            //file_Input.seekg(spos_Previous);
             break;
         } //End Case: End of Canvas Section
         else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Plot ) ){ //Case: Start of Plot Section
             InfoPlot plotInfo;
             loadParametersPlot(file_Input, plotInfo);
             inputCanvInfo.m_map_infoPlot[plotInfo.m_strName]=plotInfo;
+
+            continue;
         } //End Case: Start of Plot Section
         
+	//Debugging
+	//cout<<"strLine = " << strLine.c_str() << endl;
+
         //Parse the line
         pair_strParam = getParsedLine(strLine, bExitSuccess);
         
+	//Debugging
+	//cout<<"pair_strParam.first = " << pair_strParam.first.c_str() << endl;
+
         if (bExitSuccess) { //Case: Parameter Fetched Successfully
             //Transform input field name to all capitals for case-insensitive string comparison
             string strTmp = pair_strParam.first;
@@ -201,7 +215,7 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
         
         //Store previous stream position so main loop over file exits
         //After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly
-        spos_Previous = file_Input.tellg();
+        //spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && m_bVerboseMode_IO) {
         perror( "ParameterLoaderPlotter::loadParametersCanvas(): error while reading config file" );
@@ -227,7 +241,7 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
     
     std::pair<string,string> pair_strParam;
     
-    streampos spos_Previous; //previous stream position
+    //streampos spos_Previous; //previous stream position
     
     string strLine = "";
     
@@ -239,14 +253,15 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
         //Do we reach the end of the section or anther section?
         if ( 0 == strLine.compare( m_headers_plots.m_strSecEnd_Plot ) ) { //Case: End of Canvas Section
             if (m_bVerboseMode_IO) { //Case: User Requested Verbose Input/Output
-                cout<<"ParameterLoaderPlotter::loadParametersPlot(): End of canvas header reached!\n";
+                cout<<"ParameterLoaderPlotter::loadParametersPlot(): End of plot header reached!\n";
             } //End Case: User Requested Verbose Input/Output
             
-            file_Input.seekg(spos_Previous);
+            //file_Input.seekg(spos_Previous);
             break;
         } //End Case: End of Canvas Section
         else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Data ) ){ //Case: Start of Plot Section
-            inputPlotInfo.m_vec_DataPts =loadData(file_Input);
+            inputPlotInfo.m_vec_DataPts = loadData(file_Input);
+            continue;
         } //End Case: Start of Plot Section
         
         //Parse the line
@@ -337,7 +352,7 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
         
         //Store previous stream position so main loop over file exits
         //After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly
-        spos_Previous = file_Input.tellg();
+        //spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && m_bVerboseMode_IO) {
         perror( "ParameterLoaderPlotter::loadParametersPlot(): error while reading config file" );
@@ -362,57 +377,68 @@ vector<DataPoint> ParameterLoaderPlotter::loadData(std::ifstream & file_Input){
     //Check for faults immediately afterward
     //------------------------------------------------------
     bool bExitSuccess = false;
+    bool bPosSet = false;
     
     DataPoint dataPt;
     
     int iPos_X = -1 , iPos_X_Err = -1;
     int iPos_Y = -1 , iPos_Y_Err = -1;
     
-    streampos spos_Previous; //previous stream position
+    //streampos spos_Previous; //previous stream position
     
     string strLine = "";
     
     vector<DataPoint> vec_retData;
-    vector<string> vec_strTabSepList;
+    vector<string> vec_strDelimSepList;
     while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through input file
-        //Skip commented lines
+	//Skip commented lines
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Do we reach the end of the section or anther section?
         if ( 0 == strLine.compare( m_headers_plots.m_strSecEnd_Data ) ) { //Case: End of Canvas Section
             if (m_bVerboseMode_IO) { //Case: User Requested Verbose Input/Output
-                cout<<"ParameterLoaderPlotter::loadData(): End of canvas header reached!\n";
+                cout<<"ParameterLoaderPlotter::loadData(): End of data header reached!\n";
             } //End Case: User Requested Verbose Input/Output
             
-            file_Input.seekg(spos_Previous);
+            //file_Input.seekg(spos_Previous);
             break;
         } //End Case: End of Canvas Section
         
-        //The data is tab delimited, get a line
-        vec_strTabSepList = getCharSeparatedList(strLine, '\t');
-        
+	//cout<<strLine<<endl;
+
+	//The data is delimited, get a line
+	vec_strDelimSepList = getCharSeparatedList(strLine, ',');
+	//cout<<"vec_strDelimSepList.size() = " << vec_strDelimSepList.size() << endl;
+
+	/*for(int i=0; i < vec_strDelimSepList.size(); ++i){
+		cout<<vec_strDelimSepList[i]<<endl;
+	}*/
+
         //Determine which columns have what meaning by reading in the column labels
-        if (vec_retData.size() == 0) {
+        if (!bPosSet) {
+            iPos_X = getColLabelPosition( vec_strDelimSepList, m_col_labels.m_strColX );
+            iPos_Y = getColLabelPosition( vec_strDelimSepList, m_col_labels.m_strColY );
+            iPos_X_Err = getColLabelPosition( vec_strDelimSepList, m_col_labels.m_strColX_Err );
+            iPos_Y_Err = getColLabelPosition( vec_strDelimSepList, m_col_labels.m_strColY_Err );
             
-            iPos_X = getColLabelPosition( vec_strTabSepList, m_col_labels.m_strColX );
-            iPos_Y = getColLabelPosition( vec_strTabSepList, m_col_labels.m_strColY );
-            iPos_X_Err = getColLabelPosition( vec_strTabSepList, m_col_labels.m_strColX_Err );
-            iPos_Y_Err = getColLabelPosition( vec_strTabSepList, m_col_labels.m_strColY_Err );
-            
+            bPosSet = true;
+
             //Now move to next line
-            continue;
+            //continue;
         }
+	else{
+        	if (iPos_X > -1) {      dataPt.m_fX = stof(vec_strDelimSepList[iPos_X]); }
+        	if (iPos_Y > -1) {      dataPt.m_fY = stof(vec_strDelimSepList[iPos_Y]); }
+        	if (iPos_X_Err > -1) {  dataPt.m_fX_Err = stof(vec_strDelimSepList[iPos_X_Err]); }
+        	if (iPos_Y_Err > -1) {  dataPt.m_fY_Err = stof(vec_strDelimSepList[iPos_Y_Err]); }
         
-        if (iPos_X > -1) {      dataPt.m_fX = stof(vec_strTabSepList[iPos_X]); }
-        if (iPos_Y > -1) {      dataPt.m_fY = stof(vec_strTabSepList[iPos_Y]); }
-        if (iPos_X_Err > -1) {  dataPt.m_fX_Err = stof(vec_strTabSepList[iPos_X_Err]); }
-        if (iPos_Y_Err > -1) {  dataPt.m_fY_Err = stof(vec_strTabSepList[iPos_Y_Err]); }
-        
-        vec_retData.push_back(dataPt);
-        
+        	vec_retData.push_back(dataPt);
+		dataPt.clear();
+	}
+                
         //Store previous stream position so main loop over file exits
         //After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly
-        spos_Previous = file_Input.tellg();
+        //spos_Previous = file_Input.tellg();
     } //End Loop through input file
     if ( file_Input.bad() && m_bVerboseMode_IO) {
         perror( "ParameterLoaderPlotter::loadData(): error while reading config file" );

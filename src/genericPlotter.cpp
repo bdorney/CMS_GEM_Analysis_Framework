@@ -198,7 +198,7 @@ int main( int argc_, char * argv_[] ){
     InfoCanvas canvSetup;
     loaderPlots.loadParameters(file_Config, bVerboseMode, canvSetup);
     
-    
+    printInfoCanv(canvSetup);
     
     return 0;
 } //End main()
