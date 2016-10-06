@@ -78,7 +78,7 @@ do
     echo '#!/bin/zsh' >> $FILE_SCRIPT
     echo "cd $GEM_BASE" >> $FILE_SCRIPT
     echo "source scripts/setup_CMS_GEM.sh"
-    echo "nohup ./analyzeUniformity $FILE_RUN true >> $DIR_STDLOG/frameworkLog_RunNo${COUNTER}.txt &" >> $FILE_SCRIPT
+    echo "nohup ./frameworkMain $FILE_RUN true >> $DIR_STDLOG/frameworkLog_RunNo${COUNTER}.txt &" >> $FILE_SCRIPT
 
     #make the script executable
     chmod 777 $FILE_SCRIPT

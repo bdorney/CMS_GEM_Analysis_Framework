@@ -109,7 +109,7 @@ void PlotterGraph2D::drawPlots(){
     m_g2D_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
     m_g2D_Obs->GetXaxis()->SetNdivisions(m_canvInfo.m_iXAxis_NDiv);
     if( m_canvInfo.m_fXAxis_Title_Offset > 0 ){
-	m_g2D_Obs->GetXaxis()->SetTitleOffset(m_canvInfo.m_fXAxis_Title_Offset);
+        m_g2D_Obs->GetXaxis()->SetTitleOffset(m_canvInfo.m_fXAxis_Title_Offset);
     }
     if( m_canvInfo.m_bXAxis_UserRange ){
         m_g2D_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
@@ -119,7 +119,7 @@ void PlotterGraph2D::drawPlots(){
     m_g2D_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
     m_g2D_Obs->GetYaxis()->SetNdivisions(m_canvInfo.m_iYAxis_NDiv);
     if( m_canvInfo.m_fYAxis_Title_Offset > 0 ){
-	m_g2D_Obs->GetYaxis()->SetTitleOffset(m_canvInfo.m_fYAxis_Title_Offset);
+        m_g2D_Obs->GetYaxis()->SetTitleOffset(m_canvInfo.m_fYAxis_Title_Offset);
     }
     if( m_canvInfo.m_bYAxis_UserRange ){
         m_g2D_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
@@ -127,9 +127,9 @@ void PlotterGraph2D::drawPlots(){
     
     //Set Style - X axis
     m_g2D_Obs->GetZaxis()->SetTitle(m_canvInfo.m_strTitle_Z.c_str() );
-	//m_g2D_Obs->GetZaxis()->SetDecimals(true);
+    //m_g2D_Obs->GetZaxis()->SetDecimals(true);
     if( m_canvInfo.m_fZAxis_Title_Offset > 0 ){
-	m_g2D_Obs->GetZaxis()->SetTitleOffset(m_canvInfo.m_fZAxis_Title_Offset);
+        m_g2D_Obs->GetZaxis()->SetTitleOffset(m_canvInfo.m_fZAxis_Title_Offset);
     }
     if( m_canvInfo.m_bZAxis_UserRange ){
         m_g2D_Obs->GetZaxis()->SetRangeUser(m_canvInfo.m_fZAxis_Min, m_canvInfo.m_fZAxis_Max);

@@ -26,7 +26,7 @@
     1. Contributors & License
     2. Installation Instructions
     3. Usage
-        3.a. analyzeUniformity
+        3.a. frameworkMain
             3.a.i               Helper Script - Run Mode: Grid
             3.a.ii              Helper Script - Run Mode: Rerun
             3.a.iii             Helper Script - Run Mode: Series
@@ -187,17 +187,17 @@
     The following gives the usage case for each of the executables produced during the installation.
     It is assumed that you have successfully performed the steps listed in Section 2.
 
-    # 3.a. analyzeUniformity
+    # 3.a. frameworkMain
     # --------------------------------------------------------
 
     For each new shell navigate to the base directory of the repository and setup the environment via:
 
         source scripts/setup_CMS_GEM.sh
 
-    The usage for the analyzeUniformity executable is:
+    The usage for the frameworkMain executable is:
 
-        For help menu:  ./analyzeUniformity -h
-        For executing:  ./analyzeUniformity <PFN of Run Config File> <Verbose Mode true/false>
+        For help menu:  ./frameworkMain -h
+        For executing:  ./frameworkMain <PFN of Run Config File> <Verbose Mode true/false>
 
     Here the physical file name (PFN) represents the full path+filename to the file in question.
     The configuration files, including the run config file, are described in Section 4.e.  The
@@ -210,7 +210,7 @@
     Three example config files: 1) mapping config file, 2) analysis config file, and 3) run config
     file have been provided in the default repository.  A usage example is given as:
 
-        ./analyzeUniformity config/configRun.cfg true
+        ./frameworkMain config/configRun.cfg true
 
     As a general rule each detector you are testing will usually have a series of raw files associated
     with it.  It is recommended each raw file should have a run number associated with it.  The set of
@@ -319,7 +319,7 @@
             Example:
 
                 source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
-                ./analyzeUniformity config/configRun.cfg true
+                ./frameworkMain config/configRun.cfg true
 
             NOTE: Modications to config/configRun_Template_Rerun.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
@@ -346,7 +346,7 @@
             Example:
 
                 source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
-                ./analyzeUniformity config/configRun.cfg true
+                ./frameworkMain config/configRun.cfg true
 
             NOTE: Modications to config/configRun_Template_Series.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
@@ -1106,7 +1106,7 @@
     # 4.e. Configuration Files
     # --------------------------------------------------------
 
-    Two configuration files are require to run the analyzeUniformity exectuable.  The first is the amoreSRS
+    Two configuration files are require to run the frameworkMain exectuable.  The first is the amoreSRS
     mapping file.  The second is the Analysis Config file.  Examples of both files have been included in
     the $GEM_BASE/config directory
 
@@ -1699,8 +1699,8 @@
 
         The framework can run in an analysis mode, which has three configurations, and it can run in a
         comparison mode which has one configuration. The three configurations of the analysis mode have
-        the analyzeUniformity executable analyze raw data taken with RD51 Scaleable Readout System and
-        unpacked amoreSRS. In the comparison mode the analyzeUniformity executable is used to compare
+        the frameworkMain executable analyze raw data taken with RD51 Scaleable Readout System and
+        unpacked amoreSRS. In the comparison mode the frameworkMain executable is used to compare
         plots across multiple Framework output files.
 
         The 1st analysis configuration is the "series" mode which will analyze all of the input files
@@ -2250,7 +2250,7 @@
     but do not support this computing environemnt since lxplus is so readily accessible and configurable.
 
     ********ISSUE********
-    Running the analyzeUniformity executable in a MAC OS environment hangs indefinitely or seg faults
+    Running the frameworkMain executable in a MAC OS environment hangs indefinitely or seg faults
     when trying to parse the input analysis config file.  This appears to be due to the implementation of
     the standard library in MAC OS.  Specifically in the Timing::getlineNoSpaces() function declared in
     $GEM_BASE/include/TimingUtilityFunctions.h and implemented in $GEM_BASE/src/TimingUtilityFunctions.cpp.
@@ -2260,7 +2260,7 @@
     specified above.
 
     ********ISSUE********
-    Running analyzeUniformity executable on linux crashes when parsing the input analysis config file.
+    Running frameworkMain executable on linux crashes when parsing the input analysis config file.
     This is a very rare occurrence and it seems to be again coming from Timing::getlineNoSpaces();
     function declared in $GEM_BASE/include/TimingUtilityFunctions.h and implemented in
     $GEM_BASE/src/TimingUtilityFunctions.cpp.  It is believed that for some reason the function tries to
@@ -2271,7 +2271,7 @@
     both this issue and the above issue.
 
     ********ISSUE********
-    Runing analyzeUniformity gives error messages when parsing the input analysis config file stating
+    Runing frameworkMain gives error messages when parsing the input analysis config file stating
     it does not recognize a given (field, value) pair even though the field is listed in this README 
     file and have double checked that it is spelled correctly:
 
@@ -2285,9 +2285,9 @@
     understand what is going on.  Open issue.
 
     ********ISSUE********
-    When attempting to run the executable analyzeUniformity I get the following error:
+    When attempting to run the executable frameworkMain I get the following error:
 
-        ./analyzeUniformity: error while loading shared libraries:
+        ./frameworkMain: error while loading shared libraries:
         libSpectrum.so: cannot open shared object file: No such file or directory
 
     You did not run the setup script to initialize the computing environment.  Execute from the base 

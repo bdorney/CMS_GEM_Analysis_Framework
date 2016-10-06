@@ -61,18 +61,27 @@ void PlotterHisto::drawPlots(){
         m_canv->cd();
         (*iterPlot).second->Draw( m_canvInfo.m_strOptionDraw.c_str() );
         
-        //Set the style
+        //Set Style - X axis
         (*iterPlot).second->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
+        (*iterPlot).second->GetXaxis()->SetNdivisions(m_canvInfo.m_iXAxis_NDiv);
+        if( m_canvInfo.m_fXAxis_Title_Offset > 0 ){
+            (*iterPlot).second->GetXaxis()->SetTitleOffset(m_canvInfo.m_fXAxis_Title_Offset);
+        }
         if( m_canvInfo.m_bXAxis_UserRange ){
             (*iterPlot).second->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
         }
         
+        //Set Style - Y axis
         (*iterPlot).second->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
+        (*iterPlot).second->GetYaxis()->SetNdivisions(m_canvInfo.m_iYAxis_NDiv);
+        if( m_canvInfo.m_fYAxis_Title_Offset > 0 ){
+            (*iterPlot).second->GetYaxis()->SetTitleOffset(m_canvInfo.m_fYAxis_Title_Offset);
+        }
         if( m_canvInfo.m_bYAxis_UserRange ){
             (*iterPlot).second->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
         }    
         
-	//Add "same" to the draw option if it is not present already
+        //Add "same" to the draw option if it is not present already
         if ( std::distance(m_map_histos.begin(), iterPlot) > 0
             && ( m_canvInfo.m_strOptionDraw.find("same") == std::string::npos 
                 || m_canvInfo.m_strOptionDraw.find("SAME") == std::string::npos ) ) {

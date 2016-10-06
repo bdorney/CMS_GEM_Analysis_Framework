@@ -2,7 +2,6 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.3                               *
 *	VERSION: 2.2.4                               *
 *	LAST UPDATE: Oct 6 2016                      *
 *                                                *
@@ -18,6 +17,11 @@ Update: October 6th 2016
 ->Style attributes moved from QualityControl::Plotter::InfoPlot to QualityControl::Plotter::InfoCanvas
 ->Incorporating timing correction fix in SRSHit from M. Maggi
 ->Added flag for plotting legend or not in QualityControl::Plotter::PlotterGeneric
+->Added additional attributes to QualityControl::Plotter::InfoCanvas to allow for more configuration at runtime
+->QualityControl::Plotter::PlotterGraph, PlotterGraph2D, and PlotterHisto updated to take advantage of higher flexibility
+->src/analyzeUniformity.cpp has the analysis and reconstruction done in two functions runModeAnalysis() & runModeReconstruction()
+->Implemented the reconstruction and analysis mode in src/analyzeUniformity.cpp
+->src/analyzeUniformity.cpp renamed to src/frameworkMain.cpp
 
 Update: October 5th 2016
 ==================================================

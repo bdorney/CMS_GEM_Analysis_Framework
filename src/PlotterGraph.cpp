@@ -66,14 +66,23 @@ void PlotterGraph::drawPlots(){
     m_canv->cd();
     m_mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
 
-    //Set the style
+    //Set Style - X axis
     m_mgraph_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
+    m_mgraph_Obs->GetXaxis()->SetNdivisions(m_canvInfo.m_iXAxis_NDiv);
+    if( m_canvInfo.m_fXAxis_Title_Offset > 0 ){
+        m_mgraph_Obs->GetXaxis()->SetTitleOffset(m_canvInfo.m_fXAxis_Title_Offset);
+    }
 	if( m_canvInfo.m_bXAxis_UserRange ){
 	    m_mgraph_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
 	}    
 
+    //Set Style - Y axis
     m_mgraph_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
-    	if( m_canvInfo.m_bYAxis_UserRange ){
+    m_mgraph_Obs->GetYaxis()->SetNdivisions(m_canvInfo.m_iYAxis_NDiv);
+    if( m_canvInfo.m_fYAxis_Title_Offset > 0 ){
+        m_mgraph_Obs->GetYaxis()->SetTitleOffset(m_canvInfo.m_fYAxis_Title_Offset);
+    }
+    if( m_canvInfo.m_bYAxis_UserRange ){
 	    m_mgraph_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
 	}    
 

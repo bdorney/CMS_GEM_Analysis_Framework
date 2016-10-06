@@ -23,6 +23,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 *.o
 *analyzeUniformity
 *analyzeSpec
+*frameworkMain
 *genericPlotter
 
 # Figures #
