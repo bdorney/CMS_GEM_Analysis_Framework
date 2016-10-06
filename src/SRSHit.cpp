@@ -46,7 +46,7 @@ void SRSHit::Timing() {
   
   Bool_t timingStatus = kTRUE ;
   Int_t nBins = fTimeBinADCs.size() ;
-  TH1F * timeBinHist = new TH1F("timeBinHist", "timeBinHist", nBins, 0, nBins-1 ) ;
+  TH1F * timeBinHist = new TH1F("timeBinHist", "timeBinHist", nBins, 0, nBins ) ;
   for (Int_t k = 0; k < nBins; k++) {
     timeBinHist->Fill(k,fTimeBinADCs[k]) ;
   }

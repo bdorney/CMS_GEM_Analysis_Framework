@@ -808,13 +808,13 @@ std::list <SRSHit * >  SRSAPVEvent::ComputeListOfAPVHitsZS() {
 	  }
 	  
 	  // Getting the rawdata (Taking into account signed integers) and save them
-	  //	  else{
-	  float rawdata = ((float) fRawData16bits[idata]) ;
-	  if ((fRawData16bits[idata]>>8)!=0) rawdata = rawdata - 65536;
-	  rawdata = - rawdata ;
-	  //	  std::cout <<" ++++ normal time long word "<<rawdata<<std::endl;
-	  timeBinADCs.push_back(rawdata) ;
-	  
+	  else{
+	    float rawdata = ((float) fRawData16bits[idata]) ;
+	    if ((fRawData16bits[idata]>>8)!=0) rawdata = rawdata - 65536;
+	    rawdata = - rawdata ;
+	    //	  std::cout <<" ++++ normal time long word "<<rawdata<<std::endl;
+	    timeBinADCs.push_back(rawdata) ;
+	  }
           
             // Event Dump
             //cout << "fRawData16bits.size = " << size << " channel number = " << StripNo << " rawdata = " << fRawData16bits[idata] << " idata = " << idata << " hex is : " << "0x" << std::hex << fRawData16bits[idata] << std::dec << " MSB = " << (fRawData16bits[idata]>>8) << endl;

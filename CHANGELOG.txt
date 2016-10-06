@@ -3,9 +3,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.2.4                               *
-*	LAST UPDATE: Oct 5 2016                      *
+*	LAST UPDATE: Oct 6 2016                      *
 *                                                *
 **************************************************
+
+Update: October 6th 2016
+==================================================
+->Incorporating timing correction fix in SRSHit from M. Maggi
 
 Update: October 4th 2016
 ==================================================
