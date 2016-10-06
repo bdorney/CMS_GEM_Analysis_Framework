@@ -121,6 +121,7 @@ namespace QualityControl {
         }; //End InfoPlot
         
         struct InfoCanvas{
+            bool m_bDrawLeg;
             bool m_bGrid_X, m_bGrid_Y;//, bGrid_Z;      //Grid
             bool m_bIsPrelim;                   	//Write "Preliminary" after CMS
             bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;       //Logarithmic Axis
@@ -157,6 +158,7 @@ namespace QualityControl {
             
             //Constructor
             InfoCanvas(){
+                m_bDrawLeg=true;
                 m_bLog_X=m_bLog_Y=false;
                 m_bGrid_X=m_bGrid_Y=false;
                 m_bIsPrelim=true;

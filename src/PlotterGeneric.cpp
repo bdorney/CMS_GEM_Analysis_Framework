@@ -67,7 +67,9 @@ void PlotterGeneric::plotAndStore(){
     }
 
     //Draw legend
-    leg.Draw("same");
+    if (m_canvInfo.m_bDrawLeg) {
+        leg.Draw("same");
+    }
     
     //Draw "CMS"
     drawCMS();
@@ -76,7 +78,6 @@ void PlotterGeneric::plotAndStore(){
     m_canv->Update();
     m_canv->RedrawAxis();
     m_canv->GetFrame()->Draw();
-
 
     //Save output
     write2RootFile();

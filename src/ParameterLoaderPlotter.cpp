@@ -184,6 +184,9 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 //Set the dimensions
                 setParameters(vec_strCommaSepList, inputCanvInfo.m_fLegNDCPos_Y1, inputCanvInfo.m_fLegNDCPos_Y2);
             }
+            else if ( pair_strParam.first.compare("CANV_LEGEND_DRAW") == 0 ) {
+                inputCanvInfo.m_bDrawLeg = convert2bool(pair_strParam.second,bExitSuccess);
+            }
             else if ( pair_strParam.first.compare("CANV_LOG_XY") == 0 ) {
                 //Get the comma separated list
                 vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );

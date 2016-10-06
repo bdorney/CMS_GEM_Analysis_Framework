@@ -17,6 +17,7 @@ Update: October 6th 2016
 ->QualityControl::Plotter::DataPoint now has attributes for z and z_err respectively m_fZ and m_fZ_Err
 ->Style attributes moved from QualityControl::Plotter::InfoPlot to QualityControl::Plotter::InfoCanvas
 ->Incorporating timing correction fix in SRSHit from M. Maggi
+->Added flag for plotting legend or not in QualityControl::Plotter::PlotterGeneric
 
 Update: October 5th 2016
 ==================================================
