@@ -16,7 +16,10 @@
 //Framework Includes
 #include "ParameterLoaderPlotter.h"
 #include "PlotterGraph.h"
+#include "PlotterGraph2D.h"
+#include "PlotterHisto.h"
 #include "PlotterUtilityTypes.h"
+#include "QualityControlSectionNames.h"
 
 //ROOT Includes
 
@@ -206,14 +209,42 @@ int main( int argc_, char * argv_[] ){
     loaderPlots.loadParameters(file_Config, bVerboseMode, canvSetup);
     if (bVerboseMode) { printInfoCanv(canvSetup); }
     
-    //Setup the plotter
+    
+    //Determine the Plot Type, Setup the Plotter, and Plot
     //------------------------------------------------------
-    PlotterGraph graphPlotter;
-    graphPlotter.setCanvasParameters(canvSetup);
-    graphPlotter.setLogoPos(canvSetup.m_iLogoPos);
-    graphPlotter.setPreliminary(canvSetup.m_bIsPrelim);
-    graphPlotter.setOutputNameNOption("test.root","RECREATE");
-    graphPlotter.plotAndStore();
+    PlotTypesPlotter typePlot;
+    if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraphErrors ) ) {
+        PlotterGraph graphPlotter;
+        graphPlotter.setCanvasParameters(canvSetup);
+        graphPlotter.setLogoPos(canvSetup.m_iLogoPos);
+        graphPlotter.setPreliminary(canvSetup.m_bIsPrelim);
+        graphPlotter.setOutputNameNOption("plotterOutput.root","RECREATE");
+        graphPlotter.plotAndStore();
+    }
+    else if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraph2D ) ) {
+        PlotterGraph2D graphPlotter2D;
+        graphPlotter2D.setCanvasParameters(canvSetup);
+        graphPlotter2D.setLogoPos(canvSetup.m_iLogoPos);
+        graphPlotter2D.setPreliminary(canvSetup.m_bIsPrelim);
+        graphPlotter2D.setOutputNameNOption("plotterOutput.root","RECREATE");
+        graphPlotter2D.plotAndStore();
+    }
+    else if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strHisto ) ) {
+        PlotterHisto histoPlotter;
+        histoPlotter.setCanvasParameters(canvSetup);
+        histoPlotter.setLogoPos(canvSetup.m_iLogoPos);
+        histoPlotter.setPreliminary(canvSetup.m_bIsPrelim);
+        histoPlotter.setOutputNameNOption("plotterOutput.root","RECREATE");
+        histoPlotter.plotAndStore();
+    }
+    else{
+        cout<<"main() - Plot type: " << canvSetup.m_strPlotType << endl;
+        cout<<"\tNot Recognized\n";
+        cout<<"\tPlease cross-check " << vec_strInputArgs[1].c_str() << " and try again\n";
+        cout<<"\tExitting!\n";
+        
+        return -4;
+    }
     
     cout<<"Finished\n";
     

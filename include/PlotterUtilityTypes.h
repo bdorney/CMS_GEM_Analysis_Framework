@@ -33,9 +33,12 @@ namespace QualityControl {
             float m_fY;
             float m_fY_Err;
             
+            float m_fZ;
+            float m_fZ_Err;
+            
             //Constructor
             DataPoint(){
-                m_fX = m_fX_Err = m_fY = m_fY_Err = 0.;
+                m_fX = m_fX_Err = m_fY = m_fY_Err = m_fZ = m_fZ_Err = 0.;
             }
             
             //Copy Constructor
@@ -45,11 +48,14 @@ namespace QualityControl {
                 
                 m_fY      = other.m_fY;
                 m_fY_Err  = other.m_fY_Err;
+                
+                m_fZ      = other.m_fZ;
+                m_fZ_Err  = other.m_fZ_Err;
             } //End Copy Constructor
             
             //Clear container
             void clear(){
-                m_fX = m_fX_Err = m_fY = m_fY_Err = 0.;
+                m_fX = m_fX_Err = m_fY = m_fY_Err = m_fZ = m_fZ_Err = 0.;
                 return;
             }
         }; //End DataPoint
@@ -73,6 +79,7 @@ namespace QualityControl {
             //float m_fYAxis_Max;       //Max Y-Axis Value
             
             std::string m_strFileName;      //Input ROOT File where data is found
+            std::string m_strFilePath;      //Path in input ROOT File where data is found
             std::string m_strLegEntry;      //Legend Entry
             std::string m_strName;          //TName of TGraph
             //std::string m_strOptionDraw;    //Draw Option
@@ -95,6 +102,7 @@ namespace QualityControl {
                 m_fSizeMarker = 0.7;
                 
                 m_strFileName = "";
+                m_strFilePath = "";
                 //m_strOptionDraw = "E1";
                 //m_strTitle_Y = "N";
             }
@@ -102,6 +110,7 @@ namespace QualityControl {
             //Destructor
             ~InfoPlot(){
                 m_strFileName.clear();
+                m_strFilePath.clear();
                 m_strLegEntry.clear();
                 m_strName.clear();
                 //m_strOptionDraw.clear();
@@ -136,9 +145,10 @@ namespace QualityControl {
             
             std::vector<std::tuple<float, float, std::string> > m_vec_LatexNPos;
             
-            std::string m_strName;                      //TName
-            std::string m_strTitle;                     //Canvas Title
+            std::string m_strName;          //TName
             std::string m_strOptionDraw;    //Draw Option
+            std::string m_strPlotType;      //Type of Plot to be drawn
+            std::string m_strTitle;         //Canvas Title
             std::string m_strTitle_X;       //X-Axis Title
             std::string m_strTitle_Y;       //Y-Axis Title
             

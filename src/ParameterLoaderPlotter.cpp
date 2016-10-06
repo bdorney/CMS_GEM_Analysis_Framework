@@ -222,6 +222,10 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 //Placeholder
                 
             }
+            else if ( pair_strParam.first.compare("CANV_PLOT_TYPE") == 0 ) {
+                inputCanvInfo.m_strPlotType = pair_strParam.second;
+                transform(inputCanvInfo.m_strPlotType.begin(), inputCanvInfo.m_strPlotType.end(), inputCanvInfo.m_strPlotType.begin(), toupper);
+            }
             else if ( pair_strParam.first.compare("CANV_RANGE_X") == 0 ) {
                 //Get the comma separated list
                 vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
@@ -355,6 +359,12 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
             }
             else if ( pair_strParam.first.compare("PLOT_NAME") == 0 ) {
                 inputPlotInfo.m_strName = pair_strParam.second;
+            }
+            else if ( pair_strParam.first.compare("PLOT_ROOT_FILE") == 0 ) {
+                inputPlotInfo.m_strFileName = pair_strParam.second;
+            }
+            else if ( pair_strParam.first.compare("PLOT_ROOT_PATH") == 0 ) {
+                inputPlotInfo.m_strFilePath = pair_strParam.second;
             }
             else{ //Case: Parameter Not Recognized
                 cout<<"ParameterLoaderPlotter::loadParametersPlot(): input field name:\n";

@@ -106,6 +106,19 @@ namespace QualityControl {
                 m_strColY_Err = "VAR_DEP_ERR";
             } //End Constructor
         }; //End ColNamesPlotter
+        
+        struct PlotTypesPlotter{
+            std::string m_strGraphErrors;
+            std::string m_strGraph2D;
+            std::string m_strHisto;
+            
+            //Constructor
+            PlotTypesPlotter(){
+                m_strGraphErrors = "TGRAPHERRORS";
+                m_strGraph2D = "TGRAPH2D";
+                m_strHisto = "TH1F";
+            }
+        }; //End PlotTypesPlotter
     } //End namespace Plotter
 } //End namespace Quality Control
 

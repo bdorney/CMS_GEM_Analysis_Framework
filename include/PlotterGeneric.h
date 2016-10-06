@@ -81,6 +81,11 @@ namespace QualityControl {
                 return;
             }
             
+            virtual void setMonoColor(bool bInput){
+                m_bMonoColor = bInput;
+                return;
+            }
+            
             //True -> "CMS Preliminary"
             //False -> "CMS"
             virtual void setPreliminary(bool bInput){
@@ -161,6 +166,7 @@ namespace QualityControl {
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
             bool m_bIsPrelim;
+            bool m_bMonoColor;
             bool m_bSaveCanvases;
             
             int m_iLogoPos; //Determines CMS Logo position

@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef ____PlotterGraph__
-#define ____PlotterGraph__
+#ifndef ____PlotterGraph2D__
+#define ____PlotterGraph2D__
 
 //C++ Includes
 #include <map>
@@ -21,27 +21,25 @@
 
 //ROOT Includes
 #include "TFile.h"
-#include "TGraphErrors.h"
+//#include "TGraphErrors.h"
+#include "TGraph2D.h"
 #include "TLegend.h"
-#include "TMultiGraph.h"
+//#include "TMultiGraph.h"
 #include "TROOT.h"
 
 namespace QualityControl {
     namespace Plotter {
-        class PlotterGraph : public PlotterGeneric {
+        class PlotterGraph2D : public PlotterGeneric {
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            PlotterGraph();
+            PlotterGraph2D();
             
             //Destructor
             //------------------------------------------------------------------------------------------------------------------------------------------
-            ~PlotterGraph(){
-                //m_canv.reset();
-                //m_tdrStyle.reset();
-                m_map_graphs.clear();
-                m_mgraph_Obs.reset();
+            ~PlotterGraph2D(){
+                m_g2D_Obs.reset();
             }
             
             //Actions - Methods that Do Something
@@ -85,12 +83,14 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            //std::map<std::string, std::shared_ptr<TGraph2D> > m_map_g2D;
             
-            std::shared_ptr<TMultiGraph> m_mgraph_Obs;
-        };
+            std::shared_ptr<TGraph2D> m_g2D_Obs;
+            
+            //std::shared_ptr<TMultiGraph> mgraph_Obs;
+        }; //End class PlotterGraph2D
     } //End namespace Plotter
 } //End namespace QualityControl
 
 
-#endif /* defined(____PlotterGraph__) */
+#endif /* defined(____PlotterGraph2D__) */

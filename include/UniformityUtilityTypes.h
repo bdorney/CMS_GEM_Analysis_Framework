@@ -188,10 +188,10 @@ namespace QualityControl {
             
             //Set Initial Values
             Hit(){
-		fPos_Y = -1.;
+                fPos_Y = -1.;
 
                 //iPos_Y = iStripNum = iTimeBin = -1;
-		iStripNum = iTimeBin = -1;                
+                iStripNum = iTimeBin = -1;
 
                 sADCIntegral = 0;
                 
@@ -216,7 +216,7 @@ namespace QualityControl {
             //Set Initial Values
             Cluster(){
                 //iPos_Y = iSize = iTimeBin = -1;
-		iSize = iTimeBin = -1;                
+                iSize = iTimeBin = -1;                
 
                 fPos_X = fPos_Y = fADC = -1.;
             } //End initialization

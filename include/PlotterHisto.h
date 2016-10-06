@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef ____PlotterGraph__
-#define ____PlotterGraph__
+#ifndef ____PlotterHisto__
+#define ____PlotterHisto__
 
 //C++ Includes
 #include <map>
@@ -21,27 +21,25 @@
 
 //ROOT Includes
 #include "TFile.h"
-#include "TGraphErrors.h"
+#include "TH1F.h"
+//#include "TGraphErrors.h"
 #include "TLegend.h"
-#include "TMultiGraph.h"
+//#include "TMultiGraph.h"
 #include "TROOT.h"
 
 namespace QualityControl {
     namespace Plotter {
-        class PlotterGraph : public PlotterGeneric {
+        class PlotterHisto : public PlotterGeneric {
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            PlotterGraph();
+            PlotterHisto();
             
             //Destructor
             //------------------------------------------------------------------------------------------------------------------------------------------
-            ~PlotterGraph(){
-                //m_canv.reset();
-                //m_tdrStyle.reset();
-                m_map_graphs.clear();
-                m_mgraph_Obs.reset();
+            ~PlotterHisto(){
+                m_map_histos.clear();
             }
             
             //Actions - Methods that Do Something
@@ -85,9 +83,10 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            //std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            std::map<std::string, std::shared_ptr<TH1F> > m_map_histos;
             
-            std::shared_ptr<TMultiGraph> m_mgraph_Obs;
+            //std::shared_ptr<TMultiGraph> mgraph_Obs;
         };
     } //End namespace Plotter
 } //End namespace QualityControl

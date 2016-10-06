@@ -12,13 +12,14 @@ using std::cout;
 using std::endl;
 using std::make_shared;
 using std::shared_ptr;
+using std::string;
 
 using namespace QualityControl::Plotter;
 
 //Constructor
-PlotterGraph::PlotterGraph() : mgraph_Obs(new TMultiGraph) {
+PlotterGraph::PlotterGraph() : m_mgraph_Obs(new TMultiGraph) {
     
-    mgraph_Obs->SetName("mgraph_Obs");
+    m_mgraph_Obs->SetName("m_mgraph_Obs");
 } //End
 
 void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
@@ -48,7 +49,7 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     graphPtr->SetMarkerSize(plotInfo.m_fSizeMarker);
     
     //Add to the multigraph
-    mgraph_Obs->Add( graphPtr.get() );
+    m_mgraph_Obs->Add( graphPtr.get() );
     
     //Add to the Legend
     inputLegend.AddEntry(graphPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
@@ -63,22 +64,22 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 void PlotterGraph::drawPlots(){
     //Draw (root hack)
     m_canv->cd();
-    mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+    m_mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
 
     //Set the style
-    mgraph_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
+    m_mgraph_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
 	if( m_canvInfo.m_bXAxis_UserRange ){
-	    mgraph_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
+	    m_mgraph_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
 	}    
 
-    mgraph_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
+    m_mgraph_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
     	if( m_canvInfo.m_bYAxis_UserRange ){
-	    mgraph_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
+	    m_mgraph_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
 	}    
 
     //Draw (for realz)
     m_canv->cd();
-    mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+    m_mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
     
     return;
 } //End PlotterGraph::drawPlots()
@@ -110,8 +111,15 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
         
         TFile * file_Input = new TFile(plotInfo.m_strFileName.c_str(), "READ" );
         
+        //Setup TObject name w/path
+        string strTmpName = plotInfo.m_strName;
+        if (plotInfo.m_strFilePath.length() > 0) {
+            strTmpName = plotInfo.m_strFilePath + "/" + strTmpName;
+        }
+        
         //TGraphErrors graph
-        shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
+        //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
+        shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( strTmpName.c_str() ) ) );
         
         m_map_graphs[plotInfo.m_strName]=graphPtr;
         
