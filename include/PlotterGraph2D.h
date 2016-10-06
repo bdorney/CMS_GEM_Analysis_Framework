@@ -14,6 +14,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <tuple>
 
 //Framework Includes
 #include "PlotterGeneric.h"
@@ -65,6 +66,8 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
             
+	    virtual void drawLatex(std::tuple<float, float, std::string> tupleTexLine, float fInputAngle);
+
             //To be over-ridded by inherited classes
             virtual void drawPlots();
             

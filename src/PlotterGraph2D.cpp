@@ -10,9 +10,11 @@
 
 using std::cout;
 using std::endl;
+using std::get;
 using std::make_shared;
 using std::shared_ptr;
 using std::string;
+using std::tuple;
 
 using namespace QualityControl::Plotter;
 
@@ -45,18 +47,54 @@ void PlotterGraph2D::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     return;
 } //End PlotterGraph2D::addPlot()
 
+void PlotterGraph2D::drawLatex(std::tuple<float, float, std::string> tupleTexLine, float fInputAngle){
+    //Define the latexLine
+    TLatex latex;
+    
+    //Set the Latex style
+    latex.SetTextFont(42);
+    latex.SetTextAngle(fInputAngle);
+    latex.SetTextColor(kBlack);
+    latex.SetTextSize(0.04);
+    latex.SetTextAlign(12);
+    
+	if( get<0>(tupleTexLine) < 0 ){
+		latex.SetText(0, 0, (get<2>(tupleTexLine) ).c_str() );
+		//cout<<"m_canv->GetLeftMargin() = " << m_canv->GetLeftMargin() << endl;
+		//cout<<"m_canv->GetRightMargin() = " << m_canv->GetRightMargin() << endl;
+		//cout<<"latex.GetXsize() = " << latex.GetXsize() << endl;
+		//get<0>(tupleTexLine) = 1 - m_canv->GetLeftMargin() - m_canv->GetRightMargin() - latex.GetXsize();
+		get<0>(tupleTexLine) = 1 - m_canv->GetRightMargin() - latex.GetXsize();
+	}
+
+	if( get<1>(tupleTexLine) < 0 ){
+		latex.SetText(0, 0, (get<2>(tupleTexLine) ).c_str() );
+		//cout<<"m_canv->GetLeftMargin() = " << m_canv->GetLeftMargin() << endl;
+		//cout<<"m_canv->GetRightMargin() = " << m_canv->GetRightMargin() << endl;
+		//cout<<"latex.GetXsize() = " << latex.GetXsize() << endl;
+		//get<0>(tupleTexLine) = 1 - m_canv->GetLeftMargin() - m_canv->GetRightMargin() - latex.GetXsize();
+		get<1>(tupleTexLine) = 1 - m_canv->GetBottomMargin() - latex.GetXsize();
+	}
+
+    //Draw
+    m_canv->cd();
+    latex.DrawLatexNDC(get<0>(tupleTexLine), get<1>(tupleTexLine), (get<2>(tupleTexLine) ).c_str() );
+    
+    return;
+} //End PlotterGeneric::drawLatex()
+
 void PlotterGraph2D::drawPlots(){
     //Draw (root hack so axis pointers exist)
     m_canv->cd();
-    m_g2D_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+    m_g2D_Obs->Draw( "P" );
 
-    //Set the style
+    //Make the palette monocolored?
     if (m_bMonoColor) {
         const Int_t NRGBs = 5;
         const Int_t NCont = 255;
         Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
         Double_t red[NRGBs]   = { 0.00, 0.00, 0.00, 0.00, 0.00 };
-        Double_t green[NRGBs] = { 0.00, 0.00, 0.00, 0.00, 0.00 };
+        Double_t green[NRGBs] = { 0.05, 0.10, 0.15, 0.2, 0.25 };
         Double_t blue[NRGBs]  = { 0.6, 0.7, 0.8, 0.9, 1.00 };
         TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
         m_tdrStyle->SetNumberContours(NCont);
@@ -64,21 +102,67 @@ void PlotterGraph2D::drawPlots(){
         m_tdrStyle->cd();
     }
 
+    //hack to get the axis drawn correctly
+    auto histo = m_g2D_Obs->GetHistogram();
+
+    //Set Style - X axis
     m_g2D_Obs->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
+    m_g2D_Obs->GetXaxis()->SetNdivisions(m_canvInfo.m_iXAxis_NDiv);
+    if( m_canvInfo.m_fXAxis_Title_Offset > 0 ){
+	m_g2D_Obs->GetXaxis()->SetTitleOffset(m_canvInfo.m_fXAxis_Title_Offset);
+    }
     if( m_canvInfo.m_bXAxis_UserRange ){
         m_g2D_Obs->GetXaxis()->SetRangeUser(m_canvInfo.m_fXAxis_Min, m_canvInfo.m_fXAxis_Max);
     }
     
+    //Set Style - X axis
     m_g2D_Obs->GetYaxis()->SetTitle(m_canvInfo.m_strTitle_Y.c_str() );
+    m_g2D_Obs->GetYaxis()->SetNdivisions(m_canvInfo.m_iYAxis_NDiv);
+    if( m_canvInfo.m_fYAxis_Title_Offset > 0 ){
+	m_g2D_Obs->GetYaxis()->SetTitleOffset(m_canvInfo.m_fYAxis_Title_Offset);
+    }
     if( m_canvInfo.m_bYAxis_UserRange ){
         m_g2D_Obs->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
     }
     
+    //Set Style - X axis
+    m_g2D_Obs->GetZaxis()->SetTitle(m_canvInfo.m_strTitle_Z.c_str() );
+	//m_g2D_Obs->GetZaxis()->SetDecimals(true);
+    if( m_canvInfo.m_fZAxis_Title_Offset > 0 ){
+	m_g2D_Obs->GetZaxis()->SetTitleOffset(m_canvInfo.m_fZAxis_Title_Offset);
+    }
+    if( m_canvInfo.m_bZAxis_UserRange ){
+        m_g2D_Obs->GetZaxis()->SetRangeUser(m_canvInfo.m_fZAxis_Min, m_canvInfo.m_fZAxis_Max);
+    }
+
     //Draw (for realz)
     m_canv->cd();
     m_g2D_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
     m_canv->SetTheta(90);
     m_canv->SetPhi(0.001);
+
+	string strTempDrawOpt = m_canvInfo.m_strOptionDraw;
+	transform(strTempDrawOpt.begin(),strTempDrawOpt.end(),strTempDrawOpt.begin(), toupper);
+
+	//Draw Axis labels in special case
+    /*if( strTempDrawOpt.find("TRI2Z") != std::string::npos 
+	|| strTempDrawOpt.find("COLZ") != std::string::npos 
+	|| strTempDrawOpt.find("SURF") != std::string::npos ){
+		//Draw X-Axis Label
+		float fAxisTitlePos_Y = 0.4 * m_canv->GetBottomMargin();
+		tuple<float,float,string> tuple_texLine = std::make_tuple(-1,fAxisTitlePos_Y,m_canvInfo.m_strTitle_X);
+		drawLatex(tuple_texLine,0);
+
+		//Draw Y-Axis Label
+		float fAxisTitlePos_X = 0.15 * m_canv->GetLeftMargin();
+		tuple_texLine = std::make_tuple(fAxisTitlePos_X,-1,m_canvInfo.m_strTitle_Y);
+		drawLatex(tuple_texLine,90);
+
+		//Draw Z-Axis Label
+		fAxisTitlePos_X = 1. - 0.15 * m_canv->GetRightMargin();
+		tuple_texLine = std::make_tuple(fAxisTitlePos_X,-1,m_canvInfo.m_strTitle_Z);
+		drawLatex(tuple_texLine,90);
+	}*/
     
     return;
 } //End PlotterGraph2D::drawPlots()

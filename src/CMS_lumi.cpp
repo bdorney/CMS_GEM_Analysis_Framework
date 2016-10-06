@@ -114,7 +114,7 @@ void CMSLumi::drawLumi( std::shared_ptr<TPad> pad, int iPeriod, int iPosX ) {
     
     std::cout << strLumiText << endl;
     
-    TLatex latex;
+    TLatex latex, latex_CMS;
     latex.SetNDC();
     latex.SetTextAngle(0);
     latex.SetTextColor(kBlack);
@@ -132,6 +132,7 @@ void CMSLumi::drawLumi( std::shared_ptr<TPad> pad, int iPeriod, int iPosX ) {
         latex.SetTextAlign(11);
         latex.SetTextSize(m_fCmsTextSize*t);
         latex.DrawLatex(l,1-t+m_fLumiTextOffset*t,m_strCmsText.c_str() );
+	latex_CMS.SetText(l,1-t+m_fLumiTextOffset*t,m_strCmsText.c_str() );
     }
     
     pad->cd();
@@ -187,7 +188,7 @@ void CMSLumi::drawLumi( std::shared_ptr<TPad> pad, int iPeriod, int iPosX ) {
     {
         if( iPosX==0)
         {
-            posX_ =   l +  m_fRelPosX*(1-l-r);
+            posX_ =   l + m_fRelPosX*(1-l-r) + latex_CMS.GetXsize();
             posY_ =   1-t+m_fLumiTextOffset*t;
         }
         latex.SetTextFont(m_fExtraTextFont);

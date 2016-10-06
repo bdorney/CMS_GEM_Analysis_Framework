@@ -129,9 +129,13 @@ namespace QualityControl {
             
             bool m_bXAxis_UserRange;  //Use Range Specified by User
             bool m_bYAxis_UserRange;  //Use Range Specified by User
+            bool m_bZAxis_UserRange;  //Use Range Specified by User
             
             int m_iLogoPos;                   		//Position of "CMS" or "CMS Preliminary"
             int m_iSize_X, m_iSize_Y;                   //Canvas Size
+
+            int m_iXAxis_NDiv;      			//N Divisions for X axis
+            int m_iYAxis_NDiv;      			//N Divisions for Y axis
             
             float m_fLegNDCPos_X1, m_fLegNDCPos_X2;     //NDC X-Position of Legend
             float m_fLegNDCPos_Y1, m_fLegNDCPos_Y2;     //NDC Y-Position of Legend
@@ -141,9 +145,15 @@ namespace QualityControl {
             
             float m_fXAxis_Min;       //Min X-Axis Value
             float m_fXAxis_Max;       //Max X-Axis Value
+            float m_fXAxis_Title_Offset;       //X-Axis Title Offset
             
             float m_fYAxis_Min;       //Min Y-Axis Value
             float m_fYAxis_Max;       //Max Y-Axis Value
+            float m_fYAxis_Title_Offset;       //Y-Axis Title Offset
+
+            float m_fZAxis_Min;       //Min Z-Axis Value
+            float m_fZAxis_Max;       //Max Z-Axis Value
+            float m_fZAxis_Title_Offset;    	//Z-Axis Title Offset
             
             std::vector<std::tuple<float, float, std::string> > m_vec_LatexNPos;
             
@@ -153,6 +163,7 @@ namespace QualityControl {
             std::string m_strTitle;         //Canvas Title
             std::string m_strTitle_X;       //X-Axis Title
             std::string m_strTitle_Y;       //Y-Axis Title
+            std::string m_strTitle_Z;       //Z-Axis Title
             
             std::map<std::string, InfoPlot> m_map_infoPlot;
             
@@ -166,13 +177,21 @@ namespace QualityControl {
 
                 m_bXAxis_UserRange    = false;
                 m_bYAxis_UserRange    = false;
+                m_bZAxis_UserRange    = false;
                 
                 m_iLogoPos=11;                
                 m_iSize_X=m_iSize_Y=700;
-                
+
+                m_iXAxis_NDiv = 510;
+                m_iYAxis_NDiv = 510;              
+
                 m_fLegNDCPos_X1=m_fLegNDCPos_X2=-1;
                 m_fLegNDCPos_Y1=m_fLegNDCPos_Y2=-1;
                 
+		m_fXAxis_Title_Offset=-1;
+		m_fYAxis_Title_Offset=-1;
+		m_fZAxis_Title_Offset=-1;
+
                 m_fMargin_Top=0.08;
                 m_fMargin_Bot=0.12;
                 m_fMargin_Lf=0.15;

@@ -143,8 +143,15 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
             std::transform(strTmp.begin(), strTmp.end(), strTmp.begin(), toupper);
             
             pair_strParam.first = strTmp;
-            
-            if ( pair_strParam.first.compare("CANV_DIM") == 0 ) {
+
+            if ( pair_strParam.first.compare("CANV_AXIS_NDIV") == 0 ) {
+                //Get the comma separated list
+                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
+                
+                //Set the dimensions
+                setParameters(vec_strCommaSepList, inputCanvInfo.m_iXAxis_NDiv, inputCanvInfo.m_iYAxis_NDiv);
+            }            
+            else if ( pair_strParam.first.compare("CANV_DIM") == 0 ) {
                 //Get the comma separated list
                 vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
                 
@@ -264,13 +271,42 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 }
                 
                 //Update the flag
-                inputCanvInfo.m_bXAxis_UserRange = true;
+                inputCanvInfo.m_bYAxis_UserRange = true;
+            }
+            else if ( pair_strParam.first.compare("CANV_RANGE_Z") == 0 ) {
+                //Get the comma separated list
+                vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
+                
+                //Set the dimensions
+                setParameters(vec_strCommaSepList, inputCanvInfo.m_fZAxis_Min, inputCanvInfo.m_fZAxis_Max);
+                
+                //Check max & min are set correctly
+                if(inputCanvInfo.m_fZAxis_Max < inputCanvInfo.m_fZAxis_Min){
+                    float fTemp = inputCanvInfo.m_fZAxis_Min;
+                    inputCanvInfo.m_fZAxis_Min = inputCanvInfo.m_fZAxis_Max;
+                    inputCanvInfo.m_fZAxis_Max = fTemp;
+                }
+                
+                //Update the flag
+                inputCanvInfo.m_bZAxis_UserRange = true;
+            }
+	    else if ( pair_strParam.first.compare("CANV_TITLE_OFFSET_X") == 0 ) {
+                inputCanvInfo.m_fXAxis_Title_Offset = stof(pair_strParam.second);
+            }
+	    else if ( pair_strParam.first.compare("CANV_TITLE_OFFSET_Y") == 0 ) {
+                inputCanvInfo.m_fYAxis_Title_Offset = stof(pair_strParam.second);
+            }
+	    else if ( pair_strParam.first.compare("CANV_TITLE_OFFSET_Z") == 0 ) {
+                inputCanvInfo.m_fZAxis_Title_Offset = stof(pair_strParam.second);
             }
             else if ( pair_strParam.first.compare("CANV_TITLE_X") == 0 ) {
                 inputCanvInfo.m_strTitle_X = pair_strParam.second;
             }
             else if ( pair_strParam.first.compare("CANV_TITLE_Y") == 0 ) {
                 inputCanvInfo.m_strTitle_Y = pair_strParam.second;
+            }
+            else if ( pair_strParam.first.compare("CANV_TITLE_Z") == 0 ) {
+                inputCanvInfo.m_strTitle_Z = pair_strParam.second;
             }
             else{ //Case: Parameter Not Recognized
                 cout<<"ParameterLoaderPlotter::loadParametersCanvas(): input field name:\n";

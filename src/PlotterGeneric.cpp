@@ -311,7 +311,8 @@ void PlotterGeneric::setStyle(){
     // For the axis:
     
     m_tdrStyle->SetAxisColor(1, "XYZ");
-    m_tdrStyle->SetStripDecimals(kTRUE);
+    //m_tdrStyle->SetStripDecimals(kTRUE);
+    m_tdrStyle->SetStripDecimals(kFALSE);
     m_tdrStyle->SetTickLength(0.03, "XYZ");
     m_tdrStyle->SetNdivisions(510, "XYZ");
     m_tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
