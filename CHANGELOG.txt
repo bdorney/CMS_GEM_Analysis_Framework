@@ -22,6 +22,7 @@ Update: October 6th 2016
 ->src/analyzeUniformity.cpp has the analysis and reconstruction done in two functions runModeAnalysis() & runModeReconstruction()
 ->Implemented the reconstruction and analysis mode in src/analyzeUniformity.cpp
 ->src/analyzeUniformity.cpp renamed to src/frameworkMain.cpp
+->Updated printHelpMenu in src/frameworkMain.cpp
 
 Update: October 5th 2016
 ==================================================

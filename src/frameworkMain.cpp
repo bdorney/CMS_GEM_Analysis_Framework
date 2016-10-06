@@ -69,11 +69,15 @@ void printHelpMenu(){
     cout<<"\tExamples of each header are shown below.";
     cout<<endl;
     cout<<"\tIncluding the 'run info' header will use the input files to produce a framework output file\n";
-    cout<<"\tHere you must have a Config_Analysis & Config_Mapping file, examples of Config_Analysis shown below\n";
-    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file, default files are included in $GEM_BASE/config/\n";
+    cout<<"\tHere you must have Config_Analysis, Config_Mapping, and Config_Reco files; example of Config_Analysis shown below\n";
+    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file while the Config_Reco file is your 'amore.cfg' file.
+    cout<<"\tdefault files are included in $GEM_BASE/config/\n";
     cout<<endl;
     cout<<"\tIf Including the 'compare info' header the input must be framework output files\n";
     cout<<"\t These input files must be have been produced when running with a 'run info' header\n";
+    cout<<endl;
+    cout<<"\tIf running reconstruction the input must be an RD51 SRS output file (e.g. *.raw)\n"
+    cout<<"\tFor each call of the executable only one *.raw file should be in the input run list\n";
     cout<<endl;
     cout<<"\tIf you have both a 'run info' and a 'compare info' header only the last one will be used\n";
     
@@ -100,14 +104,16 @@ void printHelpMenu(){
     cout<<"\t(omit angle brackets, i.e. <. and >)\n";
     cout<<endl;
     cout<<"\t[BEGIN_RUN_INFO]\n";
+    cout<<"\t\Config_Reco = <PHYSICAL FILENAME OF RECO CONFIG FILE>';\n";
     cout<<"\t\tConfig_Analysis = '<PHYSICAL FILENAME OF ANALYSIS CONFIG FILE>'\n";
     cout<<"\t\tConfig_Mapping = '<PHYSICAL FILENAME OF MAPPING CONFIG FILE>';\n";
+    cout<<"\t\Detector_Name = '<DETECTOR SERIAL NUMBER WITHOUT / CHAR>';\n";
     cout<<"\t\tInput_Is_Frmwrk_Output = '<ANALYZE PREVIOUS OUTPUT true/false>';\n";
     cout<<"\t\tInput_Identifier = '<STRING IDENTIFIER FOUND IN FILENAME>';\n";
     cout<<"\t\tOutput_File_Name = '<OUTPUT ROOT FILE NAME>';\n";
     cout<<"\t\tOutput_File_Option = '<OPTION FOR OUTPUT ROOT FILE (e.g. CREATE, RECRETAE, UPDATE, etc...)>';\n";
     cout<<"\t\tOutput_Individual = '<OUTPUT ONE ROOT FILE PER INPUT RUN true/false>';\n";
-    cout<<"\t\tAna_Reco_Clusters = '<RECONSTRUCT CLUSTERS FROM THIT TREE true/false>';\n";
+    cout<<"\t\tReco_All = '<RECONSTRUCT RAW FILE true/false>';\n";
     cout<<"\t\tAna_Hits = '<PERFORM THE HIT ANALYSIS true/false>';\n";
     cout<<"\t\tAna_Clusters = '<PERFORM THE CLUSTER ANALYSIS true/false>';\n";
     cout<<"\t\tAna_Fitting = '<FIT OUTPUT HISTOGRAMS true/false>';\n";
@@ -161,6 +167,10 @@ void printHelpMenu(){
     cout<<"\t\t\tUniformity_Granularity = '<INTEGER>';\n";
     cout<<"\t\t\t[BEGIN_ADC_FIT_INFO]\n";
     cout<<"\t\t\t\tFit_Formula = '<STRING>';\n";
+    cout<<"\t\t\t\tFit_Formula_Sig = '<SIGNAL PORTION OF Fit_Formula>';\n";
+    cout<<"\t\t\t\tFit_Formula_Sig_Param_Idx_Range = '<IDX RANGE OF PARAMETERS IN Fit_Formula FOR SIGNAL>';\n";
+    cout<<"\t\t\t\tFit_Formula_Bkg = '<BACKGROUND PORTION OF Fit_Formula>';\n";
+    cout<<"\t\t\t\tFit_Formula_Bkg_Param_Idx_Range = '<IDX RANGE OF PARAMETERS IN Fit_Formula FOR BACKGROUND>';\n";
     cout<<"\t\t\t\tFit_Option = '<STRING>';\n";
     cout<<"\t\t\t\tFit_Param_Map = '<COMMA SEPARATED LIST OF STRINGS (SEE README.txt)>';\n";
     cout<<"\t\t\t\tFit_Param_IGuess = '<COMMA SEPARATED LIST OF STRINGS (SEE README.txt)>';\n";
