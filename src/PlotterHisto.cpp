@@ -72,6 +72,13 @@ void PlotterHisto::drawPlots(){
             (*iterPlot).second->GetYaxis()->SetRangeUser(m_canvInfo.m_fYAxis_Min, m_canvInfo.m_fYAxis_Max);
         }    
         
+	//Add "same" to the draw option if it is not present already
+        if ( std::distance(m_map_histos.begin(), iterPlot) > 0
+            && ( m_canvInfo.m_strOptionDraw.find("same") == std::string::npos 
+                || m_canvInfo.m_strOptionDraw.find("SAME") == std::string::npos ) ) {
+            m_canvInfo.m_strOptionDraw = "same" + m_canvInfo.m_strOptionDraw;
+        }
+
         //Draw (for realz)
         m_canv->cd();
         (*iterPlot).second->Draw( m_canvInfo.m_strOptionDraw.c_str() );
