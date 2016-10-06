@@ -27,8 +27,8 @@ using namespace QualityControl::Uniformity;
 ParameterLoader::ParameterLoader(){
     m_bVerboseMode_IO       = false;
     
-    m_strSecBegin_RunList   = "[BEGIN_RUN_LIST]";
-    m_strSecEnd_RunList     = "[END_RUN_LIST]";
+    //m_strSecBegin_RunList   = "[BEGIN_RUN_LIST]";
+    //m_strSecEnd_RunList     = "[END_RUN_LIST]";
 }
 
 //Opens a text file set by the user and loads the requested parameters
@@ -89,14 +89,14 @@ std::vector<std::pair<int, string> > ParameterLoader::getPairedRunList(ifstream 
 	//cout<<"strLine = " << strLine << endl;
 
         //Check for start of run list header
-        if ( strLine.compare( m_strSecBegin_RunList ) == 0 ) { //Case: Run list header
+        if ( strLine.compare( m_headers_Run.m_strSecBegin_RunList ) == 0 ) { //Case: Run list header
             
             while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through run list header
                 //Skip commented lines
                 if (strLine.compare(0,1,"#") == 0 ) continue;
                 
                 //Has the header ended?
-                if ( strLine.compare( m_strSecEnd_RunList ) == 0 ) { //Case: End of run list header
+                if ( strLine.compare( m_headers_Run.m_strSecEnd_RunList ) == 0 ) { //Case: End of run list header
                     if (bVerboseMode) { //Case: User Requested Verbose Input/Output
                         cout<<"ParameterLoader::getPairedRunList(): End of run list header reached!\n";
                         cout<<"ParameterLoader::getPairedRunList(): The following runs will be analyzed:\n";
@@ -159,14 +159,14 @@ vector<string> ParameterLoader::getRunList(ifstream &file_Input, bool bVerboseMo
         if (strLine.compare(0,1,"#") == 0) continue;
         
         //Check for start of run list header
-        if ( strLine.compare( m_strSecBegin_RunList ) == 0 ) { //Case: Run list header
+        if ( strLine.compare( m_headers_Run.m_strSecBegin_RunList ) == 0 ) { //Case: Run list header
             
             while ( getlineNoSpaces(file_Input, strLine) ) { //Loop through run list header
                 //Skip commented lines
                 if (strLine.compare(0,1,"#") == 0 ) continue;
                 
                 //Has the header ended?
-                if ( strLine.compare( m_strSecEnd_RunList ) == 0 ) { //Case: End of run list header
+                if ( strLine.compare( m_headers_Run.m_strSecEnd_RunList ) == 0 ) { //Case: End of run list header
                     if (bVerboseMode) { //Case: User Requested Verbose Input/Output
                         cout<<"ParameterLoader::getRunList(): End of run list header reached!\n";
                         cout<<"ParameterLoader::getRunList(): The following runs will be analyzed:\n";

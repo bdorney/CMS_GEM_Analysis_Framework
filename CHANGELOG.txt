@@ -3,11 +3,12 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.2.3                               *
+*	VERSION: 2.2.4                               *
 *	LAST UPDATE: Oct 6 2016                      *
 *                                                *
 **************************************************
 
-Update: October 5th 2016
+Update: October 6th 2016
 ==================================================
 ->Added new class QualityControl::Plotter::PlotterGraph2D inheriting from PlotterGeneric for making plots of TGraph2D objects
 ->Added new class QualityControl::Plotter::PlotterHisto inheriting from PlotterGeneric for making plots of TH1F objects
@@ -15,6 +16,7 @@ Update: October 5th 2016
 ->Now genericPlotter will understand what type of TObject it should plot
 ->QualityControl::Plotter::DataPoint now has attributes for z and z_err respectively m_fZ and m_fZ_Err
 ->Style attributes moved from QualityControl::Plotter::InfoPlot to QualityControl::Plotter::InfoCanvas
+->Incorporating timing correction fix in SRSHit from M. Maggi
 
 Update: October 5th 2016
 ==================================================
@@ -26,6 +28,20 @@ Update: October 5th 2016
 ->QualityControl::Plotter::ParameterLoaderPlotter class implemented and tested
 ->Added new class QualityControl::Plotter::PlotterGeneric for making plots
 ->Added new class QualityControl::Plotter::PlotterGraph inheriting from PlotterGeneric for making plots of TGraphError objects
+
+Update: October 4th 2016
+==================================================
+->Adding event unpacking/decoding and reconstruction classes from amoreSRS
+->The Run Config file field of "Ana_Reco_Clusters" is renamed to "Reco_All"
+->QualityControl::Uniformity::RunSetup::bAnaStep_Reco renamed to bRecoStep_All
+->Minor bug fixes to SRSMapping methods: GetPlaneOrientation(), GetNbOfAPVs(), GetSizeOfPlane(), and GetPlaneIDorEtaSector()
+->Minor bug fixes to SRSOutputROOT::WriteRootFile() and SRSOutputROOT::InitRootFile()
+->Renamed QualityControl::Uniformity::ParameterLoaderAmoreSRS to ParameterLoaderDetector
+->Added new struct QualityControl::Uniformity::RunModes to include/QualityControlSectionNames.h
+->QualityControlUniformity::ParameterLoaderRun now determines the possible running modes {Ana, Comp, Reco, RecoPlusAna} and stores them using RunModes
+->SRSOutputROOT will no longer create a TBranch called etaSector in either THit or TCluster
+->SRSOutputROOT will now store the planeID TBranch as type float in both THit and TCluster
+->Standalone reconstruction mode is now implemented
 
 Update: October 3rd 2016
 ==================================================

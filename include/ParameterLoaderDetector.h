@@ -1,13 +1,13 @@
 //
-//  ParameterLoaderAmoreSRS.h
+//  ParameterLoaderDetector.h
 //  
 //
 //  Created by Brian L Dorney on 26/01/16.
 //
 //
 
-#ifndef ____ParameterLoaderAmoreSRS__
-#define ____ParameterLoaderAmoreSRS__
+#ifndef ____ParameterLoaderDetector__
+#define ____ParameterLoaderDetector__
 
 //C++ Includes
 #include <algorithm>
@@ -25,16 +25,16 @@
 
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderAmoreSRS : public ParameterLoader{
+        class ParameterLoaderDetector : public ParameterLoader{
             
         private:
-            DetectorMPGD det_GE11;  //Link to header file in ParameterLoaderAmoreSRS.cpp file
+            DetectorMPGD det_GE11;  //Link to header file in ParameterLoaderDetector.cpp file
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderAmoreSRS();
+            ParameterLoaderDetector();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------

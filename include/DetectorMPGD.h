@@ -32,10 +32,10 @@
 //using namespace ROOT;
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderAmoreSRS;  //Defined in "ParameterLoaderAmoreSRS.h"
+        class ParameterLoaderDetector;  //Defined in "ParameterLoaderDetector.h"
         
         class DetectorMPGD {
-            friend class ParameterLoaderAmoreSRS;
+            friend class ParameterLoaderDetector;
             friend class AnalyzeResponseUniformity;
             friend class AnalyzeResponseUniformityClusters;
             friend class AnalyzeResponseUniformityHits;

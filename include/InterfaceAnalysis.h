@@ -53,9 +53,7 @@ namespace QualityControl {
             
             //As above, but resets vec_strRunList to be a single file
             virtual void analyzeInput(int iNum_Run, std::string strInputRun){
-                //vec_strRunList.clear();
                 vec_pairedRunList.clear();
-                //vec_strRunList.push_back(strInputRun);
                 vec_pairedRunList.push_back(std::make_pair(iNum_Run, strInputRun ) );
                 analyzeInput();
                 return;

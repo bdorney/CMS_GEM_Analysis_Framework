@@ -17,7 +17,38 @@ LPATHS = -L $(ROOTSYS)/lib/
 LIBS = -lSpectrum
 
 # Define source files
-SOURCES = src/DetectorMPGD.cpp src/FrameworkBase.cpp src/ReadoutSector.cpp src/ReadoutSectorPhi.cpp src/ReadoutSectorEta.cpp src/Interface.cpp src/InterfaceAnalysis.cpp src/ParameterLoader.cpp src/ParameterLoaderAmoreSRS.cpp src/ParameterLoaderAnaysis.cpp src/ParameterLoaderRun.cpp src/Selector.cpp src/SelectorCluster.cpp src/SelectorHit.cpp src/AnalyzeResponseUniformity.cpp src/AnalyzeResponseUniformityClusters.cpp src/AnalyzeResponseUniformityHits.cpp src/UniformityUtilityFunctions.cpp src/TimingUtilityFunctions.cpp src/Visualizer.cpp src/VisualizeUniformity.cpp src/VisualizeComparison.cpp src/analyzeUniformity.cpp
+SOURCES =   src/DetectorMPGD.cpp \
+            src/FrameworkBase.cpp \
+            src/ReadoutSector.cpp \
+            src/ReadoutSectorPhi.cpp \
+            src/ReadoutSectorEta.cpp \
+            src/Interface.cpp \
+            src/InterfaceAnalysis.cpp \
+            src/ParameterLoader.cpp \
+            src/ParameterLoaderDetector.cpp \
+            src/ParameterLoaderAnaysis.cpp \
+            src/ParameterLoaderRun.cpp \
+            src/Selector.cpp \
+            src/SelectorCluster.cpp \
+            src/SelectorHit.cpp \
+            src/SRSAPVEvent.cpp \
+            src/SRSCluster.cpp \
+            src/SRSConfiguration.cpp \
+            src/SRSEventBuilder.cpp \
+            src/SRSFECDecoder.cpp \
+            src/SRSHit.cpp \
+            src/SRSMain.cpp \
+            src/SRSMapping.cpp \
+            src/SRSOutputROOT.cpp \
+            src/AnalyzeResponseUniformity.cpp \
+            src/AnalyzeResponseUniformityClusters.cpp \
+            src/AnalyzeResponseUniformityHits.cpp \
+            src/UniformityUtilityFunctions.cpp \
+            src/TimingUtilityFunctions.cpp \
+            src/Visualizer.cpp \
+            src/VisualizeUniformity.cpp \
+            src/VisualizeComparison.cpp \
+            src/analyzeUniformity.cpp
 
 # Define object files
 #	We use Suffix Replacement
