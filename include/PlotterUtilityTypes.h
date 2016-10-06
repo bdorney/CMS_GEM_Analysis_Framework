@@ -121,10 +121,11 @@ namespace QualityControl {
         }; //End InfoPlot
         
         struct InfoCanvas{
-            bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;       //Logarithmic Axis
             bool m_bGrid_X, m_bGrid_Y;//, bGrid_Z;      //Grid
             bool m_bIsPrelim;                   	//Write "Preliminary" after CMS
-
+            bool m_bLog_X, m_bLog_Y;//, m_bLog_Z;       //Logarithmic Axis
+            bool m_bMonoColor;
+            
             bool m_bXAxis_UserRange;  //Use Range Specified by User
             bool m_bYAxis_UserRange;  //Use Range Specified by User
             
@@ -159,6 +160,7 @@ namespace QualityControl {
                 m_bLog_X=m_bLog_Y=false;
                 m_bGrid_X=m_bGrid_Y=false;
                 m_bIsPrelim=true;
+                m_bMonoColor=false;
 
                 m_bXAxis_UserRange    = false;
                 m_bYAxis_UserRange    = false;

@@ -209,6 +209,9 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
             else if ( pair_strParam.first.compare("CANV_MARGIN_RT") == 0 ) {
                 inputCanvInfo.m_fMargin_Rt = stof(pair_strParam.second);
             }
+            else if ( pair_strParam.first.compare("CANV_MONO_COLOR") == 0 ) {
+                inputCanvInfo.m_bMonoColor = convert2bool(pair_strParam.second,bExitSuccess);
+            }
             else if ( pair_strParam.first.compare("CANV_NAME") == 0 ) {
                 inputCanvInfo.m_strName = pair_strParam.second;
             }

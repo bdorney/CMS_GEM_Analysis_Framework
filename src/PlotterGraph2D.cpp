@@ -57,7 +57,7 @@ void PlotterGraph2D::drawPlots(){
         Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
         Double_t red[NRGBs]   = { 0.00, 0.00, 0.00, 0.00, 0.00 };
         Double_t green[NRGBs] = { 0.00, 0.00, 0.00, 0.00, 0.00 };
-        Double_t blue[NRGBs]  = { 0.0, 0.25, 0.5, 0.75, 1.00 };
+        Double_t blue[NRGBs]  = { 0.6, 0.7, 0.8, 0.9, 1.00 };
         TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
         m_tdrStyle->SetNumberContours(NCont);
         
@@ -77,6 +77,8 @@ void PlotterGraph2D::drawPlots(){
     //Draw (for realz)
     m_canv->cd();
     m_g2D_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+    m_canv->SetTheta(90);
+    m_canv->SetPhi(0.001);
     
     return;
 } //End PlotterGraph2D::drawPlots()

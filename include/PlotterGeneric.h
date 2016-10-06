@@ -66,6 +66,9 @@ namespace QualityControl {
             //Sets the canvas parameters
             virtual void setCanvasParameters(InfoCanvas & inputCanvInfo){
                 m_canvInfo = inputCanvInfo;
+                setMonoColor(m_canvInfo.m_bMonoColor);
+                setPreliminary(m_canvInfo.m_bIsPrelim);
+                setLogoPos(m_canvInfo.m_iLogoPos);
                 return;
             }
 
