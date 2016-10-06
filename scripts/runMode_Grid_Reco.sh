@@ -1,6 +1,6 @@
 #!bin/zsh
 #Usage:
-#	source runMode_Grid.sh <Data File Directory> <Config File - Reco> <Config File - Mapping> <Queue Names>
+#	source runMode_Grid_Reco.sh <Data File Directory> <Config File - Reco> <Config File - Mapping> <Queue Names>
 #
 #	Possible queue names on lxplus LSF system are:
 #		8nm	Eight natural minutes
