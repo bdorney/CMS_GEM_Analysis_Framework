@@ -3,9 +3,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.2.4                               *
-*	LAST UPDATE: Oct 6 2016                      *
+*	LAST UPDATE: Oct 7 2016                      *
 *                                                *
 **************************************************
+
+Update: October 7th 2016
+==================================================
+->Changed SRSMain::Reprocess() to call SRSMain::Close() when corrupted input is identified; this will exit the run but produce a TTree file for a portion of the events that are good.
 
 Update: October 6th 2016
 ==================================================
