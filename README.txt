@@ -1997,9 +1997,23 @@
         In the "comparison" configuration one can take a set of TFiles that have been previously
         produced by the CMS_GEM_Analysis_Framework and compare TH1F objects from the files against each other.
         Here the input Run Config file should be configured to have a "[BEGIN_COMP_INFO]" header instead of the
-        "[BEGIN_RUN_HEADER]" that is used by the other modes.  The "[BEGIN_RUN_LIST]" header is still used
+        "[BEGIN_RUN_INFO]" header that is used by the other modes.  The "[BEGIN_RUN_LIST]" header is still used
         normally; however now the input files listed here must be Framework output files produced in one of the
         three modes described above.
+
+        In the "reconstruction" configuration one can take a raw data file recorded with the RD51 SRS system and
+        perform the unpacking, decoding, and event reconstruction to produce an output TFile which contains a TTree
+        which can be analyzed by the framework.  Here the input Run Config file should be configured to have a
+        "[BEGIN_RUN]" header as in the case of the analysis configurations.  The "[BEGIN_RUN_LIST]" header is
+        still used however there should only be a single file listed.
+
+        In the "combined" configuration the framework first executes the workflow performed by the reconstruction
+        and then executes the analysis.  Here the input Run Config file should be configured to have a
+        "[BEGIN_RUN]" header as in the case of the analysis configurations. The framework will produce two TFiles
+        one will have the output TTree produced by the reconstruction configuration and the other will be the
+        standard framework output file produced by the analysis.  The "[BEGIN_RUN_LIST]" header is still used
+        however again there should only be a single file listed.  The framework will automatically determine the
+        name of the TTree file it should run over in the analysis portion.
 
         Example configuration files illustrating these options are provided in the sections below.  Furthermore
         template config files and helper scripts are provided in the framework to run in each mode.  For details

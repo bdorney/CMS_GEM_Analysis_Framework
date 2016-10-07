@@ -62,20 +62,21 @@ SRSMain::Reprocess(){
         bool first = true;                                                                                          
 	int start_eventRecord=0;
 	int end_eventRecord=0;
-        for (unsigned int ir=0;ir<nw;ir++){
-          if( ((buffer[ir] >> 8) & 0xffffff) == 0x41505a) {
-            if (first) {
-	      // take out the event header, keep the fec header and the adc payloads
-              start_eventRecord = ir - 8;
-              goodfragment = ( ((buffer[ir-6])&0xff) == iFEC);
-              if (start_eventRecord < 0) {
-		std::cout <<"  +++ reprocess: Wrong Start of Event"<<std::endl;
-		exit(-2);
+          for (unsigned int ir=0;ir<nw;ir++){
+              if( ((buffer[ir] >> 8) & 0xffffff) == 0x41505a) {
+                  if (first) {
+                      // take out the event header, keep the fec header and the adc payloads
+                      start_eventRecord = ir - 8;
+                      goodfragment = ( ((buffer[ir-6])&0xff) == iFEC);
+                      if (start_eventRecord < 0) {
+                          std::cout <<"  +++ reprocess: Wrong Start of Event"<<std::endl;
+                          Close();
+                          exit(-2);
+                      }
+                      first = false;
+                  }
               }
-              first = false;
-            }
           }
-        }
 
         end_eventRecord=nw-start_eventRecord;
         int tFEC=0;
