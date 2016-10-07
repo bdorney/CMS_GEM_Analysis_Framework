@@ -70,13 +70,13 @@ void printHelpMenu(){
     cout<<endl;
     cout<<"\tIncluding the 'run info' header will use the input files to produce a framework output file\n";
     cout<<"\tHere you must have Config_Analysis, Config_Mapping, and Config_Reco files; example of Config_Analysis shown below\n";
-    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file while the Config_Reco file is your 'amore.cfg' file.
+    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file while the Config_Reco file is your 'amore.cfg' file.\n";
     cout<<"\tdefault files are included in $GEM_BASE/config/\n";
     cout<<endl;
     cout<<"\tIf Including the 'compare info' header the input must be framework output files\n";
     cout<<"\t These input files must be have been produced when running with a 'run info' header\n";
     cout<<endl;
-    cout<<"\tIf running reconstruction the input must be an RD51 SRS output file (e.g. *.raw)\n"
+    cout<<"\tIf running reconstruction the input must be an RD51 SRS output file (e.g. *.raw)\n";
     cout<<"\tFor each call of the executable only one *.raw file should be in the input run list\n";
     cout<<endl;
     cout<<"\tIf you have both a 'run info' and a 'compare info' header only the last one will be used\n";
@@ -104,10 +104,10 @@ void printHelpMenu(){
     cout<<"\t(omit angle brackets, i.e. <. and >)\n";
     cout<<endl;
     cout<<"\t[BEGIN_RUN_INFO]\n";
-    cout<<"\t\Config_Reco = <PHYSICAL FILENAME OF RECO CONFIG FILE>';\n";
+    cout<<"\t\tConfig_Reco = <PHYSICAL FILENAME OF RECO CONFIG FILE>';\n";
     cout<<"\t\tConfig_Analysis = '<PHYSICAL FILENAME OF ANALYSIS CONFIG FILE>'\n";
     cout<<"\t\tConfig_Mapping = '<PHYSICAL FILENAME OF MAPPING CONFIG FILE>';\n";
-    cout<<"\t\Detector_Name = '<DETECTOR SERIAL NUMBER WITHOUT / CHAR>';\n";
+    cout<<"\t\tDetector_Name = '<DETECTOR SERIAL NUMBER WITHOUT / CHAR>';\n";
     cout<<"\t\tInput_Is_Frmwrk_Output = '<ANALYZE PREVIOUS OUTPUT true/false>';\n";
     cout<<"\t\tInput_Identifier = '<STRING IDENTIFIER FOUND IN FILENAME>';\n";
     cout<<"\t\tOutput_File_Name = '<OUTPUT ROOT FILE NAME>';\n";
