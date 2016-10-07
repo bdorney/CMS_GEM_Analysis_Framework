@@ -1789,24 +1789,17 @@
                 ...
             [END_RUN_LIST]
 
-        Parameters found inside the "[BEGIN_RUN_INFO]" header expected to be entered in the following format:
-
-            field_name = 'value';
-
-        The field_name should be on the left followed by an equals sign "=" then the value should be enclosed
-        in single quote marks "'".  A semicolon ";" ends the statement.  Tabs "\t" and spaces outside of the
-        single quotes will be ignored, but will be preserved inside the single quotes.  Text after the ";" will
-        also be ignored.
+        Parameters found inside the "[BEGIN_RUN_INFO]" header are expected to be entered in the manner described
+        in Section 4.e.ii.
 
         Contrary to the "[BEGIN_RUN_INFO]" header the "[BEGIN_RUN_LIST]" header is simply a list of PFN of the
         input files to be analyzed by the call of the executable.  Again tabs "\t" and spaces will be ignored.
 
         The Uniformity::ParameterLoaderRun class understands the "#" character to indicate a comment; so
-        it is possible to comment out lines in the Run Config file you create for ease of use.  The template
-        run config file at the end of this subsection showns an example.
-
-        The value of true is understood as being from the case-insensitive set {t, true, 1} while the value of
-        false is understood as being from the case-insensitive set {f, false, 0}.
+        it is possible to comment out lines in the Run Config file you create for ease of use.  The value of
+        true is understood as being from the case-insensitive set {t, true, 1} while the value of false is
+        understood as being from the case-insensitive set {f, false, 0}. Example config files are shown at the
+        end of this subsection.
 
         # 4.e.iii.I HEADER PARAMETERS - RUN_INFO
         # --------------------------------------------------------
@@ -2022,12 +2015,12 @@
         # 4.e.iii.V  Example Config File - Mode: Series
         # --------------------------------------------------------
 
-        Two example files here are presented.
+        Four example files here are presented.
 
         The first example illustrates a series run in which the entire analysis is requested on a list of
-        input TFile's create by amoreSRS.  Here the Output_Individual is set to false to create one output
-        file representing the results of the analysis on all input files. Changing Output_Individual to true
-        will produce one output file per input file.  The example is as follows:
+        input TFile's containing the THit and TCluster trees.  Here the Output_Individual is set to false
+        to create one output file representing the results of the analysis on all input files. Changing
+        Output_Individual to true will produce one output file per input file.  The example is as follows:
 
             [BEGIN_RUN_INFO]
                 #Config Files
@@ -2116,17 +2109,113 @@
         Pay special attention to the fact that these files will not necessarily be found in the directory you
         are calling the executable from but in the directory the input file is found in.
 
+        The third example illustrates a series run in which the reconstruction is requested on a list of
+        raw data files taken with the RD51 SRS.  This time the analysis config file is not supplied but
+        instead a reco config file is given. Here the Output_Individual is set to true to create one output
+        file for the input file. Only one input file is given.  The example is as follows:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Reco = 'config/configReco.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                Input_Identifier = 'Run';
+                #Output Config
+                ####################################
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+                #Reco Steps
+                ####################################
+                Reco_All = 'true';
+                #Analysis Steps
+                ####################################
+                Ana_Hits = 'false';
+                Ana_Clusters = 'false';
+                Ana_Fitting = 'false';
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'false';
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
+            [END_RUN_LIST]
+
+        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+        Notice that the three analysis flags (Ana_Hits, Ana_Clusters, and Ana_Fitting) are set to false and the
+        reconstruction flag (Reco_All) is set to true.  The visualizer has also been turned off (Visualize_Plots
+        set to false). No output file name is given here since the framework will automatically create the
+        following output file:
+
+            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
+
+        The final example illustrates a series run in which the combined option (reconstruction plus analysis)
+        is used.  Again the input file is a raw data file taken with the RD51 SRS.  Notice that all three
+        config files are given: 1) the reco, 2) analysis, and 3) mapping config file. Here the Output_Individual
+        is set to true to create one output file for the input file. Only one input file is given.  The example
+        is as follows:
+
+            [BEGIN_RUN_INFO]
+                #Config Files
+                ####################################
+                Config_Reco = 'config/configReco.cfg';
+                Config_Analysis = 'config/configAnalysis.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+                #Input Config
+                ####################################
+                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+                Input_Identifier = 'Run';
+                #Output Config
+                ####################################
+                Output_File_Option = 'RECREATE';
+                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+                #Reco Steps
+                ####################################
+                Reco_All = 'true';
+                #Analysis Steps
+                ####################################
+                Ana_Hits = 'true';
+                Ana_Clusters = 'true';
+                Ana_Fitting = 'false';
+                #Visualizer Config
+                ####################################
+                Visualize_Plots = 'false';
+            [END_RUN_INFO]
+            [BEGIN_RUN_LIST]
+                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
+            [END_RUN_LIST]
+
+        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+        Notice that Reco_All has been set to true along with Ana_Hits and Ana_Clusters.  The visualizer has
+        also been turned off (Visualize_Plots set to false). No output file name is given here since the
+        framework will automatically create the following output files:
+
+            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
+            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_Ana.root
+
+        The fitting (Ana_Fitting) and the visualizer (Visualize_Plots) may be turned on by setting the
+        relevant flags to true.  However in this example the input file contains only 500k events which is
+        not enough for a high granularity analysis which usually requires at least 10 million clusters
+        distributed over the detector.
+
         # 4.e.iii.VI  Example Config File - Mode: Grid
         # --------------------------------------------------------
 
-        Grid mode is really designed for running the analysis on multiple input TFiles, created by amoreSRS,
-        in parallel.  One could use this option when running on multiple input TFiles created by the framework
-        but the increase in analysis speed would be small in comparison since usually you are only interested
-        in checking a new set of fit parameters on the previously obtained data.
+        Grid mode is really designed for running the framewok on multiple input files (either TTree files or
+        RD51 SRS raw data files) in parallel.  One could also use this option when running on multiple input
+        TFiles created by the framework but the increase in analysis speed would be small in comparison since
+        usually you are only interested in checking a new set of fit parameters on the previously obtained data.
 
-        Ideally you should submit this with the provided script/runMode_Grid.sh script, included in the
-        repository, to a fast queue such as the 8 natural minute (8nm) or 1 natural hour (1nh) queue.
-        The example config file is shown as:
+        It is strongly recommended that you perform this script using the provided runMode_Grid.sh or
+        runMode_Grid_Reco.sh scripts (See Sections 3.a.i and 3.a.ii) located in the script/ directory, included
+        in the repository, to a fast queue such as the 8 natural minute (8nm) or 1 natural hour (1nh) queue.
+        The 8nm queue has been found to be ideal for running the analysis on an input TTree file with
+        N_Evt <= 500k.  Reconstructing an RD51 SRS raw dat of similiar event size has been shown best suited
+        for the 1nh queue.
+
+        The scripts mentioned above will setup everything automatically for you an example config file is shown as:
 
             [BEGIN_RUN_INFO]
                 #Config Files
@@ -2163,8 +2252,8 @@
         The re-run mode is designed to allow a user to change the fit parameters defined in their analysis
         config file and re-run on an input TFile previously produced by the framework.  This saves significant
         time when tweaking the fit parameters being applied to a given input file since the selection does
-        not have to be repeated.  Obviously this mode should not be applied to input TFiles produced by amoreSRS.
-        The example config file is given below:
+        not have to be repeated.  Obviously this mode should not be applied to input TTree TFiles produced
+        containing the THit and TCluster trees. The example config file is given below:
 
             [BEGIN_RUN_INFO]
                 #Config Files
@@ -2243,6 +2332,242 @@
             [END_RUN_LIST]
 
         Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+
+        # 4.e.iv. Plot Config File
+        # --------------------------------------------------------
+
+        The plot config file expects a certain "nested-header" style.  The format should look something like:
+
+            [BEGIN_CANVAS]
+                ...
+                ...
+                ...
+                [BEGIN_PLOT]
+                    ...
+                    ...
+                    ...
+                [END_PLOT]
+                ...
+                ...
+                ...
+                [BEGIN_PLOT]
+                    ...
+                    ...
+                    ...
+                    [BEGIN_DATA]
+                        ...
+                        ...
+                        ...
+                    [END_DATA]
+                [END_PLOT]
+                ...
+                ...
+            [END_CANVAS]
+
+        Parameters found inside the "[BEGIN_CANVAS]" header are expected to be entered in the following format:
+
+            field_name = 'value';'
+
+        Parameters found inside the "[BEGIN_CANVAS]" header are expected to be entered in the manner described
+        in Section 4.e.ii.
+
+        The config file will define one TCanvas which will be drawn following the official CMS Style Guide.  For
+        this canvas any number of TObjects can be defined and drawn on the canvas.  Right now the TGraphErrors,
+        TGraph2D, and TH1F classes are supported. For each of higher level header sections (i.e. "[BEGIN_CANVAS]"
+        and "[BEGIN_PLOT]") the header parameters should *always* be placed before descending into the next header.
+        Failure to adhere to this convention may lead to undefined behavior or crashes.
+
+        The Plotter::ParameterLoaderPlotter class understands the "#" character to indicate a comment; so it is
+        possible to comment out lines in the Plot Config file you create for ease of use. The value of true is
+        understood as being from the case-insensitive set {t, true, 1} while the value of false is understood as
+        being from the case-insensitive set {f, false, 0}. The template run config file at the end of this
+        subsection showns an example.
+
+        # 4.e.iv.I HEADER PARAMETERS - CANVAS
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+            The following parameters are supported:
+            #		<FIELD>             <DATA TYPE, DESCRIPTION>
+
+                Canv_Axis_NDiv          int, comma separated list of integers defining the number of divisions
+                                        for a given TAxis.  See https://root.cern.ch/doc/master/classTAttAxis.html
+                                        for more information.  Between one and three integers can be provided.
+                                        They are understand as applying to the {X}, {X,Y}, or {X,Y,Z} axes.
+
+                Canv_Dim                int, pair of integers separated by a comma defining the size of the canvas
+                                        in pixels.  The first (second) number is for the x (y) direction.
+
+                Canv_DrawOpt            string, the draw option that will be applied to all plots on this canvas
+
+                Canv_Grid_XY            boolean, pair of booleans separated by a comma defining if the grid should
+                                        be drawn on the canvas.  The first (second) boolean is for the x (y) grid.
+
+                Canv_Latex_Line         tuple<float,float,string>, comma separated list of data that defines the
+                                        position of a TLatex line and the text in the line.  The first (second)
+                                        float defines the x (y) position of the line.  Unfortunately spaces or tabs
+                                        in the string will be stripped before it is passed to the TLatex class.  Any
+                                        number of Canv_Latex_Line fields may be supplied and they will all be drawn
+                                        on the Canvas.  Note that "CMS" or "CMS Preliminary" will already be drawn by
+                                        default so there is no need to include it as an inpuy Canv_Latex_Line.
+
+                Canv_Legend_Dim_X       float, pair of floats defining the NDC position of a TLegend to be drawn on
+                                        the pad.  The first (second) float is the X1 (X2) coordinate of the TLegend.
+                                        See https://root.cern.ch/doc/master/classTLegend.html for more details.
+
+                Canv_Legend_Dim_Y       As Canv_Legend_Dim_X but for the Y coordinates.
+
+                Canv_Legend_Draw        boolean, setting to true (false) will (not) draw the TLegend on the canvas.
+
+                Canv_Log_XY             As Canv_Grid_XY but for setting the X & Y axis to logarithmic.
+
+                Canv_Logo_Pos           int, Indicates the position the CMS logo should be placed.  Possible values are
+                                        out of frame (0), top-left (11), top-centered (22), or top-right (33).  See
+                                        https://ghm.web.cern.ch/ghm/plots/ for more details and examples.
+
+                Canv_Logo_Prelim        boolean, defines whether or not a canvas is preliminary (e.g. "CMS Preliminary").
+                                        This should be true for all plots unless they are being submitted for CMS CWR
+                                        (e.g. publication in a peer-review journal).
+
+                Canv_Margin_Bot         float, sets the bottom margin of the created canvas.
+
+                Canv_Margin_Lf          float, sets the left margin of the created canvas.
+
+                Canv_Margin_Rt          float, sets the right margin of the created canvas.
+
+                Canv_Margin_Top         float, sets the top margin of the create canvas.
+
+                Canv_Mono_Color         boolean, determines if the color palette is monocolored (true), e.g. a single
+                                        shade, or multi-colored (false).  For paper publications this should be false;
+                                        for presentations/talks this ma be true.
+
+                Canv_Name               string, TName of the created TCanvas.
+
+                Canv_N_Axis_X           int, placeholder
+
+                Canv_N_Axis_Y           int, placeholder
+
+                Canv_Plot_Type          string, determines the type of TObject to be plotted on the Canvas, supported
+                                        types are "TGraph2D, TGraphErrors, TH1F".
+
+                Canv_Range_X            int, pair of integers that determine the range [X_min, X_max] of the X-axis.
+
+                Canv_Range_Y            As Canv_Range_X but for the Y-axis.
+
+                Canv_Range_Z            As Canv_Range_X but for the Z-axis.
+
+                Canv_Title_Offset_X     float, determines the offset of the X-axis title
+
+                Canv_Title_Offset_Y     As Canv_Title_Offset_X but for the Y-axis.
+
+                Canv_Title_Offset_Z     As Canv_Title_Offset_X but for the Z-axis.
+
+                Canv_Title_X            string, title (e.g. label) assigned to the X-axis.
+
+                Canv_Title_Y            As Canv_Title_X but for the Y-axis.
+
+                Canv_Title_Z            As Canv_Title_X but for the Z-axis.
+
+        # 4.e.iv.II HEADER PARAMETERS - PLOT
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+            The following parameters are supported:
+            #		<FIELD>             <DATA TYPE, DESCRIPTION>
+
+                Plot_Color              TColor, color assigned to the TObject marker, line, and fill color attributes
+                                        The list of supported colors includes {kWhite, kBlack, kGray, kRed, kGreen,
+                                        kBlue, kYellow, kMagenta, kCyan, kOrange, kSpring, kTeal, kAzure, kViolet,
+                                        kPink}.  Note mathematical expressions on TColors are supported.  For example
+                                        "kRed+2" or "kBlue-3" will be interpreted correctly.
+
+                Plot_LegEntry           string, legend entry for this TObject.
+
+                Plot_Line_Size          float, line size of the TObject
+
+                Plot_Line_Style         int, line style of the TObject
+
+                Plot_Marker_Size        float, marker size of the TObject
+
+                Plot_Marker_Style       int, marker style of the TObject
+
+                Plot_Name               string, TName of the TObject. This will be the TName of the created TObject
+                                        a [BEGIN_DATA] header is supplied.  Otherwise this is the TName of the TObject
+                                        to be loaded from the input TFile defined in Plot_Root_File found with path
+                                        Plot_Root_Path inside the TFile.
+
+                Plot_Root_File          string, if no [BEGIN_DATA] header is supplied for this plot, this is the name
+                                        of the TFile from which the desired TObject to be plotted is found in.
+
+                Plot_Root_Path          string, if no [BEGIN_DATA] header is supplied for this plot, this is the path
+                                        in Plot_Root_File for which Plot_Name is found at. Explicitly inside the TFile
+                                        the desired TObject is Plot_Root_Path/Plot_Name
+
+        # 4.e.iv.III HEADER PARAMETERS - DATA
+        # --------------------------------------------------------
+
+        Each plot is either found in an input TFile using the Plot_Name, Plot_Root_File, and Plot_Root_Path
+        fields or is created from comma separated data found in the [BEGIN_DATA] header.  If comma separated
+        data is supplied the Plot_Root_File and Plot_Root_Path fields are not used.  Presently only
+        Canv_Plot_Type set to TGraphErrors is supported, in this case a TGraphErrors object is made and the
+        value of the Plot_Name field is assigned as its TName.  Right now for Canv_Plot_Type set to either
+        TH1F or TGraph2D the TFile input must be used.
+
+        If comma separated data is supplied it is done so in this header.  Each line must have between 2 and 4
+        values.  Each value represents either the x-value, the error on the x-value, the y-value, or the error
+        on the y-value for a given point.  The first line of the [BEGIN_DATA] header must be a line consisting
+        of between 2 and 4 strings from the set {"VAR_INDEP", "VAR_INDEP_ERR", "VAR_DEP", "VAR_DEP_ERR"} for
+        the x-value, x-value error, y-value, or y-value error, respectively.  The position of these strings
+        defines the meaning of each entry in all subsequent lines.  For example:
+
+            VAR_INDEP, VAR_DEP, VAR_INDEP_ERR
+
+        Indicates that the first value of each line is the y-value, the second is the x-value, and the third value
+        is the error on the x-value for a given point. See Section 4.e.iv.VI for an example.
+
+        # 4.e.iv.IV Configuration Options
+        # --------------------------------------------------------
+
+        The genericPlotter executable will create one TCanvas for every call of the executable.  The created
+        TCanvas, and plots on it, will follow the official CMS Style Guide.  Note the user needs to ensure the
+        additional input configurations provided also conform to the CMS Style Guide (e.g. units on axis labels).
+        However this will provide a "baseline" style to the created canvas to greatly simplify the process for
+        preparing plots for publication.  The [BEGIN_CANVAS] header is required.  One or more TObjects can be
+        drawn on the canvas.  For each TObject you should define a corresponding [BEGIN_PLOT].  Note that all
+        the TObjects drawn on the canvas must be of the same type. For example you cannot draw both a TH1F and
+        a TGraphErrors on the canvas simultaneously (you'll need to convert one into the other).  The supported
+        types of TObjects are {TGraph2D, TGraphErrors, TH1F}.
+
+        For the case of TGraphErrors you can choose to provide a [BEGIN_DATA] header (see Section 4.e.iv.III) and
+        have the genericPlotter executable load comma separated data in and use this data to create the graph or
+        you can have genericPlotter load a previously created TGraphErrors from a TFile by supplying the TName of
+        the TGraphErrors (Plot_Name field), the name of the TFile (Plot_Root_File), and the path inside the TFile
+        the TGraphErrors is located at (Plot_Root_Path).
+
+        For the case of TGraph2D and TH1F objects presently they must be loaded from a previously created TFile in
+        the manner described above.
+
+        Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.  The case of the
+        TGraphErrors is shown for loading in comma separated data while the TGraph2D and TH1F cases load the objects
+        from hypothetical TFiles.  However using these other two cases you can see how to setup the config file such
+        that the executable loads a TGraphErrors from it.
+
+        # 4.e.iv.V Example Config File - TGraph2D
+        # --------------------------------------------------------
+
+        Coming "Soon"
+
+        # 4.e.iv.VI Example Config File - TGraphErrors
+        # --------------------------------------------------------
+
+        Coming "Soon"
+
+        # 4.e.iv.VII Example Config File - TH1F
+        # --------------------------------------------------------
+
+        Coming "Soon"
 
     # 4.f. Output File - Analysis Mode
     # --------------------------------------------------------
@@ -2381,7 +2706,7 @@
             the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
             of the detector and the Z-axis will be the FitObservable.
 
-        # 4.f.i Output ROOT File - Comparison Mode
+        # 4.f.ii Output ROOT File - Comparison Mode
         # --------------------------------------------------------
 
         Here the output ROOT file is produced by classes inheriting from VisualizeComparison.  The ROOT file will
@@ -2410,6 +2735,11 @@
 
         The "Obs_Name" sub directory will contain two TH1F objects with their regular TNames appended with "_ClustTime1to30"
         and "ClustTime6to27."  The TCanvas they are drawn on will be named "canv_ClustSize_<Obs_Name>"
+
+        # 4.f.iii Output ROOT File - genericPlotter
+        # --------------------------------------------------------
+
+        Coming "soon"
 
         # 4.f.iv Output Text File
         # --------------------------------------------------------

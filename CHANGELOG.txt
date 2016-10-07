@@ -10,6 +10,7 @@
 Update: October 7th 2016
 ==================================================
 ->Changed SRSMain::Reprocess() to call SRSMain::Close() when corrupted input is identified; this will exit the run but produce a TTree file for a portion of the events that are good.
+->Modified QualityControl::Plotter::ParameterLoaderPlotter::getColLabelPositions() such that it tests for the presence of the col heading rather than requiring an exact match
 
 Update: October 6th 2016
 ==================================================

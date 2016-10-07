@@ -474,15 +474,15 @@ vector<DataPoint> ParameterLoaderPlotter::loadData(std::ifstream & file_Input){
             break;
         } //End Case: End of Canvas Section
         
-	//cout<<strLine<<endl;
-
-	//The data is delimited, get a line
-	vec_strDelimSepList = getCharSeparatedList(strLine, ',');
-	//cout<<"vec_strDelimSepList.size() = " << vec_strDelimSepList.size() << endl;
-
-	/*for(int i=0; i < vec_strDelimSepList.size(); ++i){
-		cout<<vec_strDelimSepList[i]<<endl;
-	}*/
+        //cout<<strLine<<endl;
+        
+        //The data is delimited, get a line
+        vec_strDelimSepList = getCharSeparatedList(strLine, ',');
+        //cout<<"vec_strDelimSepList.size() = " << vec_strDelimSepList.size() << endl;
+        
+        /*for(int i=0; i < vec_strDelimSepList.size(); ++i){
+         cout<<vec_strDelimSepList[i]<<endl;
+         }*/
 
         //Determine which columns have what meaning by reading in the column labels
         if (!bPosSet) {
@@ -492,19 +492,19 @@ vector<DataPoint> ParameterLoaderPlotter::loadData(std::ifstream & file_Input){
             iPos_Y_Err = getColLabelPosition( vec_strDelimSepList, m_col_labels.m_strColY_Err );
             
             bPosSet = true;
-
+            
             //Now move to next line
             //continue;
         }
-	else{
-        	if (iPos_X > -1) {      dataPt.m_fX = stof(vec_strDelimSepList[iPos_X]); }
-        	if (iPos_Y > -1) {      dataPt.m_fY = stof(vec_strDelimSepList[iPos_Y]); }
-        	if (iPos_X_Err > -1) {  dataPt.m_fX_Err = stof(vec_strDelimSepList[iPos_X_Err]); }
-        	if (iPos_Y_Err > -1) {  dataPt.m_fY_Err = stof(vec_strDelimSepList[iPos_Y_Err]); }
-        
-        	vec_retData.push_back(dataPt);
-		dataPt.clear();
-	}
+        else{
+            if (iPos_X > -1) {      dataPt.m_fX = stof(vec_strDelimSepList[iPos_X]); }
+            if (iPos_Y > -1) {      dataPt.m_fY = stof(vec_strDelimSepList[iPos_Y]); }
+            if (iPos_X_Err > -1) {  dataPt.m_fX_Err = stof(vec_strDelimSepList[iPos_X_Err]); }
+            if (iPos_Y_Err > -1) {  dataPt.m_fY_Err = stof(vec_strDelimSepList[iPos_Y_Err]); }
+            
+            vec_retData.push_back(dataPt);
+            dataPt.clear();
+        }
                 
         //Store previous stream position so main loop over file exits
         //After finding the end header we will return file_Input to the previous stream position so loadParameters loop will exit properly
@@ -519,10 +519,18 @@ vector<DataPoint> ParameterLoaderPlotter::loadData(std::ifstream & file_Input){
 } //End ParameterLoaderPlotter::loadData()
 
 int ParameterLoaderPlotter::getColLabelPosition(std::vector<std::string> vec_strInputParam, std::string & strInputLabel){
-    auto iterColLabel = find( vec_strInputParam.begin(), vec_strInputParam.end(), strInputLabel );
+    /*auto iterColLabel = find( vec_strInputParam.begin(), vec_strInputParam.end(), strInputLabel );
     if ( iterColLabel != vec_strInputParam.end() ) {
         return distance( vec_strInputParam.begin(), iterColLabel );
-    }
+    }*/
+    
+    for (auto iterColLabel = vec_strInputParam.begin(); iterColLabel != vec_strInputParam.end(); ++iterColLabel) { //Loop Over input Parameters
+        //Check if Col Label exists in input
+        //prevents case where special "hidden" characters spoil the comparison (e.g. "^M")
+        if ( (*iterColLabel).find(strInputLabel) != std::string::npos ) {
+            return distance( vec_strInputParam.begin(), iterColLabel );
+        }
+    } //End Loop Over input Parameters
     
     return -1;
 } //End ParameterLoaderPlotter::getColLabelPosition()
