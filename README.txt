@@ -27,10 +27,12 @@
     2. Installation Instructions
     3. Usage
         3.a. frameworkMain
-            3.a.i               Helper Script - Run Mode: Grid
-            3.a.ii              Helper Script - Run Mode: Rerun
-            3.a.iii             Helper Script - Run Mode: Series
-            3.a.iv              Helper Script - Run Mode: Comparison
+            3.a.i               Helper Script - Run Mode: Grid (Analysis)
+            3.a.ii              Helper Script - Run Mode: Grid (Reconstruction)
+            3.a.iii             Helper Script - Run Mode: Rerun
+            3.a.iv              Helper Script - Run Mode: Series
+            3.a.v               Helper Script - Run Mode: Comparison
+        3.b. genericPlotter
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
@@ -45,23 +47,31 @@
             4.b.iii.            Interfaces
                 4.b.iii.I       Interface
                 4.b.iii.II      InterfaceAnalysis
-                4.b.iii.III     InterfaceRun
+                4.b.iii.III     InterfaceReco
+                4.b.iii.IV      InterfaceRun
             4.b.iv.             Selectors
                 4.b.iv.I        Selector
                 4.b.iv.II       SelectorCluster
                 4.b.iv.III      SelectorHit
             4.b.v.              Loaders
-                4.b.v.I         ParameterLoaderAmoreSRS
-                4.b.v.II    	ParameterLoaderAnalysis
-                4.b.v.III       ParameterLoaderRun
-            4.b.vi.             Readouts
-                4.b.vi.I        ReadoutSector
-                4.b.vi.II       ReadoutSectorEta
-                4.b.vi.III      ReadoutSectorPhi
-            4.b.vii.            DetectorMPGD
+                4.b.v.I         ParameterLoaderAnalysis
+                4.b.v.II        ParameterLoaderDetector
+                4.b.v.III       ParameterLoaderPlotter
+                4.b.v.IV        ParameterLoaderRun
+            4.b.vi.             Plotters
+                4.b.vi.I        PlotterGeneric
+                4.b.vi.II       PlotterGraph
+                4.b.vi.III      PlotterGraph2D
+                4.b.vi.IV       PlotterHisto
+            4.b.vii.            Readouts
+                4.b.vii.I       ReadoutSector
+                4.b.vii.II      ReadoutSectorEta
+                4.b.vii.III     ReadoutSectorPhi
+            4.b.viii.           DetectorMPGD
         4.c. Utilities
             4.c.i   Timing
             4.c.ii  Uniformity
+            4.c.iii Plotter
         4.d. Types
             4.d.i   Timing
             4.d.ii  Uniformity
@@ -74,6 +84,7 @@
                 4.d.ii.VII      SectorSlice
                 4.d.ii.VIII     SelParam
                 4.d.ii.IX       SummaryStatistics
+            4.d.iii Plotter
         4.e. Configuration Files
             4.e.i   amoreSRS Mapping Config File
             4.e.ii  Analysis Config File
@@ -92,6 +103,14 @@
                 4.e.iii.VI      Example Config File - Mode: Grid
                 4.e.iii.VII     Example Config File - Mode: Re-Run
                 4.e.iii.VIII    Example Config File - Mode: Comparison
+            4.e.iv Plot Config File
+                4.e.iv.I        HEADER PARAMETERS - CANVAS
+                4.e.iv.II       HEADER PARAMETERS - PLOT
+                4.e.iv.III      HEADER PARAMETERS - DATA
+                4.e.iv.IV       Configuration Options
+                4.e.iv.V        Example Config File - TGraph2D
+                4.e.iv.VI       Example Config File - TGraphErrors
+                4.e.iv.VII      Example Config File - TH1F
         4.f. Output Files
             4.f.i               Output ROOT File - Analysis Mode
                 4.f.i.I         "Segmented" Plots Stored in "Summary" folder
@@ -99,7 +118,8 @@
                 4.f.i.III       1D Fit Summary Plots Stored in "Summary" folder
                 4.f.i.IV        2D Fit Trapezoidal Map Plots Stored in "Summary" folder
             4.f.ii              Output ROOT File - Comparison Mode
-            4.f.iii             Output Text File
+            4.f.iii             Output ROOT File - genericPlotter
+            4.f.iv              Output Text File
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -108,13 +128,22 @@
 # 1. Contributors & License
 # ========================================================
 
-    Contributors: B. Dorney, M. Maggi
+    Main Developer: Brian Dorney
 
-    This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi. The
-    original selection & analysis algorithms are based off work done by J. Merlin.  This
+    Contributors: Marcello Maggi
+
+    amoreSRS Team:  Kondo Gnanvo, Mike Staib, Stefano Colafranchescci, Dorothea Pfeiffer
+
+    This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi.
+    The event unpacking and reconstruction code was ported from amoreSRS by Marcello Maggi.
+    The original selection & analysis algorithms are based off work done by J. Merlin.  This
     package makes use of several features from the CMS_GEM_TB_Timing repository (also by B. Dorney).
     Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this
     repository.
+
+    This package has adapted the tdrstyle.C, CMS_lumi.h, and CMS_lumi.C scripts, available from
+    https://ghm.web.cern.ch/ghm/plots/, for setting the style of output plots to match with the
+    official guidelines of the CMS Experiment.
 
     This package makes use of the "C++ Mathematical Expression Library" designed by Arash Partow,
     available at (http://www.partow.net/programming/exprtk/index.html), and referred to as ExprTk.
@@ -151,6 +180,8 @@
 
         make -f Makefile.gpp
 
+        make -f MakefilePlotter.gpp
+
     The repository is now compiled.  Additionally the base directory of the repository
     has been exported to the shell variable "$GEM_BASE".
 
@@ -164,6 +195,8 @@
         make -f Makefile.gpp clean
 
         make -f Makefile.gpp
+
+        make -f MakefilePlotter.gpp
 
     The local_branch_name is the name of the branch on your local machine.The
     remote_branch_name is the name of the branch you are checking out from the remote repository.
@@ -202,13 +235,19 @@
     Here the physical file name (PFN) represents the full path+filename to the file in question.
     The configuration files, including the run config file, are described in Section 4.e.  The
     executable can analyze files produced either by amoreSRS/amoreSRS_ZS or by the
-    CMS_GEM_Analysis_Framework.  For a full explanation of the available configurations please
-    consult Sections 4.e for a description, and Sections 3.a.i through 3.a.iii for examples.
+    CMS_GEM_Analysis_Framework (referred to as "the framework" henceforth).  Additionally the
+    framework can unpack, decode, and reconstruct raw data recorded by the RD51 SRS system with
+    FEC's running on the zero suppression firmware.  The unpacking, decoding, and reconstruction
+    of RD51 SRS raw data is referred to as "reconstruction" henceforth.  Reconstruction of data
+    recorded when not using the zero suppression firmware is not presently supported.
 
-    The contents and layout of the output files are described in Section 4.f.
+    For a full explanation of the available configurations please consult Sections 4.e for a description,
+    and Sections 3.a.i through 3.a.iii for examples. The contents and layout of the output files are
+    described in Section 4.f.
 
-    Three example config files: 1) mapping config file, 2) analysis config file, and 3) run config
-    file have been provided in the default repository.  A usage example is given as:
+    Four example config files: 1) mapping config file, 2) analysis config file, 3) reco config
+    file, and 4) run config file have been provided in the default repository.  A usage example
+    is given as:
 
         ./frameworkMain config/configRun.cfg true
 
@@ -221,16 +260,31 @@
 
     In addition to analyzing raw data to produce a framework output ROOT file it is also possible to
     analyze a series of framework outpt files to plot comparisons of any TH1F object stored in the
-    output ROOT file.  For More details on running in this mode see Sections 3.a.iv and 4.e.iii.
+    output ROOT file.  For more details on running in this mode see Sections 3.a.iv and 4.e.iii.
 
-            # 3.a.i Helper Script - Run Mode: Grid
+    In summary the running options of the frameowrk are:
+
+        1) Analysis, analyzing an input reconstructed SRS Tree file
+        2) Comparison, comparing one or more framework output ROOT files produced in otion #1,
+        3) Reconstruction, performing the reconstruction on an RD51 SRS input raw data file,
+        4) Combinded Reconstruction and Analysis (referred to as Combined), doing option 3 followed by option 1
+
+    Configuring for each of these options is described Secton 4.e.iii.  Option 1 can be executed in all
+    modes: Grid, Series, or Re-run.  Option 3 can be executed in Grid or Series mode; but in series mode
+    only one input RD51 SRS raw file should be supplied.  Option 4 can only be executed in Series mode,
+    again the only one RD51 SRS raw file should be supplied. run modes while option #1 can be additionally
+    exectued in the re-run mode.  See sections 3.a.i through 3.a.iv and 4.e.iii for further details.
+
+            # 3.a.i Helper Script - Run Mode: Grid (Analysis)
             # --------------------------------------------------------
 
             The script:
 
                 scripts/runMode_Grid.sh
 
-            is for running the framework the lxplus batch submission system using the scheduler bsub.
+            is for running the framework with the analysis option with the lxplus batch submission
+            system using the scheduler bsub.
+
             This script will setup the run config file and launch one job for each input file in the
             data file directory below.  The expected synatx is:
 
@@ -241,7 +295,8 @@
             file, "Config File - Mapping" is the input mapping config file, and "Queue Names" are the
             requested submission queue on the lxplus batch submmission system.  The available queues
             on lxplus are {8nm, 1nh, 8nh, 1nd} for 8 natural minutes, 1 natural hour, 8 natural hours,
-            and 1 natural day, respectively.
+            and 1 natural day, respectively.  It is expected the input files found in the "Data File
+            Directory" end with the expressiong "*dataTree.root".
 
             Additionally for each job a run config file (described in Section 4.e.iii.V), named
             config/configRun_RunNoX.cfg where X is the job number, will be created.  One script per job, named
@@ -265,7 +320,7 @@
 
                 source scripts/cleanGridFiles.sh
 
-            Eample:
+            Example:
 
                 source scripts/runMode_Grid.sh $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh
                 cd $DATA_QC5/GE11-VII-L-CERN-0001
@@ -294,16 +349,51 @@
             GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root with YY replaced
             with the total event number indicated in the filenames.
 
-            # 3.a.ii Helper Script - Run Mode: Rerun
+            # 3.a.ii Helper Script - Run Mode: Grid (Reconstruction)
+            # --------------------------------------------------------
+
+            The script:
+
+                scripts/runMode_Grid_Reco.sh
+
+            is for running the framework with the reconstruction option with the lxplus batch submission
+            system using the scheduler bsub.
+
+            This script will setup the run config file and launch one job for each input file in the
+            data file directory below.  The expected synatx is:
+
+                source scripts/runMode_Grid_Reco.sh <Data File Directory> <Config File - Reco> <Config File - Mapping> <Queue Names>
+
+            Where: the inputs are as in Section 3.a.i except that "Config File - Reco" is the PFN of the
+            input reco config file.  The behavior of this script is identical to runMode_Grid.sh except
+            that the input files found in the "Data File Directory" end with the expression "*.raw".
+            For furhter details consult Section 3.a.i.
+
+            After all your jobs have completed you are ready to process the created "*dataTree.root" files
+            with the framework in the analysis option (see Sections 3.a & 4.e.iii).
+
+            Example:
+
+                source scripts/runMode_Grid_Reco.sh $DATA_QC5/GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh
+                cd $DATA_QC5/GE11-VII-L-CERN-0004
+                ls
+                cd $GEM_BASE
+                source scripts/cleanGridFiles.sh
+                source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_QC5/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+
+            NOTE: Modications to config/configRun_Template_Grid_Reco.cfg may lead to undefined behavior or failures;
+            it is recommended to not modify the template config file.
+
+            # 3.a.iii Helper Script - Run Mode: Rerun
             # --------------------------------------------------------
 
             The script:
 
                 scripts/runMode_Rerun.sh
 
-            is for running the framework over a previously produced framework output TFile. This script will
-            setup the run config file to re-run over each input file found in the data file directory below.
-            One output TFile will be produced for each input file.  The expected synatx is:
+            is for running the framework with the analysis option over a previously produced framework output
+            TFile. This script will setup the run config file to re-run over each input file found in the data
+            file directory below. One output TFile will be produced for each input file.  The expected synatx is:
 
                 source scripts/runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
 
@@ -324,17 +414,17 @@
             NOTE: Modications to config/configRun_Template_Rerun.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
 
-            # 3.a.iii Helper Script - Run Mode: Series
+            # 3.a.iv Helper Script - Run Mode: Series
             # --------------------------------------------------------
 
             The script:
 
                 scripts/runMode_Series.sh
 
-            is for running the framework over a set of input files in series, i.e. one after the other, and
-            creating a single output TFile.  The expected syntax is:
+            is for running the framework with the analysis option over a set of input files in series, i.e.
+            one after the other, and creating a single output TFile.  The expected syntax is:
 
-                            source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+                source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
 
             Where: "Detector Name," "Data File Directory," "Config File - Analysis," and "Config File - Mapping"
             are as described in Sections 3.a.i and 3.a.ii; and "Output Data Filename" is the desired name of
@@ -348,19 +438,23 @@
                 source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
                 ./frameworkMain config/configRun.cfg true
 
+            Right now no helper script exists for running the reconstruction or combined options in the series mode.
+            Presently these modes can only be run over a single input file.  Manual configuration of the run config
+            file is required (See Section 4.e.iii).
+
             NOTE: Modications to config/configRun_Template_Series.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
 
-            # 3.a.iv  Helper Script - Run Mode: Comparison
+            # 3.a.v  Helper Script - Run Mode: Comparison
             # --------------------------------------------------------
 
             The script:
 
                 scripts/runMode_Comparison.sh
 
-            is for running the framework over a set of framework output files and creating a single output TFile
-            containing a TCanvas with a set of TH1F objects drawn on it (and also stored in the ROOT file).  The
-            expected syntax is:
+            is for running the framework with the analysis option over a set of framework output files and creating
+            a single output TFile containing a TCanvas with a set of TH1F objects drawn on it (and also stored in the
+            ROOT file).  The expected syntax is:
 
                 source runMode_Comparison.sh <Data File Directory> <Output Data Filename> <Obs Name> <iEta,iPhi,iSlice> <Identifier>
 
@@ -427,6 +521,45 @@
             NOTE: Modications to config/configComp_Template.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
 
+    # 3.b. genericPlotter
+    # --------------------------------------------------------
+
+    As with frameworkMain for each new shell navigate to the base directory of the repository and setup the
+    environment via:
+
+        source scripts/setup_CMS_GEM.sh
+
+    The usage for the genericPlotter executable is:
+
+        For executing:  ./genericPlotter <PFN of Plot Config File> <Verbose Mode true/false>
+
+    The Plot Config file is described in Section 4.e.iv.  The executable can take in comma separted data
+    or TObjects from an input TFile.  Presently TGraph2D, TGraphErrors, and TH1F objects are supported.
+
+    The genericPlotter will create a canvas following the official style guide for figures defined by the
+    CMS Collaboration at:
+
+        https://ghm.web.cern.ch/ghm/plots/
+        https://twiki.cern.ch/twiki/bin/view/CMS/Internal/PubGuidelines#Figures_and_tables
+
+    Developers should periodically check for updates to these guidelines.  This executable has been
+    adaptered from the tdrstyle.C, CMS_lumi.h, and CMS_lumi.C scripts available from the first link above.
+    Bob Brown, Gautier Hamel de Monchenault, and Dino Ferencek are the authors/contributors to these three
+    scripts at the time of their adaptation.
+
+    For a full explanation of the available configurations please consult Section 4.e.iv.  The contents and
+    layout of the output files are described in Section 4.f.iii.
+
+    Three example plot config files for plotting: 1) TGraph2D, 2) TGraphErrors, and 3) TH1F objects have been
+    provided in the default repository.  A usage example is given as:
+
+        ./genericPlotter config/configPlot_Graph.cfg true
+
+    As a general rule the style defined by genericPlotter may not persist in the created TObjects once they
+    have been saved in the output TFile.  Additionally your rootlogon.C script may define a different style
+    than the used in the official CMS guide.  As a result it is strongly suggested to relying on the output
+    image files created by genericPlotter and not the otuput ROOT file.
+
 # 4. Documentation
 # ========================================================
 
@@ -438,8 +571,11 @@
     # 4.a. Namespaces
     # --------------------------------------------------------
 
-    This repository at presently makes use of two namespaces: Timing, Uniformity.  Both of these
-    namespaces reside within the QualityControl namespace.
+    This repository has declared the following namespaces: Luminosity, Plotter, Timing, Uniformity.
+    The last three of these namespaces reside within the QualityControl namespace.
+
+    The Luminosity and Plotter namespaces include tools necessary for creating plots conforming to
+    the offical CMS Style Guide.
 
     The Timing namespace includes several operators, types, and utility functions that were developed
     in CMS_GEM_TB_Timing; the contents of the Timing namespace offer substantial utility and "quality
@@ -467,6 +603,7 @@
             |--->Interface
             |       |
             |       |--->InterfaceAnalysis
+            |       |--->InterfaceReco  (Skeleton, not implemented yet)
             |       |--->InterfaceRun   (Depreciated)
             |
             |--->Selector
@@ -476,34 +613,54 @@
 
         ParameterLoader
             |
-            |--->ParameterLoaderAmoreSRS
             |--->ParameterLoaderAnalysis
+            |--->ParameterLoaderDetector
+            |--->ParameterLoaderPlotter
             |--->ParameterLoaderRun
+
+        PlotterGeneric
+            |
+            |--->PlotterGraph
+            |--->PlotterGraph2D
+            |--->PlotterHisto
 
         ReadoutSector
             |
             |--->ReadoutSectorEta
             |--->ReadoutSectorPhi
 
-        DetectorMPGD (no children presently)
+    The following classes have no children presently
+
+        DetectorMPGD
+        SRSAPVEvent
+        SRSCluster
+        SRSConfiguration
+        SRSEventBuilder
+        SRSFECDecoder
+        SRSHit
+        SRSMain
+        SRSMapping
+        SRSOutputROOT
 
     Friendship relations:
 
         AnalyzeResponseUniformity, AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits,
-        and ParameterLoaderAmoreSRS are all friend classes to DetectorMPGD.
+        InterfaceAnalysis, and ParameterLoaderDetector are all friend classes to DetectorMPGD.
 
     Interactions:
 
-        Classes ParameterLoaderAmoreSRS, those inheriting from Selector, and those inheriting from
+        Classes ParameterLoaderDetector, those inheriting from Selector, and those inheriting from
         AnalyzeResponseUniformity all act on an object of DetectorMPGD.
 
         The ParameterLoaderAnalysis class interacts with objects who inherit from Selector and
         AnalyzResponseUniformity classes.
 
-        InterfaceAnalysis -> interface between main() and the framework; runs the analysis for loaded case.
-        ParameterLoaderAmoreSRS -> creates a DetectorMPGD object
+        InterfaceAnalysis -> interface between main() and the analysis portion of the framework; runs the analysis for loaded case.
         ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
+        ParameterLoaderDetector -> creates a DetectorMPGD object
+        ParameterLoaderPlotter -> loads necessary information for making a plot conforming to the CMS Style Guide
         ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
+        PlotterGeneric -> And it's inherited classes create a TCanvas with one or more TObjects drawn on it such that it conforms to the CMS Style Guide
         ReadoutSector -> A single readout sector, used by DetectorMPGD to track distributions in a certain portion of the detector
         ReadoutSectorEta -> As ReadoutSector, but for an iEta row inside the detector, stores the detectors ReadoutSectorPhi objects
         ReadoutSectorPhi -> As ReadoutSectorEta, but for an iPhi sector within an iEta row, stores the detector's hits, clusters, and slices
@@ -513,6 +670,57 @@
         AnalyzeResponseUniformityHit -> As AnalyzeResponseUniformityCluster but for hits.
         VisualizeUniformity -> Takes the raw plots produced by AnalyzeResponseUniformity and presents them in a user friendly manner.
         VisualizeComparison -> Compares TH1F objects from different Framework output files and makes simple comparison plots
+
+    An example process-flow of what frameworkMain does in a given execution is shown as:
+
+        frameworkMain
+            |
+            |->ParameterLoaderRun loads run parameters from run config file
+            |
+            |->Run Option Analysis
+            |       |
+            |       |->ParameterLoaderDetector creates a DetectorMPGD Object
+            |       |
+            |       |->ParameterLoaderAnalysis loads the analysis parameters from analysis config file
+            |       |
+            |       |->InterfaceAnalysis is given run & analyiss setup structs, and DetectorMPGD object
+            |               |
+            |               |->Reconstructed Tree File Input?
+            |               |       |
+            |               |       |->SelectorHit performs hit selection and stores selected hits in DetectorMPGD object
+            |               |       |
+            |               |       |->AnalyzeResponseUniformityHits makes distributions from selected hits
+            |               |       |
+            |               |       |->SelectorCluster does the same for clusters
+            |               |       |
+            |               |       |->AnalyzeResponseUniformityClusters makes distributions from selected clusters
+            |               |       |
+            |               |       |->After all input files are processed AnalyzeResponseUniformityClusters makes & fits slice distributions
+            |               |       |->VisualizeUniformity creates summary plots
+            |               |
+            |               |->Framework output file as input?
+            |                       |
+            |                       |->AnalyzeResponseUniformityClusters loads all previously created TObjects from file
+            |                       |
+            |                       |->AnalyzeResponseUniformityClusters then makes & fits slice distributions
+            |                       |
+            |                       |->VisualizeUniformity creates summary plots
+            |
+            |->Run Option Comparison
+            |       |
+            |       |->VisualizeComparison collects all TH1F objects for comparison from all input files
+            |       |
+            |       |->VisualizeComparison collected TH1F objects and sets up a legend for identification
+            |
+            |->Run Option Reconstruction
+            |       |
+            |       |->SRSMain produces a Tree file from a RD51 SRS raw file (BLACK BOX!!!)
+            |
+            |->Run Option Combined
+                    |
+                    |->Run Option Reconstruction is executed
+                    |
+                    |->Run Option Analysis is executed
 
         # 4.b.i. FrameworkBase
         # --------------------------------------------------------
@@ -624,7 +832,12 @@
 
             Coming "soon"
 
-            # 4.b.iii.III InterfaceRun
+            # 4.b.iii.III InterfaceReco
+            # --------------------------------------------------------
+
+            Skeleton class, not yet implemented
+
+            # 4.b.iii.IV InterfaceRun
             # --------------------------------------------------------
 
             Depreciated class, no longer used but kept in Framework.
@@ -654,27 +867,57 @@
 
         These classes are loading user specified parameters at runtime.
 
-            # 4.b.v.I ParameterLoaderAmoreSRS
+            # 4.b.v.I ParameterLoaderAnalysis
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.v.II ParameterLoaderAnalysis
+            # 4.b.v.II ParameterLoaderDetector
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.v.III ParameterLoaderRun
+            # 4.b.v.III ParameterLoaderPlotter
             # --------------------------------------------------------
 
             Coming "soon"
 
-        # 4.b.vi. Readouts
+            # 4.b.v.IV ParameterLoaderRun
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+        # 4.b.vi. Plotters
         # --------------------------------------------------------
 
         Coming "soon"
 
-            # 4.b.vi.I ReadoutSector
+            # 4.b.vi.I PlotterGeneric
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.vi.II PlotterGraph
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.vi.III PlotterGraph2D
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.vi.IV PlotterHisto
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+        # 4.b.vii. Readouts
+        # --------------------------------------------------------
+
+        Coming "soon"
+
+            # 4.b.vii.I ReadoutSector
             # --------------------------------------------------------
 
             More coming "soon"
@@ -700,7 +943,7 @@
                 clustHistos //Tracks observables for clusters
                 hitHistos   //Tracls observables for hits
 
-            # 4.b.vi.II ReadoutSectorEta
+            # 4.b.vii.II ReadoutSectorEta
             # --------------------------------------------------------
 
             The Uniformity::ReadoutSectorEta represents one iEta row of a detector. Each instance of a
@@ -754,7 +997,7 @@
             The copy constructor and one overloaded assignment operator perform a deep copy of the
             std::shared_ptr objects above.
 
-            # 4.b.vi.III ReadoutSectorPhi
+            # 4.b.vii.III ReadoutSectorPhi
             # --------------------------------------------------------
 
             Defined in include/ReadoutSectorPhi.h
@@ -796,7 +1039,7 @@
             The copy constructor and overloaded assignment operator perform a deep copy of
             the std::shared_ptr objects above.
 
-        # 4.b.vii. DetectorMPGD
+        # 4.b.viii. DetectorMPGD
         # --------------------------------------------------------
 
         Coming "soon"
@@ -819,6 +1062,11 @@
 
 
         # 4.c.ii. Uniformity
+        # --------------------------------------------------------
+
+        Coming "soon"
+
+        # 4.c.iii. Plotter
         # --------------------------------------------------------
 
         Coming "soon"
@@ -1102,6 +1350,11 @@
 
             There is also one copy constructor and one overloaded assignment operator.  These items perform a
             deep copy of the std::shared_ptr objects above.
+
+        # 4.d.iii. Plotter
+        # --------------------------------------------------------
+
+        Coming "soon"
 
     # 4.e. Configuration Files
     # --------------------------------------------------------
@@ -1567,6 +1820,9 @@
 
                 Config_Mapping              string, PFN of the input mapping configuration file.
 
+                Config_Reco                 string, PFN of the input reconstruction configuration file.
+                                            e.g. your "amore.cfg" file
+
                 Detector_Name               string, the serial number of the detector (do not include special
                                             characters such as '/' but dashes '-' are allowed)
 
@@ -1599,10 +1855,7 @@
                                             of the analysis of all input files.  Note that this should only be set
                                             to false if Input_Is_Frmwrk_Output is also set to false.
 
-                Ana_Reco_Clusters           boolean, set to true if you would like to the framework to reconstruct
-                                            clusters from input hits found in the amoreSRS input TFile. Setting to
-                                            false takes the clusters from the input amoreSRS TFile.  Right now this
-                                            field does nothing and is only a placeholder.
+                Reco_All                    boolean, set to true if input files are RD51 SRS raw data files.
 
                 Ana_Hits                    boolean, setting to true will tell the framework to perform the analysis
                                             of the input hits.
@@ -1697,11 +1950,19 @@
         # 4.e.iii.IV  Configuration Options
         # --------------------------------------------------------
 
-        The framework can run in an analysis mode, which has three configurations, and it can run in a
-        comparison mode which has one configuration. The three configurations of the analysis mode have
-        the frameworkMain executable analyze raw data taken with RD51 Scaleable Readout System and
-        unpacked amoreSRS. In the comparison mode the frameworkMain executable is used to compare
-        plots across multiple Framework output files.
+        The framework can run with: 1) an analysis option, which has three configurations;
+        2) a comparison option, which has one configuration; 3) a reconstruction option, which has
+        one configuration; and 4) a combined reconstruction and analysis option which has one
+        configuration. The three configurations of the analysis mode have the frameworkMain executable
+        analyze data taken with RD51 Scaleable Readout System and reconstructed either with amoreSRS
+        or the framework. In the comparison mode the frameworkMain executable is used to compare
+        plots across multiple Framework output files.  In the reconstruction option the framework
+        main executable takes reconstructs a raw data file produced by the RD51 SRS system to create
+        an output tree file for later analysis.  This option must only be given one input file.  In
+        the combined option the frameworkMain executable is used to perform the reconstruction and
+        then analysis of an input RD51 SRS raw data file.  Again in this option only a single input
+        file must be given; however here two output root files will be produced, one a tree file, the
+        other the framework output file.
 
         The 1st analysis configuration is the "series" mode which will analyze all of the input files
         defined in the "[BEGIN_RUN_LIST]" header, one after another, created by either amoreSRS or the
@@ -2136,7 +2397,7 @@
         The "Obs_Name" sub directory will contain two TH1F objects with their regular TNames appended with "_ClustTime1to30"
         and "ClustTime6to27."  The TCanvas they are drawn on will be named "canv_ClustSize_<Obs_Name>"
 
-        # 4.f.iii Output Text File
+        # 4.f.iv Output Text File
         # --------------------------------------------------------
 
         An output text file will be created that will show in tabular form a table which
