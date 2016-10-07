@@ -280,14 +280,15 @@ void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
             //Find matching eta sector
             if ( fEtaLim_Low < inputCluster.fPos_Y && inputCluster.fPos_Y < fEtaLim_High ) { //Case: Matching Eta Sector Found!
                 
-		//Debugging
-		//cout<<"Eta Selected\n";
-
                 //Find matching phi sector within this eta sector
                 for (auto iterPhi = (*iterEta).second.map_sectorsPhi.begin(); iterPhi != (*iterEta).second.map_sectorsPhi.end(); ++iterPhi) { //Loop Over map_sectorsPhi
                     
                     if ( (*iterPhi).second.fPos_Xlow <= inputCluster.fPos_X && inputCluster.fPos_X < (*iterPhi).second.fPos_Xhigh ) { //Case: Matching Phi Sector Found!
                         (*iterPhi).second.map_clusters.insert( std::pair<int, Cluster>(iNum_Evt, inputCluster) );
+
+			//Debugging
+			//cout<<"Phi Selected\n";
+
                         break;
                     } //End Case: Matching Phi Sector Found!
                 } //End Loop Over map_sectorsPhi

@@ -17,7 +17,7 @@ stdlog/*
 stdout/
 stdout/*
 scripts/submitFrameworkJob_RunNo*.sh
-scripts/deleteSelectedRawFiles.sh
+#scripts/deleteSelectedRawFiles.sh
 
 # Compiled source #
 ###################
