@@ -213,6 +213,29 @@ namespace QualityControl {
                 m_map_infoPlot.clear();
             }
         }; //End InfoCanvas
+
+//RGB color palette
+	struct PlotColorPaletteRGB{
+		static const Int_t m_NRGBs = 5;
+    		static const Int_t m_NCont = 255;
+
+    		Double_t m_stops[m_NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
+    		Double_t m_red[m_NRGBs]   = { 0.00, 0.00, 0.87, 1.00, 0.51 };
+    		Double_t m_green[m_NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };
+    		Double_t m_blue[m_NRGBs]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
+	}; //End PlotColorPaletteRGB
+
+	//Mono-shade color palette (Cyan lighter)
+	//Thanks to Tutanon Sinthuprasith
+	struct PlotColorPaletteMono{
+		static const Int_t m_NRGBs = 10;
+    		static const Int_t m_NCont = 255;
+  		
+		Double_t m_blue[m_NRGBs]   = { 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00};                                                                                                                   
+  		Double_t m_green[m_NRGBs]  = { 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.85, 0.90};                                                                                                                   
+ 		Double_t m_red[m_NRGBs]    = { 0.00, 0.00, 0.10, 0.20, 0.25, 0.40, 0.45, 0.50, 0.55, 0.60};                                                                                                                   
+  		Double_t m_stops[m_NRGBs] = { 0.00, 0.05, 0.10, 0.20, 0.40, 0.60, 0.70, 0.80, 0.85, 0.90}; 
+	}; //End PlotColorPaletteMono
     } //End namspace Plotter
 } //End namespace QualityControl
 

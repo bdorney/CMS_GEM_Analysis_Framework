@@ -2,10 +2,16 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.4                               *
-*	LAST UPDATE: Oct 7 2016                      *
+*	VERSION: 2.2.5                               *
+*	LAST UPDATE: Oct 8 2016                      *
 *                                                *
 **************************************************
+
+Update: October 8th 2016
+==================================================
+->Added two struct's QualityControl::Plotter::PlotColorPaletteRGB and PlotColorPaletteMono in include/PlotterUtilityTypes.h for defining color palette's
+->QualityControl::Plotter::PlotterGeneric::setStyle() will now use PlotColorPaletteRGB as the default color palette
+->QualityControl::Plotter::PlotterGraph2D::drawPlots() will now use PlotColorPaletteMono for the mono-color palette
 
 Update: October 7th 2016
 ==================================================

@@ -12,15 +12,12 @@
 DIR_ORIG=$PWD
 
 #store the run config file
-#FILE_RUN=$GEM_BASE/config/configRun.cfg
 FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Grid_Reco.cfg
 
 #setup input variables
-#NAME_DET=$1
 DIR_DATA=$1
 FILE_RECO=$2
 FILE_MAP=$3
-#FILE_OUT=$5
 NAME_QUEUE=$4
 
 #Move to the data directory
@@ -36,9 +33,6 @@ do
     #copy file
     FILE_RUN=$GEM_BASE/config/configRun_RunNo${COUNTER}.cfg
     cp $FILE_RUN_TEMP $FILE_RUN
-
-    #Replace Detector Name
-    #sed -i -- "s@DETECTORNAME@$NAME_DET@g" $FILE_RUN
 
     #Replace filenames
     sed -i -- "s@CONFIGFILE_RECO@$FILE_RECO@g" $FILE_RUN

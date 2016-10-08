@@ -90,14 +90,15 @@ void PlotterGraph2D::drawPlots(){
 
     //Make the palette monocolored?
     if (m_bMonoColor) {
-        const Int_t NRGBs = 5;
+        /*const Int_t NRGBs = 5;
         const Int_t NCont = 255;
         Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };
         Double_t red[NRGBs]   = { 0.00, 0.00, 0.00, 0.00, 0.00 };
         Double_t green[NRGBs] = { 0.05, 0.10, 0.15, 0.2, 0.25 };
-        Double_t blue[NRGBs]  = { 0.6, 0.7, 0.8, 0.9, 1.00 };
-        TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
-        m_tdrStyle->SetNumberContours(NCont);
+        Double_t blue[NRGBs]  = { 0.6, 0.7, 0.8, 0.9, 1.00 };*/
+	PlotColorPaletteMono palette_Mono;
+        TColor::CreateGradientColorTable(palette_Mono.m_NRGBs, palette_Mono.m_stops, palette_Mono.m_red, palette_Mono.m_green, palette_Mono.m_blue, palette_Mono.m_NCont);
+        m_tdrStyle->SetNumberContours(palette_Mono.m_NCont);
         
         m_tdrStyle->cd();
     }

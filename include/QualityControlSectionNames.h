@@ -10,12 +10,14 @@
 #define _QualityControlSectionNames_h
 
 //C++ Includes
+#include <memory>
 #include <stdio.h>
 #include <string>
 
 //Framework Includes
 
 //ROOT Includes
+#include "TROOT.h"
 
 namespace QualityControl {
     namespace Uniformity{
