@@ -64,9 +64,14 @@ void PlotterHisto::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 void PlotterHisto::drawPlots(){
     for (auto iterPlot = m_map_histos.begin(); iterPlot != m_map_histos.end(); ++iterPlot) {
         //Draw (root hack to make sure axis alive)
-        m_canv->cd();
-        (*iterPlot).second->Draw( m_canvInfo.m_strOptionDraw.c_str() );
+        //m_canv->cd();
+        //(*iterPlot).second->Draw( m_canvInfo.m_strOptionDraw.c_str() );
         
+	//Normalize?
+	if ( m_canvInfo.m_bNormalize ){
+		(*iterPlot).second->Scale(1. / (*iterPlot).second->Integral() );
+	}
+
         //Set Style - X axis
         (*iterPlot).second->GetXaxis()->SetTitle(m_canvInfo.m_strTitle_X.c_str() );
         (*iterPlot).second->GetXaxis()->SetNdivisions(m_canvInfo.m_iXAxis_NDiv);
@@ -93,11 +98,6 @@ void PlotterHisto::drawPlots(){
                 || m_canvInfo.m_strOptionDraw.find("SAME") == std::string::npos ) ) {
             m_canvInfo.m_strOptionDraw = "same" + m_canvInfo.m_strOptionDraw;
         }
-
-	//Normalize?
-	if ( m_canvInfo.m_bNormalize ){
-		(*iterPlot).second->Scale(1. / (*iterPlot).second->Integral() );
-	}
 
         //Draw (for realz)
         m_canv->cd();
