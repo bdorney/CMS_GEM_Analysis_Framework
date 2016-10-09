@@ -11,7 +11,8 @@
 //SRSMain* SRSMain::_repro = 0;
 
 SRSMain::~SRSMain(){
-  this->Close();
+  if (!_isClosed)
+    this->Close();
 };
  
 /*SRSMain* 
@@ -164,7 +165,8 @@ SRSMain::SRSMain(const std::string& rawfile, const std::string& config) :
 	_conf(new SRSConfiguration),
 	//_maps(new SRSMapping),
 	_maps( SRSMapping::GetInstance() ),
-	_root(new SRSOutputROOT)
+	_root(new SRSOutputROOT),
+	_isClosed(false)
   {
   this->Init();
 }
@@ -185,7 +187,7 @@ SRSMain::Init(){
 
 void SRSMain::Close(){
   std::string strRunName = _rawfile;
-
+  _isClosed = true;
   if( strRunName.find(".raw") != std::string::npos){
 	strRunName.erase(strRunName.find(".raw"), strRunName.length() - strRunName.find(".raw") );
   }
@@ -197,4 +199,5 @@ void SRSMain::Close(){
   //delete _conf;
   _conf.reset();
   _maps.reset();
+  
 }
