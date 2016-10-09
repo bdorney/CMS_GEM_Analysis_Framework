@@ -3,9 +3,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 2.2.5                               *
-*	LAST UPDATE: Oct 8 2016                      *
+*	LAST UPDATE: Oct 9 2016                      *
 *                                                *
 **************************************************
+
+Update: October 9th 2016
+==================================================
+->Implemented functionality for QualityControl::Plotter::PlotterHisto to draw TH1F objects with unit integral
 
 Update: October 8th 2016
 ==================================================
