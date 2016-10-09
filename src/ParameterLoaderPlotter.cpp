@@ -12,6 +12,7 @@ using std::cout;
 using std::endl;
 using std::find;
 using std::make_tuple;
+using std::pair;
 using std::stoi;    //Maybe Timing::stoiSafe?
 using std::streampos;
 using std::string;
@@ -123,7 +124,8 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
         else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Plot ) ){ //Case: Start of Plot Section
             InfoPlot plotInfo;
             loadParametersPlot(file_Input, plotInfo);
-            inputCanvInfo.m_map_infoPlot[plotInfo.m_strName]=plotInfo;
+            //inputCanvInfo.m_map_infoPlot[plotInfo.m_strName]=plotInfo;
+            inputCanvInfo.m_map_infoPlot.insert( pair<string, InfoPlot>( plotInfo.m_strName, plotInfo) );
 
             continue;
         } //End Case: Start of Plot Section

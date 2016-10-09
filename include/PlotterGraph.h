@@ -10,10 +10,12 @@
 #define ____PlotterGraph__
 
 //C++ Includes
+#include <iterator>
 #include <map>
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <utility>
 
 //Framework Includes
 #include "PlotterGeneric.h"
@@ -85,7 +87,8 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            //std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            std::multimap<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
             
             std::shared_ptr<TMultiGraph> m_mgraph_Obs;
         };

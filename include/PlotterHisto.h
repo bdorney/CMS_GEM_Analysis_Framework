@@ -10,10 +10,12 @@
 #define ____PlotterHisto__
 
 //C++ Includes
+#include <iterator>
 #include <map>
 #include <memory>
 #include <stdio.h>
 #include <string>
+#include <utility>
 
 //Framework Includes
 #include "PlotterGeneric.h"
@@ -84,7 +86,8 @@ namespace QualityControl {
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
             //std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
-            std::map<std::string, std::shared_ptr<TH1F> > m_map_histos;
+            //std::map<std::string, std::shared_ptr<TH1F> > m_map_histos;
+            std::multimap<std::string, std::shared_ptr<TH1F> > m_map_histos;
             
             //std::shared_ptr<TMultiGraph> mgraph_Obs;
         };

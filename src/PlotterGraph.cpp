@@ -11,6 +11,8 @@
 using std::cout;
 using std::endl;
 using std::make_shared;
+using std::multimap;
+using std::pair;
 using std::shared_ptr;
 using std::string;
 
@@ -27,7 +29,7 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     initPlot(plotInfo);
     
     //Check to make sure it initialized successfully
-    if ( !(m_map_graphs.count(plotInfo.m_strName) > 0 ) ) {
+    if ( !(m_map_graphs.count(plotInfo.m_strName) >= (m_map_iSameNameCount[plotInfo.m_strName]) ) ) {
         cout<<"PlotterGraph::makePlots() - Plot:\n";
         cout<<"\t"<<plotInfo.m_strName<<endl;
         cout<<"\tDid not initialize correctly, please cross-check input!\n";
@@ -37,7 +39,12 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     }
     
     //Get this plot
-    auto graphPtr = m_map_graphs[plotInfo.m_strName];
+	pair<multimap<string,shared_ptr<TGraphErrors> >::iterator, multimap<string,shared_ptr<TGraphErrors> >::iterator> pair_iterThisPlotName = m_map_graphs.equal_range(plotInfo.m_strName);
+	multimap<string,shared_ptr<TGraphErrors> >::iterator iterThisPlot = pair_iterThisPlotName.first;
+	std::advance(iterThisPlot, (m_map_iSameNameCount[plotInfo.m_strName] - 1 ) );
+	auto graphPtr = ( (*iterThisPlot).second );
+
+    //auto graphPtr = m_map_graphs[plotInfo.m_strName];
     
     //Set the Style
     graphPtr->SetLineColor(plotInfo.m_iColor);
@@ -112,7 +119,9 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
             graphPtr->SetPointError(iPos, (*iterDataPt).m_fX_Err, (*iterDataPt).m_fY_Err );
         } //End Loop Over Data
         
-        m_map_graphs[plotInfo.m_strName]=graphPtr;
+        //m_map_graphs[plotInfo.m_strName]=graphPtr;
+	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+	(m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     } //End Case: Data Input
     else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
         //TFile does not manage objects
@@ -130,8 +139,10 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
         //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
         shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( strTmpName.c_str() ) ) );
         
-        m_map_graphs[plotInfo.m_strName]=graphPtr;
-        
+        //m_map_graphs[plotInfo.m_strName]=graphPtr;
+	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+        (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
+
         file_Input->Close();
     } //End Case: TObject Input
     else{

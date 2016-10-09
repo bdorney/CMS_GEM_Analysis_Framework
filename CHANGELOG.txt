@@ -10,6 +10,9 @@
 Update: October 9th 2016
 ==================================================
 ->Implemented functionality for QualityControl::Plotter::PlotterHisto to draw TH1F objects with unit integral
+->QualityControl::Plotter::PlotterHisto::m_map_histos changed from std::map to std::multimap to allow TH1F's having the same TName from different TFile's to be plotted
+->QualityControl::Plotter::PlotterGraph::m_map_graphs changed from std::map to std::multimap to allow TGraphErrors objects having the same TName from different TFile's to be plotted
+->QualityControl::Plotter::InfoCanvas::m_map_infoPlot changed from std::map to std::multimap to allow TObjects having the same TName from different TFile's to be plotted
 
 Update: October 8th 2016
 ==================================================

@@ -11,6 +11,8 @@
 using std::cout;
 using std::endl;
 using std::make_shared;
+using std::multimap;
+using std::pair;
 using std::shared_ptr;
 using std::string;
 
@@ -28,7 +30,7 @@ void PlotterHisto::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     initPlot(plotInfo);
     
     //Check to make sure it initialized successfully
-    if ( !(m_map_histos.count(plotInfo.m_strName) > 0 ) ) {
+    if ( !(m_map_histos.count(plotInfo.m_strName) >= (m_map_iSameNameCount[plotInfo.m_strName]) ) ) {
         cout<<"PlotterHisto::makePlots() - Plot:\n";
         cout<<"\t"<<plotInfo.m_strName<<endl;
         cout<<"\tDid not initialize correctly, please cross-check input!\n";
@@ -38,7 +40,11 @@ void PlotterHisto::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     }
     
     //Get this plot
-    auto hPtr = m_map_histos[plotInfo.m_strName];
+    //auto hPtr = m_map_histos[plotInfo.m_strName];
+	pair<multimap<string,shared_ptr<TH1F> >::iterator, multimap<string,shared_ptr<TH1F> >::iterator> pair_iterThisPlotName = m_map_histos.equal_range(plotInfo.m_strName);
+	multimap<string,shared_ptr<TH1F> >::iterator iterThisPlot = pair_iterThisPlotName.first;
+	std::advance(iterThisPlot, (m_map_iSameNameCount[plotInfo.m_strName] - 1 ) );
+	auto hPtr = ( (*iterThisPlot).second );
     
     //Set the Style
     hPtr->SetLineColor(plotInfo.m_iColor);
@@ -125,7 +131,9 @@ void PlotterHisto::initPlot(InfoPlot & plotInfo){
         //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
         shared_ptr<TH1F> hPtr = make_shared<TH1F>( *((TH1F*) file_Input->Get( strTmpName.c_str() ) ) );
         
-        m_map_histos[plotInfo.m_strName]=hPtr;
+        //m_map_histos[plotInfo.m_strName]=hPtr;
+	m_map_histos.insert( pair<string, shared_ptr<TH1F> >( plotInfo.m_strName, hPtr ) );
+        (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
         
         file_Input->Close();
     } //End Case: TObject Input

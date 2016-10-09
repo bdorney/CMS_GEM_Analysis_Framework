@@ -10,6 +10,7 @@
 #define ____PlotterGeneric__
 
 //C++ Includes
+#include <map>
 #include <memory>
 #include <stdio.h>
 #include <string>
@@ -173,7 +174,10 @@ namespace QualityControl {
             bool m_bSaveCanvases;
             
             int m_iLogoPos; //Determines CMS Logo position
+            //int m_iSameNamePlotCount; //Tracks How Many Plots have the same TName
             
+            std::map<std::string,int> m_map_iSameNameCount; //Tracks How Many Plots have the same TName
+
             std::string m_strOutputFile_Name;
             std::string m_strOutputFile_Option;
             

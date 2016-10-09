@@ -166,7 +166,8 @@ namespace QualityControl {
             std::string m_strTitle_Y;       //Y-Axis Title
             std::string m_strTitle_Z;       //Z-Axis Title
             
-            std::map<std::string, InfoPlot> m_map_infoPlot;
+            //std::map<std::string, InfoPlot> m_map_infoPlot;
+            std::multimap<std::string, InfoPlot> m_map_infoPlot;
             
             //Constructor
             InfoCanvas(){
