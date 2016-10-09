@@ -12,6 +12,7 @@ Update: October 8th 2016
 ->Added two struct's QualityControl::Plotter::PlotColorPaletteRGB and PlotColorPaletteMono in include/PlotterUtilityTypes.h for defining color palette's
 ->QualityControl::Plotter::PlotterGeneric::setStyle() will now use PlotColorPaletteRGB as the default color palette
 ->QualityControl::Plotter::PlotterGraph2D::drawPlots() will now use PlotColorPaletteMono for the mono-color palette
+->Updated QualityControl::Plotter::drawLatex() to treat the "~" as a space character; when entering Canv_Latex_Line in the plot config file use "~" for spaces.
 
 Update: October 7th 2016
 ==================================================

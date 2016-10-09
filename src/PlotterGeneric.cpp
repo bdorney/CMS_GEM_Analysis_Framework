@@ -99,6 +99,9 @@ void PlotterGeneric::drawLatex(std::tuple<float, float, std::string> tupleTexLin
     latex.SetTextSize(0.04);
     latex.SetTextAlign(12);
     
+	//Replace all "~" with spaces " "
+	std::replace( get<2>(tupleTexLine).begin(), get<2>(tupleTexLine).end(), '~', ' ');
+
     //Draw
     m_canv->cd();
     latex.DrawLatexNDC(get<0>(tupleTexLine), get<1>(tupleTexLine), (get<2>(tupleTexLine) ).c_str() );

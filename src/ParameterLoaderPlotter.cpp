@@ -222,9 +222,6 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
             else if ( pair_strParam.first.compare("CANV_MONO_COLOR") == 0 ) {
                 inputCanvInfo.m_bMonoColor = convert2bool(pair_strParam.second,bExitSuccess);
             }
-            else if ( pair_strParam.first.compare("CANV_NAME") == 0 ) {
-                inputCanvInfo.m_strName = pair_strParam.second;
-            }
             else if ( pair_strParam.first.compare("CANV_N_AXIS_X") == 0 ) {
                 
                 //Placeholder
@@ -234,6 +231,12 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 
                 //Placeholder
                 
+            }
+            else if ( pair_strParam.first.compare("CANV_NAME") == 0 ) {
+                inputCanvInfo.m_strName = pair_strParam.second;
+            }
+            else if ( pair_strParam.first.compare("CANV_NORMALIZE") == 0 ) {
+                inputCanvInfo.m_bNormalize = convert2bool(pair_strParam.second,bExitSuccess);
             }
             else if ( pair_strParam.first.compare("CANV_PLOT_TYPE") == 0 ) {
                 inputCanvInfo.m_strPlotType = pair_strParam.second;

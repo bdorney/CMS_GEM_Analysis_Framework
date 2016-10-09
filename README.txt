@@ -2442,11 +2442,14 @@
                                         shade, or multi-colored (false).  For paper publications this should be false;
                                         for presentations/talks this ma be true.
 
-                Canv_Name               string, TName of the created TCanvas.
-
                 Canv_N_Axis_X           int, placeholder
 
                 Canv_N_Axis_Y           int, placeholder
+
+                Canv_Name               string, TName of the created TCanvas.
+
+                Canv_Normalize          boolean, Only implemented for TH1F objects, if set to true all TH1F's are 
+					drawn with an integral of unity.
 
                 Canv_Plot_Type          string, determines the type of TObject to be plotted on the Canvas, supported
                                         types are "TGraph2D, TGraphErrors, TH1F".

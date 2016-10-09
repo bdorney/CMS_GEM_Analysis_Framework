@@ -88,6 +88,11 @@ void PlotterHisto::drawPlots(){
             m_canvInfo.m_strOptionDraw = "same" + m_canvInfo.m_strOptionDraw;
         }
 
+	//Normalize?
+	if ( m_canvInfo.m_bNormalize ){
+		(*iterPlot).second->Scale(1. / (*iterPlot).second->Integral() );
+	}
+
         //Draw (for realz)
         m_canv->cd();
         (*iterPlot).second->Draw( m_canvInfo.m_strOptionDraw.c_str() );
