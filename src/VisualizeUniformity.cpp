@@ -1481,19 +1481,19 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         inputSlice.fitSlice_ClustADC->Draw("same");
         
         //Draw the Signal Only?
-        if (aSetup.histoSetup_clustADC.strFit_Formula_Sig.length() > 0) {
+        if (aSetup.fitSetup_clustADC.m_strFit_Formula_Sig.length() > 0) {
             func_fitSig = new TF1(
                 "func_fitSig",
-                aSetup.histoSetup_clustADC.strFit_Formula_Sig.c_str(),
+                aSetup.fitSetup_clustADC.m_strFit_Formula_Sig.c_str(),
                 inputSlice.fitSlice_ClustADC->GetXmin(),
                 inputSlice.fitSlice_ClustADC->GetXmax()
             );
             
             //Set the fit parameters from the slice fit
-            for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Sig.first;
-                 i <= aSetup.histoSetup_clustADC.pair_iParamRange_Sig.second;
+            for (int i=aSetup.fitSetup_clustADC.m_pair_iParamRange_Sig.first;
+                 i <= aSetup.fitSetup_clustADC.m_pair_iParamRange_Sig.second;
                  ++i) {
-                func_fitSig->SetParameter(i-aSetup.histoSetup_clustADC.pair_iParamRange_Sig.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+                func_fitSig->SetParameter(i-aSetup.fitSetup_clustADC.m_pair_iParamRange_Sig.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
             }
             
             func_fitSig->SetLineStyle(2);
@@ -1505,19 +1505,19 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         }
         
         //Draw the Background Only?
-        if (aSetup.histoSetup_clustADC.strFit_Formula_Bkg.length() > 0) {
+        if (aSetup.fitSetup_clustADC.m_strFit_Formula_Bkg.length() > 0) {
             func_fitBkg = new TF1(
                 "func_fitBkg",
-                aSetup.histoSetup_clustADC.strFit_Formula_Bkg.c_str(),
+                aSetup.fitSetup_clustADC.m_strFit_Formula_Bkg.c_str(),
                 inputSlice.fitSlice_ClustADC->GetXmin(),
                 inputSlice.fitSlice_ClustADC->GetXmax()
             );
             
             //Set the fit parameters from the slice fit
-            for (int i=aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.first;
-                 i <= aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.second;
+            for (int i=aSetup.fitSetup_clustADC.m_pair_iParamRange_Bkg.first;
+                 i <= aSetup.fitSetup_clustADC.m_pair_iParamRange_Bkg.second;
                  ++i) {
-                func_fitBkg->SetParameter(i-aSetup.histoSetup_clustADC.pair_iParamRange_Bkg.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
+                func_fitBkg->SetParameter(i-aSetup.fitSetup_clustADC.m_pair_iParamRange_Bkg.first, inputSlice.fitSlice_ClustADC->GetParameter(i) );
             }
             
             func_fitBkg->SetLineStyle(2);
@@ -1580,8 +1580,8 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     latex_NormChi2.DrawLatexNDC(0.55, 0.55, ("#chi^{2} / NDF = " + getString(inputSlice.fitSlice_ClustADC->GetChisquare() / inputSlice.fitSlice_ClustADC->GetNDF() ) ).c_str() );
 
     //Get the Peak Position            
-    auto iterParamPEAK = std::find(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.end(), "PEAK");
-    int iIdxPk = std::distance(aSetup.histoSetup_clustADC.vec_strFit_ParamMeaning.begin(), iterParamPEAK);
+    auto iterParamPEAK = std::find(aSetup.fitSetup_clustADC.m_vec_strFit_ParamMeaning.begin(), aSetup.fitSetup_clustADC.m_vec_strFit_ParamMeaning.end(), "PEAK");
+    int iIdxPk = std::distance(aSetup.fitSetup_clustADC.m_vec_strFit_ParamMeaning.begin(), iterParamPEAK);
     float fPkPos = inputSlice.fitSlice_ClustADC->GetParameter(iIdxPk);
     float fPkPosErr = inputSlice.fitSlice_ClustADC->GetParError(iIdxPk);
 

@@ -42,8 +42,8 @@ namespace QualityControl {
         
         //Common Data Types Goes Here
         struct HistoSetup{
-            bool bFit;              //Execute fit?
-            bool bFit_AutoRanging;  //Fit range determined automatically?
+            //bool bFit;              //Execute fit?
+            //bool bFit_AutoRanging;  //Fit range determined automatically?
             bool bIsTrig;
             //bool bSubtractBkg;      //Background subtraction
             
@@ -57,28 +57,29 @@ namespace QualityControl {
             int iTDC_Chan;
             int iHisto_nBins;   //number of bins
             
-            std::pair<int,int> pair_iParamRange_Sig;
-            std::pair<int,int> pair_iParamRange_Bkg;
+            //std::pair<int,int> pair_iParamRange_Sig;
+            //std::pair<int,int> pair_iParamRange_Bkg;
             
-            std::string strFit_Formula;     //Fit Formula (used)
-            std::string strFit_Formula_Sig; //Fit Formula - Signal (visual aid only)
-            std::string strFit_Formula_Bkg; //Fit Formula - Bkg (visual aid only)
-            std::string strFit_Name;
-            std::string strFit_Option;
+            //std::string strFit_Formula;     //Fit Formula (used)
+            //std::string strFit_Formula_Sig; //Fit Formula - Signal (visual aid only)
+            //std::string strFit_Formula_Bkg; //Fit Formula - Bkg (visual aid only)
+            //std::string strFit_Name;
+            //std::string strFit_Option;
             
             std::string strHisto_Name;
             std::string strHisto_Title_X;
             std::string strHisto_Title_Y;
             
             //Allow for complex expressions
-            std::vector<std::string> vec_strFit_ParamMeaning;
-            std::vector<std::string> vec_strFit_ParamIGuess;
-            std::vector<std::string> vec_strFit_ParamLimit_Min;
-            std::vector<std::string> vec_strFit_ParamLimit_Max;
-            std::vector<std::string> vec_strFit_Range;
+            //std::vector<std::string> vec_strFit_ParamMeaning;
+            //std::vector<std::string> vec_strFit_ParamIGuess;
+            //std::vector<std::string> vec_strFit_ParamLimit_Min;
+            //std::vector<std::string> vec_strFit_ParamLimit_Max;
+            //std::vector<std::string> vec_strFit_Range;
             
             HistoSetup(){
-                bFit = bFit_AutoRanging = bIsTrig = false;
+                //bFit = bFit_AutoRanging = bIsTrig = false;
+                bIsTrig = false;
                 
                 fHisto_BinWidth = 1;
                 fHisto_xLower = 0;
@@ -88,11 +89,11 @@ namespace QualityControl {
                 iHisto_nBins = 1200;
                 
                 //strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
-                strFit_Formula = "";
-                strFit_Formula_Sig = "";
-                strFit_Formula_Bkg = "";
-                strFit_Name = "";
-                strFit_Option = "R";
+                //strFit_Formula = "";
+                //strFit_Formula_Sig = "";
+                //strFit_Formula_Bkg = "";
+                //strFit_Name = "";
+                //strFit_Option = "R";
                 
                 strHisto_Name = "";
                 strHisto_Title_X = "";

@@ -1,12 +1,12 @@
 //
-//  ParameterLoaderAnaysis.cpp
+//  ParameterLoaderAnalysis.cpp
 //  
 //
 //  Created by Brian L Dorney on 28/01/16.
 //
 //
 
-#include "ParameterLoaderAnaysis.h"
+#include "ParameterLoaderAnalysis.h"
 
 using std::cout;
 using std::endl;
@@ -30,10 +30,10 @@ using QualityControl::Timing::stoiSafe;
 using namespace QualityControl::Uniformity;
 
 //Default Constructor
-ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
+ParameterLoaderAnalysis::ParameterLoaderAnalysis(){
     m_bVerboseMode_IO       = false;
     
-    strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
+    /*strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
     strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
     strSecBegin_Uniformity  = "[BEGIN_UNIFORMITY_INFO]";
     strSecBegin_Uniformity_Fit = "[BEGIN_ADC_FIT_INFO]";
@@ -44,11 +44,11 @@ ParameterLoaderAnaysis::ParameterLoaderAnaysis(){
     strSecEnd_Timing        = "[END_TIMING_INFO]";
     strSecEnd_Uniformity    = "[END_UNIFORMITY_INFO]";
     strSecEnd_Uniformity_Fit = "[END_ADC_FIT_INFO]";
-    strSecEnd_Uniformity_Hiso = "[END_HISTO_INFO]";
+    strSecEnd_Uniformity_Hiso = "[END_HISTO_INFO]";*/
 } //End default constructor
 
 //Opens a text file set by the user and loads the requested parameters
-void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, AnalysisSetupUniformity &aSetupUniformity){
+void ParameterLoaderAnalysis::loadAnalysisParameters(string & strInputSetupFile, AnalysisSetupUniformity &aSetupUniformity){
     //Variable Declaration
     //bool bExitSuccess = false;
     
@@ -62,7 +62,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     //Open the Data File
     //------------------------------------------------------
     /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
-        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParameters", ("trying to open and read: " + strInputSetupFile).c_str() );
+        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParameters", ("trying to open and read: " + strInputSetupFile).c_str() );
     } //End Case: User Requested Verbose Error Messages - I/O
     
     ifstream fStream( strInputSetupFile.c_str() );
@@ -70,7 +70,7 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     //Check to See if Data File Opened Successfully
     //------------------------------------------------------
     if (!fStream.is_open() && m_bVerboseMode_IO) {
-        perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while opening file: " + strInputSetupFile).c_str() );
+        perror( ("Uniformity::ParameterLoaderAnalysis::loadAnalysisParameters(): error while opening file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
     }*/
     
@@ -95,25 +95,25 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
         //cout<<"strLine = " << strLine.c_str() << endl;
         
         //Identify Section Headers
-        if ( 0 == strLine.compare(strSecEnd_Analysis) ) { //Case: Reached End of File
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecEnd_Analysis) ) { //Case: Reached End of File
             
             //Debugging
             //cout<<"Found End of Analysis Section"<<endl;
             
             break;
         } //End Case: Reached End of File
-        else if ( 0 == strLine.compare(strSecBegin_Analysis) ) { //Case: Analysis Header
+        else if ( 0 == strLine.compare(m_headers_Ana.m_strSecBegin_Analysis) ) { //Case: Analysis Header
             
             //Filler for now; intentionally empty
             
         } //End Case: Analysis Header
-        else if ( 0 == strLine.compare(strSecBegin_Timing) ) { //Case: Timing Parameters
+        else if ( 0 == strLine.compare(m_headers_Ana.m_strSecBegin_Timing) ) { //Case: Timing Parameters
             //Debugging
             //cout<<"Found Start of Timing Section"<<endl;
             
             loadAnalysisParametersTiming(fStream, aSetupUniformity);
         } //End Case: Timing Parameters
-        else if ( 0 == strLine.compare(strSecBegin_Uniformity) ) { //Case: Uniformity Parameters
+        else if ( 0 == strLine.compare(m_headers_Ana.m_strSecBegin_Uniformity) ) { //Case: Uniformity Parameters
             //Debugging
             //cout<<"Found Start of Uniformity Section"<<endl;
             
@@ -128,15 +128,15 @@ void ParameterLoaderAnaysis::loadAnalysisParameters(string & strInputSetupFile, 
     
     //Check to see if we had problems while reading the file
     if (fStream.bad() && m_bVerboseMode_IO) {
-        perror( ("Uniformity::ParameterLoaderAnaysis::loadAnalysisParameters(): error while reading file: " + strInputSetupFile).c_str() );
+        perror( ("Uniformity::ParameterLoaderAnalysis::loadAnalysisParameters(): error while reading file: " + strInputSetupFile).c_str() );
         printStreamStatus(fStream);
     }
     
     return;
-} //End ParameterLoaderAnaysis::loadAnalysisParameters()
+} //End ParameterLoaderAnalysis::loadAnalysisParameters()
 
 //
-void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStream, HistoSetup &hSetup){
+/*void ParameterLoaderAnalysis::loadAnalysisParametersFits(ifstream & inputFileStream, HistoSetup &hSetup){
     //Variable Declaration
     bool bExitSuccess = false;
     
@@ -150,7 +150,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
     if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
-        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits", "Found Fit Heading");
+        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits", "Found Fit Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
     while ( getlineNoSpaces(inputFileStream, strLine) ) {
@@ -158,7 +158,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Do we reach the end of the section?
-        if ( 0 == strLine.compare(strSecEnd_Uniformity_Fit ) ) break;
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecEnd_Uniformity_Fit ) ) break;
         
         //Debugging
         //cout<<"strLine: = " << strLine.c_str() << endl;
@@ -224,15 +224,15 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
                 hSetup.vec_strFit_Range = getCharSeparatedList(pair_strParam.second, ',');
             }
             else{ //Case: Parameter Not Recognized
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits","Error!!! Parameter Not Recognizd:\n");
-                //printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\t(Field,Value) = (" + pair_strParam.first "," + pair_strParam.second + ")\n" ).c_str() );
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits","Error!!! Parameter Not Recognizd:\n");
+                //printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity",( "\t(Field,Value) = (" + pair_strParam.first "," + pair_strParam.second + ")\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
             } //End Case: Parameter Not Recognized
         } //End Case: Parameter Fetched Correctly
         else{ //Case: Parameter Failed to fetch correctly
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits","Error!!!  I didn't parse parameter correctly\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersFits",("\tCurrent line: " + strLine).c_str() );
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits","Error!!!  I didn't parse parameter correctly\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersFits",("\tCurrent line: " + strLine).c_str() );
         } //End Case: Parameter Failed to fetch correctly
     } //End Loop through Fit Heading
     if ( inputFileStream.bad() && m_bVerboseMode_IO) {
@@ -241,11 +241,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersFits(ifstream & inputFileStre
     }
     
     return;
-} //End ParameterLoaderAnaysis::loadAnalysisParametersFits
+}*/ //End ParameterLoaderAnalysis::loadAnalysisParametersFits
 
 //Called when loading analysis parameters; relative to histograms
 //This is the top level method; this method calls loadAnalysisParametersHistograms(ifstream, Timing::HistoSetup) depending on which histogram is requested by the user
-void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
+void ParameterLoaderAnalysis::loadAnalysisParametersHistograms(ifstream & inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
     //Variable Declaration
     bool bExitSuccess = false;
     bool bSetup = false;
@@ -265,11 +265,11 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Do we reach the end of the section? If so the user has configured the file incorrectly
-        if ( 0 == strLine.compare(strSecEnd_Uniformity_Hiso) ) { //Section End Reached Prematurely
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","I have reached the END of a Histogram Heading\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","\tBut I Have NOT found the 'Histo_Name' field\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","\tYou have configured this heading incorrectly, the 'Histo_Name' field is expected to be the FIRST line after the Heading\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","\tThis object has been skipped, please cross-check\n");
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecEnd_Uniformity_Hiso) ) { //Section End Reached Prematurely
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","I have reached the END of a Histogram Heading\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","\tBut I Have NOT found the 'Histo_Name' field\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","\tYou have configured this heading incorrectly, the 'Histo_Name' field is expected to be the FIRST line after the Heading\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","\tThis object has been skipped, please cross-check\n");
             
             //Exit the Loop to find "Detector_Name"
             break;
@@ -291,15 +291,15 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
                 break;
             } //End Case: Detector Name found!
             else{ //Case: Detector Name not found!
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","I am parsing a Histogram Heading\n");
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","\tHowever I expected the 'Histo_Name' field to be the first line after the heading\n");
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "\tThe current line I am parsing: " + strLine ).c_str() );
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","\tHas been skipped and may lead to undefined behavior");
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","I am parsing a Histogram Heading\n");
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","\tHowever I expected the 'Histo_Name' field to be the first line after the heading\n");
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ( "\tThe current line I am parsing: " + strLine ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","\tHas been skipped and may lead to undefined behavior");
             } //End Case: Name not found!
         }//End Case: Parameter Fetched Successfully
         else{ //Case: Parameter was NOT fetched Successfully
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","Sorry I didn't parse parameter correctly\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "\tCurrent line: " + strLine ).c_str() );
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","Sorry I didn't parse parameter correctly\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ( "\tCurrent line: " + strLine ).c_str() );
         } //End Case: Parameter was NOT fetched Successfully
     } //Loop through file to find "Name"
     
@@ -357,15 +357,15 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream & inputFi
         } //End Case: Hit Time
         //=======================Unrecognized Parameters=======================
         else{ //Case: Undefined Behavior
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", "\tI Only Support Case-Insenstive versions from this set {CLUSTADC, CLUSTMULTI, CLUSTPOS, CLUSTSIZE, CLUSTTIME}\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ( "Histogram Type" + strName + " Not Recognized\n" ).c_str() );
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", "\tI Only Support Case-Insenstive versions from this set {CLUSTADC, CLUSTMULTI, CLUSTPOS, CLUSTSIZE, CLUSTTIME}\n");
         } //End Case: Undefined Behavior
     } //End Case: Setup Correct
     
     return;
-} //End ParameterLoaderAnaysis::loadAnalysisParametersHistograms() - Top Level
+} //End ParameterLoaderAnalysis::loadAnalysisParametersHistograms() - Top Level
 
-void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFileStream, HistoSetup &hSetup){
+void ParameterLoaderAnalysis::loadAnalysisParametersHistograms(ifstream &inputFileStream, HistoSetup &hSetup){
     //Variable Declaration
     bool bExitSuccess;
     
@@ -386,7 +386,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Has this section ended?
-        if ( 0 == strLine.compare(strSecEnd_Uniformity_Hiso) ) break;
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecEnd_Uniformity_Hiso) ) break;
         
         //Get Parameter Pairing
         pair_strParam = Timing::getParsedLine(strLine, bExitSuccess);
@@ -416,10 +416,10 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
                     
                     //Tell the user they entered more than what was expected
                     if (vec_strList.size() > 2) { //Case: 3 or more numbers
-                        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Sorry you entered 3 or more numbers for " + pair_strParam.first + "\n" ).c_str() );
-                        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", "\tI have only used the first two and ignored the rest:\n" );
-                        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xLower ) ).c_str() );
-                        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xUpper ) ).c_str() );
+                        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ( "Sorry you entered 3 or more numbers for " + pair_strParam.first + "\n" ).c_str() );
+                        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", "\tI have only used the first two and ignored the rest:\n" );
+                        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xLower ) ).c_str() );
+                        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xUpper ) ).c_str() );
                     } //End Case: 3 or more numbers
                 } //End Case: at least 2 numbers
                 else{ //Case: Not enough numbers
@@ -432,10 +432,10 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
                     hSetup.fHisto_xUpper = std::max(hSetup.fHisto_xLower, hSetup.fHisto_xUpper);
                     
                     //Output to User
-                    printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ( "Sorry I was expecting a comma separated list of 2 numbers for: " + pair_strParam.first + "\n" ).c_str() );
-                    printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", "\tRight now I have set:\n" );
-                    printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xLower ) ).c_str() );
-                    printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xUpper ) ).c_str() );
+                    printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ( "Sorry I was expecting a comma separated list of 2 numbers for: " + pair_strParam.first + "\n" ).c_str() );
+                    printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", "\tRight now I have set:\n" );
+                    printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xLower ) ).c_str() );
+                    printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms", ("\t" + getString( hSetup.fHisto_xUpper ) ).c_str() );
                 } //End Case: Not enough numbers
             } //End Case: Assign Histo Bin Range
             /*else if( 0 == pair_strParam.first.compare("HISTO_NAME") ) {
@@ -450,19 +450,19 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
             else if( 0 == pair_strParam.first.compare("HISTO_YTITLE") ){
                 hSetup.strHisto_Title_Y = pair_strParam.second;
             }
-            else if( 0 == pair_strParam.first.compare("PERFORM_FIT") ){
+            /*else if( 0 == pair_strParam.first.compare("PERFORM_FIT") ){
                 hSetup.bFit = convert2bool(pair_strParam.second, bExitSuccess);
-            }
+            }*/
             else{ //Case: Parameter not recognized
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","Error!!! Parameter Not Recognized:\n");
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","Error!!! Parameter Not Recognized:\n");
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
 
             } //End Case: Parameter not recognized
         } //End Case: Parameter Fetched Successfully
         else{ //Case: Parameter was NOT fetched Successfully
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms","Error!!!  I didn't parse parameter correctly\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersHistograms",("\tCurrent line: " + strLine).c_str() );
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms","Error!!!  I didn't parse parameter correctly\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersHistograms",("\tCurrent line: " + strLine).c_str() );
         } //End Case: Parameter was NOT fetched Successfully
     } //End Loop through Section
     
@@ -475,17 +475,17 @@ void ParameterLoaderAnaysis::loadAnalysisParametersHistograms(ifstream &inputFil
 
 //Time Resolution
 //Loads parameters defined in file read by inputFileStream and sets them to the aSetupUniformity
-void ParameterLoaderAnaysis::loadAnalysisParametersTiming(ifstream &inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
+void ParameterLoaderAnalysis::loadAnalysisParametersTiming(ifstream &inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
     
     //To be implemented
     
     return;
-} //End ParameterLoaderAnaysis::loadAnalysisParametersTiming()
+} //End ParameterLoaderAnalysis::loadAnalysisParametersTiming()
 
 //Uniformity
 //Loads parameters defined in file read by inputFileStream and sets tehm to the aSetupUniformity
 //Note this should only be called within the Uniformity heading if the user has configured the file correctly
-void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
+void ParameterLoaderAnalysis::loadAnalysisParametersUniformity(ifstream &inputFileStream, AnalysisSetupUniformity &aSetupUniformity){
     //Variable Declaration
     bool bExitSuccess = false;
     
@@ -498,7 +498,7 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
     vector<string> vec_strList; //For storing char separated input; not used here yet but placeholder
     
     if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
-        printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity", "Found Uniformity Heading");
+        printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity", "Found Uniformity Heading");
     } //End Case: User Requested Verbose Error Messages - I/O
     
     while ( getlineNoSpaces(inputFileStream, strLine) ) {
@@ -506,14 +506,16 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
         if ( 0 == strLine.compare(0,1,"#") ) continue;
         
         //Do we reach the end of the section?
-        if ( 0 == strLine.compare(strSecEnd_Uniformity ) ) break;
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecEnd_Uniformity ) ) break;
         
         //Should we be storing histogram/fit setup parameters?
-        if ( 0 == strLine.compare(strSecBegin_Uniformity_Fit) ) { //Case: Fit Setup
-            loadAnalysisParametersFits(inputFileStream, aSetupUniformity.histoSetup_clustADC);
+        if ( 0 == strLine.compare(m_headers_Ana.m_strSecBegin_Uniformity_Fit) ) { //Case: Fit Setup
+            //loadAnalysisParametersFits(inputFileStream, aSetupUniformity.histoSetup_clustADC);
+            fitLoader.loadAnalysisParametersFits(inputFileStream, aSetupUniformity.fitSetup_clustADC);
+            
             continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Fit Setup
-        else if( 0 == strLine.compare(strSecBegin_Uniformity_Histo) ){ //Case: Histo Setup
+        else if( 0 == strLine.compare(m_headers_Ana.m_strSecBegin_Uniformity_Histo) ){ //Case: Histo Setup
             loadAnalysisParametersHistograms(inputFileStream, aSetupUniformity);
             continue; //Tell it to move to the next loop iteration (e.g. line in file)
         } //End Case: Histo Setup
@@ -600,25 +602,25 @@ void ParameterLoaderAnaysis::loadAnalysisParametersUniformity(ifstream &inputFil
             } //End Case: Uniformity Granularity
             //=======================Unrecognized Parameters=======================
             else{ //Case: Parameter Not Recognized
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
-                printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity","Error!!! Parameter Not Recognizd:\n");
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity",( "\tField = " + pair_strParam.first + "\n" ).c_str() );
+                printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity",( "\tValue = " + pair_strParam.second + "\n" ).c_str() );
             } //End Case: Parameter Not Recognized
         } //End Case: Parameter Fetched Correctly
         else{ //Case: Parameter Failed to fetch correctly
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity","Error!!!  I didn't parse parameter correctly\n");
-            printClassMethodMsg("ParameterLoaderAnaysis","loadAnalysisParametersUniformity",("\tCurrent line: " + strLine).c_str() );
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity","Error!!!  I didn't parse parameter correctly\n");
+            printClassMethodMsg("ParameterLoaderAnalysis","loadAnalysisParametersUniformity",("\tCurrent line: " + strLine).c_str() );
         } //End Case: Parameter Failed to fetch correctly
     } //End Loop through Uniformity Heading
     
     return;
-} //End ParameterLoaderAnaysis::loadAnalysisParametersUniformity()
+} //End ParameterLoaderAnalysis::loadAnalysisParametersUniformity()
 
-QualityControl::Uniformity::AnalysisSetupUniformity ParameterLoaderAnaysis::getAnalysisParameters(string & strInputSetupFile){
+QualityControl::Uniformity::AnalysisSetupUniformity ParameterLoaderAnalysis::getAnalysisParameters(string & strInputSetupFile){
     //Variable Declaration
     QualityControl::Uniformity::AnalysisSetupUniformity aSetupUniformity;
     
     loadAnalysisParameters(strInputSetupFile, aSetupUniformity);
     
     return aSetupUniformity;
-} //End ParameterLoaderAnaysis::getAnalysisParameters()
+} //End ParameterLoaderAnalysis::getAnalysisParameters()

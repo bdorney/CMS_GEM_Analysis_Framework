@@ -85,6 +85,8 @@ namespace QualityControl {
             bool m_bVerboseMode_IO;
             
             QualityControl::Uniformity::SecNamesRun m_headers_Run;
+            QualityControl::Uniformity::SecNamesAna m_headers_Ana;
+            
             //std::string m_strSecBegin_RunList, m_strSecEnd_RunList;
         }; //End class ParameterLoader
     } //End namespace Uniformity

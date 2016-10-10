@@ -21,6 +21,7 @@ SOURCES =   src/ParameterLoader.cpp \
             src/PlotterUtilityFunctions.cpp \
             src/TimingUtilityFunctions.cpp \
             src/UniformityUtilityFunctions.cpp \
+            src/ParameterLoaderFit.cpp \
             src/ParameterLoaderPlotter.cpp \
             src/CMS_lumi.cpp \
             src/PlotterGeneric.cpp \

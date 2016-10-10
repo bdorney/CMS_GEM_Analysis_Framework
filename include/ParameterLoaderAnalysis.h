@@ -1,13 +1,13 @@
 //
-//  ParameterLoaderAnaysis.h
+//  ParameterLoaderAnalysis.h
 //  
 //
 //  Created by Brian L Dorney on 28/01/16.
 //
 //
 
-#ifndef ____ParameterLoaderAnaysis__
-#define ____ParameterLoaderAnaysis__
+#ifndef ____ParameterLoaderAnalysis__
+#define ____ParameterLoaderAnalysis__
 
 //C++ Includes
 #include <algorithm>
@@ -18,6 +18,7 @@
 
 //Framework Includes
 #include "ParameterLoader.h"
+#include "ParameterLoaderFit.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityTypes.h"
@@ -27,13 +28,13 @@
 
 namespace QualityControl {
     namespace Uniformity {
-        class ParameterLoaderAnaysis : public ParameterLoader {
+        class ParameterLoaderAnalysis : public ParameterLoader {
             
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderAnaysis();
+            ParameterLoaderAnalysis();
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ namespace QualityControl {
         private:
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            virtual void loadAnalysisParametersFits(std::ifstream & inputFileStream, Timing::HistoSetup &hSetup);
+            //virtual void loadAnalysisParametersFits(std::ifstream & inputFileStream, Timing::HistoSetup &hSetup);
             
             //Called when loading analysis parameters; relative to histograms
             //This is the top level method; this method calls loadAnalysisParametersHistograms(ifstream, Timing::HistoSetup) depending on which histogram is requested by the user
@@ -73,7 +74,7 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::string strSecBegin_Analysis;       //Defines how the file will look
+            /*std::string strSecBegin_Analysis;       //Defines how the file will look
             std::string strSecBegin_Timing;         //Hard coded section headers
             std::string strSecBegin_Uniformity;     //Staring point
             std::string strSecBegin_Uniformity_Fit;
@@ -83,10 +84,13 @@ namespace QualityControl {
             std::string strSecEnd_Timing;           //Hard coded section headers
             std::string strSecEnd_Uniformity;       //ending point
             std::string strSecEnd_Uniformity_Fit;
-            std::string strSecEnd_Uniformity_Hiso;
+            std::string strSecEnd_Uniformity_Hiso;*/
             
+            QualityControl::Uniformity::ParameterLoaderFit fitLoader;
+            
+            QualityControl::Uniformity::SecNamesAna m_headers_Ana;
         }; //End Class ParameterLoaderAnalysis
     } //End namespace Uniformity
 } //End namespace QualityControl
 
-#endif /* defined(____ParameterLoaderAnaysis__) */
+#endif /* defined(____ParameterLoaderAnalysis__) */

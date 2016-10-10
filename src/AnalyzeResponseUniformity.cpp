@@ -17,6 +17,8 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
+using QualityControl::Plotter::InfoFit;
+
 using QualityControl::Timing::getString;
 using QualityControl::Timing::printROOTFileStatus;
 using QualityControl::Timing::HistoSetup;
@@ -174,14 +176,15 @@ bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput, int iPar)
     return true;
 } //End AnalyzeResponseUniformity::isQualityFit()
 
-TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
+TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, InfoFit & setupFit, shared_ptr<TH1F> hInput, TSpectrum &specInput ){
     //Variable Declaration
-    float fLimit_Max = setupHisto.fHisto_xUpper, fLimit_Min = setupHisto.fHisto_xLower;
+    float fLimit_Max = hInput->GetBinLowEdge(hInput->GetNbinsX() + 1 );
+    float fLimit_Min = hInput->GetBinLowEdge(1);
     
     vector<string>::const_iterator iterVec_IGuess; //Iterator to use for setting initial guess of fit
     vector<float> vec_fFitRange;
     
-    for (auto iterRange = aSetup.histoSetup_clustADC.vec_strFit_Range.begin(); iterRange != aSetup.histoSetup_clustADC.vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
+    for (auto iterRange = setupFit.m_vec_strFit_Range.begin(); iterRange != setupFit.m_vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
         vec_fFitRange.push_back( getParsedInput( (*iterRange), hInput, specInput ) );
     } //End Loop Over Fit Range
     
@@ -190,16 +193,16 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
         fLimit_Max = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
     }
     
-    TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupHisto.strHisto_Name).c_str(), setupHisto.strFit_Formula.c_str(), fLimit_Min, fLimit_Max);
+    TF1 ret_Func( getNameByIndex(iEta, iPhi, iSlice, "fit", setupFit.m_strFit_Name).c_str(), setupFit.m_strFit_Formula.c_str(), fLimit_Min, fLimit_Max);
     
     //Check to see if the number of parameters in the TF1 meets the expectation
-    if ( ret_Func.GetNpar() < setupHisto.vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
+    if ( ret_Func.GetNpar() < setupFit.m_vec_strFit_ParamIGuess.size() || ret_Func.GetNpar() < setupFit.m_vec_strFit_ParamLimit_Min.size() || ret_Func.GetNpar() < setupFit.m_vec_strFit_ParamLimit_Max.size() ) { //Case: Set points for initial parameters do not meet expectations
 
         printClassMethodMsg("AnalyzeResponseUniformity","getFit","Error! Number of Parameters in Function Less Than Requested Initial Guess Parameters!");
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Parameter: " + getString( ret_Func.GetNpar() ) ).c_str() );
-        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guesses: " + getString( setupHisto.vec_strFit_ParamIGuess.size() ) ).c_str() );
-        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Min): " + getString( setupHisto.vec_strFit_ParamLimit_Min.size() ) ).c_str() );
-        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Max): " + getString( setupHisto.vec_strFit_ParamLimit_Max.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guesses: " + getString( setupFit.m_vec_strFit_ParamIGuess.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Min): " + getString( setupFit.m_vec_strFit_ParamLimit_Min.size() ) ).c_str() );
+        printClassMethodMsg("AnalyzeResponseUniformity","getFit", ("\tNum Initial Guess Limits (Max): " + getString( setupFit.m_vec_strFit_ParamLimit_Max.size() ) ).c_str() );
         printClassMethodMsg("AnalyzeResponseUniformity","getFit", "No Initial Parameters Have Been Set! Please Cross-Check Input Analysis Config File" );
         
         return ret_Func;
@@ -208,19 +211,19 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     //Set Fit Parameters - Initial Value
     //------------------------------------------------------
     //Keywords are defined in vec_strSupportedKeywords
-    for (int i=0; i<setupHisto.vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
-        ret_Func.SetParameter(i, getParsedInput( setupHisto.vec_strFit_ParamIGuess[i], hInput, specInput) );
+    for (int i=0; i<setupFit.m_vec_strFit_ParamIGuess.size(); ++i) { //Loop over parameters - Initial Guess
+        ret_Func.SetParameter(i, getParsedInput( setupFit.m_vec_strFit_ParamIGuess[i], hInput, specInput) );
     } //End Loop over parameters - Initial Guess
     
     //Set Fit Parameters - Boundaries
     //------------------------------------------------------
-    if (setupHisto.vec_strFit_ParamLimit_Min.size() == setupHisto.vec_strFit_ParamLimit_Max.size() ) { //Check: Stored Parameter Limits Match
+    if (setupFit.m_vec_strFit_ParamLimit_Min.size() == setupFit.m_vec_strFit_ParamLimit_Max.size() ) { //Check: Stored Parameter Limits Match
 
         //Here we use vec_strFit_ParamLimit_Min but we know it has the same number of parameters as vec_strFit_ParamLimit_Max
         //For each fit parameter, set the boundary
-        for (int i=0; i<setupHisto.vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
-            fLimit_Min = getParsedInput(setupHisto.vec_strFit_ParamLimit_Min[i], hInput, specInput);
-            fLimit_Max = getParsedInput(setupHisto.vec_strFit_ParamLimit_Max[i], hInput, specInput);
+        for (int i=0; i<setupFit.m_vec_strFit_ParamLimit_Min.size(); ++i) { //Loop over boundary parameters
+            fLimit_Min = getParsedInput(setupFit.m_vec_strFit_ParamLimit_Min[i], hInput, specInput);
+            fLimit_Max = getParsedInput(setupFit.m_vec_strFit_ParamLimit_Max[i], hInput, specInput);
 
             (fLimit_Max > fLimit_Min) ? ret_Func.SetParLimits(i, fLimit_Min, fLimit_Max ) : ret_Func.SetParLimits(i, fLimit_Max, fLimit_Min );
         } //End Loop over boundary parameters
@@ -233,8 +236,8 @@ TF1 AnalyzeResponseUniformity::getFit(int iEta, int iPhi, int iSlice, HistoSetup
     
     //Set Other Fit Data Members
     //------------------------------------------------------
-    ret_Func.SetLineColor(kRed);
-    ret_Func.SetLineWidth(3);
+    ret_Func.SetLineColor(setupFit.m_iColor);
+    ret_Func.SetLineWidth(setupFit.m_fSizeLine);
     
     //Return fit
     //------------------------------------------------------
@@ -382,17 +385,17 @@ string AnalyzeResponseUniformity::getNameByIndex(int iEta, int iPhi, int iSlice,
 
 //Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
 //This parameter is then returned to the user
-float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
+float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, InfoFit & setupFit, std::string strParam ){
     //Variable Declaration
     int iParamPos = -1;
     
     float ret_Val = -1;
     
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
+    vector<string>::iterator iterParamMeaning = std::find(setupFit.m_vec_strFit_ParamMeaning.begin(), setupFit.m_vec_strFit_ParamMeaning.end(), strParam);
     
-    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+    if ( iterParamMeaning != setupFit.m_vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
         
-        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        iParamPos = std::distance(setupFit.m_vec_strFit_ParamMeaning.begin(), iterParamMeaning);
         
         ret_Val = fitInput->GetParameter(iParamPos);
     } //End Case: Parameter Found!!!
@@ -406,17 +409,17 @@ float AnalyzeResponseUniformity::getParam( shared_ptr<TF1> fitInput, HistoSetup 
 
 //Searches the input TF1 for a parameter with meaning given by strParam and stored in HistoSetup
 //The error on this parameter is then returned to the user
-float AnalyzeResponseUniformity::getParamError( shared_ptr<TF1> fitInput, HistoSetup & setupHisto, std::string strParam ){
+float AnalyzeResponseUniformity::getParamError( shared_ptr<TF1> fitInput, Plotter::InfoFit & setupFit, std::string strParam ){
     //Variable Declaration
     int iParamPos = -1;
     
     float ret_Val = -1;
     
-    vector<string>::iterator iterParamMeaning = std::find(setupHisto.vec_strFit_ParamMeaning.begin(), setupHisto.vec_strFit_ParamMeaning.end(), strParam);
+    vector<string>::iterator iterParamMeaning = std::find(setupFit.m_vec_strFit_ParamMeaning.begin(), setupFit.m_vec_strFit_ParamMeaning.end(), strParam);
     
-    if ( iterParamMeaning != setupHisto.vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
+    if ( iterParamMeaning != setupFit.m_vec_strFit_ParamMeaning.end() ) { //Case: Parameter Found!!!
         
-        iParamPos = std::distance(setupHisto.vec_strFit_ParamMeaning.begin(), iterParamMeaning);
+        iParamPos = std::distance(setupFit.m_vec_strFit_ParamMeaning.begin(), iterParamMeaning);
         
         ret_Val = fitInput->GetParError(iParamPos);
     } //End Case: Parameter Found!!!

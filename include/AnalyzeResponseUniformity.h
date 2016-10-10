@@ -26,6 +26,7 @@
 //#include "DetectorMPGD.h"
 #include "FrameworkBase.h"
 //#include "ParameterLoaderDetector.h"
+#include "PlotterUtilityTypes.h"
 #include "TimingUtilityFunctions.h"
 #include "TimingUtilityTypes.h"
 #include "UniformityUtilityOperators.h"
@@ -103,7 +104,8 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             
             //Returns a fit whose parameters match those defined in the AnalysisSetupUniformity
-            TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
+            //TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
+            TF1 getFit(int iEta, int iPhi, int iSlice, Plotter::InfoFit & setupFit, std::shared_ptr<TH1F> hInput, TSpectrum &specInput );
             
             //strInput is understood to be a number or an algebraic expression
             //If strInput contains a substr matching to one or more elements of vec_strSupportedKeywords it is treated as an algebraic expression
@@ -125,10 +127,10 @@ namespace QualityControl {
             std::string getNameByIndex(int iEta, int iPhi, int iSlice, const std::string & strInputPrefix, const std::string & strInputName);
             
             //Searchs the input fit for the given variable (strParam); returns it
-            float getParam( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
+            float getParam( std::shared_ptr<TF1> fitInput, Plotter::InfoFit & setupFit, std::string strParam );
             
             //Searchs the input fit for the error on the given variable (strParam); returns it
-            float getParamError( std::shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, std::string strParam );
+            float getParamError( std::shared_ptr<TF1> fitInput, Plotter::InfoFit & setupFit, std::string strParam );
             
             //Given an input histogram and TSpectrum returns a numeric value based on the input keyword; supported keywords are "AMPLITUDE,MEAN,PEAK,SIGMA"
             float getValByKeyword(std::string strInputKeyword, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);

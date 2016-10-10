@@ -38,13 +38,13 @@ namespace QualityControl {
         
         struct SecNamesAna{
             std::string m_strSecBegin_Analysis;       //Defines how the file will look
-            //std::string m_strSecBegin_Timing;         //Hard coded section headers
+            std::string m_strSecBegin_Timing;         //Hard coded section headers
             std::string m_strSecBegin_Uniformity;     //Staring point
             std::string m_strSecBegin_Uniformity_Fit;
             std::string m_strSecBegin_Uniformity_Histo;
             
             std::string m_strSecEnd_Analysis;         //Defines how the file will look
-            //std::string m_strSecEnd_Timing;           //Hard coded section headers
+            std::string m_strSecEnd_Timing;           //Hard coded section headers
             std::string m_strSecEnd_Uniformity;       //ending point
             std::string m_strSecEnd_Uniformity_Fit;
             std::string m_strSecEnd_Uniformity_Hiso;
@@ -52,13 +52,13 @@ namespace QualityControl {
             //Constructor
             SecNamesAna(){
                 m_strSecBegin_Analysis    = "[BEING_ANALYSIS_INFO]";
-                //m_strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
+                m_strSecBegin_Timing      = "[BEGIN_TIMING_INFO]";
                 m_strSecBegin_Uniformity  = "[BEGIN_UNIFORMITY_INFO]";
                 m_strSecBegin_Uniformity_Fit = "[BEGIN_ADC_FIT_INFO]";
                 m_strSecBegin_Uniformity_Histo = "[BEGIN_HISTO_INFO]";
                 
                 m_strSecEnd_Analysis      = "[END_ANALYSIS_INFO]";
-                //m_strSecEnd_Timing        = "[END_TIMING_INFO]";
+                m_strSecEnd_Timing        = "[END_TIMING_INFO]";
                 m_strSecEnd_Uniformity    = "[END_UNIFORMITY_INFO]";
                 m_strSecEnd_Uniformity_Fit = "[END_ADC_FIT_INFO]";
                 m_strSecEnd_Uniformity_Hiso = "[END_HISTO_INFO]";
@@ -91,21 +91,25 @@ namespace QualityControl {
         struct SecNamesPlotter{
             std::string m_strSecBegin_Canv;
             std::string m_strSecBegin_Data;
+            std::string m_strSecBegin_Fit;
             std::string m_strSecBegin_Plot;
             
             std::string m_strSecEnd_Canv;
             std::string m_strSecEnd_Data;
+            std::string m_strSecEnd_Fit;
             std::string m_strSecEnd_Plot;
             
             //Constructor
             SecNamesPlotter(){
-                m_strSecBegin_Canv = "[BEGIN_CANVAS]";
-                m_strSecBegin_Data = "[BEGIN_DATA]";
-                m_strSecBegin_Plot = "[BEGIN_PLOT]";
+                m_strSecBegin_Canv  = "[BEGIN_CANVAS]";
+                m_strSecBegin_Data  = "[BEGIN_DATA]";
+                m_strSecBegin_Fit   = "[BEGIN_FIT]";
+                m_strSecBegin_Plot  = "[BEGIN_PLOT]";
                 
-                m_strSecEnd_Canv = "[END_CANVAS]";
-                m_strSecEnd_Data = "[END_DATA]";
-                m_strSecEnd_Plot = "[END_PLOT]";
+                m_strSecEnd_Canv    = "[END_CANVAS]";
+                m_strSecEnd_Data    = "[END_DATA]";
+                m_strSecEnd_Fit     = "[END_FIT]";
+                m_strSecEnd_Plot    = "[END_PLOT]";
             } //End Constructor
         }; //End SecNamesPlotter
         

@@ -371,10 +371,17 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
             //file_Input.seekg(spos_Previous);
             break;
         } //End Case: End of Canvas Section
-        else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Data ) ){ //Case: Start of Plot Section
+        else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Data ) ){ //Case: Start of Data Section
             inputPlotInfo.m_vec_DataPts = loadData(file_Input);
             continue;
-        } //End Case: Start of Plot Section
+        } //End Case: Start of Data Section
+        else if ( 0 == strLine.compare( m_headers_plots.m_strSecBegin_Fit ) ){ //Case: Start of Data Section
+            InfoFit fitInfo;
+            fitLoader.loadAnalysisParametersFits(file_Input, fitInfo);
+            
+            inputPlotInfo.m_map_infoFit[fitInfo.m_strFit_Name]=fitInfo;
+            continue;
+        } //End Case: Start of Data Section
         
         //Parse the line
         pair_strParam = getParsedLine(strLine, bExitSuccess);

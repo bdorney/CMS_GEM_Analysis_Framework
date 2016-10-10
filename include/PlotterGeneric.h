@@ -42,6 +42,10 @@ namespace QualityControl {
             //------------------------------------------------------------------------------------------------------------------------------------------
             ~PlotterGeneric(){
                 m_canv.reset();
+                
+                m_map_iSameNameCount.clear();
+                m_map_fits.clear();
+                
                 m_tdrStyle.reset();
             }
             
@@ -135,6 +139,11 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             virtual void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
 
+            //Draw Fits, right now fits are assumed to always be TF1 objects
+            //  Draws all fits defined for each plot
+            //Developer can override though
+            virtual void drawFits(TLegend & inputLegend);
+            
             //In inherited class developer should:
             //  Draw all plots added with addPlot()
             //To be over-ridded by inherited classes
@@ -177,6 +186,8 @@ namespace QualityControl {
             //int m_iSameNamePlotCount; //Tracks How Many Plots have the same TName
             
             std::map<std::string,int> m_map_iSameNameCount; //Tracks How Many Plots have the same TName
+            std::map<std::string, std::shared_ptr<TF1> > m_map_fits;
+            
 
             std::string m_strOutputFile_Name;
             std::string m_strOutputFile_Option;
