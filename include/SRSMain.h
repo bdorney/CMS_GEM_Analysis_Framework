@@ -18,10 +18,11 @@ public:
     ~SRSMain();
     //static SRSMain* Reprocessor(const std::string& rawfile, const std::string& config);
     void Reprocess();
+    void Close();
+
 private:
     //SRSMain(const std::string& rawfile, const std::string& config);
     void Init();
-    void Close();
 private:
     //static SRSMain* _repro;
     //SRSConfiguration* _conf;
@@ -36,6 +37,7 @@ private:
 private:
     std::string _rawfile;
     std::string _config;
+    bool _isClosed;
     
 };
 #endif

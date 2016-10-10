@@ -545,13 +545,13 @@ void SRSOutputROOT::InitRootFile() {
       fClusterTree = new TTree("TCluster","GEM Cluster Data Rootfile") ;
       //fClusterTree->SetDirectory(fFile) ;
       
-      m_clustSize    = new int[200] ;
-      m_clustTimeBin = new int[200] ;
-      m_clustPos     = new float[200] ;
-      m_clustADCs    = new float[200] ;
-      m_detID        = new int[200] ;
-      m_planeID      = new float[200] ;
-      //m_etaSector    = new short[200] ;
+      m_clustSize    = new int[10000] ;
+      m_clustTimeBin = new int[10000] ;
+      m_clustPos     = new float[10000] ;
+      m_clustADCs    = new float[10000] ;
+      m_detID        = new int[10000] ;
+      m_planeID      = new float[10000] ;
+      //m_etaSector    = new short[10000] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fClusterTree \n") ;
       fClusterTree->Branch("evtID",&m_evtID,"evtID/I");
@@ -679,13 +679,13 @@ void SRSOutputROOT::InitRootFile() {
       fClusterTree = new TTree("TCluster","GEM Cluster Data Rootfile") ;
       //fClusterTree->SetDirectory(fFile) ;
             
-      m_clustSize    = new int[200] ;
-      m_clustTimeBin = new int[200] ;
-      m_clustPos     = new float[200] ;
-      m_clustADCs    = new float[200] ;
-      m_detID        = new int[200] ;
-      m_planeID      = new float[200] ;
-      //m_etaSector    = new short[200] ;
+      m_clustSize    = new int[10000] ;
+      m_clustTimeBin = new int[10000] ;
+      m_clustPos     = new float[10000] ;
+      m_clustADCs    = new float[10000] ;
+      m_detID        = new int[10000] ;
+      m_planeID      = new float[10000] ;
+      //m_etaSector    = new short[10000] ;
       
       printf("  SRSOutputROOT::InitRootFile() ==> Initialising the branches for fClusterTree \n") ;
       fClusterTree->Branch("evtID",&m_evtID,"evtID/I");
