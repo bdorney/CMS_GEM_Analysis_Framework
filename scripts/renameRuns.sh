@@ -1,11 +1,11 @@
 #!/bin/bash
 # Usage:
-#	source mergeSelectedRuns.sh <Data Directory> <New String>
+#	source renameRuns.sh <Data Directory> <New String>
 #
 # Note dashes (e.g. "-") between numbers are accepted
 #
 # Example:
-#	source mergeSelectedRuns.sh $DATA_QC5/GE11-VII-S-CERN-0002 TimeCorr_DPGGeo
+#	source renameRuns.sh $DATA_QC5/GE11-VII-S-CERN-0002 TimeCorr_DPGGeo
 #
 #
 
@@ -26,7 +26,7 @@ else
 fi
 
 # Rename Files
-for run in *dataTree.root
+for run in *kEvt_dataTree.root
 do	
 	NAME=$(echo $run | sed "s/dataTree.root/$FIELD.root/g")
 	NAME=$(echo $NAME | sed "s/.root/_dataTree.root/g")

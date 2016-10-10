@@ -29,8 +29,8 @@ scripts/submitFrameworkJob_RunNo*.sh
 
 # Figures #
 ###########
-#figures/
-#figures/*
+figures/
+figures/*
 *.png
 *.pdf
 
