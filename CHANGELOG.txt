@@ -1,11 +1,20 @@
-
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.5                               *
-*	LAST UPDATE: Oct 9 2016                      *
+*	VERSION: 2.2.6                               *
+*	LAST UPDATE: Oct 10 2016                     *
 *                                                *
 **************************************************
+
+Update: October 10th 2016
+==================================================
+->New class QualityControl::Uniformity::ParameterLoaderFit inheriting from QualityControl::Uniformity::ParameterLoader
+->QualityControl::Uniformity::ParameterLoaderAnalysis::loadAnalysisParameters() migrated to new class QualityControl::Uniformity::ParameterLoaderFit
+->Added new attribute QualityControl::Uniformity::ParameterLoaderFit fitLoader to QualityControl::Uniformity::ParameterLoaderAnalysis and QualityControl::Plotter::ParameterLoaderPlotter
+->Added new struct QualityControl::Plotter::InfoFit for tracking fit parameter attributes.
+->Moved fit parameter attibutes from QualityControl::Timing::HistoSetup to QualityControl::Plotter::InfoFit
+->Methods in QualityControl::Uniformity::AnalyzeResponseUniformity::getFit(), getParam(), and getParamError() now take a Plotter::InfoFit object instead of a Timing::HistoSetup object
+->Added new method QualityControl::Plotter::PlotterGeneric::drawFits() for loading TF1 objects from previous files, can be overwritten by base class members.
 
 Update: October 9th 2016
 ==================================================

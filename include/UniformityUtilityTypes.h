@@ -18,6 +18,7 @@
 #include <vector>
 
 //Framework Includes
+#include "PlotterUtilityTypes.h"
 #include "TimingUtilityTypes.h"
 
 //ROOT Includes
@@ -64,6 +65,8 @@ namespace QualityControl {
             int iEvt_First;  //Starting Event For Analysis
             int iEvt_Total;    //Total number of Events to Analyze
             int iUniformityGranularity; //Each iPhi sector is partitioned into this many slices
+            
+            Plotter::InfoFit fitSetup_clustADC;
             
             Timing::HistoSetup histoSetup_clustADC;
             Timing::HistoSetup histoSetup_clustMulti;

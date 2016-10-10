@@ -21,7 +21,7 @@
 #include "DetectorMPGD.h"   //Needs to be included before AnalyzeResponseUniformity.h and ParameterloadDetectorSRS.h
 #include "InterfaceAnalysis.h"
 #include "ParameterLoaderDetector.h"
-#include "ParameterLoaderAnaysis.h"
+#include "ParameterLoaderAnalysis.h"
 #include "ParameterLoaderRun.h"
 #include "QualityControlSectionNames.h"
 #include "SRSMain.h"
@@ -219,7 +219,7 @@ void runModeAnalysis(RunSetup & rSetup, vector<string> & vec_strInputFiles, vect
     
     //Load the requested analysis parameters
     //------------------------------------------------------
-    ParameterLoaderAnaysis loaderAnalysis;
+    ParameterLoaderAnalysis loaderAnalysis;
     AnalysisSetupUniformity aSetup = loaderAnalysis.getAnalysisParameters( rSetup.strFile_Config_Ana );
     
     //Setup the analysis interface

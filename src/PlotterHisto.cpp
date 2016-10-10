@@ -132,7 +132,7 @@ void PlotterHisto::initPlot(InfoPlot & plotInfo){
         shared_ptr<TH1F> hPtr = make_shared<TH1F>( *((TH1F*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_histos[plotInfo.m_strName]=hPtr;
-	m_map_histos.insert( pair<string, shared_ptr<TH1F> >( plotInfo.m_strName, hPtr ) );
+        m_map_histos.insert( pair<string, shared_ptr<TH1F> >( plotInfo.m_strName, hPtr ) );
         (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
         
         file_Input->Close();

@@ -60,6 +60,59 @@ namespace QualityControl {
             }
         }; //End DataPoint
         
+        struct InfoFit{
+            bool m_bFit;
+            
+            //float m_fRange_xLower;
+            //float m_fRange_xUpper;
+            float m_fSizeLine;          //Line Width
+            
+            int m_iColor;             //Line and Marker Color
+            int m_iStyleLine;         //Line Style
+            
+            std::pair<int,int> m_pair_iParamRange_Sig;
+            std::pair<int,int> m_pair_iParamRange_Bkg;
+            
+            std::string m_strFile_Name;        //Input ROOT file where TF1 is found (if supplied)
+            std::string m_strFile_Path;        //Path in input ROOT file where TF1 is found
+            
+            std::string m_strFit_Formula;     //Fit Formula (used)
+            std::string m_strFit_Formula_Sig; //Fit Formula - Signal (visual aid only)
+            std::string m_strFit_Formula_Bkg; //Fit Formula - Bkg (visual aid only)
+            std::string m_strFit_Name;
+            std::string m_strFit_Option;
+            
+            std::string m_strLegEntry;
+            
+            //Allow for complex expressions
+            std::vector<std::string> m_vec_strFit_ParamMeaning;
+            std::vector<std::string> m_vec_strFit_ParamIGuess;
+            std::vector<std::string> m_vec_strFit_ParamLimit_Min;
+            std::vector<std::string> m_vec_strFit_ParamLimit_Max;
+            std::vector<std::string> m_vec_strFit_Range;
+            
+            //Constructor
+            InfoFit(){
+                m_bFit = false;
+                
+                //m_fRange_xLower=0;
+                //m_fRange_xUpper=1e4;
+                m_fSizeLine = 3;
+                
+                m_iColor = kRed;
+                m_iStyleLine = 1;
+                
+                m_strFile_Name = "";
+                m_strFile_Path = "";
+
+                m_strFit_Formula = "";
+                m_strFit_Formula_Sig = "";
+                m_strFit_Formula_Bkg = "";
+                m_strFit_Name = "";
+                m_strFit_Option = "R";
+            } //End Constructor
+        };
+        
         struct InfoPlot{
             //bool m_bXAxis_UserRange;  //Use Range Specified by User
             //bool m_bYAxis_UserRange;  //Use Range Specified by User
@@ -87,6 +140,8 @@ namespace QualityControl {
             //std::string m_strTitle_Y;       //Y-Axis Title
             
             std::vector<DataPoint> m_vec_DataPts;
+            
+            std::map<std::string, InfoFit> m_map_infoFit;
             
             //Constructor
             InfoPlot(){
@@ -176,7 +231,7 @@ namespace QualityControl {
                 m_bGrid_X=m_bGrid_Y=false;
                 m_bIsPrelim=true;
                 m_bMonoColor=false;
-		m_bNormalize=false;
+                m_bNormalize=false;
 
                 m_bXAxis_UserRange    = false;
                 m_bYAxis_UserRange    = false;
@@ -191,9 +246,9 @@ namespace QualityControl {
                 m_fLegNDCPos_X1=m_fLegNDCPos_X2=-1;
                 m_fLegNDCPos_Y1=m_fLegNDCPos_Y2=-1;
                 
-		m_fXAxis_Title_Offset=-1;
-		m_fYAxis_Title_Offset=-1;
-		m_fZAxis_Title_Offset=-1;
+                m_fXAxis_Title_Offset=-1;
+                m_fYAxis_Title_Offset=-1;
+                m_fZAxis_Title_Offset=-1;
 
                 m_fMargin_Top=0.08;
                 m_fMargin_Bot=0.12;

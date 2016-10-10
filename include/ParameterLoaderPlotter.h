@@ -21,6 +21,7 @@
 
 //Framework Includes
 #include "ParameterLoader.h"
+#include "ParameterLoaderFit.h"
 #include "PlotterUtilityFunctions.h"
 #include "PlotterUtilityTypes.h"
 #include "QualityControlSectionNames.h"
@@ -84,8 +85,9 @@ namespace QualityControl {
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
             QualityControl::Plotter::SecNamesPlotter m_headers_plots;
-            
             QualityControl::Plotter::ColNamesPlotter m_col_labels;
+            
+            QualityControl::Uniformity::ParameterLoaderFit fitLoader;
         }; //End class ParameterLoaderPlotter
     } //End namespace Plotter
 } //End namespace QualityControl

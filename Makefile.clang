@@ -27,7 +27,8 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/InterfaceAnalysis.cpp \
             src/ParameterLoader.cpp \
             src/ParameterLoaderDetector.cpp \
-            src/ParameterLoaderAnaysis.cpp \
+            src/ParameterLoaderFit.cpp \
+            src/ParameterLoaderAnalysis.cpp \
             src/ParameterLoaderRun.cpp \
             src/Selector.cpp \
             src/SelectorCluster.cpp \

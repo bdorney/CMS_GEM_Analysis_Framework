@@ -61,6 +61,9 @@ void PlotterGeneric::plotAndStore(){
     //Draw plots
     drawPlots();
     
+    //Draw fits
+    drawFits(leg);
+    
     //Draw each latex line
     for (int i=0; i<m_canvInfo.m_vec_LatexNPos.size(); ++i) {
         drawLatex(m_canvInfo.m_vec_LatexNPos[i]);
@@ -168,6 +171,70 @@ void PlotterGeneric::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     
     return;
 } //End PlotterGeneric::addPlot
+
+//Draw Fits, right now fits are assumed to always be TF1 objects
+//  Draws all fits defined for each plot
+//Developer can override in an inherited class though
+void PlotterGeneric::drawFits(TLegend & inputLegend){
+    //Clear all previous fits
+    m_map_fits.clear();
+    
+    for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.end(); ++iterPlot) { //Loop Over Defined Plots
+        for (auto iterFit = (*iterPlot).second.m_map_infoFit.begin(); iterFit != (*iterPlot).second.m_map_infoFit.end(); ++iterFit) { //Loop Over (*iterPlot)'s defined Fits
+            std::shared_ptr<TF1> func_plot;
+            
+            if ( (*iterFit).second.m_bFit) { //Case: Perform Fit
+                
+                cout<<"PlotterGeneric::drawFits() - You'll need to write your own inherited class and Over write drawFits in inherited class\n";
+                cout<<"PlotterGeneric::drawFits() - No Direct Fitting Supported in Base Class\n";
+                
+            } //End Case: Perform Fit
+            else if( (*iterFit).second.m_strFile_Name.length() > 0 ) { //Case: Load Fit
+                //TFile does not manage objects
+                TH1::AddDirectory(kFALSE);
+                
+                TFile * file_Input = new TFile((*iterFit).second.m_strFile_Name.c_str(), "READ" );
+        
+                //Setup TObject name w/path
+                string strTmpName = (*iterFit).second.m_strFit_Name;
+                if ((*iterFit).second.m_strFile_Path.length() > 0) {
+                    strTmpName = (*iterFit).second.m_strFile_Path + "/" + strTmpName;
+                }
+                
+                //Get the Plot
+                func_plot = make_shared<TF1>( *((TF1*) file_Input->Get( strTmpName.c_str() ) ) );
+                
+                //Close TFile
+                file_Input->Close();
+                delete file_Input;
+            } //End Case: Load Fit
+            else {
+                cout<<"PlotterGeneric::drawFits() - Fit Information not understood, either 'FIT_PERFORM' must be true or a TFile ('FIT_ROOT_FILE') must be provided\n";
+                cout<<"\t(*iterFit).second.m_bFit = " << (*iterFit).second.m_bFit << endl;
+                cout<<"\t(*iterFit).second.m_strFile_Name = " << (*iterFit).second.m_strFile_Name.c_str() << endl;
+                
+                continue;
+            }
+            
+            //Set the Style
+            func_plot->SetLineColor( (*iterFit).second.m_iColor );
+            func_plot->SetLineStyle( (*iterFit).second.m_iStyleLine );
+            func_plot->SetLineWidth( (*iterFit).second.m_fSizeLine );
+            
+            //Add to Legend
+            inputLegend.AddEntry(func_plot.get(), (*iterFit).second.m_strLegEntry.c_str(), "L" );
+            
+            //Draw Fit
+            m_canv->cd();
+            func_plot->Draw("same");
+            
+            //Store (keeps pointers alive)
+            m_map_fits[(*iterFit).second.m_strFile_Name]=func_plot;
+        } //End Loop Over (*iterPlot)'s defined Fits
+    } //End Loop Over Defined Plots
+    
+    return;
+} //End PlotterGeneric::drawFits()
 
 //Makes the plots defined in m_canvInfo
 //To be over-ridded by inherited classes
