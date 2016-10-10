@@ -134,10 +134,10 @@ SRSMain::Reprocess(){
           prenevt=nEvent;
         }
         if (tFEC == nFEC){
-          // The event is now complete and we can form the cluster                                                                                                                                       
-	  (if (debug_s) std::cout <<" +++ reprocess: compute cluster"<<std::endl;
+          // The event is now complete and we can form the cluster
+	  if (debug_s) std::cout <<" +++ reprocess: compute cluster"<<std::endl;
           eventBuilder->ComputeClustersInDetectorPlane();
-          // Fill the trees                                                                                                                                                                              
+          // Fill the trees
           _root->FillRootFile(eventBuilder);
           eventBuilder=0;
 	  
