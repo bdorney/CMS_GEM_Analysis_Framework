@@ -70,7 +70,7 @@ SRSMain::Reprocess(){
 	      // take out the event header, keep the fec header and the adc payloads
               start_eventRecord = ir - 8;
               if (start_eventRecord < 0) {
-		if (debus_s)std::cout <<"  +++ reprocess: Wrong Start of Event"<<std::endl;
+		if (debug_s)std::cout <<"  +++ reprocess: Wrong Start of Event"<<std::endl;
 		good_fragment = false;
               } else {
 		goodfragment = ( ((buffer[ir-6])&0xff) == iFEC);
