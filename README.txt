@@ -2552,25 +2552,173 @@
         For the case of TGraph2D and TH1F objects presently they must be loaded from a previously created TFile in
         the manner described above.
 
-        Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.  The case of the
-        TGraphErrors is shown for loading in comma separated data while the TGraph2D and TH1F cases load the objects
-        from hypothetical TFiles.  However using these other two cases you can see how to setup the config file such
-        that the executable loads a TGraphErrors from it.
+        Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.
 
         # 4.e.iv.V Example Config File - TGraph2D
         # --------------------------------------------------------
 
-        Coming "Soon"
+        The following example shows the case where a TGraph2D object is plotted.  Note the Canv_Plot_Type
+        in the [BEGIN_CANVAS] header is set to TGraph2D. Here the TGraph2D is loaded from an input TFile.
+
+            [BEGIN_CANVAS]
+                Canv_Axis_NDiv = '507,510'; #X, Y
+                Canv_Dim = '1000,1000'; #X, Y
+                Canv_DrawOpt = 'TRI2Z';
+                Canv_Grid_XY = 'false,false'; #X, Y
+                #Canv_Latex_Line = '0.55,0.97, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
+                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+                Canv_Legend_Draw = 'false';
+                Canv_Log_XY = 'false,false'; #X, Y
+                Canv_Logo_Pos = '0';
+                Canv_Logo_Prelim = 'true';
+                Canv_Margin_Top = '0.08';
+                Canv_Margin_Bot = '0.14';
+                Canv_Margin_Lf = '0.19';
+                Canv_Margin_Rt = '0.24';
+                Canv_Mono_Color = 'false';
+                Canv_Name = 'GE11-VII-L-CERN-0002_ResponseMap_Normalized'';
+                Canv_N_Axis_X = '1';
+                Canv_N_Axis_Y = '1';
+                Canv_Plot_Type = 'TGraph2D';
+                Canv_Range_Z = '0.5,1.5'; #Y1, Y2
+                Canv_Title_Offset_X = '1.2';
+                Canv_Title_Offset_Y = '1.65';
+                Canv_Title_Offset_Z = '1.32';
+                Canv_Title_X = 'Width #left(mm#right)';
+                Canv_Title_Y = 'Height #left(mm#right)';
+                Canv_Title_Z = '#splitline{Normalized Response}{#bf{GE1/1-VII-L-CERN-0002}}';
+                [BEGIN_PLOT]
+                    Plot_Name = 'g2D_Detector_ResponseFitPkPosNormalized_AllEta';
+                    Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+                    Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
+                [END_PLOT]
+            [END_CANVAS]
+
+        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
+        the physical path to the TGraphErrors object "g2D_Detector_ResponseFitPkPosNormalized_AllEta".
 
         # 4.e.iv.VI Example Config File - TGraphErrors
         # --------------------------------------------------------
 
-        Coming "Soon"
+        The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
+        in the [BEGIN_CANVAS] header is set to TGraphErrors. Here one TGraphError is supplied via comma separated
+        data while the other is loaded from an input TFile.
+
+            [BEGIN_CANVAS]
+                Canv_Axis_NDiv = '510,510'; #X, Y
+                Canv_Dim = '1000,1000'; #X, Y
+                Canv_DrawOpt = 'APE1';
+                Canv_Grid_XY = 'false,false'; #X, Y
+                Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
+                Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
+                Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
+                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+                Canv_Legend_Draw = 'true';
+                Canv_Log_XY = 'false,true'; #X, Y
+                Canv_Logo_Pos = '11'; #0, 11, 22, 33
+                Canv_Logo_Prelim = 'true';
+                Canv_Margin_Top = '0.08';
+                Canv_Margin_Bot = '0.14';
+                Canv_Margin_Lf = '0.15';
+                Canv_Margin_Rt = '0.04';
+                Canv_Name = 'GainComp';
+                Canv_Plot_Type = 'TGraphErrors';
+                Canv_Range_X = '500,800'; #X1, X2
+                Canv_Range_Y = '10,30000'; #Y1, Y2
+                Canv_Title_Offset_X = '1.0';
+                Canv_Title_Offset_Y = '1.2';
+                Canv_Title_X = 'Divider Current #left(#muA#right)';
+                Canv_Title_Y = 'Effective Gain';
+                [BEGIN_PLOT]
+                    Plot_Color = 'kBlack';
+                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
+                    Plot_Line_Size = '1';
+                    Plot_Line_Style = '1';
+                    Plot_Marker_Size = '1';
+                    Plot_Marker_Style = '22';
+                    Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
+                    [BEGIN_DATA]
+                        #NOTE:  Copying/pasting data from excel may not have the desired effect.
+                        #	Have noticed that a "newline" character (which is invisible) is
+                        #	not present in some copy/past actions, if your data does not load
+                        #	properly consider this as a potential cause.
+                        VAR_INDEP,VAR_DEP,VAR_DEP_ERR
+                        700,24850.98774,967.6738646
+                        690,16972.77181,733.8815033
+                        680,11719.64474,482.4250694
+                        670,8115.337175,323.215912
+                        660,5608.074856,223.2476327
+                        650,3882.143995,157.3363848
+                        640,2706.058443,111.6052345
+                        630,1909.212518,87.83123466
+                        620,1359.699531,63.74477198
+                        610,964.186757,47.84551633
+                        600,698.2227425,41.03127041
+                        590,516.9014257,32.91787275
+                        580,359.4035559,26.97947809
+                        570,264.6152389,22.77914941
+                        560,192.4948981,21.47259055
+                        550,140.1252986,20.45959455
+                    [END_DATA]
+                [END_PLOT]
+                [BEGIN_PLOT]
+                    Plot_Color = 'kRed+1';
+                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0003';
+                    Plot_Line_Size = '1';
+                    Plot_Line_Style = '1';
+                    Plot_Marker_Size = '1';
+                    Plot_Marker_Style = '23';
+                    Plot_Name = 'g_GE1/1-VII-L-CERN-0003_EffGain';
+                    Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0003_EffGain.root';
+                    Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
+                [END_PLOT]
+            [END_CANVAS]
+
+        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
+        the physical path to the TGraphErrors object "g_GE1/1-VII-L-CERN-0003_EffGain"
 
         # 4.e.iv.VII Example Config File - TH1F
         # --------------------------------------------------------
 
-        Coming "Soon"
+        The following example shows the case where a TH1F object is plotted.  Note the Canv_Plot_Type
+        in the [BEGIN_CANVAS] header is set to TH1F. Here the TH1F is loaded from an input TFile.
+
+            [BEGIN_CANVAS]
+                Canv_Axis_NDiv = '510,510'; #X, Y
+                Canv_Dim = '1000,1000'; #X, Y
+                Canv_DrawOpt = 'E1';
+                Canv_Grid_XY = 'false,false'; #X, Y
+                Canv_Latex_Line = '0.19,0.75, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
+                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+                Canv_Legend_Draw = 'false';
+                Canv_Log_XY = 'false,false'; #X, Y
+                Canv_Logo_Pos = '11';
+                Canv_Logo_Prelim = 'true';
+                Canv_Margin_Top = '0.08';
+                Canv_Margin_Bot = '0.12';
+                Canv_Margin_Lf = '0.12';
+                Canv_Margin_Rt = '0.04';
+                Canv_Name = 'GE11-VII-L-CERN-0002_RespFitPkPosDataset';
+                Canv_Plot_Type = 'TH1F';
+                Canv_Range_X = '0,2500'; #X1, X2
+                Canv_Range_Y = '0,150'; #Y1, Y2
+                Canv_Title_Offset_X = '1.2';
+                Canv_Title_Offset_Y = '1.65';
+                Canv_Title_X = 'Fitted Cu Fluorescence Peak Position #left(ADC#right)';
+                Canv_Title_Y = 'Entries';
+                [BEGIN_PLOT]
+                    Plot_Color = 'kBlack';
+                    Plot_Name = 'h_Summary_ResponseFitPkPosDataset';
+                    Plot_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+                    Plot_Root_Path = 'Summary/';
+                [END_PLOT]
+            [END_CANVAS]
+
+        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
+        the physical path to the TGraphErrors object "h_Summary_ResponseFitPkPosDataset".
 
     # 4.f. Output File - Analysis Mode
     # --------------------------------------------------------
@@ -2742,7 +2890,30 @@
         # 4.f.iii Output ROOT File - genericPlotter
         # --------------------------------------------------------
 
-        Coming "soon"
+        Here an output ROOT file is produced by classes inheriting from PlotterGeneric with the filename
+        "plotterOutput.root".  The ROOT file will contain the produced TCanvas and all TObjects that were declared
+        in [BEGIN_PLOT] headers and drawn on the canvas. The TName of the produce TCanvas will follow th econvention:
+
+            <Canv_Name>_<Canv_Dim X component>_<Canv_Dim Y component>_<Canv_Logo_Pos Idx>_<Canv_Logo_Prelim>_<Canv_Logo_Pos>
+
+        Here "Canv_Name" is the value of the Canv_Name field; "Canv_Dim X & Y component" are the x and y-values
+        given in the Canv_Dim field; "Canv_Logo_Pos Idx" is the value of the Canv_Logo_Pos field; "Canv_Logo_Prelim"
+        will read "prelim" if Canv_Logo_Prelim is set to true or be omitted (along with the next underscore) if
+        Canv_Logo_Prelim is set to false; "Canv_Logo_Pos" will be from the set {out, right, center, left} to indicate
+        the position of the CMS logo.
+
+        For example if Canv_Name = 'GE11-VII-L-CERN-0002_ResponseMap_Normalized', Canv_Dim = '1000,1000',
+        Canv_Logo_Pos = '0', and Canv_Logo_Prelim = 'true' the produced TCanvas would have a TName of:
+
+            GE11-VII-L-CERN-0002_ResponseMap_Normalized_1000_1000_0_prelim_out
+
+        The TObjects drawn on the TCanvas declared in [BEGIN_PLOT] headers will have the value of the Plot_Name field
+        set to their TName.
+
+        Since the style defined by genericPlotter may not persist in the created TObjects once they have been saved
+        to the output TFile and loaded again in ROOT two image files will also be produced.  In the working directory
+        you will also find one Canvas_TName.pdf and Canvas_TName.png file.  These two files should be used for
+        plot approval in publication since they are gauranteed to have the style settings created by genericPlotter.
 
         # 4.f.iv Output Text File
         # --------------------------------------------------------
