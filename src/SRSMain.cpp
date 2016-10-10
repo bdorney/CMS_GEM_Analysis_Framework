@@ -71,7 +71,7 @@ SRSMain::Reprocess(){
               start_eventRecord = ir - 8;
               if (start_eventRecord < 0) {
 		if (debug_s)std::cout <<"  +++ reprocess: Wrong Start of Event"<<std::endl;
-		good_fragment = false;
+		goodfragment = false;
               } else {
 		goodfragment = ( ((buffer[ir-6])&0xff) == iFEC);
 	      }
