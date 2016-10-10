@@ -78,7 +78,6 @@ SRSMain::Reprocess(){
               first = false;
             }
           }
-        }
 
         end_eventRecord=nw-start_eventRecord;
         int tFEC=0;

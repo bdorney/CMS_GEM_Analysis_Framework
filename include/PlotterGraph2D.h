@@ -1,48 +1,50 @@
 //
-//  ParameterLoaderPlotter.h
+//  PlotterGraph.h
 //  
 //
-//  Created by Brian L Dorney on 03/10/16.
+//  Created by Brian L Dorney on 05/10/16.
 //
 //
 
-#ifndef ____ParameterLoaderPlotter__
-#define ____ParameterLoaderPlotter__
+#ifndef ____PlotterGraph2D__
+#define ____PlotterGraph2D__
 
 //C++ Includes
-#include <algorithm>
-#include <iostream>
-#include <iterator>
+#include <map>
+#include <memory>
 #include <stdio.h>
 #include <string>
 #include <tuple>
-#include <utility>
-#include <vector>
 
 //Framework Includes
-#include "ParameterLoader.h"
-#include "PlotterUtilityFunctions.h"
+#include "PlotterGeneric.h"
 #include "PlotterUtilityTypes.h"
-#include "QualityControlSectionNames.h"
-#include "TimingUtilityFunctions.h"
-#include "UniformityUtilityFunctions.h"
 
 //ROOT Includes
+#include "TFile.h"
+//#include "TGraphErrors.h"
+#include "TGraph2D.h"
+#include "TLegend.h"
+//#include "TMultiGraph.h"
+#include "TROOT.h"
 
 namespace QualityControl {
     namespace Plotter {
-        class ParameterLoaderPlotter : public QualityControl::Uniformity::ParameterLoader {
-            
+        class PlotterGraph2D : public PlotterGeneric {
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            ParameterLoaderPlotter();
+            PlotterGraph2D();
+            
+            //Destructor
+            //------------------------------------------------------------------------------------------------------------------------------------------
+            ~PlotterGraph2D(){
+                m_g2D_Obs.reset();
+            }
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Opens a text file set by the user and loads the requested parameters
-            virtual void loadParameters(std::ifstream &file_Input, bool bVerboseMode, InfoCanvas &inputCanvInfo);
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,42 +55,45 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
-        private:
+        protected:
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Loads Parameters of the Canvas
-            virtual void loadParametersCanvas(std::ifstream & file_Input, InfoCanvas &inputCanvInfo);
+            //Intializes the plots defined in m_canvInfo
+            //To be over-ridded by inherited classes
+            void initPlot(InfoPlot & plotInfo);
             
-            //Loads Parameters of the Plot
-            virtual void loadParametersPlot(std::ifstream & file_Input, InfoPlot & inputPlotInfo);
+            //Makes the plots defined in m_canvInfo
+            //To be over-ridded by inherited classes
+            void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
             
-            //Loads Data (if any)
-            virtual std::vector<DataPoint> loadData(std::ifstream & file_Input);
+	    virtual void drawLatex(std::tuple<float, float, std::string> tupleTexLine, float fInputAngle);
 
+            //To be over-ridded by inherited classes
+            virtual void drawPlots();
+            
+            //Saves all TObjects to an output ROOT file
+            //To be over-ridded by inherited classes
+            virtual void write2RootFile();
+            
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            virtual int getColLabelPosition(std::vector<std::string> vec_strInputParam, std::string & strInputLabel);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Sets the value on a pair of parameters based on input data type
-            //We don't use std::pair here in case user gives 3 or more parameters (of which later ones are discarded)
-            //Wish I had a good idea on how to template this, but each of them individually call stoi, stof, or Timing::convert2bool based on the input type.
-            virtual void setParameters(std::vector<std::string> & vec_strInputParam, bool &bInput1, bool &bInput2);
-            virtual void setParameters(std::vector<std::string> & vec_strInputParam, float &fInput1, float &fInput2);
-            virtual void setParameters(std::vector<std::string> &vec_strInputParam, int &iInput1, int &iInput2);
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            QualityControl::Plotter::SecNamesPlotter m_headers_plots;
+            //std::map<std::string, std::shared_ptr<TGraph2D> > m_map_g2D;
             
-            QualityControl::Plotter::ColNamesPlotter m_col_labels;
-        }; //End class ParameterLoaderPlotter
+            std::shared_ptr<TGraph2D> m_g2D_Obs;
+            
+            //std::shared_ptr<TMultiGraph> mgraph_Obs;
+        }; //End class PlotterGraph2D
     } //End namespace Plotter
 } //End namespace QualityControl
 
 
-#endif /* defined(____ParameterLoaderPlotter__) */
+#endif /* defined(____PlotterGraph2D__) */

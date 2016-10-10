@@ -73,12 +73,12 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     //int iNEvt = aSetup.iEvt_Total;
     
     Int_t iClustMulti;  //I cry a little inside because of this
-    Int_t iClustPos_Y[3072];
+    //Int_t iClustPos_Y[3072];
     Int_t iClustSize[3072];
     Int_t iClustTimeBin[3072];
     
     Float_t fClustPos_X[3072];
-    //Float_t fClustPos_Y[3072];
+    Float_t fClustPos_Y[3072];
     Float_t fClustADC[3072];
     
     Cluster clust;
@@ -113,8 +113,8 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     tree_Clusters->SetBranchAddress("clustSize",&iClustSize);
     tree_Clusters->SetBranchAddress("clustADCs",&fClustADC);
     tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
-    tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
-    //tree_Clusters->SetBranchAddress("planeID",&fClustPos_Y);    
+    //tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
+    tree_Clusters->SetBranchAddress("planeID",&fClustPos_Y);    
 
     //Determine Event Range
     //------------------------------------------------------
@@ -153,7 +153,7 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
         //For each element create a cluster, and check if it passes the selection
         for (int j=0; j < iClustMulti; ++j) { //Loop Over Number of Clusters
             //Set the cluster info
-            clust.fPos_Y = iClustPos_Y[j];
+            clust.fPos_Y = fClustPos_Y[j];
             clust.fPos_X = fClustPos_X[j];
             
             clust.fADC = fClustADC[j];

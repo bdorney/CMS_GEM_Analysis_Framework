@@ -2,14 +2,49 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 2.2.4                               *
-*	LAST UPDATE: Oct 6 2016                      *
+*	VERSION: 2.2.5                               *
+*	LAST UPDATE: Oct 8 2016                      *
 *                                                *
 **************************************************
 
+Update: October 8th 2016
+==================================================
+->Added two struct's QualityControl::Plotter::PlotColorPaletteRGB and PlotColorPaletteMono in include/PlotterUtilityTypes.h for defining color palette's
+->QualityControl::Plotter::PlotterGeneric::setStyle() will now use PlotColorPaletteRGB as the default color palette
+->QualityControl::Plotter::PlotterGraph2D::drawPlots() will now use PlotColorPaletteMono for the mono-color palette
+
+Update: October 7th 2016
+==================================================
+->Changed SRSMain::Reprocess() to call SRSMain::Close() when corrupted input is identified; this will exit the run but produce a TTree file for a portion of the events that are good.
+->Modified QualityControl::Plotter::ParameterLoaderPlotter::getColLabelPositions() such that it tests for the presence of the col heading rather than requiring an exact match
+
 Update: October 6th 2016
 ==================================================
+->Added new class QualityControl::Plotter::PlotterGraph2D inheriting from PlotterGeneric for making plots of TGraph2D objects
+->Added new class QualityControl::Plotter::PlotterHisto inheriting from PlotterGeneric for making plots of TH1F objects
+->Added new struct QualityControl::Plotter::PlotTypesPlotter, in include/QualityControlSectionNames.h, for tracking type of TObject for plotter to plot
+->Now genericPlotter will understand what type of TObject it should plot
+->QualityControl::Plotter::DataPoint now has attributes for z and z_err respectively m_fZ and m_fZ_Err
+->Style attributes moved from QualityControl::Plotter::InfoPlot to QualityControl::Plotter::InfoCanvas
 ->Incorporating timing correction fix in SRSHit from M. Maggi
+->Added flag for plotting legend or not in QualityControl::Plotter::PlotterGeneric
+->Added additional attributes to QualityControl::Plotter::InfoCanvas to allow for more configuration at runtime
+->QualityControl::Plotter::PlotterGraph, PlotterGraph2D, and PlotterHisto updated to take advantage of higher flexibility
+->src/analyzeUniformity.cpp has the analysis and reconstruction done in two functions runModeAnalysis() & runModeReconstruction()
+->Implemented the reconstruction and analysis mode in src/analyzeUniformity.cpp
+->src/analyzeUniformity.cpp renamed to src/frameworkMain.cpp
+->Updated printHelpMenu in src/frameworkMain.cpp
+
+Update: October 5th 2016
+==================================================
+->New make file for genericPlotter executable: MakefilePlotter.clang & MakefilePlotter.gpp
+->New config file for use with genericPlotter executable: config/configPlot.cfg
+->Adding new utility functions for the QualityControl::Plotter namespace found in include/PlotterUtilityFunctions.h & src/PlotterUtilityFunctions.cpp
+->New utility function QualityControl::Plotter::conver2Color
+->New int main() for generic executable found in src/genericPlotter.cpp
+->QualityControl::Plotter::ParameterLoaderPlotter class implemented and tested
+->Added new class QualityControl::Plotter::PlotterGeneric for making plots
+->Added new class QualityControl::Plotter::PlotterGraph inheriting from PlotterGeneric for making plots of TGraphError objects
 
 Update: October 4th 2016
 ==================================================

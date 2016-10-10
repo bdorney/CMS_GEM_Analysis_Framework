@@ -17,12 +17,14 @@ stdlog/*
 stdout/
 stdout/*
 scripts/submitFrameworkJob_RunNo*.sh
+#scripts/deleteSelectedRawFiles.sh
 
 # Compiled source #
 ###################
 *.o
 *analyzeUniformity
 *analyzeSpec
+*frameworkMain
 *genericPlotter
 
 # Figures #
@@ -34,6 +36,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 
 # Misc #
 ########
+core.*
 AnalysisCode.cpp
 AnalysisCode_GE4_V1.cpp
 AnalysisCode_GE6_V1.cpp

@@ -1,5 +1,5 @@
 # Define the compiler
-CC = g++
+CC = clang++ #For Mac OSX > 10.9 ???
 
 # Define root-config 
 ROOTCONFIG = $(ROOTSYS)/bin/root-config
@@ -17,38 +17,17 @@ LPATHS = -L $(ROOTSYS)/lib/
 LIBS = -lSpectrum
 
 # Define source files
-SOURCES =   src/DetectorMPGD.cpp \
-            src/FrameworkBase.cpp \
-            src/ReadoutSector.cpp \
-            src/ReadoutSectorPhi.cpp \
-            src/ReadoutSectorEta.cpp \
-            src/Interface.cpp \
-            src/InterfaceAnalysis.cpp \
-            src/ParameterLoader.cpp \
-            src/ParameterLoaderDetector.cpp \
-            src/ParameterLoaderAnaysis.cpp \
-            src/ParameterLoaderRun.cpp \
-            src/Selector.cpp \
-            src/SelectorCluster.cpp \
-            src/SelectorHit.cpp \
-            src/SRSAPVEvent.cpp \
-            src/SRSCluster.cpp \
-            src/SRSConfiguration.cpp \
-            src/SRSEventBuilder.cpp \
-            src/SRSFECDecoder.cpp \
-            src/SRSHit.cpp \
-            src/SRSMain.cpp \
-            src/SRSMapping.cpp \
-            src/SRSOutputROOT.cpp \
-            src/AnalyzeResponseUniformity.cpp \
-            src/AnalyzeResponseUniformityClusters.cpp \
-            src/AnalyzeResponseUniformityHits.cpp \
-            src/UniformityUtilityFunctions.cpp \
+SOURCES =   src/ParameterLoader.cpp \
+            src/PlotterUtilityFunctions.cpp \
             src/TimingUtilityFunctions.cpp \
-            src/Visualizer.cpp \
-            src/VisualizeUniformity.cpp \
-            src/VisualizeComparison.cpp \
-            src/frameworkMain.cpp
+            src/UniformityUtilityFunctions.cpp \
+            src/ParameterLoaderPlotter.cpp \
+            src/CMS_lumi.cpp \
+            src/PlotterGeneric.cpp \
+            src/PlotterGraph.cpp \
+            src/PlotterGraph2D.cpp \
+            src/PlotterHisto.cpp \
+            src/genericPlotter.cpp
 
 # Define object files
 #	We use Suffix Replacement
@@ -58,10 +37,15 @@ SOURCES =   src/DetectorMPGD.cpp \
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Define the executable
-EXEC = frameworkMain
+EXEC = genericPlotter
 
 # Define default behavior
 #default: $(EXEC)
+
+# To create the analyzeUniformity executable we will need the following object files:
+# 	analyzeUniformity.o
+#	DetectorMPGD.o
+#	UniformityUtilityFunctions.o
 
 .PHONY: depend clean
 

@@ -1,5 +1,5 @@
 //
-//  analyzeUniformity.cpp
+//  frameworkMain.cpp
 //  
 //
 //  Created by Brian L Dorney on 25/01/16.
@@ -49,16 +49,17 @@ using QualityControl::Timing::printStreamStatus;
 
 using namespace QualityControl::Uniformity;
 
+//Print the Help Menu
 void printHelpMenu(){
     //Calling Syntax
     cout<<endl;
     cout<<endl;
     cout<<"------------------------------------------------------------------------------------------\n";
-    cout<<"analyzeUniformity\n";
+    cout<<"frameworkMain\n";
     cout<<"Author: Brian L. Dorney\n";
     cout<<"Usage options:\n";
-    cout<<"\tThis Menu:\t"<<"./analyzeUniformity -h\n";
-    cout<<"\tAnalysis:\t"<<"./analyzeUniformity <Run_Config_File> <Verbose Mode true/false>\n";
+    cout<<"\tThis Menu:\t"<<"./frameworkMain -h\n";
+    cout<<"\tAnalysis:\t"<<"./frameworkMain <Run_Config_File> <Verbose Mode true/false>\n";
     
     //Summary Info
     cout<<endl;
@@ -68,11 +69,15 @@ void printHelpMenu(){
     cout<<"\tExamples of each header are shown below.";
     cout<<endl;
     cout<<"\tIncluding the 'run info' header will use the input files to produce a framework output file\n";
-    cout<<"\tHere you must have a Config_Analysis & Config_Mapping file, examples of Config_Analysis shown below\n";
-    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file, default files are included in $GEM_BASE/config/\n";
+    cout<<"\tHere you must have Config_Analysis, Config_Mapping, and Config_Reco files; example of Config_Analysis shown below\n";
+    cout<<"\tThe Config_Mapping file is your amoreSRS mapping file while the Config_Reco file is your 'amore.cfg' file.\n";
+    cout<<"\tdefault files are included in $GEM_BASE/config/\n";
     cout<<endl;
     cout<<"\tIf Including the 'compare info' header the input must be framework output files\n";
     cout<<"\t These input files must be have been produced when running with a 'run info' header\n";
+    cout<<endl;
+    cout<<"\tIf running reconstruction the input must be an RD51 SRS output file (e.g. *.raw)\n";
+    cout<<"\tFor each call of the executable only one *.raw file should be in the input run list\n";
     cout<<endl;
     cout<<"\tIf you have both a 'run info' and a 'compare info' header only the last one will be used\n";
     
@@ -99,14 +104,16 @@ void printHelpMenu(){
     cout<<"\t(omit angle brackets, i.e. <. and >)\n";
     cout<<endl;
     cout<<"\t[BEGIN_RUN_INFO]\n";
+    cout<<"\t\tConfig_Reco = <PHYSICAL FILENAME OF RECO CONFIG FILE>';\n";
     cout<<"\t\tConfig_Analysis = '<PHYSICAL FILENAME OF ANALYSIS CONFIG FILE>'\n";
     cout<<"\t\tConfig_Mapping = '<PHYSICAL FILENAME OF MAPPING CONFIG FILE>';\n";
+    cout<<"\t\tDetector_Name = '<DETECTOR SERIAL NUMBER WITHOUT / CHAR>';\n";
     cout<<"\t\tInput_Is_Frmwrk_Output = '<ANALYZE PREVIOUS OUTPUT true/false>';\n";
     cout<<"\t\tInput_Identifier = '<STRING IDENTIFIER FOUND IN FILENAME>';\n";
     cout<<"\t\tOutput_File_Name = '<OUTPUT ROOT FILE NAME>';\n";
     cout<<"\t\tOutput_File_Option = '<OPTION FOR OUTPUT ROOT FILE (e.g. CREATE, RECRETAE, UPDATE, etc...)>';\n";
     cout<<"\t\tOutput_Individual = '<OUTPUT ONE ROOT FILE PER INPUT RUN true/false>';\n";
-    cout<<"\t\tAna_Reco_Clusters = '<RECONSTRUCT CLUSTERS FROM THIT TREE true/false>';\n";
+    cout<<"\t\tReco_All = '<RECONSTRUCT RAW FILE true/false>';\n";
     cout<<"\t\tAna_Hits = '<PERFORM THE HIT ANALYSIS true/false>';\n";
     cout<<"\t\tAna_Clusters = '<PERFORM THE CLUSTER ANALYSIS true/false>';\n";
     cout<<"\t\tAna_Fitting = '<FIT OUTPUT HISTOGRAMS true/false>';\n";
@@ -160,6 +167,10 @@ void printHelpMenu(){
     cout<<"\t\t\tUniformity_Granularity = '<INTEGER>';\n";
     cout<<"\t\t\t[BEGIN_ADC_FIT_INFO]\n";
     cout<<"\t\t\t\tFit_Formula = '<STRING>';\n";
+    cout<<"\t\t\t\tFit_Formula_Sig = '<SIGNAL PORTION OF Fit_Formula>';\n";
+    cout<<"\t\t\t\tFit_Formula_Sig_Param_Idx_Range = '<IDX RANGE OF PARAMETERS IN Fit_Formula FOR SIGNAL>';\n";
+    cout<<"\t\t\t\tFit_Formula_Bkg = '<BACKGROUND PORTION OF Fit_Formula>';\n";
+    cout<<"\t\t\t\tFit_Formula_Bkg_Param_Idx_Range = '<IDX RANGE OF PARAMETERS IN Fit_Formula FOR BACKGROUND>';\n";
     cout<<"\t\t\t\tFit_Option = '<STRING>';\n";
     cout<<"\t\t\t\tFit_Param_Map = '<COMMA SEPARATED LIST OF STRINGS (SEE README.txt)>';\n";
     cout<<"\t\t\t\tFit_Param_IGuess = '<COMMA SEPARATED LIST OF STRINGS (SEE README.txt)>';\n";
@@ -195,13 +206,67 @@ void printHelpMenu(){
     return;
 } //End printHelpMenu
 
+//Perform the Analysis
+void runModeAnalysis(RunSetup & rSetup, vector<string> & vec_strInputFiles, vector<pair<int, string> > & vec_pairedRunList, bool bVerboseMode){
+    //Load the requested amore parameters & setup the detector
+    //------------------------------------------------------
+    ParameterLoaderDetector loadDetector;
+    loadDetector.loadAmoreMapping( rSetup.strFile_Config_Map  );
+    
+    DetectorMPGD detMPGD;
+    detMPGD = loadDetector.getDetector();
+    detMPGD.setName( rSetup.strDetName );
+    
+    //Load the requested analysis parameters
+    //------------------------------------------------------
+    ParameterLoaderAnaysis loaderAnalysis;
+    AnalysisSetupUniformity aSetup = loaderAnalysis.getAnalysisParameters( rSetup.strFile_Config_Ana );
+    
+    //Setup the analysis interface
+    //------------------------------------------------------
+    InterfaceAnalysis anaInterface;
+    anaInterface.setAnalysisParameters(aSetup);
+    anaInterface.setDetector(detMPGD);
+    anaInterface.setRunParameters(rSetup);
+    anaInterface.setVerboseMode(bVerboseMode);
+    
+    //Perform the user defined analysis interface
+    //------------------------------------------------------
+    if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
+    else {                          anaInterface.analyzeInput(vec_pairedRunList); }
+    
+    return;
+} //End runModeAnalysis()
+
+//Performs the Reconstruction
+void runModeReconstruction(RunSetup & rSetup, vector<pair<int, string> > & vec_pairedRunList){
+    for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
+        //C++14 only
+        //unique_ptr<SRSMain> recoInterface = make_unique<SRSMain>(& SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
+        
+        unique_ptr<SRSMain> recoInterface(new SRSMain( (*iterRun).second, rSetup.strFile_Config_Reco ) );
+        recoInterface->Reprocess();
+        
+        //remove the *.raw from the filename, append with _dataTree.root
+        if ( (*iterRun).second.find(".raw") != std::string::npos ) {
+            (*iterRun).second.erase((*iterRun).second.find(".raw"), (*iterRun).second.length() - (*iterRun).second.find(".raw") );
+            (*iterRun).second = (*iterRun).second + "_dataTree.root";
+        }
+        
+        //Delete the interface
+        recoInterface.reset();
+    } //End Loop Over input Runs
+    
+    return;
+} //End runModeReconstruction()
+
 //Input Parameters
 //  0 -> Executable
 //  1 -> Run config file
 //  2 -> verbose mode
 //Usage examples:
-//  Help menu: ./analyzeUniformity -h
-//  Analysis: ./analyzeUniformity config/configRun.cfg true
+//  Help menu: ./frameworkMain -h
+//  Analysis: ./frameworkMain config/configRun.cfg true
 int main( int argc_, char * argv_[] ){
     //Transfer Input Arguments into vec_strInputArgs
     //------------------------------------------------------
@@ -233,7 +298,7 @@ int main( int argc_, char * argv_[] ){
             cout<<"main() - vec_strInputArgs[3] expected to be boolean!!!\n";
             cout<<"main() - Parameter given:\n";
             cout<<"\t"<<vec_strInputArgs[2]<<endl;
-            cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+            cout<<"main(): for help menu call: ./frameworkMain -h\n";
             cout<<"main(): exitting\n";
             
             return -2;
@@ -252,7 +317,7 @@ int main( int argc_, char * argv_[] ){
         if (!file_Config.is_open()) {
             perror( ("main() - error while opening file: " + vec_strInputArgs[1]).c_str() );
             printStreamStatus(file_Config);
-            cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+            cout<<"main(): for help menu call: ./frameworkMain -h\n";
             cout<<"main(): exitting\n";
             
             return -1;
@@ -265,7 +330,7 @@ int main( int argc_, char * argv_[] ){
             cout<<"\t"<<vec_strInputArgs[i]<<endl;
         } //End Loop over input parameters
         
-        cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+        cout<<"main(): for help menu call: ./frameworkMain -h\n";
         cout<<"main(): exiting\n";
         
         return -3;
@@ -278,7 +343,7 @@ int main( int argc_, char * argv_[] ){
     if (!rSetup.bLoadSuccess) {
         perror( ("main() - error while setting Run Setup config from file: " + vec_strInputArgs[1]).c_str() );
         printStreamStatus(file_Config);
-        cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+        cout<<"main(): for help menu call: ./frameworkMain -h\n";
         cout<<"main(): exitting\n";
         
         return -1;
@@ -291,7 +356,7 @@ int main( int argc_, char * argv_[] ){
         
         if (vec_strInputFiles.size() == 0) {
             cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
-            cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+            cout<<"main(): for help menu call: ./frameworkMain -h\n";
             cout<<"main(): exiting\n";
             
             return -4;
@@ -306,7 +371,7 @@ int main( int argc_, char * argv_[] ){
             cout<<"main() - no valid runs found in " << vec_strInputArgs[1].c_str() << endl;
             cout<<"\tMaybe you forgot to have a field 'RunX' in the input filenames?\n";
             cout<<"\tThis should be separated by underscores e.g. '_', and for each input file be some unique interger X\n";
-            cout<<"main(): for help menu call: ./analyzeUniformity -h\n";
+            cout<<"main(): for help menu call: ./frameworkMain -h\n";
             cout<<"main(): exiting\n";
             
             return -4;
@@ -323,7 +388,7 @@ int main( int argc_, char * argv_[] ){
 	cout<<"rSetup.strRunMode = " << rSetup.strRunMode.c_str() << endl;
 
     if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyAna ) ) { //Run Mode: Analysis
-        //Load the requested amore parameters & setup the detector
+        /*//Load the requested amore parameters & setup the detector
         //------------------------------------------------------
         ParameterLoaderDetector loadDetector;
         loadDetector.loadAmoreMapping( rSetup.strFile_Config_Map  );
@@ -348,7 +413,9 @@ int main( int argc_, char * argv_[] ){
         //Perform the user defined analysis interface
         //------------------------------------------------------
         if( rSetup.bInputFromFrmwrk ){	anaInterface.analyzeInput(vec_strInputFiles); }
-        else {                          anaInterface.analyzeInput(vec_pairedRunList); }
+        else {                          anaInterface.analyzeInput(vec_pairedRunList); }*/
+        
+        runModeAnalysis(rSetup, vec_strInputFiles, vec_pairedRunList, bVerboseMode);
     } //End Run Mode: Analysis
     else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyCompare ) ){ //Run Mode: Comparison
         VisualizeComparison visualizeComp;
@@ -367,7 +434,7 @@ int main( int argc_, char * argv_[] ){
     } //End Run Mode: Comparison
     else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strOnlyReco ) ) { //Run Mode: Reconstruction
 	//Right now this is only supported for one input file
-        for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
+        /*for (auto iterRun = vec_pairedRunList.begin(); iterRun != vec_pairedRunList.end(); ++iterRun) { //Loop Over input Runs
             //C++14 only
             //unique_ptr<SRSMain> recoInterface = make_unique<SRSMain>(& SRSMain::Reprocessor( (*iterRun).second, rSetup.strFile_Config_Reco ) );
             
@@ -375,8 +442,17 @@ int main( int argc_, char * argv_[] ){
             recoInterface->Reprocess();
             
             recoInterface.reset();
-        } //End Loop Over input Runs
+        } //End Loop Over input Runs*/
+        
+        runModeReconstruction(rSetup, vec_pairedRunList);
     } //End Run Mode: Reconstruction
+    else if ( 0 == rSetup.strRunMode.compare( m_modes_run.m_strRecoNAna) ) { //Run Mode: Reconstruction & Analysis
+        //Reconstruct Events
+        runModeReconstruction(rSetup, vec_pairedRunList);
+
+        //Analyze Events
+        runModeAnalysis(rSetup, vec_strInputFiles, vec_pairedRunList, bVerboseMode);
+    } //End Run Mode: Reconstruction & Analysis
     else{ //Run Mode: Unrecognized
         cout<<"main() - Run Mode: " << rSetup.strRunMode << " not recognized!\n";
         cout<<"\tPlease double check input run config file.\n";

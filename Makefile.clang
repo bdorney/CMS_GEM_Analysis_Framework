@@ -49,7 +49,7 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/Visualizer.cpp \
             src/VisualizeUniformity.cpp \
             src/VisualizeComparison.cpp \
-            src/analyzeUniformity.cpp
+            src/frameworkMain.cpp
 
 # Define object files
 #	We use Suffix Replacement
@@ -59,15 +59,10 @@ SOURCES =   src/DetectorMPGD.cpp \
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Define the executable
-EXEC = analyzeUniformity
+EXEC = frameworkMain
 
 # Define default behavior
 #default: $(EXEC)
-
-# To create the analyzeUniformity executable we will need the following object files:
-# 	analyzeUniformity.o
-#	DetectorMPGD.o
-#	UniformityUtilityFunctions.o
 
 .PHONY: depend clean
 

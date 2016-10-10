@@ -1,6 +1,6 @@
 #!bin/zsh
 #Usage:
-#	source runMode_Grid.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Queue Names>
+#	source runMode_Grid_Reco.sh <Data File Directory> <Config File - Reco> <Config File - Mapping> <Queue Names>
 #
 #	Possible queue names on lxplus LSF system are:
 #		8nm	Eight natural minutes
@@ -12,15 +12,12 @@
 DIR_ORIG=$PWD
 
 #store the run config file
-#FILE_RUN=$GEM_BASE/config/configRun.cfg
-FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Grid.cfg
+FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Grid_Reco.cfg
 
 #setup input variables
-#NAME_DET=$1
 DIR_DATA=$1
-FILE_ANA=$2
+FILE_RECO=$2
 FILE_MAP=$3
-#FILE_OUT=$5
 NAME_QUEUE=$4
 
 #Move to the data directory
@@ -28,7 +25,7 @@ cd $DIR_DATA
 
 #Determine which files should be analyzed
 COUNTER=0
-for f in *dataTree.root
+for f in *.raw
 do
     #increment counter
     let COUNTER=$(( ${COUNTER} + 1 ))
@@ -37,11 +34,8 @@ do
     FILE_RUN=$GEM_BASE/config/configRun_RunNo${COUNTER}.cfg
     cp $FILE_RUN_TEMP $FILE_RUN
 
-    #Replace Detector Name
-    #sed -i -- "s@DETECTORNAME@$NAME_DET@g" $FILE_RUN
-
     #Replace filenames
-    sed -i -- "s@CONFIGFILE_ANALYSIS@$FILE_ANA@g" $FILE_RUN
+    sed -i -- "s@CONFIGFILE_RECO@$FILE_RECO@g" $FILE_RUN
     sed -i -- "s@CONFIGFILE_MAPPING@$FILE_MAP@g" $FILE_RUN
     #sed -i -- "s@OUTPUTFILE@$FILE_OUT@g" $FILE_RUN
 
@@ -116,8 +110,7 @@ echo ""
 echo "To safely and conveniently remove the stdout, stderr, stdlog, config, and script files"
 echo ""
 echo "After all jobs have completed call:"
-echo "	cd $DIR_DATA"
-echo "	hadd somefilename.root *Ana.root"
+echo "	ls $DIR_DATA"
 echo ""
-echo "this will create a new TFile that is the sum of all the individual TFile's"
+echo "this will show the contents of the directory"
 echo ""
