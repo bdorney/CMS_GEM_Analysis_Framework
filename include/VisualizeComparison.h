@@ -65,8 +65,8 @@ namespace QualityControl {
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-	    //Sets the draw option
-	    virtual void setDrawOption(std::string strInput){ m_strDrawOption = strInput; return; };
+            //Sets the draw option
+            virtual void setDrawOption(std::string strInput){ m_strDrawOption = strInput; return; };
 
             //Sets the input identifier
             virtual void setIdentifier(std::string strInput){ m_strIdent = strInput; return; };
