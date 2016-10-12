@@ -188,13 +188,33 @@ void CMSLumi::drawLumi( std::shared_ptr<TPad> pad, int iPeriod, int iPosX ) {
     {
         if( iPosX==0)
         {
-            posX_ =   l + m_fRelPosX*(1-l-r) + latex_CMS.GetXsize();
+		//cout<<"l = " << l << endl;
+		//cout<<"m_fRelPosX = " << m_fRelPosX << endl;
+		//cout<<"r = " << r << endl;
+		//cout<<"latex_CMS.GetXsize() = " << latex_CMS.GetXsize() << endl;
+
+            posX_ =   l + m_fRelPosX*(1-l-r);// + latex_CMS.GetXsize();
+		if( latex_CMS.GetXsize() > 1.){
+			posX_+= ( latex_CMS.GetXsize() / ( fabs(pad->GetX2() - pad->GetX1() ) ) );
+		}
+		else{
+			posX_+= latex_CMS.GetXsize();
+		}
+
+
             posY_ =   1-t+m_fLumiTextOffset*t;
         }
         latex.SetTextFont(m_fExtraTextFont);
         latex.SetTextSize(fExtraTextSize*t);
         latex.SetTextAlign(iAlign_);
         latex.DrawLatex(posX_, posY_, m_strExtraText.c_str() );
+
+	//Debugging
+	//cout<<"posX_ = " << posX_ << endl;
+	//cout<<"posY_ = " << posY_ << endl;
+	//cout<<"m_strExtraText.c_str() = " << m_strExtraText.c_str() << endl;
+
     }
+
     return;
 }

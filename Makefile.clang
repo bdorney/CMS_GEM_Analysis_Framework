@@ -30,6 +30,7 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/ParameterLoaderFit.cpp \
             src/ParameterLoaderAnalysis.cpp \
             src/ParameterLoaderRun.cpp \
+            src/PlotterUtilityFunctions.cpp \
             src/Selector.cpp \
             src/SelectorCluster.cpp \
             src/SelectorHit.cpp \
