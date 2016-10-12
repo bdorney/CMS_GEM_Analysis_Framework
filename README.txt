@@ -56,8 +56,9 @@
             4.b.v.              Loaders
                 4.b.v.I         ParameterLoaderAnalysis
                 4.b.v.II        ParameterLoaderDetector
-                4.b.v.III       ParameterLoaderPlotter
-                4.b.v.IV        ParameterLoaderRun
+                4.b.v.III       ParameterLoaderFit
+                4.b.v.IV        ParameterLoaderPlotter
+                4.b.v.V         ParameterLoaderRun
             4.b.vi.             Plotters
                 4.b.vi.I        PlotterGeneric
                 4.b.vi.II       PlotterGraph
@@ -107,10 +108,11 @@
                 4.e.iv.I        HEADER PARAMETERS - CANVAS
                 4.e.iv.II       HEADER PARAMETERS - PLOT
                 4.e.iv.III      HEADER PARAMETERS - DATA
-                4.e.iv.IV       Configuration Options
-                4.e.iv.V        Example Config File - TGraph2D
-                4.e.iv.VI       Example Config File - TGraphErrors
-                4.e.iv.VII      Example Config File - TH1F
+                4.e.iv.IV       HEADER PARAMETERS - FIT
+                4.e.iv.V        Configuration Options
+                4.e.iv.VI       Example Config File - TGraph2D
+                4.e.iv.VII      Example Config File - TGraphErrors
+                4.e.iv.VIII     Example Config File - TH1F
         4.f. Output Files
             4.f.i               Output ROOT File - Analysis Mode
                 4.f.i.I         "Segmented" Plots Stored in "Summary" folder
@@ -615,6 +617,7 @@
             |
             |--->ParameterLoaderAnalysis
             |--->ParameterLoaderDetector
+            |--->ParameterLoaderFit
             |--->ParameterLoaderPlotter
             |--->ParameterLoaderRun
 
@@ -658,6 +661,7 @@
         InterfaceAnalysis -> interface between main() and the analysis portion of the framework; runs the analysis for loaded case.
         ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
         ParameterLoaderDetector -> creates a DetectorMPGD object
+        ParameterLoaderFit -> loads necessary information for fits
         ParameterLoaderPlotter -> loads necessary information for making a plot conforming to the CMS Style Guide
         ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
         PlotterGeneric -> And it's inherited classes create a TCanvas with one or more TObjects drawn on it such that it conforms to the CMS Style Guide
@@ -681,7 +685,7 @@
             |       |
             |       |->ParameterLoaderDetector creates a DetectorMPGD Object
             |       |
-            |       |->ParameterLoaderAnalysis loads the analysis parameters from analysis config file
+            |       |->ParameterLoaderAnalysis & ParameterLoaderFit load analysis parameters from analysis config file
             |       |
             |       |->InterfaceAnalysis is given run & analyiss setup structs, and DetectorMPGD object
             |               |
@@ -725,14 +729,13 @@
         # 4.b.i. FrameworkBase
         # --------------------------------------------------------
 
-        More coming "soon"
-
         Defined in include/FrameworkBase.h
         Non-inherited member attributes shown below.
 
-        Public Member Functions
+        Public Constructors
             FrameworkBase();
 
+        Public Member Functions
             virtual Uniformity::DetectorMPGD getDetector();
             virtual int getRunNum();
 
@@ -758,8 +761,6 @@
             # 4.b.ii.I AnalyzeResponseUniformity
             # --------------------------------------------------------
 
-            More coming "soon"
-
             Defined in include/AnalyzeResponseUniformity.h
             Inherits from FrameworkBase.
             Non-inherited member attributes shown below.
@@ -769,7 +770,7 @@
                 typedef exprtk::expression<float> expression_t;
                 typedef exprtk::parser<float> parser_t;
 
-            Public Member Functions
+            Public Constructors
                 AnalyzeResponseUniformity()
                 AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
 
@@ -795,32 +796,188 @@
             # 4.b.ii.II AnalyzeResponseUniformityClusters
             # --------------------------------------------------------
 
-            Coming "soon"
+            Defined in include/AnalyzeResponseUniformityClusters.h
+            Inherits from AnalyzeResponseUniformity.
+            Non-inherited member attributes shown below.
+
+            Public Constructors
+                AnalyzeResponseUniformityClusters()
+                AnalyzeResponseUniformityClusters(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
+
+            Public Member Functions
+                virtual void fillHistos(DetectorMPGD & inputDet)
+                virtual void fitHistos(DetectorMPGD & inputDet)
+
+                virtual void initGraphsClusters(DetectorMPGD & inputDet);
+                virtual void initHistosClusters(DetectorMPGD & inputDet);
+                virtual void initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet);
+
+                virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+                virtual void loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile);
+
+                void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+                void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
+
+                void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+                void storeFits(TFile * file_InputRootFile, DetectorMPGD & inputDet);
 
             # 4.b.ii.III AnalyzeResponseUniformityHits
             # --------------------------------------------------------
 
-            Coming "soon"
+            Defined in include/AnalyzeResponseUniformityHits.h
+            Inherits from AnalyzeResponseUniformity.
+            Non-inherited member attributes shown below.
+
+            Public Constructors
+                AnalyzeResponseUniformityHits();
+                AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup);
+
+            Public Member Functions
+                virtual void fillHistos(DetectorMPGD & inputDet);
+                virtual void findDeadStrips(DetectorMPGD & inputDet, std::string & strOutputTextFileName);
+                virtual void fitHistos(DetectorMPGD & inputDet);
+
+                virtual void initHistosHits(DetectorMPGD & inputDet);
+
+                virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+
+                void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+                void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
+
+                void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
 
             # 4.b.ii.IV Visualizer
             # --------------------------------------------------------
 
-            Coming "soon"
+            Defined in include/Visualizer.h
+            Inherits from AnalyzeResponseUniformity.
+            Non-inherited member attributes shown below.
+
+            Public Constructors
+                Visualizer()
+
+            Public Member Functions
+                virtual void setAutoSaveCanvas(bool bInput){ m_bSaveCanvases = bInput; return; };
+
+            Protected Member Functions
+                virtual void save2png(TCanvas & inputCanvas);
+                virtual TPad *getPadEta(int iEta, int iNumEta);
+                virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
+
+            Protected Attributes
+                bool m_bSaveCanvases;
 
             # 4.b.ii.V VisualizeComparison
             # --------------------------------------------------------
 
-            Coming "soon"
+            Defined in include/VisualizeComparison.h
+            Inherits from Visualizer.
+            Non-inherited member attributes shown below.
+
+            Public Constructors
+                VisualizeComparison();
+
+            Public Member Functions
+                virtual void storeCanvasComparisonHisto()
+                virtual void storeCanvasComparisonHisto(std::string strOutputROOTFileName, std::string strOption, std::string strObsName)
+                virtual void storeCanvasComparisonHisto(TFile * file_InputRootFile, std::string strObsName)
+
+                virtual void setDrawOption(std::string strInput)
+
+                virtual void setIdentifier(std::string strInput)
+
+                virtual void setInputFiles(std::vector<std::string> vec_strInput)
+
+                virtual void setNormalize(bool bInput)
+
+                virtual void setPosEta(int iInput);
+                virtual void setPosEtaPhi(int iInputEta, int iInputPhi)
+                virtual void setPosFull(int iInputEta, int iInputPhi, int iInputSlice)
+                virtual void setPosPhi(int iInput)
+                virtual void setPosSlice(int iInput)
+
+                virtual void setRunParameters(Uniformity::RunSetup inputSetup)  //Intentially overrides FrameworkBase::setRunParameters(Uniformity::RunSetup inputSetup)
+
+            Private Methods
+                virtual std::shared_ptr<TH1F> getObsHisto(TFile * file_InputRootFile, std::string strObsName)
+                virtual std::map<std::string, std::shared_ptr<TH1F> > getObsHistoMap(std::string strObsName)
+
+            Private Attributes
+                bool m_bNormalize
+
+                int m_iEta
+                int m_iPhi
+                int m_iSlice
+
+                std::string m_strIdent
+                std::string m_strDrawOption
+
+                std::vector<std::string> m_vec_strFileList;
 
             # 4.b.ii.VI VisualizeUniformity
             # --------------------------------------------------------
 
-            Coming "soon"
+            Defined in include/VisualizeUniformity.h
+            Inherits from Visualizer.
+            Non-inherited member attributes shown below.
+
+            Public Constructors
+                VisualizeUniformity();
+                VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+
+            Public Member Functions
+                virtual void makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+                virtual void makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+
+                virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+                virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+
+                virtual void storeCanvasFits(std::string & strOutputROOTFileName, std::string strOption, std::string strDrawOption);
+                virtual void storeCanvasFits(TFile * file_InputRootFile, std::string strDrawOption);
+
+                virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+                virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+                virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
+                virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
+
+                virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+                virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+                virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+                virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+                virtual void storeCanvasHisto2DHistorySegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bIsEta);
+                virtual void storeCanvasHisto2DHistorySegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bIsEta);
+
+                virtual void storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+                virtual void storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+                virtual void storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+                virtual void storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+                virtual void storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+                virtual void storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+            Private Methods
+                virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit);
+
+                virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);
+                virtual std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
+                virtual std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+
+                virtual std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+
+                virtual std::shared_ptr<TH2F> getSummarizedRunHistoryHisto2D(std::map<int, std::shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi );
 
         # 4.b.iii. Interfaces
         # --------------------------------------------------------
 
-        Coming "soon"
+Defined in include/VisualizeUniformity.h
+Inherits from Visualizer.
+Non-inherited member attributes shown below.
+
+Public Member Functions
 
             # 4.b.iii.I Interface
             # --------------------------------------------------------
@@ -877,12 +1034,17 @@
 
             Coming "soon"
 
-            # 4.b.v.III ParameterLoaderPlotter
+            # 4.b.v.III ParameterLoaderFit
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.v.IV ParameterLoaderRun
+            # 4.b.v.IV ParameterLoaderPlotter
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.v.V ParameterLoaderRun
             # --------------------------------------------------------
 
             Coming "soon"
@@ -1595,6 +1757,10 @@
                 Fit_Formula_Sig_Param_Idx_Range     integers, as Fit_Formula_Sig_Param_Idx_Range but for the
                                                     background.
 
+                Fit_Name                string, starting point of TName of the TF1 object; note the (ieta,iphi,islice)
+                                        coordinate of the fit will be used to augment the TName to ensure a unique
+                                        TName for each TF1 object created.
+
                 Fit_Option              string, the fit option to be used for fitting the ADC spectrums made
                                         from each slice.
 
@@ -1619,7 +1785,7 @@
                                         on the corresponding fit parameter determined in ROOT (e.g. TF1::GetParError() )
 
                 Fit_Range               string, as Fit_Param_IGuess but for the fit range.  NOTE: must supply
-                                        exactly two parameters.  If more then two parameters are supplied
+                                        exactly two parameters.  If more than two parameters are supplied
                                         only those that evaluate to the maximum and minimum are used.
 
         # 4.e.ii.V HEADER PARAMETERS - HISTO_INFO
@@ -2346,6 +2512,10 @@
                     ...
                     ...
                     ...
+                    [BEGIN_FIT]
+                    ...
+                    ...
+                    [END_FIT]
                 [END_PLOT]
                 ...
                 ...
@@ -2376,6 +2546,10 @@
         TGraph2D, and TH1F classes are supported. For each of higher level header sections (i.e. "[BEGIN_CANVAS]"
         and "[BEGIN_PLOT]") the header parameters should *always* be placed before descending into the next header.
         Failure to adhere to this convention may lead to undefined behavior or crashes.
+
+        Plots can be declared by entering comma separated data in the [BEGIN_DATA] header, see Section 4.e.iv.III,
+        or loaded from an input TFile, see Section 4.e.iv.II.  Additionally, one or more TF1 objects can be declared
+        for each plot and drawn on the TCanvas.  Right now these TF1 objects can only be loaded from an input TFile.
 
         The Plotter::ParameterLoaderPlotter class understands the "#" character to indicate a comment; so it is
         possible to comment out lines in the Plot Config file you create for ease of use. The value of true is
@@ -2530,7 +2704,45 @@
         Indicates that the first value of each line is the y-value, the second is the x-value, and the third value
         is the error on the x-value for a given point. See Section 4.e.iv.VI for an example.
 
-        # 4.e.iv.IV Configuration Options
+        # 4.e.iv.III HEADER PARAMETERS - FIT
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>             <DATA TYPE, DESCRIPTION>
+
+                Fit_Color           As Plot_Color in Section 4.e.iv.II.
+
+                Fit_Formula         As Fit_Formula in Section 4.e.ii.IV.
+
+                Fit_LegEntry        As Plot_LegEntry in Section 4.e.iv.II.
+
+                Fit_Line_Size       As Plot_Line_Size in Section 4.e.iv.II.
+
+                Fit_Line_Style      As Plot_Line_Style in Section 4.e.iv.II.
+
+                Fit_Name            string, TName of the TF1 object.  Either the TF1 will be created with this
+                                    TName or it will be loaded from Fit_Root_File found with path Fit_Root_Path
+                                    inside the TFile.
+
+                Fit_Option          string, if the TF1 is being loaded from a previous TFile with FIT_ROOT_FILE
+                                    option this is the draw option; if the TF1 is being fit to one of the TObjects
+                                    on the TCanvas this is the fit option.
+
+                Fit_Root_File       As Plot_Root_File in Section 4.e.iv.II.
+
+                Fit_Root_Path       As Plot_Root_Path  in Section 4.e.iv.II.
+
+                Fit_Perform         boolean, if true perform a fit to the TObject defined in the [BEGIN_PLOT]
+                                    header this [BEGIN_FIT] header is found in; otherwise the TF1 is just
+                                    drawn on the TCanvas
+
+                Fit_Range           string, comma separated list of numbers.  NOTE: must supply exactly two
+                                    parameters.  If more than two parameters are supplied only those that
+                                    evaluate to the maximum and minimum are used.
+
+        # 4.e.iv.V Configuration Options
         # --------------------------------------------------------
 
         The genericPlotter executable will create one TCanvas for every call of the executable.  The created
@@ -2554,7 +2766,7 @@
 
         Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.
 
-        # 4.e.iv.V Example Config File - TGraph2D
+        # 4.e.iv.VI Example Config File - TGraph2D
         # --------------------------------------------------------
 
         The following example shows the case where a TGraph2D object is plotted.  Note the Canv_Plot_Type
@@ -2598,7 +2810,7 @@
         Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
         the physical path to the TGraphErrors object "g2D_Detector_ResponseFitPkPosNormalized_AllEta".
 
-        # 4.e.iv.VI Example Config File - TGraphErrors
+        # 4.e.iv.VII Example Config File - TGraphErrors
         # --------------------------------------------------------
 
         The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
@@ -2679,7 +2891,7 @@
         Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
         the physical path to the TGraphErrors object "g_GE1/1-VII-L-CERN-0003_EffGain"
 
-        # 4.e.iv.VII Example Config File - TH1F
+        # 4.e.iv.VIII Example Config File - TH1F
         # --------------------------------------------------------
 
         The following example shows the case where a TH1F object is plotted.  Note the Canv_Plot_Type
@@ -2711,9 +2923,19 @@
                 Canv_Title_Y = 'Entries';
                 [BEGIN_PLOT]
                     Plot_Color = 'kBlack';
+                    Plot_LegEntry = 'Data';
                     Plot_Name = 'h_Summary_ResponseFitPkPosDataset';
                     Plot_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
                     Plot_Root_Path = 'Summary/';
+                    [BEGIN_FIT]
+                        Fit_Color = 'kRed';
+                        Fit_LegEntry = 'Fit';
+                        Fit_Line_Size = '1';
+                        Fit_Line_Style = '1';
+                        Fit_Name = 'fit_Summary_ResponseFitPkPosDataset';
+                        Fit_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+                        Fit_Root_Path = 'Summary/';
+                    [END_FIT]
                 [END_PLOT]
             [END_CANVAS]
 
@@ -2990,7 +3212,6 @@
 
                     vector              Follow the convention for std::map but the starting sequence 'vec_'
                                         should be used instead. e.g. "vec_strName" or "vec_hClustHistos"
-
 
         # 4.g.i. ROOT Objects
         # --------------------------------------------------------
