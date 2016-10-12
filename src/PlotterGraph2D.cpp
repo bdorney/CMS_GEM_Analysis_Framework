@@ -201,7 +201,9 @@ void PlotterGraph2D::initPlot(InfoPlot & plotInfo){
         if (plotInfo.m_strFilePath.length() > 0) {
             strTmpName = plotInfo.m_strFilePath + "/" + strTmpName;
         }
-        
+       
+	//cout<<"strTmpName = " << strTmpName << endl;
+ 
         //Get the Graph
         m_g2D_Obs = make_shared<TGraph2D>( *((TGraph2D*) file_Input->Get( strTmpName.c_str() ) ) );
         
