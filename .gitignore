@@ -47,6 +47,7 @@ loopdir.C
 *.xlsm
 tmp/
 tmp/*
+config/configRun_RecoLong3.cfg
 
 # ROOT Files #
 ##############
