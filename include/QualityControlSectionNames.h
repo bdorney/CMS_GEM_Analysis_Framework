@@ -132,12 +132,14 @@ namespace QualityControl {
             std::string m_strGraphErrors;
             std::string m_strGraph2D;
             std::string m_strHisto;
+            std::string m_strHisto2D;
             
             //Constructor
             PlotTypesPlotter(){
                 m_strGraphErrors = "TGRAPHERRORS";
                 m_strGraph2D = "TGRAPH2D";
                 m_strHisto = "TH1F";
+                m_strHisto2D = "TH2F";
             }
         }; //End PlotTypesPlotter
     } //End namespace Plotter

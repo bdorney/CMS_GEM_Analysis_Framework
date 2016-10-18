@@ -2,9 +2,15 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.0                                 *
-*	LAST UPDATE: Oct 10 2016                     *
+*	LAST UPDATE: Oct 18 2016                     *
 *                                                *
 **************************************************
+
+Update: October 18th 2016
+==================================================
+->Added new attribute to QualityControl::Plotter::PlotTypesPlotter called m_strHisto2D set to "TH2F"
+->Added new class QualityControl::Plotter::PlotterHisto2D for plotting TH2F objects
+->The genericPlotter executable will now recognize TH2F objects
 
 Update: October 12th 2016
 ==================================================
