@@ -45,6 +45,8 @@ loopdir.C
 *.xls
 *.xlsx
 *.xlsm
+tmp/
+tmp/*
 
 # ROOT Files #
 ##############

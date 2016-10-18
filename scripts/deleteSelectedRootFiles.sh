@@ -1,11 +1,11 @@
 #!/bin/bash
 # Usage:
-#	source deleteSelectedRawFiles.sh <Data Directory> <Comman Separated List of Runs>
+#	source deleteSelectedRootFiles.sh <Data Directory> <Comman Separated List of Runs>
 #
 # Note dashes (e.g. "-") between numbers are accepted
 #
 # Example:
-#	source deleteSelectedRawFiles.sh $DATA_QC5/GE11-VII-S-CERN-0002 134,135,137-153,154-158
+#	source deleteSelectedRootFiles.sh $DATA_QC5/GE11-VII-S-CERN-0002 134,135,137-153,154-158
 #
 #
 
