@@ -11,6 +11,7 @@ Update: October 18th 2016
 ->Added new attribute to QualityControl::Plotter::PlotTypesPlotter called m_strHisto2D set to "TH2F"
 ->Added new class QualityControl::Plotter::PlotterHisto2D for plotting TH2F objects
 ->The genericPlotter executable will now recognize TH2F objects
+->The QualityControl::Plotter::PlotterGraph::drawPlots() method will now check to make sure the draw option "A" is present, if not it will be added (prevents seg fault) 
 
 Update: October 12th 2016
 ==================================================

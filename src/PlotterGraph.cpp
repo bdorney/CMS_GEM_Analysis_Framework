@@ -69,6 +69,11 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 } //End PlotterGraph::addPlot()
 
 void PlotterGraph::drawPlots(){
+    //Ensure axis is drawn!
+    if( m_canvInfo.m_strOptionDraw.find("A") == std::string::npos){
+	m_canvInfo.m_strOptionDraw += "A";
+    }
+    
     //Draw (root hack)
     m_canv->cd();
     m_mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );

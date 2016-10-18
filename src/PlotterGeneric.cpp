@@ -202,8 +202,8 @@ void PlotterGeneric::drawFits(TLegend & inputLegend){
                 }
                 
                 //Get the Plot
-                func_plot = make_shared<TF1>( *((TF1*) file_Input->Get( strTmpName.c_str() ) ) );
-                
+		func_plot = make_shared<TF1>( *((TF1*) file_Input->Get( strTmpName.c_str() ) ) );
+		
                 //Close TFile
                 file_Input->Close();
                 delete file_Input;
