@@ -18,6 +18,7 @@
 #include "PlotterGraph.h"
 #include "PlotterGraph2D.h"
 #include "PlotterHisto.h"
+#include "PlotterHisto2D.h"
 #include "PlotterUtilityTypes.h"
 #include "QualityControlSectionNames.h"
 
@@ -236,6 +237,14 @@ int main( int argc_, char * argv_[] ){
         histoPlotter.setPreliminary(canvSetup.m_bIsPrelim);
         histoPlotter.setOutputNameNOption("plotterOutput.root","RECREATE");
         histoPlotter.plotAndStore();
+    }
+    else if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strHisto2D ) ) {
+        PlotterHisto2D histoPlotter2D;
+        histoPlotter2D.setCanvasParameters(canvSetup);
+        histoPlotter2D.setLogoPos(canvSetup.m_iLogoPos);
+        histoPlotter2D.setPreliminary(canvSetup.m_bIsPrelim);
+        histoPlotter2D.setOutputNameNOption("plotterOutput.root","RECREATE");
+        histoPlotter2D.plotAndStore();
     }
     else{
         cout<<"main() - Plot type: " << canvSetup.m_strPlotType << endl;
