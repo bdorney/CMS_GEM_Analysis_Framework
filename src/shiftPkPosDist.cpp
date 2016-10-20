@@ -71,8 +71,8 @@ int main(){
         } //End Loop Over bins of hSummaryDist
         
         //Add two fake points so we can change the x-axis at will
-        gSummaryDistShifted->SetPoint(iNbinsX, -2000, 0);
-        gSummaryDistShifted->SetPoint(iNbinsX+1, 2000, 0);
+        gSummaryDistShifted->SetPoint(iNbinsX, -2100, 0);
+        gSummaryDistShifted->SetPoint(iNbinsX+1, 2100, 0);
         
         //Get the input fit
         TF1 *fit_Summary_ResponseFitPkPosDataset_shifted = (TF1*)file_Input->Get("Summary/fit_Summary_ResponseFitPkPosDataset");
