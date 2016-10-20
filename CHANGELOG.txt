@@ -1,10 +1,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 3.0                                 *
-*	LAST UPDATE: Oct 18 2016                     *
+*	VERSION: 3.1                                 *
+*	LAST UPDATE: Oct 20 2016                     *
 *                                                *
 **************************************************
+
+Update: October 20th 2016
+==================================================
+->Added new helper script for making all plots from all plot config files in a given directory: scripts/makeAllPlots.sh
+-> 
 
 Update: October 18th 2016
 ==================================================

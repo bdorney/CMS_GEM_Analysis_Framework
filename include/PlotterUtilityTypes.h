@@ -286,13 +286,13 @@ namespace QualityControl {
 	//Mono-shade color palette (Cyan lighter)
 	//Thanks to Tutanon Sinthuprasith
 	struct PlotColorPaletteMono{
-		static const Int_t m_NRGBs = 10;
-    		static const Int_t m_NCont = 255;
-  		
-		Double_t m_blue[m_NRGBs]   = { 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00};                                                                                                                   
-  		Double_t m_green[m_NRGBs]  = { 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.85, 0.90};                                                                                                                   
- 		Double_t m_red[m_NRGBs]    = { 0.00, 0.00, 0.10, 0.20, 0.25, 0.40, 0.45, 0.50, 0.55, 0.60};                                                                                                                   
-  		Double_t m_stops[m_NRGBs] = { 0.00, 0.05, 0.10, 0.20, 0.40, 0.60, 0.70, 0.80, 0.85, 0.90}; 
+		static const Int_t m_NRGBs = 20;
+    		static const Int_t m_NCont = 510;
+
+		Double_t m_blue[m_NRGBs]   = { 0.3825, 0.415, 0.4475, 0.48, 0.5125, 0.545, 0.5775, 0.61, 0.6425, 0.675, 0.7075, 0.74, 0.7725, 0.805, 0.8375, 0.87, 0.9025, 0.935, 0.9675, 1.00};
+  		Double_t m_green[m_NRGBs]  = { 0.25, 0.30, 0.325, 0.35, 0.375, 0.40, 0.425, 0.45, 0.475, 0.50, 0.525, 0.55, 0.575, 0.60, 0.625, 0.65, 0.675, 0.75, 0.775, 0.80};
+ 		Double_t m_red[m_NRGBs]    = {  0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50};
+  		Double_t m_stops[m_NRGBs] = { 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.95, 0.975, 1.00};
 	}; //End PlotColorPaletteMono
     } //End namspace Plotter
 } //End namespace QualityControl
