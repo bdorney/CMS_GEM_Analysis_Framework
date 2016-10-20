@@ -31,9 +31,9 @@ int main(){
     vec_strFilenames.push_back("GE11-VII-L-CERN-0001_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_588uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0003_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_600uA_10115kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
-    vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_585uA_7pt4mm_9786kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
+    //vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_585uA_7pt4mm_9786kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_589uA_7pt2mm_10771kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
-    vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_615uA_7pt0mm_10217kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
+    //vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_615uA_7pt0mm_10217kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0003_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     
@@ -87,7 +87,7 @@ int main(){
         vector<string> vec_strParsedFileName = getCharSeparatedList( vec_strFilenames[i], '_' );
         string strDetSerialNo = vec_strParsedFileName[0];
         
-        TFile *file_Output = new TFile( (strDetSerialNo + "_PkPosDistShifted" ).c_str()  , "RECREATE");
+        TFile *file_Output = new TFile( (strDetSerialNo + "_PkPosDistShifted.root" ).c_str()  , "RECREATE");
         TDirectory *dir_Summary =file_Output->mkdir("Summary");
         dir_Summary->cd();
         gSummaryDistShifted->Write();
@@ -101,7 +101,7 @@ int main(){
         file_Output->Close();
         delete gSummaryDistShifted;
         delete fit_Summary_ResponseFitPkPosDataset_shifted;
-        delete dir_Summary;
+        //delete dir_Summary;
         delete file_Output;
     } //End Loop Over vec_strFilenames
     
