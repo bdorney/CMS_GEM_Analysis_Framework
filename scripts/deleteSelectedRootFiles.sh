@@ -47,30 +47,30 @@ do
 		for i in {$RANGE_FIRST..$RANGE_LAST}
 		do
 			if [ $i -gt 999 ]; then
-				LIST_FILES="$LIST_FILES $(ls *Run$i*.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run$i*dataTree.root)"
 			elif [ $i -gt 99 ]; then
-				#LIST_FILES="$LIST_FILES $(ls *Run0$i*.root)"
-				LIST_FILES="$LIST_FILES $(ls *Run$i*.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run0$i*dataTree.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run$i*dataTree.root)"
 			elif [ $i -gt 9 ]; then
-				#LIST_FILES="$LIST_FILES $(ls *Run00$i*.root)"
-				LIST_FILES="$LIST_FILES $(ls *Run0$i*.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run00$i*dataTree.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run0$i*dataTree.root)"
 			else
-				#LIST_FILES="$LIST_FILES $(ls *Run000$i*.root)"
-				LIST_FILES="$LIST_FILES $(ls *Run00$i*.root)"
+				#LIST_FILES="$LIST_FILES $(ls *Run000$i*dataTree.root)"
+				LIST_FILES="$LIST_FILES $(ls *Run00$i*dataTree.root)"
 			fi
 		done
 	else
 		if [ $RANGE_FIRST -gt 999 ]; then
-			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*dataTree.root)"
 		elif [ $RANGE_FIRST -gt 99 ]; then
-			#LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*.root)"
-			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*dataTree.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run$RANGE_FIRST*dataTree.root)"
 		elif [ $RANGE_FIRST -gt 9 ]; then
-			#LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*.root)"
-			LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*dataTree.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run0$RANGE_FIRST*dataTree.root)"
 		else
-			#LIST_FILES="$LIST_FILES $(ls *Run000$RANGE_FIRST*.root)"
-			LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*.root)"
+			#LIST_FILES="$LIST_FILES $(ls *Run000$RANGE_FIRST*dataTree.root)"
+			LIST_FILES="$LIST_FILES $(ls *Run00$RANGE_FIRST*dataTree.root)"
 		fi
 
 	fi

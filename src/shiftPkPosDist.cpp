@@ -26,16 +26,23 @@ int main(){
     //Set file path
     string strPFP = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna";
 
-    //Set file names
+    //Declare file name container
     vector<string> vec_strFilenames;
+
+    //Set file names - Long Detectors
     vec_strFilenames.push_back("GE11-VII-L-CERN-0001_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_588uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0003_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_600uA_10115kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
     //vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_585uA_7pt4mm_9786kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_589uA_7pt2mm_10771kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
     //vec_strFilenames.push_back("GE11-VII-L-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_615uA_7pt0mm_10217kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
+
+    //Set file names - Short Detectors
+    vec_strFilenames.push_back("GE11-VII-S-CERN-0001_TimeCorr_DPGGeo_Second_Set_616uA_Xray40kV100uA_Ana.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0003_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
+    vec_strFilenames.push_back("GE11-VII-S-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_585uA_9633kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
+    vec_strFilenames.push_back("GE11-VII-S-CERN-0006_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_611uA_TimeCorr_DPGGeo_AnaWithFits.root");
     
     //TFile doesn't manage TH1F objects
     TH1::AddDirectory(kFALSE);
@@ -49,8 +56,9 @@ int main(){
         
         int iNbinsX = hSummaryDist->GetNbinsX();
         
-        //cout<<"====================NEW FILE====================\n";
-        //cout<<"Filename = " << vec_strFilenames[i].c_str() << endl;
+        cout<<"====================NEW FILE====================\n";
+        cout<<"Filename = " << vec_strFilenames[i].c_str() << endl;
+	cout<<"Bin Width = " << hSummaryDist->GetBinWidth(1) << endl;
         //cout<<"\t\tVAR_INDEP,VAR_INDEP_ERR,VAR_DEP,VAR_DEP_ERR"<<endl;
         
         //Create the new plot and set all points
@@ -64,6 +72,11 @@ int main(){
             //cout<<hSummaryDist->GetBinContent(i)<<",";
             //cout<<hSummaryDist->GetBinError(i)*0.5<<endl;
             
+		if ( !(hSummaryDist->GetBinContent(i) > 0) ){
+			gSummaryDistShifted->SetPoint( i-1, 0, -1 );
+			continue; 
+		}
+
             //Set values
             gSummaryDistShifted->SetPoint( i-1, hSummaryDist->GetBinCenter(i) - hSummaryDist->GetMean(), hSummaryDist->GetBinContent(i) );
             gSummaryDistShifted->SetPointError( i-1, 0., hSummaryDist->GetBinError(i) );
