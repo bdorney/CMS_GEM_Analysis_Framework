@@ -6,10 +6,14 @@
 *                                                *
 **************************************************
 
+Update: October 26th 2016
+==================================================
+->Destructor of QualityControl::Uniformity::DetectorMPGD will now call DetectorMPGD::reset()
+->Added new class QualityControl::Timing::DetectorTiming for work with timing data from a test stand
+
 Update: October 20th 2016
 ==================================================
 ->Added new helper script for making all plots from all plot config files in a given directory: scripts/makeAllPlots.sh
--> 
 
 Update: October 18th 2016
 ==================================================

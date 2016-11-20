@@ -34,22 +34,6 @@ void ParameterLoaderDetector::loadAmoreMapping(string & strInputMappingFileName)
     
     vector<string> vec_strParam; //vector of parameters found from strLine
     
-    //Open the Mapping File
-    //------------------------------------------------------
-    /*if (m_bVerboseMode_IO) { //Case: User Requested Verbose Error Messages - I/O
-        cout<< "treeProducerTDC::readRuns(): trying to open and read: " << strInputMappingFileName << endl;
-    } //End Case: User Requested Verbose Error Messages - I/O
-    
-    ifstream file_AmoreMapping( strInputMappingFileName.c_str() );
-    
-    //Check to See if Mapping File Opened Successfully
-    //------------------------------------------------------
-    if (!file_AmoreMapping.is_open() && m_bVerboseMode_IO) {
-        perror( ("treeProducerTDC::readRuns(): error while opening file: " + strInputMappingFileName).c_str() );
-        printStreamStatus(file_AmoreMapping);
-    }*/
-    
-    //ifstream file_AmoreMapping = getFileStream(strInputMappingFileName, m_bVerboseMode_IO);
     ifstream file_AmoreMapping;
     setFileStream(strInputMappingFileName, file_AmoreMapping, m_bVerboseMode_IO);    
 

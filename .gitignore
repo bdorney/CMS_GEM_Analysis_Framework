@@ -26,6 +26,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 *analyzeSpec
 *frameworkMain
 *genericPlotter
+*cosmicTest
 
 # Figures #
 ###########
@@ -55,6 +56,9 @@ config/configRun_RecoLong3.cfg
 #TestBeamDataset_*.root
 data/
 data/*
+*_h_ACLiC_dict_rdict.pcm
+*_cpp.d
+*_h.d
 
 # Text Files #
 ##############

@@ -37,7 +37,7 @@ namespace QualityControl {
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Filters an input vector<Uniformity::Cluster object based on the stored Uniformity::AnalysisSetupUniformity attribute
+            //Filters an input vector<Uniformity::Cluster> object based on the stored Uniformity::AnalysisSetupUniformity attribute
             virtual std::vector<Uniformity::Cluster> filterClusters(std::vector<Uniformity::Cluster> vec_inputClusts);
             
             //Filters an input vector<Uniformity::Cluster> object based on the provided Uniformity::AnalysisSetupUniformity object
@@ -66,9 +66,6 @@ namespace QualityControl {
             //Applies the cluster selection and stores those selected clusters in inputDet
             //Input is a TFile *
             virtual void setClusters(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet);
-            
-            //Sets the clusters found in event number iEvtNum in TTree inputTree to event inputEvt
-            //virtual void setClusters(Uniformity::Event &inputEvt, TTree * inputTree, int iEvtNum);
             
             //As above but overwrites the stored AnalysisSetupUniformity object
             //Input is a std::string storing the physical filename
