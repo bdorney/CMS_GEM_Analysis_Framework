@@ -25,51 +25,13 @@ namespace QualityControl{
     namespace Timing{
         
         //Declare class
-        class DetectorSuperchamber;
+        //class DetectorSuperchamber;
         
         //Define detector iterator
         typedef
-        std::map<int, std::shared_ptr<Timing::DetectorTiming> >::const_iterator imap_detIter_t;
-        
-        //Define detector matrix
-        //Don't necessarily need to wrap this map in a struct,
-        //But in case we need to add other information in the future I have.
-        struct DetectorMatrix{
-            //Key value is the (i,j) or (i,k) index on the stand
-            //The superchamber holds either detectors or pmts
-            std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> > m_map_detectors;
-            
-            //Default Destructor
-            ~DetectorMatrix(){
-                clear();
-            }
-            
-            void clear(){
-                m_map_detectors.clear();
-            }
-            
-            std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator begin(){
-                return m_map_detectors.begin();
-            }
-            
-            std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator end(){
-                return m_map_detectors.end();
-            }
-            
-            std::shared_ptr<Timing::DetectorSuperchamber> & operator[](std::pair<int,int> pair_Pos){
-                return m_map_detectors[pair_Pos];
-            } //End subscript operator
-            
-            /*DetectorMatrix & operator=(const DetectorMatrix & other){ //assignment operator
-                if (this != &other) { //Protects against invalid self-assignment
-                    for (auto iterSC = other.m_map_detectors.begin(); iterSC != other.m_map_detectors.end(); ++iterSC) {
-                        m_map_detectors[ (*iterSC).first ] = (*iterSC).second;
-                    }
-                } //Protects against invalid self-assignment
-                
-                return *this;
-            }*/ //End assignment operator
-        }; //End DetectorMatrix
+        //std::map<int, std::shared_ptr<Timing::DetectorTiming> >::const_iterator imap_detIter_t;
+        //std::map<int, Timing::DetectorTiming>::const_iterator imap_detIter_t;
+        std::map<int, Timing::DetectorTiming>::iterator imap_detIter_t;
         
         //Define class
         class DetectorSuperchamber {
@@ -108,7 +70,10 @@ namespace QualityControl{
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Get Detector - by index within superchamber
-            virtual std::shared_ptr<Timing::DetectorTiming> getDetector(int iDetPos){
+            /*virtual std::shared_ptr<Timing::DetectorTiming> getDetector(int iDetPos){
+                return m_map_detectors[iDetPos];
+            };*/
+            virtual Timing::DetectorTiming getDetector(int iDetPos){
                 return m_map_detectors[iDetPos];
             };
             
@@ -123,7 +88,8 @@ namespace QualityControl{
             };
             
             //Get Detector - by VME base address
-            virtual std::shared_ptr<Timing::DetectorTiming> getDetector(std::string & strBaseAddress);
+            //virtual std::shared_ptr<Timing::DetectorTiming> getDetector(std::string & strBaseAddress);
+            virtual Timing::DetectorTiming getDetector(std::string & strBaseAddress);
             
             //Get Detector's name
             virtual std::string getName(){
@@ -148,8 +114,9 @@ namespace QualityControl{
             //------------------------------------------------------------------------------------------------------------------------------------------
             
             //Set a detector
-            virtual void setDetector(int iDetPos, std::shared_ptr<Timing::DetectorTiming> inputDetector);
-            
+            //virtual void setDetector(int iDetPos, std::shared_ptr<Timing::DetectorTiming> inputDetector);
+            //virtual void setDetector(int iDetPos, Timing::DetectorTiming &inputDetector);
+            virtual void setDetector(int iDetPos, Timing::DetectorTiming inputDetector);
             
             //Set Detector's name
             virtual void setName(std::string strInput){
@@ -172,11 +139,65 @@ namespace QualityControl{
             //Mapped value is base address the of the detector
             std::map<std::string, int> m_map_strBaseAddr2iDetPos;
             
-            std::map<int, std::shared_ptr<Timing::DetectorTiming> > m_map_detectors;
+            //std::map<int, std::shared_ptr<Timing::DetectorTiming> > m_map_detectors;
+            std::map<int, Timing::DetectorTiming> m_map_detectors;
             
             Timing::DetType detType;
             
         }; //End class DetectorSuperchamber
+        
+        //Define detector matrix
+        //Don't necessarily need to wrap this map in a struct,
+        //But in case we need to add other information in the future I have.
+        struct DetectorMatrix{
+            //Key value is the (i,j) or (i,k) index on the stand
+            //The superchamber holds either detectors or pmts
+            //std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> > m_map_detectors;
+            std::map<std::pair<int,int>, Timing::DetectorSuperchamber> m_map_detectors;
+            
+            //Default Destructor
+            ~DetectorMatrix(){
+                clear();
+            }
+            
+            void clear(){
+                m_map_detectors.clear();
+            }
+            
+            /*std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator begin(){
+             return m_map_detectors.begin();
+             }*/
+            
+            std::map<std::pair<int,int>, Timing::DetectorSuperchamber>::iterator begin(){
+                return m_map_detectors.begin();
+            }
+            
+            /*std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator end(){
+             return m_map_detectors.end();
+             }*/
+            
+            std::map<std::pair<int,int>, Timing::DetectorSuperchamber>::iterator end(){
+                return m_map_detectors.end();
+            }
+            
+            /*std::shared_ptr<Timing::DetectorSuperchamber> & operator[](std::pair<int,int> pair_Pos){
+             return m_map_detectors[pair_Pos];
+             }*/ //End subscript operator
+            
+            Timing::DetectorSuperchamber & operator[](std::pair<int,int> pair_Pos){
+                return m_map_detectors[pair_Pos];
+            } //End subscript operator
+            
+            /*DetectorMatrix & operator=(const DetectorMatrix & other){ //assignment operator
+             if (this != &other) { //Protects against invalid self-assignment
+             for (auto iterSC = other.m_map_detectors.begin(); iterSC != other.m_map_detectors.end(); ++iterSC) {
+             m_map_detectors[ (*iterSC).first ] = (*iterSC).second;
+             }
+             } //Protects against invalid self-assignment
+             
+             return *this;
+             }*/ //End assignment operator
+        }; //End DetectorMatrix
     } //End namespace Timing
 } //End namespace QualityControl
 

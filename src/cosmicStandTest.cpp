@@ -47,11 +47,11 @@ using QualityControl::Timing::kVMETDC;
 
 void printEventDetMatrix(DetectorMatrix & inputDetMatrix){
     for (auto iterMatrix = inputDetMatrix.m_map_detectors.begin(); iterMatrix != inputDetMatrix.m_map_detectors.end(); ++iterMatrix) {
-        for (auto iterDet = (*iterMatrix).second->getDetectorPtrBegin(); iterDet != (*iterMatrix).second->getDetectorPtrEnd(); ++iterDet) {
-            cout<<"----" << (*iterDet).second->getName() << "----\n";
+        for (auto iterDet = (*iterMatrix).second.getDetectorPtrBegin(); iterDet != (*iterMatrix).second.getDetectorPtrEnd(); ++iterDet) {
+            cout<<"----" << (*iterDet).second.getName() << "----\n";
             cout<<"Ch\tData\n";
-            for (int i=0; i < (*iterDet).second->getNChan() ; ++i) {
-                cout<<i<<"\t"<<(*iterDet).second->getChanData(i)<<endl;
+            for (int i=0; i < (*iterDet).second.getNChan() ; ++i) {
+                cout<<i<<"\t"<<(*iterDet).second.getChanData(i)<<endl;
             }
         } //End Loop Over Detectors in Trigger
     } //End Loop Over Trigger Detectors
@@ -73,7 +73,7 @@ int main(){
     TestStandVME cosmicStand;
     
     //Top PMT's
-    shared_ptr<DetectorTiming> det_PMT1(new DetectorTiming);
+    /*shared_ptr<DetectorTiming> det_PMT1(new DetectorTiming);
     shared_ptr<DetectorTiming> det_PMT2(new DetectorTiming);
     shared_ptr<DetectorTiming> det_PMT3(new DetectorTiming);
     shared_ptr<DetectorTiming> det_PMT4(new DetectorTiming);
@@ -88,9 +88,27 @@ int main(){
     
     //Detectors
     shared_ptr<DetectorTiming> det_GE11Long2(new DetectorTiming);
-    shared_ptr<DetectorTiming> det_GE11Long4(new DetectorTiming);
+    shared_ptr<DetectorTiming> det_GE11Long4(new DetectorTiming);*/
     
-    det_PMT1->setName("PMT1");  det_PMT1->setBaseAddress( "400C" ); det_PMT1->setChannelMapVME2Det(0,0);
+    //Top PMT's
+    DetectorTiming det_PMT1;
+    DetectorTiming det_PMT2;
+    DetectorTiming det_PMT3;
+    DetectorTiming det_PMT4;
+    DetectorTiming det_PMT5;
+    
+    //Bottom PMT's
+    DetectorTiming det_PMT6;
+    DetectorTiming det_PMT8;
+    DetectorTiming det_PMT9;
+    DetectorTiming det_PMT11;
+    DetectorTiming det_PMT12;
+    
+    //Detectors
+    DetectorTiming det_GE11Long2;
+    DetectorTiming det_GE11Long4;
+    
+    /*det_PMT1->setName("PMT1");  det_PMT1->setBaseAddress( "400C" ); det_PMT1->setChannelMapVME2Det(0,0);
     det_PMT2->setName("PMT2");  det_PMT2->setBaseAddress( "400C" ); det_PMT2->setChannelMapVME2Det(1,0);
     det_PMT3->setName("PMT3");  det_PMT3->setBaseAddress( "400C" ); det_PMT3->setChannelMapVME2Det(2,0);
     det_PMT4->setName("PMT4");  det_PMT4->setBaseAddress( "400C" ); det_PMT4->setChannelMapVME2Det(3,0);
@@ -118,7 +136,37 @@ int main(){
     det_GE11Long4->setChannelMapVME2Det(18, 3);
     det_GE11Long4->setChannelMapVME2Det(19, 4);
     det_GE11Long4->setChannelMapVME2Det(20, 5);
-    det_GE11Long4->setChannelMapVME2Det(21, 6);
+    det_GE11Long4->setChannelMapVME2Det(21, 6);*/
+    
+    det_PMT1.setName("PMT1");  det_PMT1.setBaseAddress( "400C" ); det_PMT1.setChannelMapVME2Det(0,0);
+    det_PMT2.setName("PMT2");  det_PMT2.setBaseAddress( "400C" ); det_PMT2.setChannelMapVME2Det(1,0);
+    det_PMT3.setName("PMT3");  det_PMT3.setBaseAddress( "400C" ); det_PMT3.setChannelMapVME2Det(2,0);
+    det_PMT4.setName("PMT4");  det_PMT4.setBaseAddress( "400C" ); det_PMT4.setChannelMapVME2Det(3,0);
+    det_PMT5.setName("PMT5");  det_PMT5.setBaseAddress( "400C" ); det_PMT5.setChannelMapVME2Det(4,0);
+    
+    det_PMT6.setName("PMT6");  det_PMT6.setBaseAddress( "400C" ); det_PMT6.setChannelMapVME2Det(5,0);
+    det_PMT8.setName("PMT8");  det_PMT8.setBaseAddress( "400C" ); det_PMT8.setChannelMapVME2Det(7,0);
+    det_PMT9.setName("PMT9");  det_PMT9.setBaseAddress( "400C" ); det_PMT9.setChannelMapVME2Det(8,0);
+    det_PMT11.setName("PMT11"); det_PMT11.setBaseAddress( "400C" );det_PMT11.setChannelMapVME2Det(10,0);
+    det_PMT12.setName("PMT12"); det_PMT12.setBaseAddress( "400C" );det_PMT12.setChannelMapVME2Det(12,0);
+    
+    det_GE11Long2.setName("GE11-VII-L-CERN-0002"); //3/2/T
+    det_GE11Long2.setBaseAddress("0011");
+    det_GE11Long2.setChannelMapVME2Det(8, 1);
+    det_GE11Long2.setChannelMapVME2Det(9, 1);
+    det_GE11Long2.setChannelMapVME2Det(10, 1);
+    det_GE11Long2.setChannelMapVME2Det(11, 2);
+    det_GE11Long2.setChannelMapVME2Det(12, 3);
+    det_GE11Long2.setChannelMapVME2Det(13, 4);
+    
+    det_GE11Long4.setName("GE11-VII-L-CERN-0004");  //3/2/B
+    det_GE11Long4.setBaseAddress("0011");
+    det_GE11Long4.setChannelMapVME2Det(16, 1);
+    det_GE11Long4.setChannelMapVME2Det(17, 2);
+    det_GE11Long4.setChannelMapVME2Det(18, 3);
+    det_GE11Long4.setChannelMapVME2Det(19, 4);
+    det_GE11Long4.setChannelMapVME2Det(20, 5);
+    det_GE11Long4.setChannelMapVME2Det(21, 6);
     
     cosmicStand.setDetector(0,1, det_PMT1, kTrigger);
     cosmicStand.setDetector(0,2, det_PMT2, kTrigger);
@@ -137,11 +185,11 @@ int main(){
     
     auto standMatrix = cosmicStand.getMatrix();
     for (auto iterSuperChamber = standMatrix.m_map_detectors.begin(); iterSuperChamber != standMatrix.m_map_detectors.end(); ++iterSuperChamber) { //Loop Over Superchambers
-        for (auto iterDet = (*iterSuperChamber).second->getDetectorPtrBegin(); iterDet != (*iterSuperChamber).second->getDetectorPtrEnd(); ++iterDet) {
+        for (auto iterDet = (*iterSuperChamber).second.getDetectorPtrBegin(); iterDet != (*iterSuperChamber).second.getDetectorPtrEnd(); ++iterDet) {
             cout<<((*iterSuperChamber).first).first<<"\t";
             cout<<((*iterSuperChamber).first).second<<"\t";
-            cout<<std::distance((*iterSuperChamber).second->getDetectorPtrBegin(), iterDet)<<"\t";
-            cout<<(*iterDet).second->getName()<<endl;
+            cout<<std::distance((*iterSuperChamber).second.getDetectorPtrBegin(), iterDet)<<"\t";
+            cout<<(*iterDet).second.getName()<<endl;
         }
     }
     

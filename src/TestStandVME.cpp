@@ -38,15 +38,15 @@ EventReco TestStandVME::getEventReco(Timing::EventDigi & inputEvtDIGI){
     }*/
     
     for (auto iterSuperChamber = m_detMatrix.m_map_detectors.begin(); iterSuperChamber != m_detMatrix.m_map_detectors.end(); ++iterSuperChamber) { //Loop through stand
-        for (auto iterDet = (*iterSuperChamber).second->getDetectorPtrBegin(); iterDet != (*iterSuperChamber).second->getDetectorPtrEnd(); ++iterDet) { //Loop throguh detectors in this superchamber
+        for (auto iterDet = (*iterSuperChamber).second.getDetectorPtrBegin(); iterDet != (*iterSuperChamber).second.getDetectorPtrEnd(); ++iterDet) { //Loop throguh detectors in this superchamber
             
             //Debugging
             //cout<<"DETECTOR = " << (*iterDet).second->getName() << endl;
             //cout<<"inputEvtDIGI.m_map_TDCData.count(" << (*iterDet).second->getBaseAddress() <<") = " << inputEvtDIGI.m_map_TDCData.count( (*iterDet).second->getBaseAddress() ) << endl;
             
-            if (inputEvtDIGI.m_map_TDCData.count( (*iterDet).second->getBaseAddress() ) > 0 ) {
+            if (inputEvtDIGI.m_map_TDCData.count( (*iterDet).second.getBaseAddress() ) > 0 ) {
                 
-                pair<imap_iter_t, imap_iter_t> pair_iterChMap = (*iterDet).second->getChannelMapVME2Det();
+                pair<imap_iter_t, imap_iter_t> pair_iterChMap = (*iterDet).second.getChannelMapVME2Det();
                 
                 //Debugging
                 //cout<<"pair_iterChMap.first.first = " << (pair_iterChMap.first)->first << endl;
@@ -64,7 +64,7 @@ EventReco TestStandVME::getEventReco(Timing::EventDigi & inputEvtDIGI){
                     //cout<<(*iterChMap).first<<"\t";
                     //cout<<(inputEvtDIGI.m_map_TDCData[(*iterDet).second->getBaseAddress()]).m_map_fTime[(*iterChMap).first]<<endl;
                     
-                    (*iterDet).second->setChanData( (*iterChMap).first, (inputEvtDIGI.m_map_TDCData[(*iterDet).second->getBaseAddress()]).m_map_fTime[(*iterChMap).first] );
+                    (*iterDet).second.setChanData( (*iterChMap).first, (inputEvtDIGI.m_map_TDCData[(*iterDet).second.getBaseAddress()]).m_map_fTime[(*iterChMap).first] );
                 } //End Loop over mapped channels for this detector
             } //End Case: This event has this detector's base address
             
@@ -74,13 +74,13 @@ EventReco TestStandVME::getEventReco(Timing::EventDigi & inputEvtDIGI){
         //cout<<"Superchamber has data = " << (*iterSuperChamber).second->hasData() << endl;
         
         //Store in event
-        if ( (*iterSuperChamber).second->getType() == kDUT && (*iterSuperChamber).second->hasData() ) { //Case: Superchamer is DUT
+        if ( (*iterSuperChamber).second.getType() == kDUT && (*iterSuperChamber).second.hasData() ) { //Case: Superchamer is DUT
             evtReco.m_detMatrix_DUTs.m_map_detectors[(*iterSuperChamber).first]=(*iterSuperChamber).second;
-            (*iterSuperChamber).second->resetChannels();
+            (*iterSuperChamber).second.resetChannels();
         } //End Case: Superchamer is DUT
-        else if ( (*iterSuperChamber).second->getType() == kTrigger && (*iterSuperChamber).second->hasData() ) { //Case: Superchamer is Trigger
+        else if ( (*iterSuperChamber).second.getType() == kTrigger && (*iterSuperChamber).second.hasData() ) { //Case: Superchamer is Trigger
             evtReco.m_detMatrix_Trigger.m_map_detectors[(*iterSuperChamber).first]=(*iterSuperChamber).second;
-            (*iterSuperChamber).second->resetChannels();
+            (*iterSuperChamber).second.resetChannels();
         } //End Case: Superchamer is Trigger
     } //End Loop through stand
     
@@ -93,13 +93,13 @@ EventReco TestStandVME::getEventReco(Timing::EventDigi & inputEvtDIGI){
 } //End TestStandVME::getEventReco()
 
 //Inserst a detector into the stand
-void TestStandVME::setDetector(int iRow, int iCol, std::shared_ptr<Timing::DetectorTiming> inputDet, Timing::DetType detType){
-    
+//void TestStandVME::setDetector(int iRow, int iCol, std::shared_ptr<Timing::DetectorTiming> inputDet, Timing::DetType detType){
+void TestStandVME::setDetector(int iRow, int iCol, Timing::DetectorTiming inputDet, Timing::DetType detType){
     pair<int,int> pair_iPos = std::make_pair(iRow, iCol);
     
     //Check if the position exists
     if (m_detMatrix.m_map_detectors.count(pair_iPos) > 0 ) { //Case: Position Exists, Add to it!
-        int iNDet = m_detMatrix.m_map_detectors[pair_iPos]->getNDetectors();
+        int iNDet = m_detMatrix.m_map_detectors[pair_iPos].getNDetectors();
         
         /*try {
             if (detType != m_detMatrix.m_map_detectors[pair_iPos]->getType() ) {
@@ -110,21 +110,22 @@ void TestStandVME::setDetector(int iRow, int iCol, std::shared_ptr<Timing::Detec
         }*/
         
         //Check to make sure they type is the same
-        if (detType == m_detMatrix.m_map_detectors[pair_iPos]->getType() ) {
-            m_detMatrix.m_map_detectors[pair_iPos]->setDetector(iNDet, inputDet);
+        if (detType == m_detMatrix.m_map_detectors[pair_iPos].getType() ) {
+            m_detMatrix.m_map_detectors[pair_iPos].setDetector(iNDet, inputDet);
         }
         else{
             cout<<"TestStandVME::setDetector() - Type Mismatch\n";
             cout<<"\tInput Type = " << detType << endl;
-            cout<<"\tDetectorSuperchamber at (" << iRow << "," << iCol << ") has type " << m_detMatrix.m_map_detectors[pair_iPos]->getType() << endl;
+            cout<<"\tDetectorSuperchamber at (" << iRow << "," << iCol << ") has type " << m_detMatrix.m_map_detectors[pair_iPos].getType() << endl;
             cout<<"\tInput Detector is not set\n";
         }
     } //End Case: Position Exists, Add to it!
     else{ //Case: Position does not exist, CREATE IT!
-        shared_ptr<DetectorSuperchamber> detectorSC(new DetectorSuperchamber);
+        //shared_ptr<DetectorSuperchamber> detectorSC(new DetectorSuperchamber);
+        DetectorSuperchamber detectorSC;
         
-        detectorSC->setType(detType);
-        detectorSC->setDetector(0, inputDet);
+        detectorSC.setType(detType);
+        detectorSC.setDetector(0, inputDet);
         
         m_detMatrix.m_map_detectors[pair_iPos]=detectorSC;
     } //End Case: Position does not exist, CREATE IT!
@@ -134,8 +135,8 @@ void TestStandVME::setDetector(int iRow, int iCol, std::shared_ptr<Timing::Detec
 
 //Inserst a superchamber into the stand
 //Erases any superchamber previously at that position
-void TestStandVME::setSuperchamber(int iRow, int iCol, std::shared_ptr<Timing::DetectorSuperchamber> inputSuperchamber){
-    
+//void TestStandVME::setSuperchamber(int iRow, int iCol, std::shared_ptr<Timing::DetectorSuperchamber> inputSuperchamber){
+void TestStandVME::setSuperchamber(int iRow, int iCol, Timing::DetectorSuperchamber inputSuperchamber){
     pair<int,int> pair_iPos = std::make_pair(iRow, iCol);
     
     m_detMatrix.m_map_detectors[pair_iPos]=inputSuperchamber;

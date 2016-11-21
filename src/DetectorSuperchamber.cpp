@@ -24,13 +24,15 @@ void DetectorSuperchamber::reset(){
 
 void DetectorSuperchamber::resetChannels(){
     for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) {
-        (*iterDet).second->resetChannels();
+        //(*iterDet).second->resetChannels();
+        (*iterDet).second.resetChannels();
     }
     
     return;
 }
 
-shared_ptr<DetectorTiming> DetectorSuperchamber::getDetector(string & strBaseAddress){
+//shared_ptr<DetectorTiming> DetectorSuperchamber::getDetector(string & strBaseAddress){
+DetectorTiming DetectorSuperchamber::getDetector(string & strBaseAddress){
     return m_map_detectors[m_map_strBaseAddr2iDetPos[strBaseAddress]];
 } //End DetectorSuperchamber::getDetector()
 
@@ -38,15 +40,17 @@ bool DetectorSuperchamber::hasData(){
     bool bRetVal = false;
     
     for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) {
-        bRetVal = ( bRetVal || (*iterDet).second->hasData() );
+        //bRetVal = ( bRetVal || (*iterDet).second->hasData() );
+        bRetVal = ( bRetVal || (*iterDet).second.hasData() );
     }
     
     return bRetVal;
 } //End DetectorSuperchamber::hasData()
 
-void DetectorSuperchamber::setDetector(int iDetPos, shared_ptr<DetectorTiming> inputDetector){
-    
-    m_map_strBaseAddr2iDetPos[inputDetector->getBaseAddress()]=iDetPos;
+//void DetectorSuperchamber::setDetector(int iDetPos, shared_ptr<DetectorTiming> inputDetector){
+//void DetectorSuperchamber::setDetector(int iDetPos, DetectorTiming & inputDetector){
+void DetectorSuperchamber::setDetector(int iDetPos, DetectorTiming inputDetector){
+    m_map_strBaseAddr2iDetPos[inputDetector.getBaseAddress()]=iDetPos;
     
     m_map_detectors[iDetPos]=inputDetector;
     

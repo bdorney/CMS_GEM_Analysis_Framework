@@ -60,11 +60,13 @@ namespace QualityControl {
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Add a detector to the stand
-            virtual void setDetector(int iRow, int iCol, std::shared_ptr<Timing::DetectorTiming> inputDet, Timing::DetType detType);
+            //virtual void setDetector(int iRow, int iCol, std::shared_ptr<Timing::DetectorTiming> inputDet, Timing::DetType detType);
+            virtual void setDetector(int iRow, int iCol, Timing::DetectorTiming inputDet, Timing::DetType detType);
 
             //Add a superchamber to the stand
             //Erases any superchamber previously at that position
-            virtual void setSuperchamber(int iRow, int iCol, std::shared_ptr<Timing::DetectorSuperchamber> inputSuperchamber);
+            //virtual void setSuperchamber(int iRow, int iCol, std::shared_ptr<Timing::DetectorSuperchamber> inputSuperchamber);
+            virtual void setSuperchamber(int iRow, int iCol, Timing::DetectorSuperchamber  inputSuperchamber);
             
         protected:
             //Actions - Methods that Do Something
