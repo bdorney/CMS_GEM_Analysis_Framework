@@ -42,6 +42,7 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/SRSMain.cpp \
             src/SRSMapping.cpp \
             src/SRSOutputROOT.cpp \
+            src/Analyzer.cpp \
             src/AnalyzeResponseUniformity.cpp \
             src/AnalyzeResponseUniformityClusters.cpp \
             src/AnalyzeResponseUniformityHits.cpp \

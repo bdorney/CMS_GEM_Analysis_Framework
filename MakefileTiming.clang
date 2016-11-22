@@ -30,6 +30,7 @@ SOURCES =   src/DetectorMPGD.cpp \
             src/TestStandVME.cpp \
             src/TimingUtilityFunctions.cpp \
             src/UniformityUtilityFunctions.cpp \
+            src/Analyzer.cpp \
             src/AnalyzeTiming.cpp \
             src/cosmicStandTest.cpp
 

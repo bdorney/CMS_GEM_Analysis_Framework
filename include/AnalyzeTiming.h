@@ -19,7 +19,8 @@
 #include <utility>
 
 //Framework Includes
-#include "FrameworkBase.h"
+#include "Analyzer.h"
+#include "PlotterUtilityTypes.h"
 #include "TestStandVME.h"
 #include "TimingEvent.h"
 #include "TimingRunSetup.h"
@@ -33,7 +34,7 @@
 
 namespace QualityControl {
     namespace Timing {
-        class AnalyzeTiming : public QualityControl::FrameworkBase {
+        class AnalyzeTiming : public QualityControl::Analyzer {
             
         public:
             //Constructors
@@ -93,6 +94,9 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            //Gets a histogram for channel iChan, iChan = -1 treated as the "All Channel" case
+            virtual TF1 getFit(int iChan, std::string strLogic, Plotter::InfoFit & setupFit, std::shared_ptr<TH1F> hInput, TSpectrum &specInput);
+            
             //Gets a histogram for channel iChan, iChan = -1 treated as the "All Channel" case
             virtual TH1F getHistogram(int iChan, std::string strLogic, Timing::HistoSetup setupHisto);
             

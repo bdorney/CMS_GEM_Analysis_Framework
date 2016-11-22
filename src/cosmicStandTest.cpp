@@ -30,6 +30,7 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
+using QualityControl::Timing::AnalysisSetupTiming;
 using QualityControl::Timing::AnalyzeTiming;
 using QualityControl::Timing::DetectorTiming;
 using QualityControl::Timing::DetectorMatrix;
@@ -271,6 +272,7 @@ int main(){
     
     printEvent(evtReco);*/
     
+    //DAQ Setup
     HwVMEBoard vmeBoard_A;
     vmeBoard_A.m_strBaseAddress = "0x400C0000";
     vmeBoard_A.m_vme_type = kVMETDC;
@@ -288,14 +290,21 @@ int main(){
     daqSetup.m_map_vmeBoards[vmeBoard_B.m_strBaseAddress]=vmeBoard_B;
     daqSetup.m_map_vmeBoards[vmeBoard_C.m_strBaseAddress]=vmeBoard_C;
     
+    //Ana Setup
+    AnalysisSetupTiming aSetupTiming;
+    aSetupTiming.iEvt_First = 0;
+    aSetupTiming.iEvt_Total = -1;
+    aSetupTiming.selTime.m_iCut_NTrig_Max = 1;
+    aSetupTiming.selTime.m_iCut_NTrig_Min = 1;
+    
     string strInputFileName = "data/CosmicStand_TrialRun_500kEvt_6Det.root";
     SelectorTiming selector(daqSetup);
+    selector.setAnalysisParameters(aSetupTiming);
     
-    cout<<"main() - No Fault 1\n";
+    //cout<<"aSetupTiming.selTime.m_iCut_NTrig_Min = " << aSetupTiming.selTime.m_iCut_NTrig_Min << endl;
+    //cout<<"aSetupTiming.selTime.m_iCut_NTrig_Max = " << aSetupTiming.selTime.m_iCut_NTrig_Max << endl;
     
     vector<EventReco> vec_recoEvts = selector.getEventsReco(strInputFileName, cosmicStand);
-    
-    cout<<"main() - No Fault 2\n";
     
     cout<<"vec_recoEvts.size() = " << vec_recoEvts.size() << endl;
     

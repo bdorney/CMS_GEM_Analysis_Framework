@@ -14,6 +14,7 @@
 
 //My Includes
 #include "TimingUtilityOperators.h"
+#include "PlotterUtilityTypes.h"
 
 //ROOT Includes
 #include "TF1.h"
@@ -244,6 +245,8 @@ namespace QualityControl {
         struct AnalysisSetupTiming{
             int iEvt_First;  //Starting Event For Analysis
             int iEvt_Total;    //Total number of Events to Analyze
+            
+            Plotter::InfoFit fitSetup_timeRes;
             
             SelParamTiming selTime;
             

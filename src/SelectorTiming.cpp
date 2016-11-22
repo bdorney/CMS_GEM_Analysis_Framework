@@ -49,6 +49,7 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
     
     //Require at least one DUT
     if( !(inputEvt.m_detMatrix_DUTs.m_map_detectors.size() >= aSetupTiming.selTime.m_iCut_NDUT ) ) return false;
+    //cout<<"Passed N_DUT Requirement\n";
     
     //Check to see how many Trigger Detectors are on in each row (i)
     for (auto iterTrigMatrix = inputEvt.m_detMatrix_Trigger.begin(); iterTrigMatrix != inputEvt.m_detMatrix_Trigger.end(); ++iterTrigMatrix) { //Loop Through Trigger Matrix
@@ -68,13 +69,21 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
         return false;
     } //End Case: Not Enough Trigger Detectors
     else{ //Case: At least two trigger detectors
+        //cout<<"--------------\n";
+        //cout<<"Min\tVal\tMax\n";
         for (auto iterTrigMatrix = map_iNTrigInLayer.begin(); iterTrigMatrix != map_iNTrigInLayer.end(); ++iterTrigMatrix) { //Loop Over map_iNTrigInLayer
+            
+            //cout<<aSetupTiming.selTime.m_iCut_NTrig_Min<<"\t";
+            //cout<< (*iterTrigMatrix).second << "\t";
+            //cout<< aSetupTiming.selTime.m_iCut_NTrig_Max << endl;
             
             if (  (*iterTrigMatrix).second < aSetupTiming.selTime.m_iCut_NTrig_Min || (*iterTrigMatrix).second > aSetupTiming.selTime.m_iCut_NTrig_Max ) {   //This cuts about 10-11% of events for cut equal to 1
                 return false;
             }
         } //End Loop Over map_iNTrigInLayer
+        //cout<<"--------------\n";
     } //End Case: At least two trigger detectors
+    //cout<<"Passed N_Trig Requirement\n";
     
     //Accept the event if we reached here.
     return true;
