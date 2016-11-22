@@ -183,7 +183,6 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
     
     string strTempChNum;
     
-    //for (int iEvt=99998; iEvt < 100001; ++iEvt) {
     for (int iEvt=pair_iEvtRange.first; iEvt < pair_iEvtRange.second; ++iEvt) {
         //Get this event's data
         tree_eventsDigi->GetEntry(iEvt);

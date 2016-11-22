@@ -223,10 +223,10 @@ int main(){
     cosmicStand.setDetector(0,4, det_PMT4, kTrigger);
     cosmicStand.setDetector(0,5, det_PMT5, kTrigger);
     
-    //cosmicStand.setDetector(2,2, det_GE11Long3, kDUT);
-    //cosmicStand.setDetector(2,2, det_GE11Long1, kDUT);
-    //cosmicStand.setDetector(3,2, det_GE11Long2, kDUT);
-    //cosmicStand.setDetector(3,2, det_GE11Long4, kDUT);
+    cosmicStand.setDetector(2,2, det_GE11Long3, kDUT);
+    cosmicStand.setDetector(2,2, det_GE11Long1, kDUT);
+    cosmicStand.setDetector(3,2, det_GE11Long2, kDUT);
+    cosmicStand.setDetector(3,2, det_GE11Long4, kDUT);
     cosmicStand.setDetector(4,2, det_GE11Short5, kDUT);
     cosmicStand.setDetector(4,2, det_GE11Short6, kDUT);
     
@@ -288,7 +288,7 @@ int main(){
     daqSetup.m_map_vmeBoards[vmeBoard_B.m_strBaseAddress]=vmeBoard_B;
     daqSetup.m_map_vmeBoards[vmeBoard_C.m_strBaseAddress]=vmeBoard_C;
     
-    string strInputFileName = "/Users/dorney/Desktop/MyResearch/GitRepos/CMS_GEM_Analysis_Framework/data/cosmicTesting/CosmicStand_TrialRun_500kEvt_6Det.root";
+    string strInputFileName = "data/CosmicStand_TrialRun_500kEvt_6Det.root";
     SelectorTiming selector(daqSetup);
     
     cout<<"main() - No Fault 1\n";
@@ -312,6 +312,7 @@ int main(){
     AnalyzeTiming anaTiming;
     anaTiming.setRunParameters(daqSetup);
     anaTiming.initHistos( cosmicStand.getMatrix() );
+    //anaTiming.initHistos( cosmicStand );
     anaTiming.fillHistos( vec_recoEvts );
     anaTiming.storeHistos(strFileOutput,strFileOption);
     

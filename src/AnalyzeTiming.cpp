@@ -8,15 +8,19 @@
 
 #include "AnalyzeTiming.h"
 
+using std::cin;
 using std::cout;
 using std::endl;
 using std::make_shared;
 using std::map;
+using std::pair;
 using std::string;
 
 using namespace QualityControl::Timing;
 
 using QualityControl::Uniformity::printClassMethodMsg;
+
+using QualityControl::Timing::imap_iter_t;
 
 //Fills Histograms for all events
 void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco){
@@ -50,7 +54,7 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
                         continue;
                     }
                     
-                    cout<<(*iterChan).first<<"\t"<<(*iterChan).second<<endl;
+                    //cout<<(*iterChan).first<<"\t"<<(*iterChan).second<<endl;
                     
                     //Fill Superchamber
                     m_mtrxHistos[(*iterSC).first].m_hAll->Fill( (*iterChan).second );
@@ -58,6 +62,9 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
                     //Fill Detector
                     m_mtrxHistos[(*iterSC).first].m_map_HistosDet[(*iterDet).second.getName()].m_hAll->Fill( (*iterChan).second );
                     
+			//Debugging
+			//cout<<"m_mtrxHistos[("<<(*iterSC).first.first<<","<<(*iterSC).first.second<<")].m_map_HistosDet["<<(*iterDet).second.getName().c_str()<<"].m_map_hChan["<<(*iterChan).first<<"] = " << m_mtrxHistos[(*iterSC).first].m_map_HistosDet[(*iterDet).second.getName()].m_map_hChan[(*iterChan).first] << endl;
+
                     m_mtrxHistos[(*iterSC).first].m_map_HistosDet[(*iterDet).second.getName()].m_map_hChan[(*iterChan).first]->Fill( (*iterChan).second );
                 }  //End Loop Over Detector's Channels
             } //End Loop Over Detectors
@@ -76,7 +83,8 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
                         continue;
                     }
                     
-                    cout<<(*iterChan).first<<"\t"<<(*iterChan).second<<endl;
+			//Debugging
+                    //cout<<(*iterChan).first<<"\t"<<(*iterChan).second<<endl;
                     
                     //Fill Superchamber
                     m_mtrxHistos[(*iterSC).first].m_hAll->Fill( (*iterChan).second );
@@ -88,7 +96,7 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
                 }  //End Loop Over Detector's Channels
             } //End Loop Over Detectors
         } //End Loop Over Superchambers - Trig
-        
+
         ++iEvt;
     } //End Loop Over Events
     
@@ -103,9 +111,12 @@ void AnalyzeTiming::fitHistos(){
 //Initializes all TH1F objects for all detectors in a test stand
 //Wipes any existing histograms
 void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
-    
+//void AnalyzeTiming::initHistos(Timing::TestStandVME testStand){
+
+    //cout<<"=======AnalyzeTiming::initHistos()=======\n";
+      
     m_mtrxHistos.m_map_HistosSC_All.clear();
-    
+
     //Determine the largest full scale range
     float fVME_LSB = -1;    //Least Sensitive Bit
     int iBitADC = 0;        //Bits in the ADC
@@ -133,7 +144,7 @@ void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
         //Declare a new HistoSC Container & create TH1F objects for this superchamber
         HistoSC superChamberHistos;
         superChamberHistos.m_strName = (*iterSC).second.getName();
-        
+
         hSetup.strHisto_Name = (*iterSC).second.getName(); //Set this superchambers name
         superChamberHistos.m_hAll = make_shared<TH1F>( getHistogram(-1, "",  hSetup) );
         //superChamberHistos.m_hAND = make_shared<TH1F>( getHistogram(-1, "AND",  hSetup) );
@@ -141,15 +152,22 @@ void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
         
         //Loop Over all Detectors in this Superchamber
         for (auto iterDet = (*iterSC).second.getDetectorPtrBegin(); iterDet != (*iterSC).second.getDetectorPtrEnd(); ++iterDet) {
+		//Get the channel map for this detector
+		pair<imap_iter_t, imap_iter_t> pair_chanMapIter = (*iterDet).second.getChannelMapVME2Det();
+
             //Declare a new HistoDet container & create TH1F objects for this detector
             HistoDet detectorHistos;
             
             hSetup.strHisto_Name = (*iterDet).second.getName(); //Set this superchambers name
             detectorHistos.m_hAll = make_shared<TH1F>( getHistogram(-1, "",  hSetup) );
             
+		//cout<<(*iterSC).first.first<<"\t"<<(*iterSC).first.second<<"\t"<<(*iterSC).second.getName()<<"\t"<<(*iterDet).second.getName()<<"\t"<<(*iterDet).second.getNChan()<<endl;
+
             //Make Histograms for each channel
-            for (int iChan=0; iChan<(*iterDet).second.getNChan(); ++iChan) { //Loop Over Detector's Channels
-                detectorHistos.m_map_hChan[iChan] = make_shared<TH1F>( getHistogram(iChan, "",  hSetup) );
+            for (auto iterChan = pair_chanMapIter.first; iterChan != pair_chanMapIter.second; ++iterChan) { //Loop Over Detector's Channels
+                detectorHistos.m_map_hChan[(*iterChan).second] = make_shared<TH1F>( getHistogram((*iterChan).second, "",  hSetup) );
+
+		//cout<<(*iterSC).first.first<<"\t"<<(*iterSC).first.second<<"\t"<<(*iterSC).second.getName()<<"\t"<<(*iterDet).second.getName()<<"\t"<<(*iterChan).first<<endl;
             } //End Loop Over Detector's Channels
             
             superChamberHistos.m_map_HistosDet[(*iterDet).second.getName()]=detectorHistos;
@@ -157,7 +175,7 @@ void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
         
         m_mtrxHistos.m_map_HistosSC_All[(*iterSC).first]=superChamberHistos;
     } //End Loop Over Superchambers
-    
+
     return;
 } //End AnalyzeTiming::initHistos()
 
