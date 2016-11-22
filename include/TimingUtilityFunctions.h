@@ -99,9 +99,13 @@ namespace QualityControl {
         template<typename T, typename A>
         float deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2);
         
-        int getDeltaTForChannel(std::map<std::string, int> inputMap);
-        int getMaxForChannelAND(std::map<std::string, int> inputMap);
-        int getMinForChannelOR(std::map<std::string, int> inputMap);
+        double getDeltaTForChannel(double dChan1, double dChan2);
+        
+        template<typename TKeyVal>
+        double getMaxForChannelAND(std::map<TKeyVal, double> inputMap);
+        
+        template<typename TKeyVal>
+        double getMinForChannelOR(std::map<TKeyVal, double> inputMap);
         
         //printers
         void printROOTFileStatus(TFile *file_ROOT);
@@ -141,6 +145,51 @@ namespace QualityControl {
             
             return fMean1 - fMean2;
         } //End deltaMean
+        
+        
+        //Gets the maximum value for two channels (both channels required to be nonzero)
+        template<class TKeyVal>
+        double getMaxForChannelAND(std::map<TKeyVal, double> inputMap){
+            //Variable Declaration
+            std::pair<TKeyVal, double> min = *min_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+            
+            //Require All Elements to be nonzero (i.e. have a signal)
+            if ( min.second > 0 ) {
+                std::pair<TKeyVal, double> max = *max_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+                return max.second;
+            }
+            else{
+                //One or more channels off
+                return -1;
+            }
+        } //End getMaxForChannel
+        
+        //Gets the minimum value for two channels
+        template<class TKeyVal>
+        double getMinForChannelOR(std::map<TKeyVal, double> inputMap){
+            //Variable Declaration
+            typename std::map<TKeyVal, double>::iterator iterMap = inputMap.begin();
+            typename std::map<TKeyVal, double>::iterator iterMapEnd = inputMap.end();
+            
+            while( iterMap != inputMap.end() ){
+                if( 0 == (*iterMap).second){
+                    //C++11 is magic
+                    iterMap = inputMap.erase(iterMap);
+                }
+                else{
+                    ++iterMap;
+                }
+            }
+            
+            if( 0 == inputMap.size() ){
+                return -1;
+            }
+            else{
+                std::pair<TKeyVal, int> min = *std::min_element(inputMap.begin(), inputMap.end(), Timing::compare());
+                
+                return min.second;
+            }
+        }
         
         //string manipulation
         //----------------------------------------------------------------------------------------

@@ -35,9 +35,6 @@ AnalyzeResponseUniformityClusters::AnalyzeResponseUniformityClusters(AnalysisSet
     
     //Store Analysis Parameters
     aSetup = inputSetup;
-    
-    //Store Detector
-    //detMPGD = inputDet;
 } //End Constructor
 
 //Loops over all stored clusters in an input DetectorMPGD object and fills histograms for the full detector
@@ -162,7 +159,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 dPeakPos = specADC.GetPositionX();
                 
                 //Initialize Fit
-                //(*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.fitSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
                 //Clear the calculated fit range from the previous slice

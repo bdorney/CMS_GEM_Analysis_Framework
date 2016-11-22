@@ -18,6 +18,7 @@
 
 //Framework Includes
 #include "TimingUtilityTypes.h"
+#include "TimingUtilityFunctions.h"
 
 //ROOT Includes
 
@@ -64,6 +65,11 @@ namespace QualityControl {
             
             virtual std::map<int, double>::iterator getChanDataEnd(){
                 return m_map_DetChanData.end();
+            };
+            
+            //Returns the first time
+            virtual double getChannelOR(){
+                return getMinForChannelOR(m_map_DetChanData);
             };
             
             //Get const iterators for the detector's channel map

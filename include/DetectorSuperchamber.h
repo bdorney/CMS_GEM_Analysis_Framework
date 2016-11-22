@@ -18,6 +18,7 @@
 //Framework Includes
 #include "DetectorTiming.h"
 #include "TimingUtilityTypes.h"
+#include "TimingUtilityFunctions.h"
 
 //ROOT Includes
 
@@ -39,6 +40,7 @@ namespace QualityControl{
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
+            DetectorSuperchamber();
             
             //Destructors
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,6 +66,8 @@ namespace QualityControl{
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual void calcAndDeltaOr();
+            
             virtual void reset();
             virtual void resetChannels();
             
@@ -77,6 +81,19 @@ namespace QualityControl{
                 return m_map_detectors[iDetPos];
             };
             
+            //Get Detector - by VME base address
+            //virtual std::shared_ptr<Timing::DetectorTiming> getDetector(std::string & strBaseAddress);
+            virtual Timing::DetectorTiming getDetector(std::string & strBaseAddress);
+            
+            //Get the AND of all detectors
+            virtual double getDetectorAND(){ return m_dDetAND; };
+            
+            //Get the difference between fastest and slowest time from set of detectors
+            virtual double getDetectorDelta(){ return m_dDetDelta; };
+            
+            //Get the OR of all detectors (first time, any number of detectors)
+            virtual double getDetectorOR(){ return m_dDetOR; };
+            
             //Get Pointer to the beginning of m_map_detectors
             virtual Timing::imap_detIter_t getDetectorPtrBegin(){
                 return m_map_detectors.begin();
@@ -87,9 +104,6 @@ namespace QualityControl{
                 return m_map_detectors.end();
             };
             
-            //Get Detector - by VME base address
-            //virtual std::shared_ptr<Timing::DetectorTiming> getDetector(std::string & strBaseAddress);
-            virtual Timing::DetectorTiming getDetector(std::string & strBaseAddress);
             
             //Get Detector's name
             virtual std::string getName(){
@@ -102,7 +116,7 @@ namespace QualityControl{
             };
             
             virtual Timing::DetType getType(){
-                return detType;
+                return m_detType;
             };
             
             virtual bool hasData();
@@ -127,13 +141,17 @@ namespace QualityControl{
             
             //Set the detector's type
             virtual void setType(Timing::DetType inputDetType){
-                detType = inputDetType;
+                m_detType = inputDetType;
                 return;
             };
             
         protected:
             //Attributes - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            double m_dDetAND;
+            double m_dDetDelta;
+            double m_dDetOR;
+            
             std::string m_strName;  //Name of the detector
             
             //Key value is detector position within superchamber
@@ -143,7 +161,7 @@ namespace QualityControl{
             //std::map<int, std::shared_ptr<Timing::DetectorTiming> > m_map_detectors;
             std::map<int, Timing::DetectorTiming> m_map_detectors;
             
-            Timing::DetType detType;
+            Timing::DetType m_detType;
             
         }; //End class DetectorSuperchamber
         

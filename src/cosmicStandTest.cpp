@@ -292,10 +292,10 @@ int main(){
     
     //Ana Setup
     AnalysisSetupTiming aSetupTiming;
-    aSetupTiming.iEvt_First = 0;
-    aSetupTiming.iEvt_Total = -1;
-    aSetupTiming.selTime.m_iCut_NTrig_Max = 1;
-    aSetupTiming.selTime.m_iCut_NTrig_Min = 1;
+    aSetupTiming.m_iEvt_First = 0;
+    aSetupTiming.m_iEvt_Total = -1;
+    aSetupTiming.m_selTime.m_iCut_NTrig_Max = 1;
+    aSetupTiming.m_selTime.m_iCut_NTrig_Min = 1;
     
     string strInputFileName = "data/CosmicStand_TrialRun_500kEvt_6Det.root";
     SelectorTiming selector(daqSetup);

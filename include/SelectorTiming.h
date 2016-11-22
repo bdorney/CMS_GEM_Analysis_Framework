@@ -110,6 +110,8 @@ namespace QualityControl {
 
             //Attributes - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            bool m_bInvertTime;
+            
             //Timing::RunSetup m_daqSetup;
         };
     } //End namespace Timing

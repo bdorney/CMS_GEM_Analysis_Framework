@@ -100,6 +100,9 @@ namespace QualityControl {
             //Gets a histogram for channel iChan, iChan = -1 treated as the "All Channel" case
             virtual TH1F getHistogram(int iChan, std::string strLogic, Timing::HistoSetup setupHisto);
             
+            //Gets a histogram for channel iChan, iChan = -1 treated as teh "All Channel" case
+            virtual TH2F getHistogram2D(int iChan, Timing::HistoSetup &setupHisto_X, Timing::HistoSetup &setupHisto_Y);
+            
             //Gets a name for a channel iChan, iChan = -1 treated as the "All Channel" case
             virtual std::string getNameByChanNum(int iChan, std::string strPrefix, std::string strName);
             

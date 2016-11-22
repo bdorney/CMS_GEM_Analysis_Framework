@@ -70,6 +70,10 @@ namespace QualityControl {
                 m_strFullScaleRange = other.m_strFullScaleRange;
             }; //End Copy Constructor
             
+            float getInvertedTime(float fInput){
+                return (fInput > 0) ? (pow(2,m_iBitADC) * getLSB() - fInput) : fInput;
+            }
+            
             //Get Least Sensitive Bit
             float getLSB(){
                 switch(m_vme_type){

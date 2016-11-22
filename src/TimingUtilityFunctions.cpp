@@ -11,7 +11,7 @@
 using std::cout;
 using std::endl;
 
-using namespace Timing;
+using namespace QualityControl::Timing;
 
 //Function Code Begins
 //========================================================================================
@@ -71,82 +71,14 @@ std::istream & QualityControl::Timing::getlineNoSpaces(std::istream & stream, st
 
 //Math
 //----------------------------------------------------------------------------------------
-//T -> Type; A -> Allocator
-//Determines the difference in mean between two datasets
-//template<typename T, typename A>
-//float QualityControl::Timing::deltaMean( std::vector<T,A> const &vec1, std::vector<T,A> const &vec2){
-//    float fMean1 = (std::accumulate(vec1.begin(), vec1.end(), 0.0) / (float) vec1.size() );
-//    float fMean2 = (std::accumulate(vec2.begin(), vec2.end(), 0.0) / (float) vec2.size() );
-//
-//    return fMean1 - fMean2;
-//} //End deltaMean
-
-int QualityControl::Timing::getDeltaTForChannel(std::map<std::string, int> inputMap){
-    int max = getMaxForChannelAND(inputMap);
-    int min = getMinForChannelOR(inputMap);
-    
-	//cout<<"QualityControl::Timing::getDeltaTForChannel() - max = " << max << "; min = " << min << endl;
-
-    if (max > 0 && min > 0 ) {
-        return abs(max - min);
+double QualityControl::Timing::getDeltaTForChannel(double dChan1, double dChan2){
+    if (dChan1 > 0 && dChan2 > 0 ) {
+        return fabs(dChan1 - dChan2);
     }
     else{
         return -1;
     }
 } //End getDeltaTForChannel()
-
-//Gets the maximum value for two channels (both channels required to be nonzero)
-int QualityControl::Timing::getMaxForChannelAND(std::map<std::string, int> inputMap){
-    //Variable Declaration
-    //int iRetVal;
-    
-    std::pair<std::string, int> min = *min_element(inputMap.begin(), inputMap.end(), CompareSecond_Min() );
-    //std::pair<std::string, int> min = *min_element(inputMap.begin(), inputMap.end() );    
-
-    //Require All Elements to be nonzero (i.e. have a signal)
-    if ( min.second > 0 ) {
-        //std::pair<std::string, int> max = *max_element(inputMap.begin(), inputMap.end(), CompareSecond_Max() );
-	std::pair<std::string, int> max = *max_element(inputMap.begin(), inputMap.end(), CompareSecond_Min() );	
-	//std::pair<std::string, int> max = *max_element(inputMap.begin(), inputMap.end() );        
-
-        //iRetVal = getMaxForChannelAND(inputMap);
-        //iRetVal = max.second;
-        return max.second;
-    }
-    else{
-        //One or more channels off
-        //iRetVal = -1;
-        return -1;
-    }
-    //return iRetVal;
-} //End getMaxForChannel
-
-//Gets the minimum value for two channels
-int QualityControl::Timing::getMinForChannelOR(std::map<std::string, int> inputMap){
-    //Variable Declaration
-    std::map<std::string, int>::iterator iterMap = inputMap.begin();
-    std::map<std::string, int>::iterator iterMapEnd = inputMap.end();
-    
-    while( iterMap != inputMap.end() ){
-        if( 0 == (*iterMap).second){
-            //C++11 is magic
-            iterMap = inputMap.erase(iterMap);
-        }
-        else{
-            ++iterMap;
-        }
-    }
-    
-    if( 0 == inputMap.size() ){
-        return -1;
-    }
-    else{
-        std::pair<std::string, int> min = *std::min_element(inputMap.begin(), inputMap.end(), CompareSecond_Min());
-        //std::pair<std::string, int> min = *std::min_element(inputMap.begin(), inputMap.end() );
-
-        return min.second;
-    }
-}
 
 //printers
 //----------------------------------------------------------------------------------------

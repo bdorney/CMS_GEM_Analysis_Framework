@@ -69,7 +69,10 @@ EventReco TestStandVME::getEventReco(Timing::EventDigi & inputEvtDIGI){
             } //End Case: This event has this detector's base address
             
             //cout<<"Detector has data = " << (*iterDet).second->hasData() << endl;
-        } //End Loop throguh detectors in this superchamber
+        } //End Loop through detectors in this superchamber
+        
+        //Calculate AND, OR, and DELTA
+        (*iterSuperChamber).second.calcAndDeltaOr();
         
         //cout<<"Superchamber has data = " << (*iterSuperChamber).second->hasData() << endl;
         

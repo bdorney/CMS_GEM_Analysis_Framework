@@ -128,8 +128,11 @@ namespace QualityControl {
             
             std::shared_ptr<TH1F> m_hAll;   //All Hits, from all det, from all chan
             std::shared_ptr<TH1F> m_hAND;   //AND from all det, from one chan per det (first chan in time)
+            std::shared_ptr<TH1F> m_hDelta; //Difference in time between detectors
             std::shared_ptr<TH1F> m_hMulti; //Number of Detectors on per superchamber
             std::shared_ptr<TH1F> m_hOR;    //OR from all det, from one chan per det (first chan in time)
+            
+            std::shared_ptr<TH2F> m_hCorr;  //Correlation between detectors
             
             std::string m_strName;
             
@@ -142,11 +145,15 @@ namespace QualityControl {
             HistoSC(const HistoSC & other){
                 m_map_HistosDet = other.m_map_HistosDet;
                 
-                //Deep copy
+                //Deep copy - TH1F Pointers
                 if( other.m_hAll != NULL )    m_hAll    = std::make_shared<TH1F>( *other.m_hAll.get() );
                 if( other.m_hAND != NULL )    m_hAND    = std::make_shared<TH1F>( *other.m_hAND.get() );
+                if( other.m_hDelta != NULL )    m_hDelta    = std::make_shared<TH1F>( *other.m_hDelta.get() );
                 if( other.m_hMulti != NULL )    m_hMulti    = std::make_shared<TH1F>( *other.m_hMulti.get() );
                 if( other.m_hOR != NULL )    m_hOR    = std::make_shared<TH1F>( *other.m_hOR.get() );
+                
+                //Deep copy - TH2F Pointers
+                if( other.m_hCorr != NULL )    m_hCorr    = std::make_shared<TH2F>( *other.m_hCorr.get() );
                 
                 m_strName = other.m_strName;
             } //End Copy Constructor
@@ -156,10 +163,15 @@ namespace QualityControl {
                 if (this != &other) { //Protects against invalid self-assignment
                     m_map_HistosDet = other.m_map_HistosDet;
                     
+                    //Deep copy - TH1F Pointers
                     if( other.m_hAll != NULL )    m_hAll    = std::make_shared<TH1F>( *other.m_hAll.get() );
                     if( other.m_hAND != NULL )    m_hAND    = std::make_shared<TH1F>( *other.m_hAND.get() );
+                    if( other.m_hDelta != NULL )    m_hDelta    = std::make_shared<TH1F>( *other.m_hDelta.get() );
                     if( other.m_hMulti != NULL )    m_hMulti    = std::make_shared<TH1F>( *other.m_hMulti.get() );
                     if( other.m_hOR != NULL )    m_hOR    = std::make_shared<TH1F>( *other.m_hOR.get() );
+                    
+                    //Deep copy - TH2F Pointers
+                    if( other.m_hCorr != NULL )    m_hCorr    = std::make_shared<TH2F>( *other.m_hCorr.get() );
                     
                     m_strName = other.m_strName;
                 } //Protects against invalid self-assignment
@@ -243,32 +255,35 @@ namespace QualityControl {
         }; //End SelParamTiming
         
         struct AnalysisSetupTiming{
-            int iEvt_First;  //Starting Event For Analysis
-            int iEvt_Total;    //Total number of Events to Analyze
+            int m_iEvt_First;  //Starting Event For Analysis
+            int m_iEvt_Total;    //Total number of Events to Analyze
             
-            Plotter::InfoFit fitSetup_timeRes;
+            HistoSetup m_hSetupTime;
+            HistoSetup m_hSetupMulti;
             
-            SelParamTiming selTime;
+            Plotter::InfoFit m_fitSetup_timeRes;
+            
+            SelParamTiming m_selTime;
             
             //Default Constructor
             AnalysisSetupTiming(){
-                iEvt_First = 0;
-                iEvt_Total = -1;
+                m_iEvt_First = 0;
+                m_iEvt_Total = -1;
             } //End Default Constructor
             
             //Copy Constructor
             AnalysisSetupTiming(const AnalysisSetupTiming & other){
-                iEvt_First  = other.iEvt_First;
-                iEvt_Total  = other.iEvt_Total;
-                selTime     = other.selTime;
+                m_iEvt_First  = other.m_iEvt_First;
+                m_iEvt_Total  = other.m_iEvt_Total;
+                m_selTime     = other.m_selTime;
             } //End Copy Constructor
             
             //Assignment Operator
             AnalysisSetupTiming & operator=(const AnalysisSetupTiming & other){
                 if (this != &other){ //Protects against invalid self-assignment
-                    iEvt_First  = other.iEvt_First;
-                    iEvt_Total  = other.iEvt_Total;
-                    selTime     = other.selTime;
+                    m_iEvt_First  = other.m_iEvt_First;
+                    m_iEvt_Total  = other.m_iEvt_Total;
+                    m_selTime     = other.m_selTime;
                 } //Protects against invalid self-assignment
                 
                 return *this;

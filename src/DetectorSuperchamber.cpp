@@ -14,6 +14,28 @@ using std::string;
 
 using namespace QualityControl::Timing;
 
+DetectorSuperchamber::DetectorSuperchamber(){
+    m_dDetAND = m_dDetOR = -1.;
+    m_dDetDelta = 0.;
+    
+    m_strName = "Superchamber";
+};
+
+void DetectorSuperchamber::calcAndDeltaOr(){
+    map<string, double> map_detTime;
+    
+    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.begin(); ++iterDet) {
+        map_detTime[(*iterDet).second.getBaseAddress()]=(*iterDet).second.getChannelOR();
+    }
+    
+    m_dDetAND = getMaxForChannelAND(map_detTime);
+    m_dDetOR = getMinForChannelOR(map_detTime);
+    
+    m_dDetDelta = getDeltaTForChannel(m_dDetAND, m_dDetOR);
+    
+    return;
+} //End DetectorSuperchamber::calcAndDeltaOr()
+
 void DetectorSuperchamber::reset(){
     m_strName.clear();
     m_map_strBaseAddr2iDetPos.clear();
@@ -29,7 +51,7 @@ void DetectorSuperchamber::resetChannels(){
     }
     
     return;
-}
+} //End DetectorSuperchamber::resetChannels()
 
 //shared_ptr<DetectorTiming> DetectorSuperchamber::getDetector(string & strBaseAddress){
 DetectorTiming DetectorSuperchamber::getDetector(string & strBaseAddress){

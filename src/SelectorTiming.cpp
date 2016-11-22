@@ -25,6 +25,8 @@ using namespace QualityControl::Timing;
 
 //Default Constructor
 SelectorTiming::SelectorTiming(Timing::RunSetup & inputSetup){
+    m_bInvertTime = true;
+    
     m_daqSetup = inputSetup;
 } //End SelectorTiming::SelectorTiming()
 
@@ -48,7 +50,7 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
     //map<int, double> map_dTrigTimeOfLayer;
     
     //Require at least one DUT
-    if( !(inputEvt.m_detMatrix_DUTs.m_map_detectors.size() >= aSetupTiming.selTime.m_iCut_NDUT ) ) return false;
+    if( !(inputEvt.m_detMatrix_DUTs.m_map_detectors.size() >= aSetupTiming.m_selTime.m_iCut_NDUT ) ) return false;
     //cout<<"Passed N_DUT Requirement\n";
     
     //Check to see how many Trigger Detectors are on in each row (i)
@@ -77,7 +79,7 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
             //cout<< (*iterTrigMatrix).second << "\t";
             //cout<< aSetupTiming.selTime.m_iCut_NTrig_Max << endl;
             
-            if (  (*iterTrigMatrix).second < aSetupTiming.selTime.m_iCut_NTrig_Min || (*iterTrigMatrix).second > aSetupTiming.selTime.m_iCut_NTrig_Max ) {   //This cuts about 10-11% of events for cut equal to 1
+            if (  (*iterTrigMatrix).second < aSetupTiming.m_selTime.m_iCut_NTrig_Min || (*iterTrigMatrix).second > aSetupTiming.m_selTime.m_iCut_NTrig_Max ) {   //This cuts about 10-11% of events for cut equal to 1
                 return false;
             }
         } //End Loop Over map_iNTrigInLayer
@@ -183,7 +185,7 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
     //------------------------------------------------------
     pair<int,int> pair_iEvtRange;
     
-    pair_iEvtRange = getEventRange( aSetupTiming.iEvt_First, aSetupTiming.iEvt_Total, tree_eventsDigi->GetEntries() );
+    pair_iEvtRange = getEventRange( aSetupTiming.m_iEvt_First, aSetupTiming.m_iEvt_Total, tree_eventsDigi->GetEntries() );
     
     //Get data event-by-event
     //------------------------------------------------------
@@ -230,7 +232,12 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
                 //cout<<"iChan = " << iChan << endl;
                 
                 if (evtDigi.m_map_TDCData.count(strTempBaseAddr) > 0 ) { //Case: Board Exists, add to it!
-                    evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = (*iterVMEBoard).second;
+                    if (m_bInvertTime) { //Case: Time in Wall Clock Format
+                        evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[(*iterVMEBoard).first].getInvertedTime( (*iterVMEBoard).second );
+                    } //End Case: Time in Wall Clock Format
+                    else{ //Case: Time in Common Stop Format
+                        evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = (*iterVMEBoard).second;
+                    } //End Case: Time in Common Stop Format
                     
                     //Debugging
                     //cout<<evtDigi.m_map_TDCData[strTempBaseAddr].m_uiEvtCount<<"\t";
@@ -242,7 +249,13 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
                     TDCDataDigi digi;
                     digi.m_uiEvtCount = iEvt;
                     digi.m_strBaseAddress = strTempBaseAddr;
-                    digi.m_map_fTime[iChan] = (*iterVMEBoard).second;
+                    
+                    if (m_bInvertTime) { //Case: Time in Wall Clock Format
+                        digi.m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[(*iterVMEBoard).first].getInvertedTime( (*iterVMEBoard).second );
+                    } //End Case: Time in Wall Clock Format
+                    else{ //Case: Time in Common Stop Format
+                        digi.m_map_fTime[iChan] = (*iterVMEBoard).second;
+                    } //End Case: Time in Common Stop Format
                     
                     //Debugging
                     //cout<<digi.m_uiEvtCount<<"\t";
