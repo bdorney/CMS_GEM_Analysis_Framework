@@ -103,9 +103,13 @@ namespace QualityControl {
         
         template<typename TKeyVal>
         double getMaxForChannelAND(std::map<TKeyVal, double> inputMap);
+        //double getMaxForChannelAND(std::map<std::string, double> &inputMap);
+        //double getMaxForChannelAND(std::map<int, double> &inputMap);
         
         template<typename TKeyVal>
         double getMinForChannelOR(std::map<TKeyVal, double> inputMap);
+        //double getMinForChannelOR(std::map<std::string, double> &inputMap);
+        //double getMinForChannelOR(std::map<int, double> &inputMap);
         
         //printers
         void printROOTFileStatus(TFile *file_ROOT);
@@ -148,25 +152,32 @@ namespace QualityControl {
         
         
         //Gets the maximum value for two channels (both channels required to be nonzero)
-        template<class TKeyVal>
+        template<typename TKeyVal>
         double getMaxForChannelAND(std::map<TKeyVal, double> inputMap){
+	    if( inputMap.size() == 0 ) return -1.;
+
             //Variable Declaration
-            std::pair<TKeyVal, double> min = *min_element(inputMap.begin(), inputMap.end(), Timing::compare() );
-            
+            std::pair<TKeyVal, double> pair_dMin = *min_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+            //double dMin = ( *min_element(inputMap.begin(), inputMap.end(), Timing::compare() ) ).second;
+
             //Require All Elements to be nonzero (i.e. have a signal)
-            if ( min.second > 0 ) {
-                std::pair<TKeyVal, double> max = *max_element(inputMap.begin(), inputMap.end(), Timing::compare() );
-                return max.second;
+            if ( pair_dMin.second > 0 ) {
+                std::pair<TKeyVal, double> pair_dMax = *max_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+		//double dMax = ( *max_element(inputMap.begin(), inputMap.end(), Timing::compare() ) ).second;
+
+                return pair_dMax.second;
             }
             else{
                 //One or more channels off
-                return -1;
+                return -1.;
             }
-        } //End getMaxForChannel
+        } //End getMaxForChannelAND
         
         //Gets the minimum value for two channels
-        template<class TKeyVal>
+        template<typename TKeyVal>
         double getMinForChannelOR(std::map<TKeyVal, double> inputMap){
+	    if( inputMap.size() == 0 ) return -1.;
+
             //Variable Declaration
             typename std::map<TKeyVal, double>::iterator iterMap = inputMap.begin();
             typename std::map<TKeyVal, double>::iterator iterMapEnd = inputMap.end();
@@ -189,7 +200,7 @@ namespace QualityControl {
                 
                 return min.second;
             }
-        }
+        } //End getMinForChannelOR
         
         //string manipulation
         //----------------------------------------------------------------------------------------

@@ -28,27 +28,23 @@ using namespace QualityControl::Timing;
 //Fills Histograms for all events
 void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco){
     //Variable Declaration
-    int iEvt = 0;
-    
-    //int iMulti_DUT = 0;     //Multiplicity Counters
-    //int iMulti_Trig = 0;
-    int iMulti_Chan = 0;
-    
+    int iEvt = 0;     
+    int iMultiChan = 0;	//Multiplicity Counters
+    int iMultiDet = 0;
+
     //Debugging
     //cout<<"AnalyzeTiming::fillHistos() - vec_inputEvtsReco.size() = " << vec_inputEvtsReco.size() << endl;
     
     for (auto iterEvt = vec_inputEvtsReco.begin(); iterEvt != vec_inputEvtsReco.end(); ++iterEvt) { //Loop Over Events
         if (iEvt % 1000 == 0) cout<<"Filling Histos; " <<iEvt<<" Events Processed\n";
         
-        //Fill Multiplicity
+        //Fill Event Multiplicity
         m_mtrxHistos.m_hMultiDUT->Fill( (*iterEvt).m_detMatrix_DUTs.m_map_detectors.size() );
         m_mtrxHistos.m_hMultiTrig->Fill( (*iterEvt).m_detMatrix_Trigger.m_map_detectors.size() );
         
         //Loop Through Superchambers - DUT's
         for (auto iterSC = (*iterEvt).m_detMatrix_DUTs.begin(); iterSC != (*iterEvt).m_detMatrix_DUTs.end(); ++iterSC) { //Loop Over Superchambers
-            
-            if ((*iterSC).second.getNDetectors() > 1) { //Case: Superchamber has more than one detector
-                //Fill Superchamber AND
+		//Fill Superchamber AND
                 if ( (*iterSC).second.getDetectorAND() > 0 ) {
                     m_mtrxHistos[(*iterSC).first].m_hAND->Fill( (*iterSC).second.getDetectorAND() );
                 }
@@ -58,11 +54,17 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
                     m_mtrxHistos[(*iterSC).first].m_hDelta->Fill( (*iterSC).second.getDetectorDelta() );
                 }
                 
+		//Fill Superchamber Detector Multiplicity
+		iMultiDet = 0;
+		(*iterSC).second.hasData(iMultiDet);
+		m_mtrxHistos[(*iterSC).first].m_hMulti->Fill( iMultiDet );            
+
                 //Fill Superchamber OR
                 if ( (*iterSC).second.getDetectorOR() > 0 ) {
                     m_mtrxHistos[(*iterSC).first].m_hOR->Fill( (*iterSC).second.getDetectorOR() );
                 }
-                
+
+            if ((*iterSC).second.getNDetectors() > 1) { //Case: Superchamber has more than one detector
                 //Fill Superchamber Correlation
                 double dDet0 = (*iterSC).second.getDetector(0).getChannelOR();
                 double dDet1 = (*iterSC).second.getDetector(1).getChannelOR();
@@ -70,8 +72,12 @@ void AnalyzeTiming::fillHistos(std::vector<Timing::EventReco> vec_inputEvtsReco)
             } //End Case: Superchamber has more than one detector
             
             //Loop Over (*iterSC).second's Detectors
-            for (auto iterDet = (*iterSC).second.getDetectorPtrBegin(); iterDet != (*iterSC).second.getDetectorPtrEnd(); ++iterDet) {
-                
+            for (auto iterDet = (*iterSC).second.getDetectorPtrBegin(); iterDet != (*iterSC).second.getDetectorPtrEnd(); ++iterDet) {                
+		//Fill Detector Channel Multiplicity
+		iMultiChan = 0;
+		(*iterDet).second.hasData(iMultiChan);
+		m_mtrxHistos[(*iterSC).first].m_map_HistosDet[(*iterDet).second.getName()].m_hMulti->Fill( iMultiChan );       
+
                 for (auto iterChan = (*iterDet).second.getChanDataBegin(); iterChan != (*iterDet).second.getChanDataEnd(); ++iterChan) { //Loop Over Detector's Channels
                     
                     //Skip Empty Channels
@@ -175,7 +181,7 @@ void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
     aSetupTiming.m_hSetupTime.fHisto_BinWidth = fVME_LSB;
     aSetupTiming.m_hSetupTime.fHisto_xLower = 0;
     aSetupTiming.m_hSetupTime.fHisto_xUpper = fVME_LSB * pow(2, iBitADC);
-    aSetupTiming.m_hSetupTime.iHisto_nBins = pow(2, iBitADC);
+    aSetupTiming.m_hSetupTime.iHisto_nBins = pow(2, iBitADC)-1;
     aSetupTiming.m_hSetupTime.strHisto_Title_X = "Time #left(ns#right)";
     aSetupTiming.m_hSetupTime.strHisto_Title_Y = "N #left(" + getString(std::ceil( fVME_LSB*1.e3) / 1.e3 ) + " ns#right)"; //Should round to thousandths place
     
@@ -201,14 +207,21 @@ void AnalyzeTiming::initHistos(Timing::DetectorMatrix detMatrix){
         HistoSC superChamberHistos;
         superChamberHistos.m_strName = (*iterSC).second.getName();
         
+	//Channel histograms
         aSetupTiming.m_hSetupTime.strHisto_Name = (*iterSC).second.getName(); //Set this superchambers name
         superChamberHistos.m_hAll = make_shared<TH1F>( getHistogram(-1, "",  aSetupTiming.m_hSetupTime) );
         superChamberHistos.m_hAND = make_shared<TH1F>( getHistogram(-1, "AND",  aSetupTiming.m_hSetupTime) );
-        superChamberHistos.m_hDelta = make_shared<TH1F>( getHistogram(-1, "AND",  aSetupTiming.m_hSetupTime) );
+        superChamberHistos.m_hDelta = make_shared<TH1F>( getHistogram(-1, "Delta",  aSetupTiming.m_hSetupTime) );
         superChamberHistos.m_hOR = make_shared<TH1F>( getHistogram(-1, "OR",  aSetupTiming.m_hSetupTime) );
         
         superChamberHistos.m_hCorr = make_shared<TH2F>( Analyzer::getHistogram2D(aSetupTiming.m_hSetupTime, aSetupTiming.m_hSetupTime) );
         
+	//Multiplicity Histograms
+	aSetupTiming.m_hSetupMulti.strHisto_Name = (*iterSC).second.getName() + "DetMulti";
+        aSetupTiming.m_hSetupMulti.fHisto_xUpper = (*iterSC).second.getNDetectors()+1;
+        aSetupTiming.m_hSetupMulti.iHisto_nBins = (*iterSC).second.getNDetectors()+1;
+        superChamberHistos.m_hMulti = make_shared<TH1F>( getHistogram(-1, "",  aSetupTiming.m_hSetupMulti) );    
+
         //Special Formatting Cases
         superChamberHistos.m_hDelta->SetXTitle("#Deltat #left(ns#right)");
         superChamberHistos.m_hCorr->SetName( ( superChamberHistos.m_strName + "DetCorr").c_str() );
@@ -326,7 +339,7 @@ void AnalyzeTiming::storeHistos(TFile * file_InputRootFile){
         (*iterSC).second.m_hDelta->Write();
         (*iterSC).second.m_hMulti->Write();
         (*iterSC).second.m_hOR->Write();
-        
+        (*iterSC).second.m_hCorr->Write();
         //cout<<"(*iterSC).second.m_hAll->GetName() = " << (*iterSC).second.m_hAll->GetName() << endl;
         //cout<<"(*iterSC).second.m_hAll->GetEntries() = " << (*iterSC).second.m_hAll->GetEntries() << endl;
         

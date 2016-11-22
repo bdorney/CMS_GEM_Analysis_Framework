@@ -10,6 +10,7 @@
 
 using std::cout;
 using std::endl;
+using std::map;
 
 using namespace QualityControl::Timing;
 
@@ -79,6 +80,101 @@ double QualityControl::Timing::getDeltaTForChannel(double dChan1, double dChan2)
         return -1;
     }
 } //End getDeltaTForChannel()
+
+//Gets the maximum value for two channels (both channels required to be nonzero)
+/*        double QualityControl::Timing::getMaxForChannelAND(std::map<std::string, double> &inputMap){
+				std::cout<<"getMaxForChannelAND() - inputMap.size() = " << inputMap.size() << std::endl;
+
+		if( !(inputMap.size() > 0) ) return -1.;
+
+            //Variable Declaration
+            std::pair<std::string, double> pair_min = *min_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+            
+		std::cout<<"getMaxForChannelAND() - inputMap.size() = " << inputMap.size() << std::endl;
+		std::cout<<"dMin = " << pair_min.second << std::endl;
+
+            //Require All Elements to be nonzero (i.e. have a signal)
+            if ( pair_min.second > 0 ) {
+                std::pair<std::string, double> pair_max = *max_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+		
+                return pair_max.second;
+            }
+            else{
+                //One or more channels off
+                return -1.;
+            }
+        } //End getMaxForChannelAND
+        
+        double QualityControl::Timing::getMaxForChannelAND(std::map<int, double> &inputMap){
+            //Variable Declaration
+            std::pair<int, double> pair_min = *min_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+            
+		std::cout<<"getMaxForChannelAND() - inputMap.size() = " << inputMap.size() << std::endl;
+		std::cout<<"dMin = " << pair_min.second << std::endl;
+
+            //Require All Elements to be nonzero (i.e. have a signal)
+            if ( pair_min.second > 0 ) {
+                std::pair<int, double> pair_max = *max_element(inputMap.begin(), inputMap.end(), Timing::compare() );
+		
+                return pair_max.second;
+            }
+            else{
+                //One or more channels off
+                return -1.;
+            }
+        } //End getMaxForChannelAND
+        
+        //Gets the minimum value for two channels
+        double QualityControl::Timing::getMinForChannelOR(std::map<std::string, double> &inputMap){
+            //Variable Declaration
+            std::map<std::string, double>::iterator iterMap = inputMap.begin();
+            std::map<std::string, double>::iterator iterMapEnd = inputMap.end();
+            
+            while( iterMap != inputMap.end() ){
+                if( 0 == (*iterMap).second){
+                    //C++11 is magic
+                    iterMap = inputMap.erase(iterMap);
+                }
+                else{
+                    ++iterMap;
+                }
+            }
+            
+            if( 0 == inputMap.size() ){
+                return -1;
+            }
+            else{
+                std::pair<std::string, double> min = *std::min_element(inputMap.begin(), inputMap.end(), Timing::compare());
+                
+                return min.second;
+            }
+        } //End getMinForChannelOR
+
+        //Gets the minimum value for two channels
+        double QualityControl::Timing::getMinForChannelOR(std::map<int, double> &inputMap){
+            //Variable Declaration
+            std::map<int, double>::iterator iterMap = inputMap.begin();
+            std::map<int, double>::iterator iterMapEnd = inputMap.end();
+            
+            while( iterMap != inputMap.end() ){
+                if( 0 == (*iterMap).second){
+                    //C++11 is magic
+                    iterMap = inputMap.erase(iterMap);
+                }
+                else{
+                    ++iterMap;
+                }
+            }
+            
+            if( 0 == inputMap.size() ){
+                return -1;
+            }
+            else{
+                std::pair<int, double> min = *std::min_element(inputMap.begin(), inputMap.end(), Timing::compare());
+                
+                return min.second;
+            }
+        }*/ //End getMinForChannelOR
 
 //printers
 //----------------------------------------------------------------------------------------

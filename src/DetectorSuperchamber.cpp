@@ -8,6 +8,8 @@
 
 #include "DetectorSuperchamber.h"
 
+using std::cout;
+using std::endl;
 using std::map;
 using std::shared_ptr;
 using std::string;
@@ -24,7 +26,7 @@ DetectorSuperchamber::DetectorSuperchamber(){
 void DetectorSuperchamber::calcAndDeltaOr(){
     map<string, double> map_detTime;
     
-    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.begin(); ++iterDet) {
+    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) {
         map_detTime[(*iterDet).second.getBaseAddress()]=(*iterDet).second.getChannelOR();
     }
     
@@ -32,7 +34,7 @@ void DetectorSuperchamber::calcAndDeltaOr(){
     m_dDetOR = getMinForChannelOR(map_detTime);
     
     m_dDetDelta = getDeltaTForChannel(m_dDetAND, m_dDetOR);
-    
+
     return;
 } //End DetectorSuperchamber::calcAndDeltaOr()
 

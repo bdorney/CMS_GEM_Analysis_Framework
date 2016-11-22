@@ -10,6 +10,7 @@
 #define ____DetectorSuperchamber__
 
 //C++ Includes
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stdio.h>

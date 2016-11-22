@@ -74,10 +74,10 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
         //cout<<"--------------\n";
         //cout<<"Min\tVal\tMax\n";
         for (auto iterTrigMatrix = map_iNTrigInLayer.begin(); iterTrigMatrix != map_iNTrigInLayer.end(); ++iterTrigMatrix) { //Loop Over map_iNTrigInLayer
-            
-            //cout<<aSetupTiming.selTime.m_iCut_NTrig_Min<<"\t";
+            //Debugging
+            //cout<<aSetupTiming.m_selTime.m_iCut_NTrig_Min<<"\t";
             //cout<< (*iterTrigMatrix).second << "\t";
-            //cout<< aSetupTiming.selTime.m_iCut_NTrig_Max << endl;
+            //cout<< aSetupTiming.m_selTime.m_iCut_NTrig_Max << endl;
             
             if (  (*iterTrigMatrix).second < aSetupTiming.m_selTime.m_iCut_NTrig_Min || (*iterTrigMatrix).second > aSetupTiming.m_selTime.m_iCut_NTrig_Max ) {   //This cuts about 10-11% of events for cut equal to 1
                 return false;
@@ -160,6 +160,8 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
     
     string strTempBaseAddr;
     string strChanName;
+
+	map<string, string> map_strKeyData2KeyBoard;
     
     for (auto iterVMEBoard = m_daqSetup.m_map_vmeBoards.begin(); iterVMEBoard != m_daqSetup.m_map_vmeBoards.end(); ++iterVMEBoard) { //Loop Over VME Boards Used in DAQ
         //Format Base Address
@@ -171,6 +173,8 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
             strChanName = ( "TDC" + strTempBaseAddr + "_Ch" + getString(iChan) );
             map_vmeEvtData[strChanName]=-1;
         }
+
+	map_strKeyData2KeyBoard[("TDC" + strTempBaseAddr)]=(*iterVMEBoard).first;
     } //End Loop Over VME Boards Used in DAQ
     
     //cout<<"map_vmeEvtData.size() = " << map_vmeEvtData.size() << endl;
@@ -193,7 +197,7 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
     EventReco evtReco;
     
     string strTempChNum;
-    
+    string strLinker;
     for (int iEvt=pair_iEvtRange.first; iEvt < pair_iEvtRange.second; ++iEvt) {
         //Get this event's data
         tree_eventsDigi->GetEntry(iEvt);
@@ -212,6 +216,9 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
             strTempChNum = strTempBaseAddr.substr(strTempBaseAddr.find("_"), std::string::npos);
             strTempBaseAddr.erase(strTempBaseAddr.find("_"), std::string::npos);
             
+	    //Get the base address without "_ChX"
+	    strLinker = "TDC" + strTempBaseAddr;
+
             //Debugging
             //cout<<"strTempBaseAddr = " << strTempBaseAddr << endl;
             
@@ -233,12 +240,16 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
                 
                 if (evtDigi.m_map_TDCData.count(strTempBaseAddr) > 0 ) { //Case: Board Exists, add to it!
                     if (m_bInvertTime) { //Case: Time in Wall Clock Format
-                        evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[(*iterVMEBoard).first].getInvertedTime( (*iterVMEBoard).second );
+                        evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].getInvertedTime( (*iterVMEBoard).second );
                     } //End Case: Time in Wall Clock Format
                     else{ //Case: Time in Common Stop Format
                         evtDigi.m_map_TDCData[strTempBaseAddr].m_map_fTime[iChan] = (*iterVMEBoard).second;
                     } //End Case: Time in Common Stop Format
                     
+			//Debugging
+			//cout<<"m_daqSetup.m_map_vmeBoards["<<map_strKeyData2KeyBoard[strLinker].c_str()<<"].m_strBaseAddress = " << m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].m_strBaseAddress<<endl;
+			//cout<<"m_daqSetup.m_map_vmeBoards["<<map_strKeyData2KeyBoard[strLinker].c_str()<<"].m_vme_type = " << m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].m_vme_type<<endl;
+
                     //Debugging
                     //cout<<evtDigi.m_map_TDCData[strTempBaseAddr].m_uiEvtCount<<"\t";
                     //cout<<evtDigi.m_map_TDCData[strTempBaseAddr].m_strBaseAddress<<"\t";
@@ -251,12 +262,16 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
                     digi.m_strBaseAddress = strTempBaseAddr;
                     
                     if (m_bInvertTime) { //Case: Time in Wall Clock Format
-                        digi.m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[(*iterVMEBoard).first].getInvertedTime( (*iterVMEBoard).second );
+                        digi.m_map_fTime[iChan] = m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].getInvertedTime( (*iterVMEBoard).second );
                     } //End Case: Time in Wall Clock Format
                     else{ //Case: Time in Common Stop Format
                         digi.m_map_fTime[iChan] = (*iterVMEBoard).second;
                     } //End Case: Time in Common Stop Format
                     
+			//Debugging
+			//cout<<"m_daqSetup.m_map_vmeBoards["<<map_strKeyData2KeyBoard[strLinker].c_str()<<"].m_strBaseAddress = " << m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].m_strBaseAddress<<endl;
+			//cout<<"m_daqSetup.m_map_vmeBoards["<<map_strKeyData2KeyBoard[strLinker].c_str()<<"].m_vme_type = " << m_daqSetup.m_map_vmeBoards[map_strKeyData2KeyBoard[strLinker]].m_vme_type<<endl;
+			
                     //Debugging
                     //cout<<digi.m_uiEvtCount<<"\t";
                     //cout<<digi.m_strBaseAddress<<"\t";
