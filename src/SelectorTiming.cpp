@@ -48,7 +48,7 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
     //map<int, double> map_dTrigTimeOfLayer;
     
     //Require at least one DUT
-    if( !(inputEvt.m_detMatrix_DUTs.m_map_detectors.size() > 0 ) ) return false;
+    if( !(inputEvt.m_detMatrix_DUTs.m_map_detectors.size() >= aSetupTiming.selTime.m_iCut_NDUT ) ) return false;
     
     //Check to see how many Trigger Detectors are on in each row (i)
     for (auto iterTrigMatrix = inputEvt.m_detMatrix_Trigger.begin(); iterTrigMatrix != inputEvt.m_detMatrix_Trigger.end(); ++iterTrigMatrix) { //Loop Through Trigger Matrix
@@ -70,7 +70,7 @@ bool SelectorTiming::eventPassesSelection(Timing::EventReco &inputEvt){
     else{ //Case: At least two trigger detectors
         for (auto iterTrigMatrix = map_iNTrigInLayer.begin(); iterTrigMatrix != map_iNTrigInLayer.end(); ++iterTrigMatrix) { //Loop Over map_iNTrigInLayer
             
-            if ( (*iterTrigMatrix).second != 1) {
+            if (  (*iterTrigMatrix).second < aSetupTiming.selTime.m_iCut_NTrig_Min || (*iterTrigMatrix).second > aSetupTiming.selTime.m_iCut_NTrig_Max ) {   //This cuts about 10-11% of events for cut equal to 1
                 return false;
             }
         } //End Loop Over map_iNTrigInLayer
@@ -156,7 +156,7 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
         strTempBaseAddr.erase(6,4); //Remove trailing 0's
         strTempBaseAddr.erase(0,2); //Remove "0x"
         
-        for (int iChan=0; iChan<32; ++iChan) {
+        for (int iChan=0; iChan<(*iterVMEBoard).second.m_iNumChan; ++iChan) {
             strChanName = ( "TDC" + strTempBaseAddr + "_Ch" + getString(iChan) );
             map_vmeEvtData[strChanName]=-1;
         }
@@ -174,7 +174,7 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
     //------------------------------------------------------
     pair<int,int> pair_iEvtRange;
     
-    pair_iEvtRange = getEventRange( aSetup.iEvt_First, aSetup.iEvt_Total, tree_eventsDigi->GetEntries() );
+    pair_iEvtRange = getEventRange( aSetupTiming.iEvt_First, aSetupTiming.iEvt_Total, tree_eventsDigi->GetEntries() );
     
     //Get data event-by-event
     //------------------------------------------------------
@@ -189,7 +189,7 @@ std::vector<EventReco> SelectorTiming::getEventsReco(TFile * file_InputRootFile,
         tree_eventsDigi->GetEntry(iEvt);
         
         //Output to the user some message that we are still running
-        if (iEvt % 1000 == 0) cout<<"Event Selection; " <<iEvt<<" Events Analyzed\n";
+        if (iEvt % 1000 == 0) cout<<"Event Selection; " <<iEvt<<" Events Processed\n";
         //cout<<"--------------------New Event--------------------\n";
         
         //---------------Load Digi Level Event---------------

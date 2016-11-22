@@ -110,7 +110,7 @@ namespace QualityControl {
 
             //Attributes - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            Timing::RunSetup m_daqSetup;
+            //Timing::RunSetup m_daqSetup;
         };
     } //End namespace Timing
 } //End namespace QualityControl

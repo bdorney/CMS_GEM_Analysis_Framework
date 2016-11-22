@@ -124,6 +124,7 @@ void TestStandVME::setDetector(int iRow, int iCol, Timing::DetectorTiming inputD
         //shared_ptr<DetectorSuperchamber> detectorSC(new DetectorSuperchamber);
         DetectorSuperchamber detectorSC;
         
+        detectorSC.setName( "Superchamber" + getString(iRow) + getString(iCol) );
         detectorSC.setType(detType);
         detectorSC.setDetector(0, inputDet);
         

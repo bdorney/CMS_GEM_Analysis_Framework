@@ -58,6 +58,14 @@ namespace QualityControl {
                 return m_map_DetChanData[iDetChan];
             };
             
+            virtual std::map<int, double>::iterator getChanDataBegin(){
+                return m_map_DetChanData.begin();
+            };
+            
+            virtual std::map<int, double>::iterator getChanDataEnd(){
+                return m_map_DetChanData.end();
+            };
+            
             //Get const iterators for the detector's channel map
             //pair::first is m_map_VMEChan2DetChan.cbegin()
             //pair::second is m_map_VMEChan2DetChan.cend()
@@ -74,8 +82,14 @@ namespace QualityControl {
             };
             
             virtual bool hasData(){
-                return bHasData;
+                return m_bHasData;
             };
+            
+            virtual bool hasData(int & iNumNonZeroChan){
+                iNumNonZeroChan = m_iNumNonZeroChan;
+                return m_bHasData;
+            };
+            
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -114,7 +128,9 @@ namespace QualityControl {
         protected:
             //Attributes - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            bool bHasData;
+            bool m_bHasData;
+            
+            int m_iNumNonZeroChan;
             
             std::string m_strName;  //Name of the detector
             

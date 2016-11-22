@@ -47,6 +47,21 @@ bool DetectorSuperchamber::hasData(){
     return bRetVal;
 } //End DetectorSuperchamber::hasData()
 
+bool DetectorSuperchamber::hasData(int & iNumNonZeroDet){
+    bool bRetVal = false;
+    
+    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) {
+        //bRetVal = ( bRetVal || (*iterDet).second->hasData() );
+        bRetVal = ( bRetVal || (*iterDet).second.hasData() );
+        
+        if (bRetVal) {
+            iNumNonZeroDet++;
+        }
+    }
+    
+    return bRetVal;
+} //End DetectorSuperchamber::hasData()
+
 //void DetectorSuperchamber::setDetector(int iDetPos, shared_ptr<DetectorTiming> inputDetector){
 //void DetectorSuperchamber::setDetector(int iDetPos, DetectorTiming & inputDetector){
 void DetectorSuperchamber::setDetector(int iDetPos, DetectorTiming inputDetector){

@@ -106,6 +106,7 @@ namespace QualityControl{
             };
             
             virtual bool hasData();
+            virtual bool hasData(int & iNumNonZeroDet);
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
@@ -160,16 +161,16 @@ namespace QualityControl{
                 clear();
             }
             
-            void clear(){
-                m_map_detectors.clear();
-            }
-            
             /*std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator begin(){
              return m_map_detectors.begin();
              }*/
             
             std::map<std::pair<int,int>, Timing::DetectorSuperchamber>::iterator begin(){
                 return m_map_detectors.begin();
+            }
+            
+            void clear(){
+                m_map_detectors.clear();
             }
             
             /*std::map<std::pair<int,int>, std::shared_ptr<Timing::DetectorSuperchamber> >::iterator end(){

@@ -32,8 +32,11 @@ namespace QualityControl {
         };
         
         struct HwVMEBoard{
-            int m_iNumLink;     //Bridge - Link number (if relevant)
+            int m_iBitADC;      //X-bit ADC if present
+            
             int m_iNumBoard;    //Bridge - Board number (if relevant)
+            int m_iNumChan;     //Number of channels (if relevant)
+            int m_iNumLink;     //Bridge - Link number (if relevant)
             
             Timing::VMETypes m_vme_type;        //All - Type of Board
             
@@ -42,6 +45,9 @@ namespace QualityControl {
             
             //Default Constructor
             HwVMEBoard(){
+                m_iBitADC = 12;
+                
+                m_iNumChan = 32;
                 m_iNumLink = m_iNumBoard = 0;
                 
                 m_vme_type = kVMEUnrecognized;
@@ -52,14 +58,25 @@ namespace QualityControl {
             
             //Copy Constructor
             HwVMEBoard(const HwVMEBoard & other){
-                m_iNumLink  = other.m_iNumLink;
+                m_iBitADC   = other.m_iBitADC;
+                
+                m_iNumChan  = other.m_iNumChan;
                 m_iNumBoard = other.m_iNumBoard;
+                m_iNumLink  = other.m_iNumLink;
                 
                 m_vme_type  = other.m_vme_type;
                 
                 m_strBaseAddress = other.m_strBaseAddress;
                 m_strFullScaleRange = other.m_strFullScaleRange;
             }; //End Copy Constructor
+            
+            //Get Least Sensitive Bit
+            float getLSB(){
+                switch(m_vme_type){
+                    case Timing::kVMETDC:   return 8.9 / std::stoi(m_strFullScaleRange, NULL, 16);
+                    default:        return -1.;
+                }
+            }
             
             //Destructor
             /*~HwVMEBoard(){

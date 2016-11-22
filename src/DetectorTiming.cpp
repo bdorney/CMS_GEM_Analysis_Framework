@@ -20,7 +20,8 @@ using namespace QualityControl::Timing;
 
 //Default Constructor
 DetectorTiming::DetectorTiming(){
-    bHasData = false;
+    m_bHasData = false;
+    m_iNumNonZeroChan = 0;
     m_strName = "";
     m_strBaseAddress = "";
 } //End Default Constructor
@@ -41,7 +42,8 @@ void DetectorTiming::setChanData(int iVMEChan, double dData){
             //Debugging
             //cout<<m_strName<<" iVMEChan = " << iVMEChan << " iDetChan = " << m_map_VMEChan2DetChan[iVMEChan] << " data = " << dData << endl;
             
-            bHasData = true;
+            m_bHasData = true;
+            m_iNumNonZeroChan++;
         }
         
         //cout<<"DetectorTiming::setChanData() - bHasData = " << bHasData << endl;
@@ -55,16 +57,20 @@ void DetectorTiming::setChanData(int iVMEChan, double dData){
 
 //Wipe all stored objects
 void DetectorTiming::reset(){
-    bHasData = false;
+    m_bHasData = false;
+    
+    m_iNumNonZeroChan = 0;
     
     m_strName.clear();
     m_strBaseAddress.clear();
+    
     m_map_VMEChan2DetChan.clear();
     m_map_DetChanData.clear();
 } //End DetectorTiming::reset()
 
 //Reset Channel Data
 void DetectorTiming::resetChannels(){
-    bHasData = false;
+    m_bHasData = false;
+    m_iNumNonZeroChan = 0;
     m_map_DetChanData.clear();
 }

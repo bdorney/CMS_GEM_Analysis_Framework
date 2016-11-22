@@ -20,6 +20,7 @@
 #include "DetectorSuperchamber.h"
 #include "TimingEvent.h"
 #include "TimingUtilityTypes.h"
+#include "TimingUtilityFunctions.h"
 
 //ROOT Includes
 
