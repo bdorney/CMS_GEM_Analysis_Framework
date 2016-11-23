@@ -169,7 +169,7 @@ void AnalyzeTiming::fitHistos(){
                 if ( (*iterChan).second == nullptr ) continue;
                 
                 //Check if the histogram has entries, skip it if it doesn't
-                if ( (*iterChan).second->GetEntries() > 0) continue;
+                if ( !( (*iterChan).second->GetEntries() > 0) ) continue;
                 
                 //Find peak & store it's position
                 specTime.Search( (*iterChan).second.get(), 2, "nobackground", 0.5 );

@@ -280,17 +280,29 @@ namespace QualityControl {
             
             //Copy Constructor
             AnalysisSetupTiming(const AnalysisSetupTiming & other){
-                m_iEvt_First  = other.m_iEvt_First;
-                m_iEvt_Total  = other.m_iEvt_Total;
-                m_selTime     = other.m_selTime;
+                m_iEvt_First  		= other.m_iEvt_First;
+                m_iEvt_Total  		= other.m_iEvt_Total;
+
+		m_hSetupTime		= other.m_hSetupTime;
+            	m_hSetupMulti		= other.m_hSetupMulti;
+            
+            	m_fitSetup_timeRes	= other.m_fitSetup_timeRes;
+
+                m_selTime     		= other.m_selTime;
             } //End Copy Constructor
             
             //Assignment Operator
             AnalysisSetupTiming & operator=(const AnalysisSetupTiming & other){
                 if (this != &other){ //Protects against invalid self-assignment
-                    m_iEvt_First  = other.m_iEvt_First;
-                    m_iEvt_Total  = other.m_iEvt_Total;
-                    m_selTime     = other.m_selTime;
+                    m_iEvt_First  		= other.m_iEvt_First;
+                    m_iEvt_Total  		= other.m_iEvt_Total;
+
+	 	    m_hSetupTime		= other.m_hSetupTime;
+            	    m_hSetupMulti		= other.m_hSetupMulti;
+            
+            	    m_fitSetup_timeRes		= other.m_fitSetup_timeRes;
+
+                    m_selTime     		= other.m_selTime;
                 } //Protects against invalid self-assignment
                 
                 return *this;

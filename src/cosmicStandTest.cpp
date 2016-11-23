@@ -316,7 +316,7 @@ int main(){
     
     //Setup Fits - Formula & Option
     aSetupTiming.m_fitSetup_timeRes.m_strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
-    aSetupTiming.m_fitSetup_timeRes.m_strFit_Option = "S";
+    aSetupTiming.m_fitSetup_timeRes.m_strFit_Option = "QMS";
     
     //Setup Fits - Meaning
     aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamMeaning.push_back("AMPLITUDE");
