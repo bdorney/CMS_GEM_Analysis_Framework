@@ -26,15 +26,34 @@ DetectorSuperchamber::DetectorSuperchamber(){
 void DetectorSuperchamber::calcAndDeltaOr(){
     map<string, double> map_detTime;
     
-    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) {
-        map_detTime[(*iterDet).second.getBaseAddress()]=(*iterDet).second.getChannelOR();
-    }
+    for (auto iterDet = m_map_detectors.begin(); iterDet != m_map_detectors.end(); ++iterDet) { //Loop Over Detectors
+        //Debugging
+        //(*iterDet).second.printChannelData();
+        
+        if ((*iterDet).second.getChannelOR() > 0) {
+            map_detTime[(*iterDet).second.getName()]=(*iterDet).second.getChannelOR();
+        }
+        
+        //cout<<"Detector Channel OR = ";
+        //cout<<map_detTime[(*iterDet).second.getBaseAddress()] << endl;
+    } //End Loop Over Detectors
+    
+    //Debugging
+    /*cout<<"Stored Superchamber Information\n";
+    for (auto iterDet = map_detTime.begin(); iterDet != map_detTime.end(); ++iterDet) {
+        cout<<(*iterDet).first<<"\t"<<(*iterDet).second<<endl;
+    }*/
     
     m_dDetAND = getMaxForChannelAND(map_detTime);
     m_dDetOR = getMinForChannelOR(map_detTime);
     
     m_dDetDelta = getDeltaTForChannel(m_dDetAND, m_dDetOR);
 
+    //Debugging
+    //cout<<"Superchamber Details\n";
+    //cout<<"AND\tDELTA\tOR\n";
+    //cout<<m_dDetAND<<"\t"<<m_dDetDelta<<"\t"<<m_dDetOR<<endl;
+    
     return;
 } //End DetectorSuperchamber::calcAndDeltaOr()
 

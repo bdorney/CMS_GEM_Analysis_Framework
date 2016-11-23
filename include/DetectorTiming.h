@@ -67,9 +67,9 @@ namespace QualityControl {
                 return m_map_DetChanData.end();
             };
             
-            //Returns the first time
+            //Returns the fastest channel time
             virtual double getChannelOR(){
-                return getMinForChannelOR(m_map_DetChanData);
+                return (m_bHasData) ? getMinForChannelOR(m_map_DetChanData) : -1.;
             };
             
             //Get const iterators for the detector's channel map
@@ -99,6 +99,7 @@ namespace QualityControl {
             
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
+            virtual void printChannelData();
             
             //Setters - Methods that Set Something
             //------------------------------------------------------------------------------------------------------------------------------------------

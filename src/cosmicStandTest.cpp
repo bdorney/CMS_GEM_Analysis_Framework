@@ -314,16 +314,45 @@ int main(){
         }
     }*/
     
-    //Analyze Selected Events
+    //Setup Fits - Formula & Option
+    aSetupTiming.m_fitSetup_timeRes.m_strFit_Formula = "[0]*[2]*sqrt(TMath::Pi()/2.)*(TMath::Erf( (12.5 + (x-[1])) / ([2] * sqrt(2.) ) ) - TMath::Erf( ((x-[1]) - 12.5) / ([2] * sqrt(2.) ) ) )";
+    aSetupTiming.m_fitSetup_timeRes.m_strFit_Option = "S";
+    
+    //Setup Fits - Meaning
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamMeaning.push_back("AMPLITUDE");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamMeaning.push_back("MEAN");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamMeaning.push_back("SIGMA");
+    
+    //Setup Fits - Initial Guess
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamIGuess.push_back("AMPLITUDE");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamIGuess.push_back("PEAK");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamIGuess.push_back("10");
+    
+    //Setup Fits - Lower Limit
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Min.push_back("0");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Min.push_back("0.8*PEAK");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Min.push_back("5");
+    
+    //Setup Fits - Upper Limit
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Max.push_back("100*AMPLITUDE");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Max.push_back("1.2*PEAK");
+    aSetupTiming.m_fitSetup_timeRes.m_vec_strFit_ParamLimit_Max.push_back("20");
+    
+    //Analyze Selected Events & Fit Output Distributions
     string strFileOutput = "TimingOutput.root";
     string strFileOption = "RECREATE";
     
     AnalyzeTiming anaTiming;
+    anaTiming.setAnalysisParameters(aSetupTiming);
     anaTiming.setRunParameters(daqSetup);
     anaTiming.initHistos( cosmicStand.getMatrix() );
-    //anaTiming.initHistos( cosmicStand );
     anaTiming.fillHistos( vec_recoEvts );
     anaTiming.storeHistos(strFileOutput,strFileOption);
+
+    anaTiming.fitHistos();
+    anaTiming.storeFits(strFileOutput,strFileOption);
+    
+    cout<<"Success!\n";
     
     return 1;
 } //End main()

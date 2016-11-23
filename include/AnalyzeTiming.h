@@ -28,9 +28,16 @@
 #include "UniformityUtilityFunctions.h"
 
 //ROOT Includes
+#include "TDirectory.h"
 #include "TH1F.h"
+#include "TF1.h"
+//#include "TList.h" ?
 #include "TFile.h"
+#include "TFitResult.h"
+#include "TFitResultPtr.h"
 #include "TROOT.h"
+#include "TSpectrum.h"
+#include "TVirtualFitter.h"
 
 namespace QualityControl {
     namespace Timing {
@@ -67,6 +74,14 @@ namespace QualityControl {
             //Loading*****************
 
             //Storing*****************
+            //Stores booked fits (for those fits that are non-null)
+            //Takes a std::string which stores the physical filename as input
+            void storeFits(std::string & strOutputROOTFileName, std::string strOption);
+            
+            //Stores booked fits (for those histograms that are non-null)
+            //Takes a TFile * which the fits are written to as input
+            void storeFits(TFile * file_InputRootFile);
+            
             //Stores booked histograms (for those histograms that are non-null)
             //Takes a std::string which stores the physical filename as input
             void storeHistos(std::string & strOutputROOTFileName, std::string strOption);

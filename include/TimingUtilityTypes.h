@@ -89,7 +89,8 @@ namespace QualityControl {
             std::shared_ptr<TH1F> m_hAll; //All hits for this detector
             std::shared_ptr<TH1F> m_hMulti; //Channel Multiplicity for this detector
             
-            std::map<int, std::shared_ptr<TH1F> > m_map_hChan; //hits for each channel
+            std::map<int, std::shared_ptr<TH1F> > m_map_hChan;  //hits for each channel
+            std::map<int, std::shared_ptr<TF1> > m_map_fitChan; //fits for each channel
             
             //Default Constructor
             HistoDet(){
@@ -105,6 +106,9 @@ namespace QualityControl {
                 for(auto iterHisto = other.m_map_hChan.begin(); iterHisto != other.m_map_hChan.end(); ++iterHisto){ //Loop Over Histograms
                     m_map_hChan[(*iterHisto).first] = std::make_shared<TH1F>( *(*iterHisto).second.get() );
                 } //End Loop Over Histograms
+                for(auto iterFit = other.m_map_fitChan.begin(); iterFit != other.m_map_fitChan.end(); ++iterFit){ //Loop Over Fits
+                    m_map_fitChan[(*iterFit).first] = std::make_shared<TF1>( *(*iterFit).second.get() );
+                } //End Loop Over Fits
             } //End Copy Constructor
             
             //Assignment operator
@@ -116,6 +120,9 @@ namespace QualityControl {
                     for(auto iterHisto = other.m_map_hChan.begin(); iterHisto != other.m_map_hChan.end(); ++iterHisto){ //Loop Over Histograms
                         m_map_hChan[(*iterHisto).first] = std::make_shared<TH1F>( *(*iterHisto).second.get() );
                     } //End Loop Over Histograms
+                    for(auto iterFit = other.m_map_fitChan.begin(); iterFit != other.m_map_fitChan.end(); ++iterFit){ //Loop Over Fits
+                        m_map_fitChan[(*iterFit).first] = std::make_shared<TF1>( *(*iterFit).second.get() );
+                    } //End Loop Over Fits
                 } //Protects against invalid self-assignment
                 
                 return *this;

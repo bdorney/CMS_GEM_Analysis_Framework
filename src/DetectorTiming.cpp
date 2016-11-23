@@ -33,6 +33,19 @@ pair<imap_iter_t, imap_iter_t> DetectorTiming::getChannelMapVME2Det(){
     return make_pair(m_map_VMEChan2DetChan.cbegin(), m_map_VMEChan2DetChan.cend() );
 } //End DetectorTiming::getChannelMapVME2Det()
 
+void DetectorTiming::printChannelData(){
+    
+    cout<<"Channel Data for: " <<m_strName<<endl;
+    cout<<"Ch\tVal\n";
+    cout<<"---------------\n";
+    for (auto iterChan = m_map_DetChanData.begin(); iterChan != m_map_DetChanData.end(); ++iterChan) {
+        cout<<(*iterChan).first<<"\t"<<(*iterChan).second<<endl;
+    } //End Loop Over Channels
+    cout<<"---------------\n";
+    
+    return;
+} //End DetectorTiming::printChannelData()
+
 void DetectorTiming::setChanData(int iVMEChan, double dData){
     
     if (m_map_VMEChan2DetChan.count(iVMEChan) > 0 ) { //Case: Mapping for this VME Channel exists in detector
