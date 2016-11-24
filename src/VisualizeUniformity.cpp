@@ -192,7 +192,7 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, 
     return;
 } //End VisualizeUniformity::makeAndStoreCanvasHisto2D()
 
-void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShiftMean){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -211,7 +211,7 @@ void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, s
     } //End Check if File Failed to Open Correctly
     
     //Call the method below
-    storeCanvasData(ptr_fileOutput, strObsName, strDrawOption);
+    storeCanvasData(ptr_fileOutput, strObsName, strDrawOption, bShiftMean);
     
     //Close the File
     //------------------------------------------------------
@@ -222,7 +222,7 @@ void VisualizeUniformity::storeCanvasData(std::string & strOutputROOTFileName, s
 
 //Draws the distribution of an observable onto a single pad of canvas
 //Takes a TFile * which the histograms are written to as input
-void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShiftMean){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -271,12 +271,50 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //------------------------------------------------------
     statObs = getObsData(strObsName);
     
-    //Draw hObs
+    //Make Shifted Distribution
+    //------------------------------------------------------
+    int iNbinsX = statObs.hDist->GetNbinsX();
+    shared_ptr<TGraphErrors> gDistShifted = std::make_shared<TGraphErrors>( TGraphErrors( iNbinsX+2) );
+    for (int i=1; i<=iNbinsX; ++i) {
+        //Print to user
+        //cout<<"\t\t";
+        //cout<<hSummaryDist->GetBinCenter(i)- hDataset->GetMean()<<",";
+        //cout<<hSummaryDist->GetBinWidth(i)*0.5<<",";
+        //cout<<hSummaryDist->GetBinContent(i)<<",";
+        //cout<<hSummaryDist->GetBinError(i)*0.5<<endl;
+        
+        //Set values
+        gDistShifted->SetPoint( i-1, statObs.hDist->GetBinCenter(i) - statObs.hDist->GetMean(), statObs.hDist->GetBinContent(i) );
+        gDistShifted->SetPointError( i-1, 0., statObs.hDist->GetBinError(i) );
+    } //End Loop Over bins of hSummaryDist
+    
+    //Add two fake points so we can change the x-axis at will
+    gDistShifted->SetPoint(iNbinsX, -2000, 0);
+    gDistShifted->SetPoint(iNbinsX+1, 2000, 0);
+    
+    //Make Shifted Fit
+    //------------------------------------------------------
+    string strShifted = "Shifted";
+    //shared_ptr<TF1> fitDistShifted = make_shared<TF1>( statObs.fitDist->Clone( (statObs.fitDist->GetName() + strShifted).c_str() ) );
+    TF1 * fitDistShifted = (TF1*) statObs.fitDist->Clone( (statObs.fitDist->GetName() + strShifted).c_str() );
+
+    float fXmax= statObs.fitDist->GetXmax();
+    float fXmin= statObs.fitDist->GetXmin();
+    fitDistShifted->SetRange(fXmin - statObs.hDist->GetMean(), fXmax - statObs.hDist->GetMean() );
+    fitDistShifted->SetParameter(1, statObs.fitDist->GetParameter(1) - statObs.hDist->GetMean() );
+    
+    //Draw Observable
     //------------------------------------------------------
     canv_DetSum.cd();
-    statObs.hDist->Draw( strDrawOption.c_str() );
-    statObs.fitDist->Draw("same");
-
+    if (bShiftMean) {
+        gDistShifted->Draw( (strDrawOption + "AP").c_str() );
+        fitDistShifted->Draw("same");
+    }
+    else{
+        statObs.hDist->Draw( strDrawOption.c_str() );
+        statObs.fitDist->Draw("same");
+    }
+    
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
     fMu		= statObs.fitDist->GetParameter(1);
@@ -313,8 +351,14 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     dir_Summary->cd();
     canv_DetSum.Write();
     if (m_bSaveCanvases) { save2png(canv_DetSum); }
-    statObs.hDist->Write();
-    statObs.fitDist->Write();
+    if (bShiftMean) {
+        gDistShifted->Write();
+        fitDistShifted->Write();
+    }
+    else{
+        statObs.hDist->Write();
+        statObs.fitDist->Write();
+    }
     
     //Do not close file_InputRootFile it is used elsewhere
     
