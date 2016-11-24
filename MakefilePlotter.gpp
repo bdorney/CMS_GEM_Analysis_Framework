@@ -26,6 +26,7 @@ SOURCES =   src/ParameterLoader.cpp \
             src/CMS_lumi.cpp \
             src/PlotterGeneric.cpp \
             src/PlotterGraph.cpp \
+            src/PlotterGraphErrors.cpp \
             src/PlotterGraph2D.cpp \
             src/PlotterHisto.cpp \
             src/PlotterHisto2D.cpp \

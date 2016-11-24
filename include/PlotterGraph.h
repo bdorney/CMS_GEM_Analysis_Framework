@@ -23,7 +23,7 @@
 
 //ROOT Includes
 #include "TFile.h"
-#include "TGraphErrors.h"
+#include "TGraph.h"
 #include "TLegend.h"
 #include "TMultiGraph.h"
 #include "TROOT.h"
@@ -87,8 +87,7 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
-            std::multimap<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            std::multimap<std::string, std::shared_ptr<TGraph> > m_map_graphs;
             
             std::shared_ptr<TMultiGraph> m_mgraph_Obs;
         };

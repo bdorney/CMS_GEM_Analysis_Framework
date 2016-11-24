@@ -6,10 +6,14 @@
 *                                                *
 **************************************************
 
+Update: November 24th 2016
+==================================================
+->Renamed class QualityControl::Plotter::PlotterGraph to QualityControl::Plotter::PlotterGraphErrors
+->Added new class QualityControl::Plotter::PlotterGraph for handling TGraph objects
+
 Update: October 20th 2016
 ==================================================
 ->Added new helper script for making all plots from all plot config files in a given directory: scripts/makeAllPlots.sh
--> 
 
 Update: October 18th 2016
 ==================================================

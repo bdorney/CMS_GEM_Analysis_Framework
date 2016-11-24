@@ -39,8 +39,8 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     }
     
     //Get this plot
-	pair<multimap<string,shared_ptr<TGraphErrors> >::iterator, multimap<string,shared_ptr<TGraphErrors> >::iterator> pair_iterThisPlotName = m_map_graphs.equal_range(plotInfo.m_strName);
-	multimap<string,shared_ptr<TGraphErrors> >::iterator iterThisPlot = pair_iterThisPlotName.first;
+	pair<multimap<string,shared_ptr<TGraph> >::iterator, multimap<string,shared_ptr<TGraph> >::iterator> pair_iterThisPlotName = m_map_graphs.equal_range(plotInfo.m_strName);
+	multimap<string,shared_ptr<TGraph> >::iterator iterThisPlot = pair_iterThisPlotName.first;
 	std::advance(iterThisPlot, (m_map_iSameNameCount[plotInfo.m_strName] - 1 ) );
 	auto graphPtr = ( (*iterThisPlot).second );
 
@@ -109,7 +109,7 @@ void PlotterGraph::drawPlots(){
 void PlotterGraph::initPlot(InfoPlot & plotInfo){
     if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
         //Intialize
-        shared_ptr<TGraphErrors> graphPtr(new TGraphErrors(plotInfo.m_vec_DataPts.size() ) );
+        shared_ptr<TGraph> graphPtr(new TGraph(plotInfo.m_vec_DataPts.size() ) );
         
         //Set the TName
         graphPtr->SetName( plotInfo.m_strName.c_str() );
@@ -121,11 +121,10 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
             iPos = std::distance(plotInfo.m_vec_DataPts.begin(), iterDataPt);
             
             graphPtr->SetPoint(iPos, (*iterDataPt).m_fX,  (*iterDataPt).m_fY );
-            graphPtr->SetPointError(iPos, (*iterDataPt).m_fX_Err, (*iterDataPt).m_fY_Err );
         } //End Loop Over Data
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
 	(m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     } //End Case: Data Input
     else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
@@ -140,12 +139,11 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
             strTmpName = plotInfo.m_strFilePath + "/" + strTmpName;
         }
         
-        //TGraphErrors graph
-        //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
-        shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( strTmpName.c_str() ) ) );
+        //TGraph graph
+        shared_ptr<TGraph> graphPtr = make_shared<TGraph>( *((TGraph*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
         (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
 
         file_Input->Close();
