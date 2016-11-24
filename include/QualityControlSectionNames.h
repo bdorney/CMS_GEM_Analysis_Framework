@@ -129,6 +129,7 @@ namespace QualityControl {
         }; //End ColNamesPlotter
         
         struct PlotTypesPlotter{
+            std::string m_strGraph;
             std::string m_strGraphErrors;
             std::string m_strGraph2D;
             std::string m_strHisto;
@@ -136,6 +137,7 @@ namespace QualityControl {
             
             //Constructor
             PlotTypesPlotter(){
+                m_strGraphErrors = "TGRAPH";
                 m_strGraphErrors = "TGRAPHERRORS";
                 m_strGraph2D = "TGRAPH2D";
                 m_strHisto = "TH1F";

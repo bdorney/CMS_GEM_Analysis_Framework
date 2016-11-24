@@ -77,11 +77,11 @@ namespace QualityControl {
             
             //Draws the distribution of an observable onto a single pad of canvas
             //Takes a std::string which stores the physical filename as input
-            virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+            virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShiftMean);
             
             //Draws the distribution of an observable onto a single pad of canvas
             //Takes a TFile *, which the canvas is written to, as input
-            virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+            virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShiftMean);
             
             //Draws a canvas with the slice histo & fit for all slices
             //Also makes a summary distribution showing the % of good fits per ReadoutSectorPhi

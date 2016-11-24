@@ -423,9 +423,10 @@ void InterfaceAnalysis::storeResults(TFile * file_Results, string strFileName){
                 map_res_ObsAndDrawOpt["ResponseFitPkPos"]="APE1";
                 map_res_ObsAndDrawOpt["ResponseFitPkRes"]="APE1";
                 
-                visualizeUni.storeCanvasData(file_Results, "ResponseFitChi2", "E1");
-                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1");
-                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1");
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitChi2", "E1",false);
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1",false);
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkPos", "E1",true);
+                visualizeUni.storeCanvasData(file_Results, "ResponseFitPkRes", "E1",false);
                 visualizeUni.storeCanvasFits(file_Results, "COLZTEXT");
                 
                 visualizeUni.storeListOfCanvasesGraph(file_Results,map_res_ObsAndDrawOpt, rSetup.bVisPlots_PhiLines);

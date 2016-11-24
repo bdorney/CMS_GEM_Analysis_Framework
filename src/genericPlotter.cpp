@@ -17,6 +17,7 @@
 #include "ParameterLoaderPlotter.h"
 #include "PlotterGraph.h"
 #include "PlotterGraph2D.h"
+#include "PlotterGraphErrors.h"
 #include "PlotterHisto.h"
 #include "PlotterHisto2D.h"
 #include "PlotterUtilityTypes.h"
@@ -214,7 +215,7 @@ int main( int argc_, char * argv_[] ){
     //Determine the Plot Type, Setup the Plotter, and Plot
     //------------------------------------------------------
     PlotTypesPlotter typePlot;
-    if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraphErrors ) ) {
+    if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraph ) ) {
         PlotterGraph graphPlotter;
         graphPlotter.setCanvasParameters(canvSetup);
         graphPlotter.setLogoPos(canvSetup.m_iLogoPos);
@@ -229,6 +230,14 @@ int main( int argc_, char * argv_[] ){
         graphPlotter2D.setPreliminary(canvSetup.m_bIsPrelim);
         graphPlotter2D.setOutputNameNOption("plotterOutput.root","RECREATE");
         graphPlotter2D.plotAndStore();
+    }
+    if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraphErrors ) ) {
+        PlotterGraphErrors graphPlotterErr;
+        graphPlotterErr.setCanvasParameters(canvSetup);
+        graphPlotterErr.setLogoPos(canvSetup.m_iLogoPos);
+        graphPlotterErr.setPreliminary(canvSetup.m_bIsPrelim);
+        graphPlotterErr.setOutputNameNOption("plotterOutput.root","RECREATE");
+        graphPlotterErr.plotAndStore();
     }
     else if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strHisto ) ) {
         PlotterHisto histoPlotter;

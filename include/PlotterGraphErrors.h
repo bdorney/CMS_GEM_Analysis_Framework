@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef ____PlotterGraph__
-#define ____PlotterGraph__
+#ifndef ____PlotterGraphErrors__
+#define ____PlotterGraphErrors__
 
 //C++ Includes
 #include <iterator>
@@ -23,23 +23,23 @@
 
 //ROOT Includes
 #include "TFile.h"
-#include "TGraph.h"
+#include "TGraphErrors.h"
 #include "TLegend.h"
 #include "TMultiGraph.h"
 #include "TROOT.h"
 
 namespace QualityControl {
     namespace Plotter {
-        class PlotterGraph : public PlotterGeneric {
+        class PlotterGraphErrors : public PlotterGeneric {
         public:
             //Constructors
             //------------------------------------------------------------------------------------------------------------------------------------------
             //Default
-            PlotterGraph();
+            PlotterGraphErrors();
             
             //Destructor
             //------------------------------------------------------------------------------------------------------------------------------------------
-            ~PlotterGraph(){
+            ~PlotterGraphErrors(){
                 //m_canv.reset();
                 //m_tdrStyle.reset();
                 m_map_graphs.clear();
@@ -87,10 +87,11 @@ namespace QualityControl {
             
             //Attributes
             //------------------------------------------------------------------------------------------------------------------------------------------
-            std::multimap<std::string, std::shared_ptr<TGraph> > m_map_graphs;
+            //std::map<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
+            std::multimap<std::string, std::shared_ptr<TGraphErrors> > m_map_graphs;
             
             std::shared_ptr<TMultiGraph> m_mgraph_Obs;
-        };
+        }; //End class PlotterGraphErrors
     } //End namespace Plotter
 } //End namespace QualityControl
 

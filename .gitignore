@@ -26,6 +26,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 *analyzeSpec
 *frameworkMain
 *genericPlotter
+*shiftPkPosDist
 
 # Figures #
 ###########

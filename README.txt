@@ -63,7 +63,8 @@
                 4.b.vi.I        PlotterGeneric
                 4.b.vi.II       PlotterGraph
                 4.b.vi.III      PlotterGraph2D
-                4.b.vi.IV       PlotterHisto
+                4.b.vi.IV       PlotterGraphErrors
+                4.b.vi.V        PlotterHisto
             4.b.vii.            Readouts
                 4.b.vii.I       ReadoutSector
                 4.b.vii.II      ReadoutSectorEta
@@ -110,9 +111,10 @@
                 4.e.iv.III      HEADER PARAMETERS - DATA
                 4.e.iv.IV       HEADER PARAMETERS - FIT
                 4.e.iv.V        Configuration Options
-                4.e.iv.VI       Example Config File - TGraph2D
-                4.e.iv.VII      Example Config File - TGraphErrors
-                4.e.iv.VIII     Example Config File - TH1F
+                4.e.iv.VI       Example Config File - TGraph
+                4.e.iv.VII      Example Config File - TGraph2D
+                4.e.iv.VIII     Example Config File - TGraphErrors
+                4.e.iv.IX       Example Config File - TH1F
         4.f. Output Files
             4.f.i               Output ROOT File - Analysis Mode
                 4.f.i.I         "Segmented" Plots Stored in "Summary" folder
@@ -383,6 +385,10 @@
                 source scripts/cleanGridFiles.sh
                 source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_QC5/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
 
+            It is important to note that, unfortunately, the mapping file must be provided in two locations: 1) the Run Config file, and
+            2) the Reco Config file.  If you reconstruct one set of data with one mapping file, but then use a different mapping file to
+            perform the analysis it is likely only empty histograms will be generated.
+
             NOTE: Modications to config/configRun_Template_Grid_Reco.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
 
@@ -536,7 +542,7 @@
         For executing:  ./genericPlotter <PFN of Plot Config File> <Verbose Mode true/false>
 
     The Plot Config file is described in Section 4.e.iv.  The executable can take in comma separted data
-    or TObjects from an input TFile.  Presently TGraph2D, TGraphErrors, and TH1F objects are supported.
+    or TObjects from an input TFile.  Presently TGraph, TGraph2D, TGraphErrors, and TH1F objects are supported.
 
     The genericPlotter will create a canvas following the official style guide for figures defined by the
     CMS Collaboration at:
@@ -552,8 +558,8 @@
     For a full explanation of the available configurations please consult Section 4.e.iv.  The contents and
     layout of the output files are described in Section 4.f.iii.
 
-    Three example plot config files for plotting: 1) TGraph2D, 2) TGraphErrors, and 3) TH1F objects have been
-    provided in the default repository.  A usage example is given as:
+    Three example plot config files for plotting: 1) TGraph, 2) TGraph2D, 3) TGraphErrors, and 4) TH1F objects
+    have been provided in the default repository.  A usage example is given as:
 
         ./genericPlotter config/configPlot_Graph.cfg true
 
@@ -625,6 +631,7 @@
             |
             |--->PlotterGraph
             |--->PlotterGraph2D
+            |--->PlotterGraphErrors
             |--->PlotterHisto
 
         ReadoutSector
@@ -1065,6 +1072,11 @@ Public Member Functions
             Coming "soon"
 
             # 4.b.vi.III PlotterGraph2D
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.vi.III PlotterGraphErrors
             # --------------------------------------------------------
 
             Coming "soon"
@@ -2284,7 +2296,7 @@ Public Member Functions
                 #Config Files
                 ####################################
                 Config_Reco = 'config/configReco.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
@@ -2306,6 +2318,7 @@ Public Member Functions
                 Visualize_Plots = 'false';
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
+                #Place only one file here, use grid submission mode for multiple files
                 /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
             [END_RUN_LIST]
 
@@ -2328,7 +2341,7 @@ Public Member Functions
                 ####################################
                 Config_Reco = 'config/configReco.cfg';
                 Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
                 #Input Config
                 ####################################
                 Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
@@ -2350,6 +2363,7 @@ Public Member Functions
                 Visualize_Plots = 'false';
             [END_RUN_INFO]
             [BEGIN_RUN_LIST]
+                #Place only one file here, use grid submission mode for multiple files
                 /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
             [END_RUN_LIST]
 
@@ -2626,7 +2640,7 @@ Public Member Functions
 					drawn with an integral of unity.
 
                 Canv_Plot_Type          string, determines the type of TObject to be plotted on the Canvas, supported
-                                        types are "TGraph2D, TGraphErrors, TH1F".
+                                        types are "TGraph, TGraph2D, TGraphErrors, TH1F".
 
                 Canv_Range_X            int, pair of integers that determine the range [X_min, X_max] of the X-axis.
 
@@ -2766,7 +2780,74 @@ Public Member Functions
 
         Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.
 
-        # 4.e.iv.VI Example Config File - TGraph2D
+        # 4.e.iv.VI Example Config File - TGraph
+        # --------------------------------------------------------
+
+        The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
+        in the [BEGIN_CANVAS] header is set to TGraphErrors. Here one TGraphError is supplied via comma separated
+        data while the other is loaded from an input TFile.
+
+            [BEGIN_CANVAS]
+                Canv_Axis_NDiv = '510,510'; #X, Y
+                Canv_Dim = '1000,1000'; #X, Y
+                Canv_DrawOpt = 'APE1';
+                Canv_Grid_XY = 'false,false'; #X, Y
+                Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
+                Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
+                Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
+                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+                Canv_Legend_Draw = 'true';
+                Canv_Log_XY = 'false,true'; #X, Y
+                Canv_Logo_Pos = '11'; #0, 11, 22, 33
+                Canv_Logo_Prelim = 'true';
+                Canv_Margin_Top = '0.08';
+                Canv_Margin_Bot = '0.14';
+                Canv_Margin_Lf = '0.15';
+                Canv_Margin_Rt = '0.04';
+                Canv_Name = 'GainComp';
+                Canv_Plot_Type = 'TGraph';
+                Canv_Range_X = '500,800'; #X1, X2
+                Canv_Range_Y = '10,30000'; #Y1, Y2
+                Canv_Title_Offset_X = '1.0';
+                Canv_Title_Offset_Y = '1.2';
+                Canv_Title_X = 'Divider Current #left(#muA#right)';
+                Canv_Title_Y = 'Effective Gain';
+                [BEGIN_PLOT]
+                    Plot_Color = 'kBlack';
+                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
+                    Plot_Line_Size = '1';
+                    Plot_Line_Style = '1';
+                    Plot_Marker_Size = '1';
+                    Plot_Marker_Style = '22';
+                    Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
+                    [BEGIN_DATA]
+                        #NOTE:  Copying/pasting data from excel may not have the desired effect.
+                        #	Have noticed that a "newline" character (which is invisible) is
+                        #	not present in some copy/past actions, if your data does not load
+                        #	properly consider this as a potential cause.
+                        VAR_INDEP,VAR_DEP
+                        700,24850.98774
+                        690,16972.77181
+                        680,11719.64474
+                        670,8115.337175
+                        660,5608.074856
+                        650,3882.143995
+                        640,2706.058443
+                        630,1909.212518
+                        620,1359.699531
+                        610,964.186757
+                        600,698.2227425
+                        590,516.9014257
+                        580,359.4035559
+                        570,264.6152389
+                        560,192.4948981
+                        550,140.1252986
+                    [END_DATA]
+                [END_PLOT]
+            [END_CANVAS]
+
+        # 4.e.iv.VII Example Config File - TGraph2D
         # --------------------------------------------------------
 
         The following example shows the case where a TGraph2D object is plotted.  Note the Canv_Plot_Type
@@ -2810,7 +2891,7 @@ Public Member Functions
         Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
         the physical path to the TGraphErrors object "g2D_Detector_ResponseFitPkPosNormalized_AllEta".
 
-        # 4.e.iv.VII Example Config File - TGraphErrors
+        # 4.e.iv.VIII Example Config File - TGraphErrors
         # --------------------------------------------------------
 
         The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
@@ -2891,7 +2972,7 @@ Public Member Functions
         Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
         the physical path to the TGraphErrors object "g_GE1/1-VII-L-CERN-0003_EffGain"
 
-        # 4.e.iv.VIII Example Config File - TH1F
+        # 4.e.iv.IX Example Config File - TH1F
         # --------------------------------------------------------
 
         The following example shows the case where a TH1F object is plotted.  Note the Canv_Plot_Type
@@ -3038,6 +3119,12 @@ Public Member Functions
             on the TPad.  The percent error of the dataset, defined as sigma / mean (scale / MPV) from the Gaussian
             (Landua), will also be displayed on the TPad.  This offers an "at a glance" look at the total distribution
             for a given observable and may help understand an immediate pass/fail condition.
+
+            Additionally there will be one TCanvas & TGraphErrors object with "Shifted" in it's name. This is identical
+            to the objects without the "Shifted" string in their names but here the mean position of the plot has been
+            shifted to 0.  This allows you to better compare across detectors when you are interested in the spread of
+            the distribution rather than the mean.  Here two points at (+/-2000,0) have been added to allow a greater
+            range of drawing the x-axis with genericPlotter or some custom code of your choice.
 
             # 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
             # --------------------------------------------------------

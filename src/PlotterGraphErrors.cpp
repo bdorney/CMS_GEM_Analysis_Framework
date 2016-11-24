@@ -1,12 +1,12 @@
 //
-//  PlotterGraph.cpp
+//  PlotterGraphErrors.cpp
 //  
 //
 //  Created by Brian L Dorney on 05/10/16.
 //
 //
 
-#include "PlotterGraph.h"
+#include "PlotterGraphErrors.h"
 
 using std::cout;
 using std::endl;
@@ -19,18 +19,18 @@ using std::string;
 using namespace QualityControl::Plotter;
 
 //Constructor
-PlotterGraph::PlotterGraph() : m_mgraph_Obs(new TMultiGraph) {
+PlotterGraphErrors::PlotterGraphErrors() : m_mgraph_Obs(new TMultiGraph) {
     
     m_mgraph_Obs->SetName("m_mgraph_Obs");
 } //End
 
-void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
+void PlotterGraphErrors::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     //Initialize
     initPlot(plotInfo);
     
     //Check to make sure it initialized successfully
     if ( !(m_map_graphs.count(plotInfo.m_strName) >= (m_map_iSameNameCount[plotInfo.m_strName]) ) ) {
-        cout<<"PlotterGraph::makePlots() - Plot:\n";
+        cout<<"PlotterGraphErrors::makePlots() - Plot:\n";
         cout<<"\t"<<plotInfo.m_strName<<endl;
         cout<<"\tDid not initialize correctly, please cross-check input!\n";
         cout<<"\tExiting!!!\n";
@@ -39,8 +39,8 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     }
     
     //Get this plot
-	pair<multimap<string,shared_ptr<TGraph> >::iterator, multimap<string,shared_ptr<TGraph> >::iterator> pair_iterThisPlotName = m_map_graphs.equal_range(plotInfo.m_strName);
-	multimap<string,shared_ptr<TGraph> >::iterator iterThisPlot = pair_iterThisPlotName.first;
+	pair<multimap<string,shared_ptr<TGraphErrors> >::iterator, multimap<string,shared_ptr<TGraphErrors> >::iterator> pair_iterThisPlotName = m_map_graphs.equal_range(plotInfo.m_strName);
+	multimap<string,shared_ptr<TGraphErrors> >::iterator iterThisPlot = pair_iterThisPlotName.first;
 	std::advance(iterThisPlot, (m_map_iSameNameCount[plotInfo.m_strName] - 1 ) );
 	auto graphPtr = ( (*iterThisPlot).second );
 
@@ -66,9 +66,9 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     //graphPtr->Draw(plotInfo.m_strOptionDraw.c_str() );
     
     return;
-} //End PlotterGraph::addPlot()
+} //End PlotterGraphErrors::addPlot()
 
-void PlotterGraph::drawPlots(){
+void PlotterGraphErrors::drawPlots(){
     //Ensure axis is drawn!
     if( m_canvInfo.m_strOptionDraw.find("A") == std::string::npos){
 	m_canvInfo.m_strOptionDraw += "A";
@@ -103,13 +103,13 @@ void PlotterGraph::drawPlots(){
     m_mgraph_Obs->Draw( m_canvInfo.m_strOptionDraw.c_str() );
     
     return;
-} //End PlotterGraph::drawPlots()
+} //End PlotterGraphErrors::drawPlots()
 
 //Intializes the plots defined in m_canvInfo
-void PlotterGraph::initPlot(InfoPlot & plotInfo){
+void PlotterGraphErrors::initPlot(InfoPlot & plotInfo){
     if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
         //Intialize
-        shared_ptr<TGraph> graphPtr(new TGraph(plotInfo.m_vec_DataPts.size() ) );
+        shared_ptr<TGraphErrors> graphPtr(new TGraphErrors(plotInfo.m_vec_DataPts.size() ) );
         
         //Set the TName
         graphPtr->SetName( plotInfo.m_strName.c_str() );
@@ -121,10 +121,11 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
             iPos = std::distance(plotInfo.m_vec_DataPts.begin(), iterDataPt);
             
             graphPtr->SetPoint(iPos, (*iterDataPt).m_fX,  (*iterDataPt).m_fY );
+            graphPtr->SetPointError(iPos, (*iterDataPt).m_fX_Err, (*iterDataPt).m_fY_Err );
         } //End Loop Over Data
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
+	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
 	(m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     } //End Case: Data Input
     else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
@@ -139,23 +140,24 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
             strTmpName = plotInfo.m_strFilePath + "/" + strTmpName;
         }
         
-        //TGraph graph
-        shared_ptr<TGraph> graphPtr = make_shared<TGraph>( *((TGraph*) file_Input->Get( strTmpName.c_str() ) ) );
+        //TGraphErrors graph
+        //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
+        shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
+	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
         (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
 
         file_Input->Close();
     } //End Case: TObject Input
     else{
-        cout<<"PlotterGraph::initPlots() - Input Case not understood, please cross-check input!\n";
+        cout<<"PlotterGraphErrors::initPlots() - Input Case not understood, please cross-check input!\n";
     }
     
     return;
-} //End PlotterGraph::initPlots()
+} //End PlotterGraphErrors::initPlots()
 
-void PlotterGraph::write2RootFile(){
+void PlotterGraphErrors::write2RootFile(){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -172,4 +174,4 @@ void PlotterGraph::write2RootFile(){
     file_Output->Close();
     
     return;
-} //End PlotterGraph::write2RootFile
+} //End PlotterGraphErrors::write2RootFile
