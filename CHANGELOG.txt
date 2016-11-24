@@ -12,6 +12,7 @@ Update: November 24th 2016
 ->Added new class QualityControl::Plotter::PlotterGraph for handling TGraph objects
 ->QualityControl::Uniformity::VisualizeUniformity will now automatically create a PkPosDataset distribution shifted to 0 ADC in addition to the current version
 ->Updated README.txt
+->Added new GE1/1-IV Mapping file
 
 Update: October 20th 2016
 ==================================================
