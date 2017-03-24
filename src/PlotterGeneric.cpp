@@ -15,6 +15,7 @@ using std::make_shared;
 using std::shared_ptr;
 using std::string;
 using std::tuple;
+using std::vector;
 
 using QualityControl::Timing::getString;
 
@@ -181,32 +182,11 @@ void PlotterGeneric::drawFits(TLegend & inputLegend){
     
     for (auto iterPlot = m_canvInfo.m_map_infoPlot.begin(); iterPlot != m_canvInfo.m_map_infoPlot.end(); ++iterPlot) { //Loop Over Defined Plots
         for (auto iterFit = (*iterPlot).second.m_map_infoFit.begin(); iterFit != (*iterPlot).second.m_map_infoFit.end(); ++iterFit) { //Loop Over (*iterPlot)'s defined Fits
-            std::shared_ptr<TF1> func_plot;
-            
             if ( (*iterFit).second.m_bFit) { //Case: Perform Fit
-                
-                cout<<"PlotterGeneric::drawFits() - You'll need to write your own inherited class and Over write drawFits in inherited class\n";
-                cout<<"PlotterGeneric::drawFits() - No Direct Fitting Supported in Base Class\n";
-                
+		performAndDrawFit(inputLegend, (*iterFit).second, (*iterPlot).second);
             } //End Case: Perform Fit
             else if( (*iterFit).second.m_strFile_Name.length() > 0 ) { //Case: Load Fit
-                //TFile does not manage objects
-                TH1::AddDirectory(kFALSE);
-                
-                TFile * file_Input = new TFile((*iterFit).second.m_strFile_Name.c_str(), "READ" );
-        
-                //Setup TObject name w/path
-                string strTmpName = (*iterFit).second.m_strFit_Name;
-                if ((*iterFit).second.m_strFile_Path.length() > 0) {
-                    strTmpName = (*iterFit).second.m_strFile_Path + "/" + strTmpName;
-                }
-                
-                //Get the Plot
-		func_plot = make_shared<TF1>( *((TF1*) file_Input->Get( strTmpName.c_str() ) ) );
-		
-                //Close TFile
-                file_Input->Close();
-                delete file_Input;
+                loadAndDrawFit(inputLegend, (*iterFit).second);
             } //End Case: Load Fit
             else {
                 cout<<"PlotterGeneric::drawFits() - Fit Information not understood, either 'FIT_PERFORM' must be true or a TFile ('FIT_ROOT_FILE') must be provided\n";
@@ -214,22 +194,7 @@ void PlotterGeneric::drawFits(TLegend & inputLegend){
                 cout<<"\t(*iterFit).second.m_strFile_Name = " << (*iterFit).second.m_strFile_Name.c_str() << endl;
                 
                 continue;
-            }
-            
-            //Set the Style
-            func_plot->SetLineColor( (*iterFit).second.m_iColor );
-            func_plot->SetLineStyle( (*iterFit).second.m_iStyleLine );
-            func_plot->SetLineWidth( (*iterFit).second.m_fSizeLine );
-            
-            //Add to Legend
-            inputLegend.AddEntry(func_plot.get(), (*iterFit).second.m_strLegEntry.c_str(), "L" );
-            
-            //Draw Fit
-            m_canv->cd();
-            func_plot->Draw("same");
-            
-            //Store (keeps pointers alive)
-            m_map_fits[(*iterFit).second.m_strFile_Name]=func_plot;
+            } //End Case: Input Not Understood - Skip
         } //End Loop Over (*iterPlot)'s defined Fits
     } //End Loop Over Defined Plots
     
@@ -253,6 +218,52 @@ void PlotterGeneric::initPlot(InfoPlot & plotInfo){
     
     return;
 } //End PlotterGeneric::initPlot
+
+//Loads a fit from a TFile and draws it for the requested plot
+void PlotterGeneric::loadAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo){
+	//TFile does not manage objects
+        TH1::AddDirectory(kFALSE);
+                
+        TFile * file_Input = new TFile(fitInfo.m_strFile_Name.c_str(), "READ" );
+        
+                //Setup TObject name w/path
+                string strTmpName = fitInfo.m_strFit_Name;
+                if (fitInfo.m_strFile_Path.length() > 0) {
+                    strTmpName = fitInfo.m_strFile_Path + "/" + strTmpName;
+                }
+                
+                //Load the fit for this plot
+		std::shared_ptr<TF1> func_plot;
+		func_plot = make_shared<TF1>( *((TF1*) file_Input->Get( strTmpName.c_str() ) ) );
+		
+                //Close TFile
+                file_Input->Close();
+                delete file_Input;
+
+	//Set the Style
+            func_plot->SetLineColor( fitInfo.m_iColor );
+            func_plot->SetLineStyle( fitInfo.m_iStyleLine );
+            func_plot->SetLineWidth( fitInfo.m_fSizeLine );
+            
+            //Add to Legend
+            inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+            
+            //Draw Fit
+            m_canv->cd();
+            func_plot->Draw("same");
+            
+            //Store (keeps pointers alive)
+            m_map_fits[fitInfo.m_strFile_Name]=func_plot;
+
+	return;
+} //End PlotterGeneric::loadAndDrawFit()
+
+void PlotterGeneric::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo){
+                cout<<"PlotterGeneric::performAndDrawFit() - You'll need to write your own inherited class and Over write drawFits in inherited class\n";
+                cout<<"PlotterGeneric::performAndDrawFit() - No Direct Fitting Supported in Base Class\n";
+        
+	return;
+} //End PlotterGeneric::performAndDrawFit()
 
 //Saves inputCanv as a *.png file
 //The file is placed in the working directory
@@ -432,3 +443,41 @@ void PlotterGeneric::write2RootFile(){
     
     return;
 } //End PlotterGeneric::makePlots
+
+std::shared_ptr<TF1> PlotterGeneric::getFit(InfoFit & fitInfo){
+    //Variable Declaration
+    float fLimit_Max = 1;
+    float fLimit_Min = 0;
+    
+    vector<float> vec_fFitRange;
+    
+    for (auto iterRange = fitInfo.m_vec_strFit_Range.begin(); iterRange != fitInfo.m_vec_strFit_Range.end(); ++iterRange) { //Loop Over Fit Range
+        vec_fFitRange.push_back( std::stof(*iterRange) );
+    } //End Loop Over Fit Range
+    
+    if (vec_fFitRange.size() > 1) {
+        fLimit_Min = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+        fLimit_Max = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
+    }
+    
+    std::shared_ptr<TF1> ret_Func = make_shared<TF1>( TF1(fitInfo.m_strFit_Name.c_str(), fitInfo.m_strFit_Formula.c_str(), fLimit_Min, fLimit_Max) );
+    
+    //Set Fit Parameters - Initial Value
+    //------------------------------------------------------
+	//Blank for now    
+	//If this is really needed should just implement an instance of AnalyzeResponseUniformity
+
+    //Set Fit Parameters - Boundaries
+    //------------------------------------------------------
+    	//Blank for now
+	//If this is really needed should just implement an instance of AnalyzeResponseUniformity
+
+    //Set Fit Parameters - Fixed?
+    //------------------------------------------------------
+    	//Blank for now
+	//If this is really needed should just implement an instance of AnalyzeResponseUniformity
+
+    //Return fit
+    //------------------------------------------------------
+    return ret_Func;
+} //End PlotterGeneric::getFit()

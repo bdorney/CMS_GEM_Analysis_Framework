@@ -1,10 +1,17 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 3.1                                 *
-*	LAST UPDATE: Oct 20 2016                     *
+*	VERSION: 3.2                                 *
+*	LAST UPDATE: Mar 24 2017                     *
 *                                                *
 **************************************************
+
+Update: Mar 24th 2017
+==================================================
+->PlotterGeneric::drawFit() now has actions done in either PlotterGeneric::performAndDrawFit() and PlotterGeneric::loadAndDrawFit()
+->PlotterGeneric::performAndDrawFit() and PlotterGeneric::loadAndDrawFit() are now the methods that should be over-ridden in inherited classes
+->Added Overloaded method PlotterGraphErrors::performAndDrawFit() to handle fitting of TGraphErrors objects
+->Added method PlotterGraphErrors::getFit() for fitting the exact TGraphError object (get around the multimap usage, less efficient yes...but works)
 
 Update: November 24th 2016
 ==================================================

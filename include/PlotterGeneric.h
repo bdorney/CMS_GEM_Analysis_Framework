@@ -156,6 +156,16 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             virtual void initPlot(InfoPlot & plotInfo);
 
+            //In inherited class developer should:
+            //  Loads a fit from a TFile and draws it for the requested plot
+            //To be over-ridded by inherited classes
+            virtual void loadAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo);
+
+            //In inherited class developer should:
+            //  Perform a fit and draws it for the requested plot
+            //To be over-ridded by inherited classes
+            virtual void performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo);
+
             //Saves the canvas as a *.png and a *.pdf file
             virtual void save2ImgFile(std::shared_ptr<TCanvas> inputCanvas);
             
@@ -165,7 +175,9 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            
+	    //Returns a TF1 object from a given fitInfo container
+            std::shared_ptr<TF1>  getFit(InfoFit & fitInfo);
+
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             

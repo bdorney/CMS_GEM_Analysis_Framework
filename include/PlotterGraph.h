@@ -69,6 +69,11 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
             
+	    //Draw Fits, right now fits are assumed to always be TF1 objects
+            //  Draws all fits defined for each plot
+            //Developer can override though
+            //virtual void drawFits(TLegend & inputLegend);
+            
             //To be over-ridded by inherited classes
             virtual void drawPlots();
             
