@@ -69,10 +69,10 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             void addPlot(TLegend & inputLegend, InfoPlot & plotInfo);
             
-	    //To be over-ridded by inherited classes
+            //To be over-ridded by inherited classes
             virtual void drawPlots();
             
-	    //In inherited class developer should:
+            //In inherited class developer should:
             //  Perform a fit and draws it for the requested plot
             //To be over-ridded by inherited classes
             void performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo);
@@ -83,7 +83,7 @@ namespace QualityControl {
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Returns a specific plot defined in m_canvInfo
+            //Intializes a plot defined in an input InfoPlot (aka plotInfo)
             std::shared_ptr<TGraphErrors> getPlot(InfoPlot & plotInfo);
             
             //Printers - Methods that Print Something

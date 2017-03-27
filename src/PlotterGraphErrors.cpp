@@ -108,7 +108,7 @@ void PlotterGraphErrors::drawPlots(){
 
 //Intializes the plots defined in m_canvInfo
 void PlotterGraphErrors::initPlot(InfoPlot & plotInfo){
-    if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
+    /*if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
         //Intialize
         shared_ptr<TGraphErrors> graphPtr(new TGraphErrors(plotInfo.m_vec_DataPts.size() ) );
         
@@ -126,8 +126,8 @@ void PlotterGraphErrors::initPlot(InfoPlot & plotInfo){
         } //End Loop Over Data
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
-	(m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
+        m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+        (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     } //End Case: Data Input
     else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
         //TFile does not manage objects
@@ -145,62 +145,56 @@ void PlotterGraphErrors::initPlot(InfoPlot & plotInfo){
         shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+        m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
         (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
 
         file_Input->Close();
     } //End Case: TObject Input
     else{
         cout<<"PlotterGraphErrors::initPlots() - Input Case not understood, please cross-check input!\n";
-    }
+    }*/
+
+    //Get the plot
+    shared_ptr<TGraphErrors> graphPtr = getPlot(plotInfo);
+    
+    //Store this plot in class's data member m_map_graphs
+    m_map_graphs.insert( pair<string, shared_ptr<TGraphErrors> >( plotInfo.m_strName, graphPtr ) );
+    (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     
     return;
 } //End PlotterGraphErrors::initPlots()
 
 void PlotterGraphErrors::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo){
-	//TFile does not manage objects
-        TH1::AddDirectory(kFALSE);
-        
-	//Initialize the fit for this plot
-		//std::shared_ptr<TF1> func_plot = make_shared<TF1>( TF1(fitInfo.m_strFit_Name.c_str(), fitInfo.m_strFit_Formula.c_str(), 500, 1000 ) );
-		std::shared_ptr<TF1> func_plot = getFit(fitInfo);
-		
-		/*if(func_plot == nullptr ){
-			cout<<"Adam is right and I'm an idiot, if this statement doesn't trigger, I'm owed a beer\n";
-		}*/
-
-	//Set the Style
-            func_plot->SetLineColor( fitInfo.m_iColor );
-            func_plot->SetLineStyle( fitInfo.m_iStyleLine );
-            func_plot->SetLineWidth( fitInfo.m_fSizeLine );
-            
-		//cout<<"Hi My name is hex reference: " << func_plot.get() << endl;
-
-            //Add to Legend
-            inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
-            //inputLegend.AddEntry(func_plot->GetName(), fitInfo.m_strLegEntry.c_str(), "L" );
-
-		//Perform Fit
-		std::shared_ptr<TGraphErrors> graphPtr = getPlot(plotInfo);
-		cout<<"====================================================================\n";
-		cout<<"Fitting: " << plotInfo.m_strName << endl;
-		cout<<"Function used: " << fitInfo.m_strFit_Name << endl;
-		graphPtr->Fit(func_plot.get(), fitInfo.m_strFit_Option.c_str() );
-		graphPtr.reset();
-		cout<<"====================================================================\n";
-		
-            //Draw Fit
-            m_canv->cd();
-            func_plot->Draw("same");
-            
-            //Store (keeps pointers alive)
-            m_map_fits[fitInfo.m_strFit_Name]=func_plot;
-        
-		//Add to Legend
-
-            //inputLegend.AddEntry(m_map_fits[fitInfo.m_strFile_Name].get(), fitInfo.m_strLegEntry.c_str(), "L" );
-            //inputLegend.AddEntry(func_plot->GetName(), fitInfo.m_strLegEntry.c_str(), "L" );
-            
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Initialize the fit for this plot
+    std::shared_ptr<TF1> func_plot = getFit(fitInfo);
+    
+    //Set the Style
+    func_plot->SetLineColor( fitInfo.m_iColor );
+    func_plot->SetLineStyle( fitInfo.m_iStyleLine );
+    func_plot->SetLineWidth( fitInfo.m_fSizeLine );
+    
+    //Add to Legend
+    inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+    
+    //Perform Fit
+    std::shared_ptr<TGraphErrors> graphPtr = getPlot(plotInfo);
+    cout<<"====================================================================\n";
+    cout<<"Fitting: " << plotInfo.m_strName << endl;
+    cout<<"Function used: " << fitInfo.m_strFit_Name << endl;
+    graphPtr->Fit(func_plot.get(), fitInfo.m_strFit_Option.c_str() );
+    graphPtr.reset();
+    cout<<"====================================================================\n";
+    
+    //Draw Fit
+    m_canv->cd();
+    func_plot->Draw("same");
+    
+    //Store (keeps pointers alive)
+    m_map_fits[fitInfo.m_strFit_Name]=func_plot;
+    
 	return;
 } //End PlotterGeneric::performAndDrawFit()
 
@@ -217,7 +211,7 @@ void PlotterGraphErrors::write2RootFile(){
         (*iterPlot).second->Write();
     }
     for (auto iterFit = m_map_fits.begin(); iterFit != m_map_fits.end(); ++iterFit){
-	(*iterFit).second->Write();
+        (*iterFit).second->Write();
     }
     
     //Close the file
@@ -226,7 +220,7 @@ void PlotterGraphErrors::write2RootFile(){
     return;
 } //End PlotterGraphErrors::write2RootFile
 
-//Intializes the plots defined in m_canvInfo
+//Intializes a plot defined in an input InfoPlot (aka plotInfo)
 std::shared_ptr<TGraphErrors> PlotterGraphErrors::getPlot(InfoPlot & plotInfo){
     shared_ptr<TGraphErrors> graphPtr;
 
@@ -265,7 +259,7 @@ std::shared_ptr<TGraphErrors> PlotterGraphErrors::getPlot(InfoPlot & plotInfo){
         file_Input->Close();
     } //End Case: TObject Input
     else{
-        cout<<"PlotterGraphErrors::initPlots() - Input Case not understood, please cross-check input!\n";
+        cout<<"PlotterGraphErrors::getPlot() - Input Case not understood, please cross-check input!\n";
     }
     
     return graphPtr;

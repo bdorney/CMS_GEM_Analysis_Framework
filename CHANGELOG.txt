@@ -6,6 +6,11 @@
 *                                                *
 **************************************************
 
+Update: Mar 27th 2017
+==================================================
+->PlotterGraphErrors::initPlot() gutted to instead call PlotterGraphErrors::getPlot() and store in map object m_map_graphs
+->Classes PlotterGraph and PlotterHisto modified to feature one dimensional fitting following the recipe illustrated in PlotterGraphErrors
+
 Update: Mar 24th 2017
 ==================================================
 ->PlotterGeneric::drawFit() now has actions done in either PlotterGeneric::performAndDrawFit() and PlotterGeneric::loadAndDrawFit()

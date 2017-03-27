@@ -70,13 +70,20 @@ namespace QualityControl {
             //To be over-ridded by inherited classes
             virtual void drawPlots();
             
+            //In inherited class developer should:
+            //  Perform a fit and draws it for the requested plot
+            //To be over-ridded by inherited classes
+            void performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo);
+            
             //Saves all TObjects to an output ROOT file
             //To be over-ridded by inherited classes
             virtual void write2RootFile();
             
             //Getters - Methods that Get (i.e. Return) Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            
+            //Intializes a plot defined in an input InfoPlot (aka plotInfo)
+            std::shared_ptr<TH1F> getPlot(InfoPlot & plotInfo);
+
             //Printers - Methods that Print Something
             //------------------------------------------------------------------------------------------------------------------------------------------
             

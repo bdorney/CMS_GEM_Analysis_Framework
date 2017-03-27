@@ -107,14 +107,14 @@ void PlotterGraph::drawPlots(){
 
 //Intializes the plots defined in m_canvInfo
 void PlotterGraph::initPlot(InfoPlot & plotInfo){
-    if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
+    /*if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
         //Intialize
         shared_ptr<TGraph> graphPtr(new TGraph(plotInfo.m_vec_DataPts.size() ) );
         
         //Set the TName
         graphPtr->SetName( plotInfo.m_strName.c_str() );
-        graphPtr->SetTitle( "" );        
-
+        graphPtr->SetTitle( "" );
+        
         //Fill the data
         int iPos;
         for (auto iterDataPt = plotInfo.m_vec_DataPts.begin(); iterDataPt != plotInfo.m_vec_DataPts.end(); ++iterDataPt) { //Loop Over Data
@@ -124,8 +124,8 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
         } //End Loop Over Data
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
-	(m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
+        m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
+        (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     } //End Case: Data Input
     else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
         //TFile does not manage objects
@@ -143,14 +143,21 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
         shared_ptr<TGraph> graphPtr = make_shared<TGraph>( *((TGraph*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_graphs[plotInfo.m_strName]=graphPtr;
-	m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
+        m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
         (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
-
+        
         file_Input->Close();
     } //End Case: TObject Input
     else{
         cout<<"PlotterGraph::initPlots() - Input Case not understood, please cross-check input!\n";
-    }
+    }*/
+    
+    //Get the plot
+    shared_ptr<TGraph> graphPtr = getPlot(plotInfo);
+
+    //Store this plot in class's data member m_map_graphs
+    m_map_graphs.insert( pair<string, shared_ptr<TGraph> >( plotInfo.m_strName, graphPtr ) );
+    (m_map_iSameNameCount[plotInfo.m_strName] == 0) ? m_map_iSameNameCount[plotInfo.m_strName] = 1 : m_map_iSameNameCount[plotInfo.m_strName]++;
     
     return;
 } //End PlotterGraph::initPlots()
@@ -167,9 +174,56 @@ void PlotterGraph::write2RootFile(){
     for (auto iterPlot = m_map_graphs.begin(); iterPlot != m_map_graphs.end(); ++iterPlot) {
         (*iterPlot).second->Write();
     }
+    for (auto iterFit = m_map_fits.begin(); iterFit != m_map_fits.end(); ++iterFit){
+        (*iterFit).second->Write();
+    }
     
     //Close the file
     file_Output->Close();
     
     return;
 } //End PlotterGraph::write2RootFile
+
+//Intializes a plot defined in an input InfoPlot (aka plotInfo)
+std::shared_ptr<TGraph> PlotterGraph::getPlot(InfoPlot & plotInfo){
+    shared_ptr<TGraph> graphPtr;
+    
+    if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
+        //Intialize
+        graphPtr = make_shared<TGraph>( TGraph(plotInfo.m_vec_DataPts.size() ) );
+        
+        //Set the TName
+        graphPtr->SetName( plotInfo.m_strName.c_str() );
+        graphPtr->SetTitle( "" );
+        
+        //Fill the data
+        int iPos;
+        for (auto iterDataPt = plotInfo.m_vec_DataPts.begin(); iterDataPt != plotInfo.m_vec_DataPts.end(); ++iterDataPt) { //Loop Over Data
+            iPos = std::distance(plotInfo.m_vec_DataPts.begin(), iterDataPt);
+            
+            graphPtr->SetPoint(iPos, (*iterDataPt).m_fX,  (*iterDataPt).m_fY );
+        } //End Loop Over Data
+    } //End Case: Data Input
+    else if ( plotInfo.m_strFileName.length() > 0 ){ //Case: TObject Input
+        //TFile does not manage objects
+        TH1::AddDirectory(kFALSE);
+        
+        TFile * file_Input = new TFile(plotInfo.m_strFileName.c_str(), "READ" );
+        
+        //Setup TObject name w/path
+        string strTmpName = plotInfo.m_strName;
+        if (plotInfo.m_strFilePath.length() > 0) {
+            strTmpName = plotInfo.m_strFilePath + "/" + strTmpName;
+        }
+        
+        //TGraphErrors graph
+        graphPtr = make_shared<TGraph>( *((TGraph*) file_Input->Get( strTmpName.c_str() ) ) );
+        
+        file_Input->Close();
+    } //End Case: TObject Input
+    else{
+        cout<<"PlotterGraph::getPlot() - Input Case not understood, please cross-check input!\n";
+    }
+    
+    return graphPtr;
+} //End PlotterGraph::getPlot()
