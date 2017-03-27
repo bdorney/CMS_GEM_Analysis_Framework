@@ -208,7 +208,7 @@ void PlotterHisto::write2RootFile(){
 
 //Intializes a plot defined in an input InfoPlot (aka plotInfo)
 std::shared_ptr<TH1F> PlotterHisto::getPlot(InfoPlot & plotInfo){
-    //shared_ptr<TH1F> graphPtr;
+    shared_ptr<TH1F> hPtr;
     
     if( plotInfo.m_vec_DataPts.size() > 0 ){ //Case: Data Input
         
@@ -230,7 +230,7 @@ std::shared_ptr<TH1F> PlotterHisto::getPlot(InfoPlot & plotInfo){
         
         //TGraphErrors graph
         //shared_ptr<TGraphErrors> graphPtr = make_shared<TGraphErrors>( *((TGraphErrors*) file_Input->Get( plotInfo.m_strName.c_str() ) ) );
-        shared_ptr<TH1F> hPtr = make_shared<TH1F>( *((TH1F*) file_Input->Get( strTmpName.c_str() ) ) );
+        hPtr = make_shared<TH1F>( *((TH1F*) file_Input->Get( strTmpName.c_str() ) ) );
         
         //m_map_histos[plotInfo.m_strName]=hPtr;
         m_map_histos.insert( pair<string, shared_ptr<TH1F> >( plotInfo.m_strName, hPtr ) );
@@ -242,5 +242,5 @@ std::shared_ptr<TH1F> PlotterHisto::getPlot(InfoPlot & plotInfo){
         cout<<"PlotterHisto::initPlots() - Input Case not understood, please cross-check input!\n";
     }
     
-    return graphPtr;
+    return hPtr;
 } //End PlotterGraphErrors::getPlot()

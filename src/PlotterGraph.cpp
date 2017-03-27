@@ -162,6 +162,40 @@ void PlotterGraph::initPlot(InfoPlot & plotInfo){
     return;
 } //End PlotterGraph::initPlots()
 
+void PlotterGraph::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, InfoPlot & plotInfo){
+    //TFile does not manage objects
+    TH1::AddDirectory(kFALSE);
+    
+    //Initialize the fit for this plot
+    std::shared_ptr<TF1> func_plot = getFit(fitInfo);
+    
+    //Set the Style
+    func_plot->SetLineColor( fitInfo.m_iColor );
+    func_plot->SetLineStyle( fitInfo.m_iStyleLine );
+    func_plot->SetLineWidth( fitInfo.m_fSizeLine );
+    
+    //Add to Legend
+    inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+    
+    //Perform Fit
+    std::shared_ptr<TGraph> graphPtr = getPlot(plotInfo);
+    cout<<"====================================================================\n";
+    cout<<"Fitting: " << plotInfo.m_strName << endl;
+    cout<<"Function used: " << fitInfo.m_strFit_Name << endl;
+    graphPtr->Fit(func_plot.get(), fitInfo.m_strFit_Option.c_str() );
+    graphPtr.reset();
+    cout<<"====================================================================\n";
+    
+    //Draw Fit
+    m_canv->cd();
+    func_plot->Draw("same");
+    
+    //Store (keeps pointers alive)
+    m_map_fits[fitInfo.m_strFit_Name]=func_plot;
+    
+	return;
+} //End PlotterGraph::performAndDrawFit()
+
 void PlotterGraph::write2RootFile(){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);

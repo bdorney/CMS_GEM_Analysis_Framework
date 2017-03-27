@@ -27,6 +27,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 *frameworkMain
 *genericPlotter
 *shiftPkPosDist
+*cosmicTest
 
 # Figures #
 ###########
