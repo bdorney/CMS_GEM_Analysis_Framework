@@ -30,5 +30,19 @@ if __name__ == "__main__":
                             imonpts=hvPoints)
 
     filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
+    #filePath = "/Users/dorney/Desktop/MyResearch/GitRepos/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
 
-    anaSuite = GainMapAnalysisSuite(filePath, params_gain, params_det, debug=True)
+    anaSuite = GainMapAnalysisSuite(filePath, params_gain, params_det, debug=False)
+
+    anaSuite.avgROSectorADCPkPos()
+    anaSuite.calcROSectorLambda()
+    anaSuite.calcGainMap("GE11-VII-L-CERN-0002")
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",625)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",650)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",660)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",670)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",680)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",690)
+    anaSuite.calcGainMapHV("GE11-VII-L-CERN-0002",700)
+    anaSuite.plotAvgGain("GE11-VII-L-CERN-0002")
+    anaSuite.reset()

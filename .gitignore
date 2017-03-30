@@ -22,7 +22,6 @@ scripts/submitFrameworkJob_RunNo*.sh
 # Compiled source #
 ###################
 *.o
-*.pyc
 *analyzeUniformity
 *analyzeSpec
 *frameworkMain
@@ -51,6 +50,15 @@ loopdir.C
 tmp/
 tmp/*
 config/configRun_RecoLong3.cfg
+
+# Python #
+##########
+*.pyc
+numpy/
+numpy/*
+python/pip/
+python/pip/*
+scripts/installPythonPkgs.sh
 
 # ROOT Files #
 ##############
