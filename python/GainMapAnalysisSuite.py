@@ -22,7 +22,8 @@ from ROOT import gROOT, TGraphErrors, TF1, TFile, TDirectory
 #   G_ijk = lambda * ADCPkPos_ijk
 #
 class PARAMS_GAIN:
-    def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1, lam, lam_err):
+    #def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1, lam, lam_err):
+    def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1):
         self.GAIN_CURVE_P0      = gain_p0
         self.GAIN_CURVE_P0_ERR  = gain_p0_err
         self.GAIN_CURVE_P1      = gain_p1
@@ -35,9 +36,9 @@ class PARAMS_GAIN:
 #Container
 class PARAMS_DET:
     
-    #hvPoints = [650,660,670,680,690,700]  #Divider current valuves
+    hvPoints = [650,660,670,680,690,700]  #Divider current valuves
     
-    def __init__(self, ieta=4, iphi=2, sectorsize, nbconnect=3, imon0=600, imonpts):
+    def __init__(self, sectorsize=-1, ieta=4, iphi=2, nbconnect=3, imon0=600, imonpts=hvPoints):
         self.DETPOS_IETA            = ieta          #iEta Position QC5_Gain_Cal performed in
         self.DETPOS_IPHI            = iphi          #iPhi "                                 "
 
@@ -48,11 +49,11 @@ class PARAMS_DET:
         self.DET_IMON_POINTS        = imonpts       #Imon points gain map desired at
         #self.DET_ALPHA              = alpha         #Exponential factor to calculat G_ijk at some value in DET_IMON_POINTS
 
-    return
+        return
 
 class GainMapAnalysisSuite:
 
-    def __init__(self, inputfilename="", params_gain, params_det, debug=False):
+    def __init__(self, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), debug=False):
 
         self.INPUT_FILE = inputfilename
 
@@ -66,7 +67,7 @@ class GainMapAnalysisSuite:
         self.DETPOS_IETA            = params_det.DETPOS_IETA
         self.DETPOS_IPHI            = params_det.DETPOS_IPHI
         
-        self.DETGEO_SECSIZE         = params_det.DETPOS_SECSIZE
+        self.DETGEO_SECSIZE         = params_det.DETGEO_SECSIZE
         self.DETGEO_NCONNECTORS     = params_det.DETGEO_NCONNECTORS
         
         self.DET_IMON_QC5_RESP_UNI  = params_det.DET_IMON_QC5_RESP_UNI

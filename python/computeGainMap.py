@@ -22,13 +22,13 @@ if __name__ == "__main__":
 
     hvPoints = [650,660,670,680,690,700]  #Divider current valuves
 
-    params_det = PARAMS_DET(ieta=4,
+    params_det = PARAMS_DET(sectorsize=319.48,
+                            ieta=4,
                             iphi=2,
-                            sectorsize=319.48,
                             nbconnect=3,
-                            imon=600,
+                            imon0=600,
                             imonpts=hvPoints)
 
-filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
+    filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
 
     anaSuite = GainMapAnalysisSuite(filePath, params_gain, params_det, debug=True)

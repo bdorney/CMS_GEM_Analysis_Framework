@@ -22,6 +22,7 @@ scripts/submitFrameworkJob_RunNo*.sh
 # Compiled source #
 ###################
 *.o
+*.pyc
 *analyzeUniformity
 *analyzeSpec
 *frameworkMain

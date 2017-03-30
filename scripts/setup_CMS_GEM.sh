@@ -18,12 +18,13 @@ source bin/thisroot.sh
 cd $GEM_BASE
 
 #Setup Python
-export PYTHONDIR=/afs/cern.ch/sw/lcg/external/Python/2.7.3/x86_64-slc6-gcc48-opt
+#export PYTHONDIR=/afs/cern.ch/sw/lcg/external/Python/2.7.3/x86_64-slc6-gcc48-opt
 #export PYTHONDIR=/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt
-export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
-export LD_LIBRARY_PATH=$ROOTSYS/lib:$PYTHONDIR/lib:$LD_LIBRARY_PATH:/opt/rh/python27/root/usr/lib64
-alias python2.7="$PYTHONDIR/bin/python2.7"
-alias python2.7-config="$PYTHONDIR/bin/python2.7-config"
+#export PYTHONPATH=$PYTHONPATH:$ROOTSYS/lib
+#export LD_LIBRARY_PATH=$ROOTSYS/lib:$PYTHONDIR/lib:$LD_LIBRARY_PATH:/opt/rh/python27/root/usr/lib64
+#alias python2.7="$PYTHONDIR/bin/python2.7"
+#alias python2.7-config="$PYTHONDIR/bin/python2.7-config"
+#export PATH="$PATH:~/.local/bin"
 
 which root
-which python2.7
+#which python2.7
