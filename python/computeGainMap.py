@@ -29,6 +29,7 @@ if __name__ == "__main__":
                             imon=600,
                             imonpts=hvPoints)
 
-filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
+    #filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
+    filePath = "/Users/dorney/Desktop/MyResearch/GitRepos/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
 
     anaSuite = GainMapAnalysisSuite(filePath, params_gain, params_det, debug=True)

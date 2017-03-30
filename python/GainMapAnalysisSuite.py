@@ -86,5 +86,18 @@ class GainMapAnalysisSuite:
     def avgROSectorADCPkPos(self):
         file_Input = TFile(str(self.INPUT_FILE),"READ","",1)
 
+        strPlotName = "g_iEta" + str(self.DETPOS_IETA) + "_clustADC_Fit_PkPos"
+
+        gSector_clustADC_Fit_PkPos = file_Input.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
+
+        for i in range(0, gSector_clustADC_Fit_PkPos.GetN() ):
+    
+            fPx=0
+            fPy=0
+        
+            gSector_clustADC_Fit_PkPos.GetPoint(i, fPx, fPy)
+        
+            print (i+ "\t" + fPx + "\t" + fPy)
+
         return
 
