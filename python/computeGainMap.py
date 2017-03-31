@@ -1,17 +1,17 @@
-#!/bin/env python2.7
+#!/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt/bin/python2.7
 
 # -*- coding: utf-8 -*-
 
-"""
-    Created on Tuesday March 28 10:54:01 2017
-    
-    @author: Brian L. Dorney
-    
-    Example call:
-    
-        python2.7 python/computeGainMap.py --file=data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root -gp0=3.49545e-02 -gp0Err=1.98035e-04 -gp1=-1.40236e+01 -gp1Err=1.28383e-01 -n=GE11-VII-L-CERN-0002 -hv=600 -hvlist=625,650,660,670,680,690,700,710,720,730
-    
-"""
+#"""
+#    Created on Tuesday March 28 10:54:01 2017
+#    
+#    @author: Brian L. Dorney
+#    
+#    Example call:
+#    
+#        python2.7 python/computeGainMap.py --file=$PWD/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=600 --hvlist=625,650,660,670,680,690,700,710,720,730
+#    
+#"""
 
 import sys, os
 
@@ -20,23 +20,6 @@ if __name__ == "__main__":
     #Import Analysis Suit
     from GainMapAnalysisSuite import *
     from AnalysisOptions import *
-
-#params_gain = PARAMS_GAIN(gain_p0=3.49545e-02,
-#                              gain_p0_err=1.98035e-04,
-#                              gain_p1=-1.40236e+01,
-#                              gain_p1_err=1.28383e-01)
-
-#    hvPoints = [650,660,670,680,690,700]  #Divider current valuves
-
-#    params_det = PARAMS_DET(sectorsize=319.48,
-#                            ieta=4,
-#                            iphi=2,
-#                            nbconnect=3,
-#                            imon0=600,
-#                            imonpts=hvPoints)
-
-#    filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
-    #filePath = "/Users/dorney/Desktop/MyResearch/GitRepos/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
 
     #Get input options
     (options, args) = parser.parse_args()
@@ -77,7 +60,7 @@ if __name__ == "__main__":
     params_gain = PARAMS_GAIN(gain_p0=options.gain_P0,
                               gain_p0_err=options.gain_P0_Err,
                               gain_p1=options.gain_P1,
-                              gain_p1_err=gain_P1_Err)
+                              gain_p1_err=options.gain_P1_Err)
 
     params_det = PARAMS_DET(sectorsize=options.det_sectSize,
                             ieta=options.det_ieta,
@@ -85,16 +68,14 @@ if __name__ == "__main__":
                             nbconnect=options.det_nbconnect,
                             imon0=options.hv_orig)
 
-    #filePath = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
-    #filePath = "/Users/dorney/Desktop/MyResearch/GitRepos/CMS_GEM_Analysis_Framework/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root"
-
     anaSuite = GainMapAnalysisSuite(options.filename, params_gain, params_det, debug=options.debug)
 
     anaSuite.avgROSectorADCPkPos()
     anaSuite.calcROSectorLambda()
     anaSuite.calcGainMap(options.det_name)
-    for hvPt in options.hvlist:
-        anaSuite.calcGainMapHV(options.det_name,hvPt)
+
+    for hvPt in options.hv_list.split(','):
+        anaSuite.calcGainMapHV(options.det_name, float(hvPt) )
 
     anaSuite.plotAvgGain(options.det_name)
     anaSuite.reset()

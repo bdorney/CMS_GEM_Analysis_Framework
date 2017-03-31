@@ -194,11 +194,13 @@ class GainMapAnalysisSuite:
         canv_Gain_Map_Orig.SetPhi(0.0);
         
         #Write the effective gain map to the output file
-        self.FILE_OUT.cd()
+        #self.FILE_OUT.cd()
+	dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(self.DET_IMON_QC5_RESP_UNI) )
+	dir_hvOrig.cd()                
         canv_Gain_Map_Orig.Write()
         self.G2D_MAP_GAIN_ORIG.Write()
 
-    return
+        return
 
     #Determines the gain map from the absolute response uniformity map for an arbitrary voltage
     def calcGainMapHV(self, strDetName, hvPt):
@@ -235,25 +237,35 @@ class GainMapAnalysisSuite:
         canv_Gain_Map_hvPt.SetPhi(0.0);
         
         #Write the effective gain map to the output file
-        self.FILE_OUT.cd()
+        #self.FILE_OUT.cd()
+	dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(hvPt) )
+	dir_hvPt.cd()        
         canv_Gain_Map_hvPt.Write()
         g2D_Map_Gain_hvPt.Write()
             
-    return
+        return
 
     #Plot Average Gain Over Entire Detector Area
     def plotAvgGain(self, strDetName):
-        #Create the Plot
+        #Create the Plot - Average
         gDet_AvgEffGain = TGraphErrors( len(self.GAIN_AVG_POINTS) )
-        gDet_AvgEffGain.SetName("g_" + strDetName + "_AvgEffGain")
+        gDet_AvgEffGain.SetName("g_" + strDetName + "_EffGainAvg")
         
+	#Create the Plot - Percet Error
+	#gDet_PerErrEffGain = TGraphErrors( len(self.GAIN_AVG_POINTS) )
+        #gDet_PerErrEffGain.SetName("g_" + strDetName + "_EffGainPerErr")	
+
         #Set the points
         for i in range(0, len(self.GAIN_AVG_POINTS) ):
+	    #Average
             gDet_AvgEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_AVG_POINTS[i])
             gDet_AvgEffGain.SetPointError(i,0,self.GAIN_STDDEV_POINTS[i])
+
+	    #Percent Error
+            #gDet_PerErrEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_STDDEV_POINTS[i] / self.GAIN_AVG_POINTS[i])
         
-        #Draw
-        canv_AvgEffGain = TCanvas("canv_" + strDetName + "_AvgEffGain",strDetName + " Average Effective Gain",600,600)
+        #Draw - Average
+        canv_AvgEffGain = TCanvas("canv_" + strDetName + "_EffGainAvg",strDetName + " Average Effective Gain",600,600)
         canv_AvgEffGain.cd()
         canv_AvgEffGain.cd().SetLogy()
         gDet_AvgEffGain.GetXaxis().SetTitle("HV")
@@ -261,9 +273,21 @@ class GainMapAnalysisSuite:
         gDet_AvgEffGain.SetMarkerStyle(21)
         gDet_AvgEffGain.Draw("AP")	
         
+	#Draw - Percent Error
+        #canv_PerErrEffGain = TCanvas("canv_" + strDetName + "_EffGainPerErr",strDetName + " Percent Error in Effective Gain",600,600)
+        #canv_PerErrEffGain.cd()
+        #gDet_PerErrEffGain.GetXaxis().SetTitle("HV")
+        #gDet_PerErrEffGain.GetYaxis().SetTitle("Percent Error in Gain")
+        #gDet_PerErrEffGain.SetMarkerStyle(21)
+        #gDet_PerErrEffGain.Draw("AP")
+
         #Write
+	dir_Summary = self.FILE_OUT.mkdir("Summary")
+	dir_Summary.cd()
         canv_AvgEffGain.Write()
         gDet_AvgEffGain.Write()
+        #canv_PerErrEffGain.Write()
+        #gDet_PerErrEffGain.Write()
         
-    return
+    	return
 
