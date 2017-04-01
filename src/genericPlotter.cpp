@@ -231,7 +231,7 @@ int main( int argc_, char * argv_[] ){
         graphPlotter2D.setOutputNameNOption("plotterOutput.root","RECREATE");
         graphPlotter2D.plotAndStore();
     }
-    if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraphErrors ) ) {
+    else if ( 0 == canvSetup.m_strPlotType.compare( typePlot.m_strGraphErrors ) ) {
         PlotterGraphErrors graphPlotterErr;
         graphPlotterErr.setCanvasParameters(canvSetup);
         graphPlotterErr.setLogoPos(canvSetup.m_iLogoPos);

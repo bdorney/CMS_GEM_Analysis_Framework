@@ -59,8 +59,10 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     m_mgraph_Obs->Add( graphPtr.get() );
     
     //Add to the Legend
-    inputLegend.AddEntry(graphPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
-    
+    if(plotInfo.m_strLegEntry.length() > 0){
+    	inputLegend.AddEntry(graphPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
+    }
+
     //Draw the plot
     //m_canv->cd();
     //graphPtr->Draw(plotInfo.m_strOptionDraw.c_str() );
@@ -175,8 +177,10 @@ void PlotterGraph::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, I
     func_plot->SetLineWidth( fitInfo.m_fSizeLine );
     
     //Add to Legend
-    inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
-    
+    if(fitInfo.m_strLegEntry.length() > 0){
+	inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+    }
+
     //Perform Fit
     std::shared_ptr<TGraph> graphPtr = getPlot(plotInfo);
     cout<<"====================================================================\n";

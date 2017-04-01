@@ -52,6 +52,9 @@ else
 	alias pip2.7="$DIR_PIP/bin/pip"
 fi
 
+#alias helper scripts
+#alias makePlots="source $GEM_BASE/scripts/makeAllPlots.sh"
+
 which root
 which python2.7
 which pip2.7

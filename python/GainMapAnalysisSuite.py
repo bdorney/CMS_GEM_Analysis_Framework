@@ -11,7 +11,7 @@
 #Imports
 import sys, os
 import numpy as np
-from ROOT import gROOT, Double, TCanvas, TDirectory, TF1, TFile, TGraph2D, TGraphErrors, TH1F
+from ROOT import gROOT, Double, TCanvas, TDirectory, TF1, TFile, TGraph2D, TGraphErrors, TH1F, TLegend
 
 #Container for storing gain parameters
 #Gain is defined as:
@@ -32,6 +32,13 @@ class PARAMS_GAIN:
         
         return
 
+class PARAMS_PD:
+    def __init__(self, const=-2.12136e+01, slope=2.49075e-05):
+	self.PD_CONST = const
+	self.PD_SLOPE = slope
+
+	return
+
 #Container
 class PARAMS_DET:
     
@@ -50,7 +57,7 @@ class PARAMS_DET:
 
 class GainMapAnalysisSuite:
     
-    def __init__(self, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), debug=False):
+    def __init__(self, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):
         
         self.ADCPKPOS_SECTOR_AVG    = 0. #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         self.ADCPKPOS_SECTOR_STDDEV = 0. #Std. Dev. of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
@@ -67,7 +74,10 @@ class GainMapAnalysisSuite:
         self.DET_IMON_POINTS        = []
         
         self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
-        self.FILE_OUT	= TFile("GainMapAnalysisSuiteOutput.root","RECREATE","",1)
+
+	outputFileName	= inputfilename.split('/')
+	outputFileName	= "GainMapAnalysisSuiteOutput_" + outputFileName[len(outputFileName)-1]
+	self.FILE_OUT	= TFile(str(outputFileName),"RECREATE","",1)
         
         self.GAIN_CURVE_P0      = params_gain.GAIN_CURVE_P0
         self.GAIN_CURVE_P0_ERR  = params_gain.GAIN_CURVE_P0_ERR
@@ -75,12 +85,23 @@ class GainMapAnalysisSuite:
         self.GAIN_CURVE_P1_ERR  = params_gain.GAIN_CURVE_P1_ERR
         self.GAIN_LAMBDA        = 1.
         self.GAIN_LAMBDA_ERR    = 0.
+
         self.GAIN_AVG_POINTS	= [] #Average Gain over the entire detector
         self.GAIN_STDDEV_POINTS	= [] #Std. Dev of Gain over the entire detector
-        
+	self.GAIN_MAX_POINTS	= [] #Max Gain over the entire detector
+	self.GAIN_MIN_POINTS	= [] #Min Gain over the entire detector 
+
         self.G2D_MAP_ABS_RESP_UNI = TGraph2D()
         self.G2D_MAP_GAIN_ORIG = TGraph2D()
         
+	self.PD_CONST	= params_discharge.PD_CONST
+	self.PD_SLOPE	= params_discharge.PD_SLOPE
+
+	self.PD_AVG_POINTS	= [] #Avg P_D over entire detector
+	self.PD_STDDEV_POINTS	= [] #Std. Dev of P_D over entire detector
+	self.PD_MAX_POINTS	= [] #Max P_D over the entire detector
+	self.PD_MIN_POINTS	= [] #Min P_D over the entire detector
+
         return
     
     def reset(self, debug=False):
@@ -143,6 +164,10 @@ class GainMapAnalysisSuite:
     def calcGainErr(self, hvPt):
         return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
     
+    #PD(x) = exp(slope*x+Const)
+    def calcPD(self, gain):
+	return np.exp(self.PD_SLOPE*gain+self.PD_CONST)
+
     #Determines the linear correlation factor lambda which relates Gain to ADC counts
     def calcROSectorLambda(self):
         gain = self.calcGain(self.DET_IMON_QC5_RESP_UNI)
@@ -166,7 +191,7 @@ class GainMapAnalysisSuite:
             print "Summary/" + strPlotName
         
         self.G2D_MAP_GAIN_ORIG.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )
-        self.G2D_MAP_GAIN_ORIG.SetName( "g2D_" + strDetName + "_EffGain_AllEta" )
+        self.G2D_MAP_GAIN_ORIG.SetName( "g2D_" + strDetName + "_EffGain_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)) )
         
         #Get the arrays that make the response uniformity map
         array_fPx = self.G2D_MAP_ABS_RESP_UNI.GetX()
@@ -175,27 +200,37 @@ class GainMapAnalysisSuite:
         
         #Loop Over all Points of self.G2D_MAP_ABS_RESP_UNI
         list_Gain_Vals = []
-        for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
+	list_PD_Vals = []
+	for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
             list_Gain_Vals.append( array_fPz[i] * self.GAIN_LAMBDA )
+	    list_PD_Vals.append( self.calcPD(array_fPz[i] * self.GAIN_LAMBDA) )
             self.G2D_MAP_GAIN_ORIG.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * self.GAIN_LAMBDA)
     
-        #Store Average Gain and Std. Dev. Gain
+        #Store Average, Std. Dev., Max, & Min Gain
         self.DET_IMON_POINTS.append(self.DET_IMON_QC5_RESP_UNI)
         self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
         self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
+	self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
+	self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
         
+	#Store Average, Std. Dev., Max & Min P_D
+	self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
+	self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
+	self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
+	self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+
         #Draw the effective gain map
-        canv_Gain_Map_Orig = TCanvas("canv_" + strDetName + "_EffGain_AllEta","Gain Map - Original",600,600)
+        canv_Gain_Map_Orig = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)),"Gain Map - Original " + str(self.DET_IMON_QC5_RESP_UNI),600,600)
         canv_Gain_Map_Orig.cd()
         canv_Gain_Map_Orig.cd().SetLogz(1)
         self.G2D_MAP_GAIN_ORIG.Draw("TRI2Z")
-        canv_Gain_Map_Orig.SetTheta(90);
-        canv_Gain_Map_Orig.SetPhi(0.0);
+        #canv_Gain_Map_Orig.SetTheta(90);
+        #canv_Gain_Map_Orig.SetPhi(0.0);
         
         #Write the effective gain map to the output file
         #self.FILE_OUT.cd()
-	dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(self.DET_IMON_QC5_RESP_UNI) )
+	dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)) )
 	dir_hvOrig.cd()                
         canv_Gain_Map_Orig.Write()
         self.G2D_MAP_GAIN_ORIG.Write()
@@ -204,10 +239,14 @@ class GainMapAnalysisSuite:
 
     #Determines the gain map from the absolute response uniformity map for an arbitrary voltage
     def calcGainMapHV(self, strDetName, hvPt):
-        #Create the new TGraph2D
+        #Create the new TGraph2D - Gain
         g2D_Map_Gain_hvPt = TGraph2D( self.G2D_MAP_GAIN_ORIG.GetN() )
-        g2D_Map_Gain_hvPt.SetName( "g2D_" + strDetName + "_EffGain_AllEta_" + str(hvPt) )
-        
+        g2D_Map_Gain_hvPt.SetName( "g2D_" + strDetName + "_EffGain_AllEta_" + str(int(hvPt)) )
+
+	#Create the new TGraph2D - Discharge Probability
+	g2D_Map_PD_hvPt = TGraph2D( self.G2D_MAP_GAIN_ORIG.GetN() )
+        g2D_Map_PD_hvPt.SetName( "g2D_" + strDetName + "_PD_AllEta_" + str(int(hvPt)) )
+
         #Get the arrays that make the response uniformity map
         array_fPx = self.G2D_MAP_GAIN_ORIG.GetX()
         array_fPy = self.G2D_MAP_GAIN_ORIG.GetY()
@@ -218,42 +257,67 @@ class GainMapAnalysisSuite:
         
         #Loop Over all Points of self.G2D_MAP_ABS_RESP_UNI
         list_Gain_Vals = []
+	list_PD_Vals = []
         for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
             list_Gain_Vals.append( array_fPz[i] * alpha )
+	    list_PD_Vals.append( self.calcPD(array_fPz[i] * alpha) )
             g2D_Map_Gain_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * alpha)
+	    g2D_Map_PD_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], self.calcPD(array_fPz[i] * alpha) )
     
-        #Store Average Gain and Std. Dev. Gain
+        #Store Average, Std. Dev., Max, & Min Gain
         self.DET_IMON_POINTS.append(hvPt)
         self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
         self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
+	self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
+	self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
         
+	#Store Average, Std. Dev., Max & Min P_D
+	self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
+	self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
+	self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
+	self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+
         #Draw the effective gain map
-        canv_Gain_Map_hvPt = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(hvPt),"Gain Map - hvPt = " + str(hvPt),600,600)
+        canv_Gain_Map_hvPt = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(hvPt)),"Gain Map - hvPt = " + str(hvPt),600,600)
         canv_Gain_Map_hvPt.cd()
         canv_Gain_Map_hvPt.cd().SetLogz(1)
         g2D_Map_Gain_hvPt.Draw("TRI2Z")
-        canv_Gain_Map_hvPt.SetTheta(90);
-        canv_Gain_Map_hvPt.SetPhi(0.0);
+        #canv_Gain_Map_hvPt.SetTheta(90);
+        #canv_Gain_Map_hvPt.SetPhi(0.0);
+
+	#Draw the discharge probability map
+        canv_PD_Map_hvPt = TCanvas("canv_" + strDetName + "_PD_AllEta_" + str(int(hvPt)),"Discharge Probability Map - hvPt = " + str(hvPt),600,600)
+        canv_PD_Map_hvPt.cd()
+        canv_PD_Map_hvPt.cd().SetLogz(1)
+        g2D_Map_PD_hvPt.Draw("TRI2Z")
+        #canv_PD_Map_hvPt.SetTheta(90);
+        #canv_PD_Map_hvPt.SetPhi(0.0);
         
         #Write the effective gain map to the output file
         #self.FILE_OUT.cd()
-	dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(hvPt) )
+	dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(hvPt)) )
 	dir_hvPt.cd()        
         canv_Gain_Map_hvPt.Write()
         g2D_Map_Gain_hvPt.Write()
+        canv_PD_Map_hvPt.Write()
+        g2D_Map_PD_hvPt.Write()
             
         return
 
     #Plot Average Gain Over Entire Detector Area
-    def plotAvgGain(self, strDetName):
+    def plotGainSummary(self, strDetName):
         #Create the Plot - Average
         gDet_AvgEffGain = TGraphErrors( len(self.GAIN_AVG_POINTS) )
         gDet_AvgEffGain.SetName("g_" + strDetName + "_EffGainAvg")
         
-	#Create the Plot - Percet Error
-	#gDet_PerErrEffGain = TGraphErrors( len(self.GAIN_AVG_POINTS) )
-        #gDet_PerErrEffGain.SetName("g_" + strDetName + "_EffGainPerErr")	
+	#Create the Plot - Max Gain
+	gDet_MaxEffGain = TGraphErrors( len(self.GAIN_MAX_POINTS) )
+        gDet_MaxEffGain.SetName("g_" + strDetName + "_EffGainMax")	
+
+	#Create the Plot - Min Gain
+	gDet_MinEffGain = TGraphErrors( len(self.GAIN_MIN_POINTS) )
+        gDet_MinEffGain.SetName("g_" + strDetName + "_EffGainMin")	
 
         #Set the points
         for i in range(0, len(self.GAIN_AVG_POINTS) ):
@@ -261,33 +325,79 @@ class GainMapAnalysisSuite:
             gDet_AvgEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_AVG_POINTS[i])
             gDet_AvgEffGain.SetPointError(i,0,self.GAIN_STDDEV_POINTS[i])
 
-	    #Percent Error
-            #gDet_PerErrEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_STDDEV_POINTS[i] / self.GAIN_AVG_POINTS[i])
+	    #Max
+            gDet_MaxEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_MAX_POINTS[i])
+
+	    #Min
+            gDet_MinEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_MIN_POINTS[i])
         
-        #Draw - Average
+        #Draw
         canv_AvgEffGain = TCanvas("canv_" + strDetName + "_EffGainAvg",strDetName + " Average Effective Gain",600,600)
         canv_AvgEffGain.cd()
         canv_AvgEffGain.cd().SetLogy()
         gDet_AvgEffGain.GetXaxis().SetTitle("HV")
         gDet_AvgEffGain.GetYaxis().SetTitle("#LT Effective Gain #GT")
+	gDet_AvgEffGain.GetYaxis().SetRangeUser(1e2,1e6)
         gDet_AvgEffGain.SetMarkerStyle(21)
-        gDet_AvgEffGain.Draw("AP")	
-        
-	#Draw - Percent Error
-        #canv_PerErrEffGain = TCanvas("canv_" + strDetName + "_EffGainPerErr",strDetName + " Percent Error in Effective Gain",600,600)
-        #canv_PerErrEffGain.cd()
-        #gDet_PerErrEffGain.GetXaxis().SetTitle("HV")
-        #gDet_PerErrEffGain.GetYaxis().SetTitle("Percent Error in Gain")
-        #gDet_PerErrEffGain.SetMarkerStyle(21)
-        #gDet_PerErrEffGain.Draw("AP")
+        gDet_AvgEffGain.Draw("AP")
+        gDet_MaxEffGain.Draw("sameL")
+	gDet_MinEffGain.Draw("sameL")
 
         #Write
 	dir_Summary = self.FILE_OUT.mkdir("Summary")
 	dir_Summary.cd()
         canv_AvgEffGain.Write()
         gDet_AvgEffGain.Write()
-        #canv_PerErrEffGain.Write()
-        #gDet_PerErrEffGain.Write()
+        gDet_MaxEffGain.Write()
+        gDet_MinEffGain.Write()
         
     	return
 
+    #Plot Average Gain Over Entire Detector Area
+    def plotPDSummary(self, strDetName):
+        #Create the Plot - Average
+        gDet_AvgPD = TGraphErrors( len(self.PD_AVG_POINTS) )
+        gDet_AvgPD.SetName("g_" + strDetName + "_PDAvg")
+        
+	#Create the Plot - Max Gain
+	gDet_MaxPD = TGraphErrors( len(self.PD_MAX_POINTS) )
+        gDet_MaxPD.SetName("g_" + strDetName + "_PDMax")	
+
+	#Create the Plot - Min Gain
+	gDet_MinPD = TGraphErrors( len(self.PD_MIN_POINTS) )
+        gDet_MinPD.SetName("g_" + strDetName + "_PDMin")	
+
+        #Set the points
+        for i in range(0, len(self.PD_AVG_POINTS) ):
+	    #Average
+            gDet_AvgPD.SetPoint(i,self.GAIN_AVG_POINTS[i],self.PD_AVG_POINTS[i])
+            gDet_AvgPD.SetPointError(i,self.GAIN_STDDEV_POINTS[i],self.PD_STDDEV_POINTS[i])
+
+	    #Max
+            gDet_MaxPD.SetPoint(i,self.GAIN_AVG_POINTS[i],self.PD_MAX_POINTS[i])
+
+	    #Min
+            gDet_MinPD.SetPoint(i,self.GAIN_AVG_POINTS[i],self.PD_MIN_POINTS[i])
+        
+        #Draw
+        canv_AvgPD = TCanvas("canv_" + strDetName + "_PDAvg",strDetName + " Discharge Probability",600,600)
+        canv_AvgPD.cd()
+        canv_AvgPD.cd().SetLogx()
+        canv_AvgPD.cd().SetLogy()
+        gDet_AvgPD.GetXaxis().SetTitle("#LT Effective Gain #GT")
+        gDet_AvgPD.GetYaxis().SetTitle("Discharge Probability P_{D}")
+	gDet_AvgPD.GetYaxis().SetRangeUser(1e-11,1e-6)
+        gDet_AvgPD.SetMarkerStyle(21)
+        gDet_AvgPD.Draw("AP")
+        gDet_MaxPD.Draw("sameL")
+	gDet_MinPD.Draw("sameL")
+
+        #Write
+	dir_Summary = self.FILE_OUT.GetDirectory("Summary")
+	dir_Summary.cd()
+        canv_AvgPD.Write()
+        gDet_AvgPD.Write()
+        gDet_MaxPD.Write()
+        gDet_MinPD.Write()
+        
+    	return

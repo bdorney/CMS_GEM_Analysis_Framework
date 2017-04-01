@@ -55,8 +55,10 @@ void PlotterHisto::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
     hPtr->SetMarkerSize(plotInfo.m_fSizeMarker);
     
     //Add to the Legend
-    inputLegend.AddEntry(hPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
-    
+    if(plotInfo.m_strLegEntry.length() > 0){
+    	inputLegend.AddEntry(hPtr.get(), plotInfo.m_strLegEntry.c_str(), "LPE" );
+    }
+
     return;
 } //End PlotterHisto::addPlot()
 
@@ -163,8 +165,10 @@ void PlotterHisto::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo, I
     func_plot->SetLineWidth( fitInfo.m_fSizeLine );
     
     //Add to Legend
-    inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
-    
+    if(fitInfo.m_strLegEntry.length() > 0){
+	inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+    }
+
     //Perform Fit
     std::shared_ptr<TH1F> hPtr = getPlot(plotInfo);
     cout<<"====================================================================\n";

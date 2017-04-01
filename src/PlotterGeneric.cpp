@@ -142,6 +142,7 @@ void PlotterGeneric::initCanv(){
     //Log
     m_canv->cd()->SetLogx(m_canvInfo.m_bLog_X);
     m_canv->cd()->SetLogy(m_canvInfo.m_bLog_Y);
+    m_canv->cd()->SetLogz(m_canvInfo.m_bLog_Z);
     
     //Determine values for margins
     /*float fMargin_Top   = 0.08;// * m_canvInfo.m_iSize_Y;
@@ -246,8 +247,10 @@ void PlotterGeneric::loadAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo){
             func_plot->SetLineWidth( fitInfo.m_fSizeLine );
             
             //Add to Legend
-            inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
-            
+	    if(fitInfo.m_strLegEntry.length() > 0){
+            	inputLegend.AddEntry(func_plot.get(), fitInfo.m_strLegEntry.c_str(), "L" );
+            }
+
             //Draw Fit
             m_canv->cd();
             func_plot->Draw("same");

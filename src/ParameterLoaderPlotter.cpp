@@ -200,8 +200,11 @@ void ParameterLoaderPlotter::loadParametersCanvas(std::ifstream & file_Input, In
                 //Get the comma separated list
                 vec_strCommaSepList = getCharSeparatedList( pair_strParam.second, ',' );
                 
-                //Set the grid case
+                //Set the log case
                 setParameters(vec_strCommaSepList, inputCanvInfo.m_bLog_X, inputCanvInfo.m_bLog_Y);
+            }
+	    else if ( pair_strParam.first.compare("CANV_LOG_Z") == 0 ) {
+                inputCanvInfo.m_bLog_Z = convert2bool(pair_strParam.second,bExitSuccess);
             }
             else if ( pair_strParam.first.compare("CANV_LOGO_POS") == 0 ) {
                 inputCanvInfo.m_iLogoPos = stoi(pair_strParam.second);

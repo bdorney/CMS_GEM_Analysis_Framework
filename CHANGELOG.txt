@@ -2,9 +2,21 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Mar 24 2017                     *
+*	LAST UPDATE: Mar 31 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 1st 2017
+==================================================
+->python/GainMapAnalysisSuite.py now also provides plots of a detector's discharge probability
+
+Update: Mar 31th 2017
+==================================================
+->Plotter classes will now only add an entry to the legend if LegEntry string has a nonzero length
+->scripts/setup_CMS_GEM.sh will now setup the computing environment to use python2.7 (installing pip and several packages locally if they are not present)
+->Added significant python analysis scripts for computing gain map, gain curves, and discharge prob. maps
+->The plot config file will now support logarithmic z-axis
+->Fixed a bug in genericPlotter where an if-else if-else statement was not correctly joined
 
 Update: Mar 27th 2017
 ==================================================
