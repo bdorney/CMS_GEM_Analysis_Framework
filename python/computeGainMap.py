@@ -6,7 +6,7 @@
 #    Created on Tuesday March 28 10:54:01 2017
 #    
 #    @author: Brian L. Dorney
-#    
+#
 #    Example call:
 #    
 #        python2.7 python/computeGainMap.py --file=$PWD/data/sliceTestAna/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730
