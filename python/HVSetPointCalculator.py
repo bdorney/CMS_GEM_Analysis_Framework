@@ -1,12 +1,12 @@
 #!/bin/env python2.7
 
 # -*- coding: utf-8 -*-
-
-    """
-    Created on Saturday April 1
-    
-    @author: Brian L. Dorney
-    """
+#
+#    """
+#    Created on Saturday April 1
+#    
+#    @author: Brian L. Dorney
+#    """
 
 #Imports
 import sys, os
@@ -37,7 +37,7 @@ class PARAMS_TFILE_INPUT:
     #   inputFileName -> physical filename of the desired TFile
     #   inputDetName  -> detector's serial number
     #   inputTObjStr  -> string used to identify the detector in stored TObject's found in inputFileName
-    def __init__(self, inputFileName, inputDetName, inputTObjStr)
+    def __init__(self, inputFileName, inputDetName, inputTObjStr):
         self.NAME_FILE  = inputFileName
         self.NAME_DET   = inputDetName
         self.NAME_TOBJ  = inputTObjStr
@@ -45,12 +45,14 @@ class PARAMS_TFILE_INPUT:
         return
 
 class HVSetPoint:
-    def __init__(self, inputGainVal):
+    def __init__(self, inputGainVal, debug=False):
+	self.DEBUG	= debug
+
         self.GAIN_VAL   = inputGainVal
 
-        self.LIST_INPUT_FILES
-        self.LIST_FIT_PARAMS_GAIN
-        self.LIST_FIT_PARAMS_PD
+        self.LIST_INPUT_FILES		= []
+        self.LIST_FIT_PARAMS_GAIN	= []
+        self.LIST_FIT_PARAMS_PD		= []
 
         return
 
@@ -73,6 +75,10 @@ class HVSetPoint:
     def loadFitParams(self, inputList, inputObsName="EffGain"):
         #Loop over files
         for iFile in range(0,len(self.LIST_INPUT_FILES)):
+	    #Print debugging information
+	    if self.DEBUG:
+		print "Processing " + str(iFile) + "th file: " +  self.LIST_INPUT_FILES[iFile].NAME_FILE
+
             #Get the i^th input file
             thisFile = TFile(self.LIST_INPUT_FILES[iFile].NAME_FILE, "READ", "", 1)
 
@@ -80,6 +86,15 @@ class HVSetPoint:
             fit_Obs_Avg = thisFile.Get("fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName + "Avg")
             fit_Obs_Max = thisFile.Get("fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName + "Max")
             fit_Obs_Min = thisFile.Get("fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName +  "Min")
+
+	    #Print debugging information
+	    if self.DEBUG:
+		print "fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName + "Avg"
+		print "fit_Obs_Avg.GetName() = " + fit_Obs_Avg.GetName()
+		print "fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName + "Max"
+		print "fit_Obs_Max.GetName() = " + fit_Obs_Avg.GetName()
+		print "fit_" + self.LIST_INPUT_FILES[iFile].NAME_TOBJ + "_" + inputObsName +  "Min"
+		print "fit_Obs_Min.GetName() = " + fit_Obs_Avg.GetName()
 
             #Get & store the fit parameters - Gain
             params_obs_fit         = PARAMS_OBS_FIT(self.LIST_INPUT_FILES[iFile].NAME_DET)
@@ -99,6 +114,7 @@ class HVSetPoint:
         return
 
     def printFitParamGain(self):
+	print "Det\tAvgP0\tAvgP1\tMaxP0\tMaxP1\tMinP0\tMinP1"
         for i in range(0, len(self.LIST_FIT_PARAMS_GAIN)):
             printedString = self.LIST_FIT_PARAMS_GAIN[i].NAME + "\t"
             printedString = printedString + str(self.LIST_FIT_PARAMS_GAIN[i].AVG_P0) + "\t"
@@ -117,10 +133,10 @@ class HVSetPoint:
         if printGain:
             print "Det\tHVSetPt\tMinGain\tAvgGain\tMaxGain"
             for i in range(0,len(self.LIST_FIT_PARAMS_GAIN)):
-                hvVal = ( 1. / self.LIST_FIT_PARAMS_GAIN[i].AVG_P1 ) * ( math.log(self.GAIN_VAL) - self.LIST_FIT_PARAMS_GAIN[i].AVG_P0 )
+                hvVal = ( 1. / self.LIST_FIT_PARAMS_GAIN[i].AVG_P0 ) * ( math.log(self.GAIN_VAL) - self.LIST_FIT_PARAMS_GAIN[i].AVG_P1 )
     
-                gain_Max = math.exp( self.LIST_FIT_PARAMS_GAIN[i].MAX_P0 * self.GAIN_VAL + self.LIST_FIT_PARAMS_GAIN[i].MAX_P1)
-                gain_Min = math.exp( self.LIST_FIT_PARAMS_GAIN[i].MAX_P0 * self.GAIN_VAL + self.LIST_FIT_PARAMS_GAIN[i].MAX_P1)
+                gain_Max = math.exp( self.LIST_FIT_PARAMS_GAIN[i].MAX_P0 * hvVal + self.LIST_FIT_PARAMS_GAIN[i].MAX_P1)
+                gain_Min = math.exp( self.LIST_FIT_PARAMS_GAIN[i].MIN_P0 * hvVal + self.LIST_FIT_PARAMS_GAIN[i].MIN_P1)
                     
                 print self.LIST_FIT_PARAMS_GAIN[i].NAME + "\t" + str(hvVal) + "\t" + str(gain_Min) + "\t" + str(self.GAIN_VAL) + "\t" + str(gain_Max)
                 
@@ -130,7 +146,7 @@ class HVSetPoint:
 
         return
 
-if __name__ = "__main__":
+if __name__ == "__main__":
 
     from optparse import OptionParser
     
@@ -147,11 +163,11 @@ if __name__ = "__main__":
     (options, args) = parser.parse_args()
     
     #Define the HVSetPoint objcet
-    hvSettings = HVSetPoint(options.gainval)
+    hvSettings = HVSetPoint(options.gainval, options.debug)
 
     #Add list of files
     hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long1/GE11-VII-L-CERN-0001_GainCurves.root","GE1/1-VII-L-CERN-0001","GE11-VII-L-CERN-0001")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long2/GE11-VII-L-CERN-0002_GainCurves.root","GE1/1-VII-L-CERN-0002","GE1/1-VII-L-CERN-0002")
+    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long2/GE11-VII-L-CERN-0002_GainCurves.root","GE1/1-VII-L-CERN-0002","GE11-VII-L-CERN-0002")
     hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long3/GE11-VII-L-CERN-0003_GainCurves.root","GE1/1-VII-L-CERN-0003","Detector")
     hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long4/GE11-VII-L-CERN-0004_GainCurves.root","GE1/1-VII-L-CERN-0004","Detector")
     hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short1/GE11-VII-S-CERN-0001_GainCurves.root","GE1/1-VII-S-CERN-0001","GE11-VII-S-CERN-0001")
@@ -163,6 +179,7 @@ if __name__ = "__main__":
     
     #Print the file list if requested
     if options.debug:
+	#Printing input files
         hvSettings.printFileList()
 
     #Get the fit parameters - gain
@@ -174,5 +191,3 @@ if __name__ = "__main__":
 
     #Calculate HV SetPoint
     hvSettings.calculateHVPt()
-
-    return

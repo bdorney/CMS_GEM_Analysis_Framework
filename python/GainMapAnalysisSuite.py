@@ -130,6 +130,7 @@ class GainMapAnalysisSuite:
         
         #Loop Over poins in the plot
         list_clustADC_Fit_PkPos = []
+	#array_clustADC_Fit_PkPos = np.array()
         for i in range(0, gSector_clustADC_Fit_PkPos.GetN() ):
             #Get the i^th point in this plot
             fPx=Double(0.0)
@@ -144,9 +145,19 @@ class GainMapAnalysisSuite:
                 
                 #store data point
                 list_clustADC_Fit_PkPos.append(fPy)
+                #array_clustADC_Fit_PkPos.append(fPy)
         
-        self.ADCPKPOS_SECTOR_AVG    = np.mean(list_clustADC_Fit_PkPos) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
-        self.ADCPKPOS_SECTOR_STDDEV = np.std(list_clustADC_Fit_PkPos) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
+	array_clustADC_Fit_PkPos = np.array(list_clustADC_Fit_PkPos)
+	array_clustADC_Fit_PkPos = self.rejectOutliers(array_clustADC_Fit_PkPos)
+
+	if self.DEBUG:
+	    print "np.mean(list_clustADC_Fit_PkPos) = " + str(np.mean(list_clustADC_Fit_PkPos))
+	    print "np.mean(array_clustADC_Fit_PkPos) = " + str(np.mean(array_clustADC_Fit_PkPos)) + "\t No Outliers"
+
+        #self.ADCPKPOS_SECTOR_AVG    = np.mean(list_clustADC_Fit_PkPos) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
+        #self.ADCPKPOS_SECTOR_STDDEV = np.std(list_clustADC_Fit_PkPos) #Std Dev of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
+        self.ADCPKPOS_SECTOR_AVG    = np.mean(array_clustADC_Fit_PkPos) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
+        self.ADCPKPOS_SECTOR_STDDEV = np.std(array_clustADC_Fit_PkPos) #Std Dev of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         
         print "Avg PkPos = " + str(self.ADCPKPOS_SECTOR_AVG) + "+/-" + str(str(self.ADCPKPOS_SECTOR_STDDEV))
         
@@ -180,6 +191,26 @@ class GainMapAnalysisSuite:
         
         return
     
+    #Use Median absolute deviation (MAD) to reject outliers)
+    #See: http://stackoverflow.com/questions/22354094/pythonic-way-of-detecting-outliers-in-one-dimensional-observation-data
+    def rejectOutliers(self, arrayData, thresh=3.5):
+	if len(arrayData.shape) == 1:
+	    tempData = arrayData[:,None]
+
+	median = np.median(tempData, axis=0)
+
+	diff = np.sum((tempData - median)**2, axis=-1)
+	diff = np.sqrt(diff)
+
+	med_abs_deviation = np.median(diff)
+
+	modified_z_score = 0.6745 * diff / med_abs_deviation
+
+	arrayMask = (modified_z_score < thresh) #true if points are not outliers, false if points are outliers
+	arrayData = np.multiply(arrayData, arrayMask) #Now outliers are set to zero
+
+	return arrayData[(arrayData > 0)] #Return only the non-outlier versions
+
     #Determines the gain map from the absolute response uniformity map
     def calcGainMap(self, strDetName):
         #Load the absolute response uniformity map
@@ -199,26 +230,54 @@ class GainMapAnalysisSuite:
         array_fPz = self.G2D_MAP_ABS_RESP_UNI.GetZ()
         
         #Loop Over all Points of self.G2D_MAP_ABS_RESP_UNI
-        list_Gain_Vals = []
-        list_PD_Vals = []
+        #list_Gain_Vals = []
+        #list_PD_Vals = []
+        array_Gain_Vals = np.zeros(self.G2D_MAP_ABS_RESP_UNI.GetN())
+        array_PD_Vals = np.zeros(self.G2D_MAP_ABS_RESP_UNI.GetN())
         for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
-            list_Gain_Vals.append( array_fPz[i] * self.GAIN_LAMBDA )
-            list_PD_Vals.append( self.calcPD(array_fPz[i] * self.GAIN_LAMBDA) )
+            #list_Gain_Vals.append( array_fPz[i] * self.GAIN_LAMBDA )
+            #list_PD_Vals.append( self.calcPD(array_fPz[i] * self.GAIN_LAMBDA) )
+            array_Gain_Vals[i] = array_fPz[i] * self.GAIN_LAMBDA
+            array_PD_Vals[i] = self.calcPD(array_fPz[i] * self.GAIN_LAMBDA) 
             self.G2D_MAP_GAIN_ORIG.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * self.GAIN_LAMBDA)
     
+	#array_Gain_Vals = np.array(list_Gain_Vals)
+
+	#print "len(array_Gain_Vals) = " + str(len(array_Gain_Vals) )
+	#print "len(self.rejectOutliers(array_Gain_Vals)) = " + str(len(self.rejectOutliers(array_Gain_Vals)))
+
+	#print "np.min(array_Gain_Vals) = " + str(np.min(array_Gain_Vals) )
+	#print "np.min(self.rejectOutliers(array_Gain_Vals)) = " + str(np.min(self.rejectOutliers(array_Gain_Vals)))
+
+	#print "np.mean(array_Gain_Vals) = " + str(np.mean(array_Gain_Vals) )
+	#print "np.mean(self.rejectOutliers(array_Gain_Vals)) = " + str(np.mean(self.rejectOutliers(array_Gain_Vals)))
+
+	#print "np.max(array_Gain_Vals) = " + str(np.max(array_Gain_Vals) )
+	#print "np.max(self.rejectOutliers(array_Gain_Vals)) = " + str(np.max(self.rejectOutliers(array_Gain_Vals)))
+
         #Store Average, Std. Dev., Max, & Min Gain
+	array_Gain_Vals = self.rejectOutliers(array_Gain_Vals)
         self.DET_IMON_POINTS.append(self.DET_IMON_QC5_RESP_UNI)
-        self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
-        self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
-        self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
-        self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
+        #self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
+        #self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
+        #self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
+        #self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
+        self.GAIN_AVG_POINTS.append(np.mean(array_Gain_Vals) )
+        self.GAIN_STDDEV_POINTS.append(np.std(array_Gain_Vals) )
+        self.GAIN_MAX_POINTS.append(np.max(array_Gain_Vals) )
+        self.GAIN_MIN_POINTS.append(np.min(array_Gain_Vals) )
             
         #Store Average, Std. Dev., Max & Min P_D
-        self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
-        self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
-        self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
-        self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+	array_PD_Vals = self.rejectOutliers(array_PD_Vals)
+        #self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
+        #self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
+        #self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
+        #self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+        self.PD_AVG_POINTS.append(np.mean(array_PD_Vals) )
+        self.PD_STDDEV_POINTS.append(np.std(array_PD_Vals) )
+        self.PD_MAX_POINTS.append(np.max(array_PD_Vals) )
+        self.PD_MIN_POINTS.append(np.min(array_PD_Vals) )
 
         #Draw the effective gain map
         canv_Gain_Map_Orig = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)),"Gain Map - Original " + str(self.DET_IMON_QC5_RESP_UNI),600,600)
@@ -256,27 +315,41 @@ class GainMapAnalysisSuite:
         alpha = self.calcAlpha(hvPt)
         
         #Loop Over all Points of self.G2D_MAP_ABS_RESP_UNI
-        list_Gain_Vals = []
-        list_PD_Vals = []
+        #list_Gain_Vals = []
+        #list_PD_Vals = []
+        array_Gain_Vals = np.zeros(self.G2D_MAP_ABS_RESP_UNI.GetN())
+        array_PD_Vals = np.zeros(self.G2D_MAP_ABS_RESP_UNI.GetN())
         for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
-            list_Gain_Vals.append( array_fPz[i] * alpha )
-            list_PD_Vals.append( self.calcPD(array_fPz[i] * alpha) )
+            #list_Gain_Vals.append( array_fPz[i] * alpha )
+            #list_PD_Vals.append( self.calcPD(array_fPz[i] * alpha) )
+            array_Gain_Vals[i] = array_fPz[i] * alpha 
+            array_PD_Vals[i] = self.calcPD(array_fPz[i] * alpha)
             g2D_Map_Gain_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * alpha)
             g2D_Map_PD_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], self.calcPD(array_fPz[i] * alpha) )
     
         #Store Average, Std. Dev., Max, & Min Gain
+	array_Gain_Vals = self.rejectOutliers(array_Gain_Vals)
         self.DET_IMON_POINTS.append(hvPt)
-        self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
-        self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
-        self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
-        self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
+        #self.GAIN_AVG_POINTS.append(np.mean(list_Gain_Vals) )
+        #self.GAIN_STDDEV_POINTS.append(np.std(list_Gain_Vals) )
+        #self.GAIN_MAX_POINTS.append(np.max(list_Gain_Vals) )
+        #self.GAIN_MIN_POINTS.append(np.min(list_Gain_Vals) )
+        self.GAIN_AVG_POINTS.append(np.mean(array_Gain_Vals) )
+        self.GAIN_STDDEV_POINTS.append(np.std(array_Gain_Vals) )
+        self.GAIN_MAX_POINTS.append(np.max(array_Gain_Vals) )
+        self.GAIN_MIN_POINTS.append(np.min(array_Gain_Vals) )
             
         #Store Average, Std. Dev., Max & Min P_D
-        self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
-        self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
-        self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
-        self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+	array_PD_Vals = self.rejectOutliers(array_PD_Vals)
+        #self.PD_AVG_POINTS.append(np.mean(list_PD_Vals) )
+        #self.PD_STDDEV_POINTS.append(np.std(list_PD_Vals) )
+        #self.PD_MAX_POINTS.append(np.max(list_PD_Vals) )
+        #self.PD_MIN_POINTS.append(np.min(list_PD_Vals) )
+        self.PD_AVG_POINTS.append(np.mean(array_PD_Vals) )
+        self.PD_STDDEV_POINTS.append(np.std(array_PD_Vals) )
+        self.PD_MAX_POINTS.append(np.max(array_PD_Vals) )
+        self.PD_MIN_POINTS.append(np.min(array_PD_Vals) )
 
         #Draw the effective gain map
         canv_Gain_Map_hvPt = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(hvPt)),"Gain Map - hvPt = " + str(hvPt),600,600)
