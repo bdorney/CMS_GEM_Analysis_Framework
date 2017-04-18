@@ -73,6 +73,7 @@ if __name__ == "__main__":
     anaSuite.ANA_UNI_GRANULARITY = 32
 
     anaSuite.avgROSectorADCPkPos()
+    anaSuite.avgROSectorAvgClustSize()
     anaSuite.calcROSectorLambda()
     anaSuite.calcGainMap(options.det_name)
     anaSuite.calcClusterSizeMap(options.det_name)
