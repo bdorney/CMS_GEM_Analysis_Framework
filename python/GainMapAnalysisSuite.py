@@ -66,7 +66,7 @@ class PARAMS_DET:
         return
 
     #Load the mapping information
-    def loadMapping(self, inputfilename, debug=FALSE):
+    def loadMapping(self, inputfilename, debug=False):
         #Open the mapping file
         file_Mapping = open(inputfilename, 'r')
 
@@ -413,7 +413,8 @@ class GainMapAnalysisSuite:
         #self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )    #Set number of pts
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( iNBinNum ) #Set number of pts, see comments above
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetName( strPlotName )
-    
+	self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetTitle("")    
+
         for iEta in range(1, self.DETGEO_NETASECTORS+1):
             #Load the cluster size vs cluster position plot for this iEta value
             strPlotName = "SectorEta" + str(iEta) + "/h_iEta" + str(iEta) + "_clustSize_v_clustPos"
@@ -431,10 +432,10 @@ class GainMapAnalysisSuite:
                 h_clustSize = h_clustSize_v_clustPos.ProjectionY(strPlotName, iSlice, iSlice, "")
     
                 #Store average cluster size, y-position and x-position
-                array_clustSize[ (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice ] = (h_clustSize_v_clustPos.GetXaxis().GetBinCenter(i), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
+                array_clustSize[ (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1 ] = (h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
                 
                 #Set this point in the plot
-                self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(i), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
+                self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
     
         #Print the cluster map to the user if requested
         if self.DEBUG:
@@ -448,7 +449,7 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Draw("TRI2Z")
         
         #Write the average cluster size map to the output file
-        dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)), FALSE, "GetDirectory" )
+        dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)), False, "GetDirectory" )
         dir_hvOrig.cd()
         canv_AvgClustSize_Map_Orig.Write()
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Write()

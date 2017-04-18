@@ -62,10 +62,10 @@ if __name__ == "__main__":
                               gain_p1=options.gain_P1,
                               gain_p1_err=options.gain_P1_Err)
 
-    params_det = PARAMS_DET(sectorsize=options.det_sectSize,
+    params_det = PARAMS_DET(#sectorsize=options.det_sectSize,
                             ieta=options.det_ieta,
                             iphi=options.det_iphi,
-                            nbconnect=options.det_nbconnect,
+                            #nbconnect=options.det_nbconnect,
                             imon0=options.hv_orig)
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
@@ -75,6 +75,7 @@ if __name__ == "__main__":
     anaSuite.avgROSectorADCPkPos()
     anaSuite.calcROSectorLambda()
     anaSuite.calcGainMap(options.det_name)
+    anaSuite.calcClusterSizeMap(options.det_name)
 
     for hvPt in options.hv_list.split(','):
         anaSuite.calcGainMapHV(options.det_name, float(hvPt) )
