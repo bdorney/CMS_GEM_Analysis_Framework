@@ -39,7 +39,7 @@ VisualizeUniformity::VisualizeUniformity(Uniformity::AnalysisSetupUniformity inp
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a std::string which stores the physical filename as input
-void VisualizeUniformity::makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -69,7 +69,7 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(std::string & strOutputROOTF
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a TFile *, which the canvas is writtent to, as input
-void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
+void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption){
     //TFile does not manage objects
     TH1::AddDirectory(kFALSE);
     
@@ -163,8 +163,7 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, 
     //g2DObs->SetNpy(200);
     g2DObs->Draw( strDrawOption.c_str() );
     canv_DetSum.SetTheta(90);
-    //canv_DetSum.SetPhi(0.05);
-    canv_DetSum.SetPhi(0.0);
+    canv_DetSum.SetPhi(0.001);
     
     //Setup the TLatex for "CMS Preliminary"
     //------------------------------------------------------
@@ -172,13 +171,13 @@ void VisualizeUniformity::makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, 
     latex_CMSPrelim.SetTextSize(0.05);
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
     
-    cout<<"Points Stored In 2D Graph\n";
+    /*cout<<"Points Stored In 2D Graph\n";
     cout<<"====================================================\n";
     cout<<"i\tPx\tPy\tPz\n";
     Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
     for(int i=0; i<g2DObs->GetN(); ++i){
         cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
-    }
+    }*/
     
     //Write the Canvas to the File
     //------------------------------------------------------

@@ -67,14 +67,6 @@ namespace QualityControl {
             
             //Actions - Methods that Do Something
             //------------------------------------------------------------------------------------------------------------------------------------------
-            //Makes a 2D plot of a given observable in the detector's active area
-            //Takes a std::string which stores the physical filename as input
-            virtual void makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-            
-            //Makes a 2D plot of a given observable in the detector's active area
-            //Takes a TFile *, which the canvas is writtent to, as input
-            virtual void makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-            
             //Draws the distribution of an observable onto a single pad of canvas
             //Takes a std::string which stores the physical filename as input
             virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShiftMean);
@@ -111,6 +103,14 @@ namespace QualityControl {
             //Draws a given observable onto a single pad of canvas
             //Takes a TFile * which the histograms are written to as input
             virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a std::string which stores the physical filename as input
+            virtual void storeCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+            
+            //Makes a 2D plot of a given observable in the detector's active area
+            //Takes a TFile *, which the canvas is writtent to, as input
+            virtual void storeCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
             
             virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
             

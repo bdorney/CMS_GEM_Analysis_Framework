@@ -9,9 +9,11 @@ parser = OptionParser()
 parser.add_option("-d","--deubg", type="int", dest="debug",
                   help="Print debugging information", metavar="debug")
 
-#input filename
+#filenames
 parser.add_option("-f", "--file", type="string", dest="filename",
                   help="physical filename of input QC5_Resp_Uni analyzed file", metavar="filename", default="FrameworkOutput.root")
+parser.add_option("--fileMap", type="string", dest="filename_Map",
+                  help="physical filename of mapping config file", metavar="filename_Map", default="config/Mapping_GE11-VII-L.cfg")
 
 #gain parameters
 parser.add_option("--gp0", type="float", dest="gain_P0",

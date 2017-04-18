@@ -2,9 +2,23 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Mar 31 2017                     *
+*	LAST UPDATE: Apr 18 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 18th 2017
+==================================================
+->AnalyzeResponseUniformityClusters::initHistosClusters() when intitalizing the number of bins in the cluster position
+observable, this method will now automatically account for # of iPhi sector's declared for an Eta Sector in the input
+mapping config file (e.g. nbConnect) rather than this being hard-coded
+
+Update: Apr 10th 2017
+==================================================
+->Class PARAMS_DET in python/GainAnalysisSuite.py will now load the geometry from a mapping configuration file
+
+Update: Apr 7th 2017
+==================================================
+->Overloaded methods VisualizeUniformity::makeAndStoreCanvasHisto2D() renamed to storeCanvasHisto2D()
 
 Update: Apr 1st 2017
 ==================================================
