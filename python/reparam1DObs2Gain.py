@@ -6,6 +6,12 @@ if __name__ == "__main__":
     #Import Options
     from AnalysisOptions import *
     from GainMapAnalysisSuite import PARAMS_GAIN
+    from Utilities import getall
+
+    #Specific Options
+    parser.add_option("--ident", type="string", dest="strIdent",
+		      help="Substring within a TObject's TName that corresponds to the divider current value",
+		      metavar="strIdent")
 
     #Get input options
     (options, args) = parser.parse_args()
@@ -21,13 +27,13 @@ if __name__ == "__main__":
     #Check to make sure the user specified a gain curve
     if options.gain_P0 is None or options.gain_P1 is None:
         print "For G(x) = exp(P0 * x + P1)"
-            print "P0 = " + str(options.gain_P0)
-            print "P0_Err = " + str(options.gain_P0_Err)
-            print "P1 = " + str(options.gain_P1)
-            print "P1_Err = " + str(options.gain_P1_Err)
-            print "You must specify values for P0 & P1"
-            exit(1)
-            pass
+        print "P0 = " + str(options.gain_P0)
+        print "P0_Err = " + str(options.gain_P0_Err)
+        print "P1 = " + str(options.gain_P1)
+        print "P1_Err = " + str(options.gain_P1_Err)
+        print "You must specify values for P0 & P1"
+        exit(1)
+        pass
 
     #Check to make sure the user specified detector parameters
     if options.det_name is None:
@@ -44,21 +50,42 @@ if __name__ == "__main__":
 
     #Load the input file
     file_Input	= TFile(str(options.filename),"READ","",1)
-    TIter iterKeys(file_Input.GetListOfKeys())
-    TKey keyCurrent
 
-    #Loop Over the keys in the file
-    while (keyCurrent = (TKey)iterKeys()):
-        #Get the i^th object
-        TClass objInput = gROOT.GetClass(keyCurrent.GetClassName())
+    #Loop over all TObjects in this File
+    list_IndepVar = []
+    list_DepVar = []
+    list_DepVar_Err = []
+    for strPath, obj in getall(file_Input, ""):
+	#Print the class name and path pair to user
+	if options.debug:
+	    print obj.ClassName(), strPath	
 
-        if !objInput.InheritsFrom("TH1"):
-            print "Skipping Current Object"
-            continue
+	#Skip all objects that are not TH1's or their daughters
+	if obj.InheritsFrom("TH1") == False:
+	    print "Skipping Current Object"
+	    continue
 
-        TH1 hInput(keyCurrent.ReadObj())
+	#Get this histogram & store the values of interest
+	hInput = file_Input.Get(strPath)
+	list_DepVar.append(hInput.GetMean())
+	list_DepVar_Err.append(hInput.GetRMS())
 
-        print hInput.GetName()
+	#Get the current values
+	strName = hInput.GetName()
+	list_NameFields = strName.split('_') 
+	list_NameFields = [x for x in list_NameFields if options.strIdent in x ]
+	#print list_CurrentVals
+
+	#Store the current
+	#fCurrent = float(list_NameFields[0].replace(options.strIdent, "."))
+	#print "fCurrent = " + str(fCurrent)
+	list_IndepVar.append(float(list_NameFields[0].replace(options.strIdent, ".")))
+
+    #Reparameterize independent variable into gain & print data to user
+    print "VAR_INDEP,VAR_DEP,VAR_DEP_ERR"
+    for i in range(0,len(list_IndepVar)):
+	#list_IndepVar[i]=np.exp(options.p0 * list_IndepVar[i] + options.p1)
+	list_IndepVar[i]=params_gain.calcGain(list_IndepVar[i])         
+	print str(list_IndepVar[i]) + "," + str(list_DepVar[i]) + "," + str(list_DepVar_Err[i])
 
     print "Finished"
-

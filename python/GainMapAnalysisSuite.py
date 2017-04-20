@@ -32,6 +32,14 @@ class PARAMS_GAIN:
         
         return
 
+    #G(x) = exp([0]*x+[1]) where x is hvPt
+    def calcGain(self, hvPt):
+        return np.exp(self.GAIN_CURVE_P0 * hvPt + self.GAIN_CURVE_P1)
+
+    #G(x) = exp([0]*x+[1]) where x is hvPt
+    def calcGainErr(self, hvPt):
+        return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
+
 class PARAMS_GEO:
     def __init__(self):
         self.IETA       = -1
@@ -185,7 +193,7 @@ class GainMapAnalysisSuite:
         #list_sectBoundary = []
         #for i in range(0, self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].NBCONNECT+1):
         #    list_sectBoundary.append(-0.5 * self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].SECTSIZE + i * self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].SECTSIZE / self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].NBCONNECT)
-        list_sectBoundary = calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
+        list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
         
         #Print to user - Section Boundaries
         if self.DEBUG == True:
@@ -232,7 +240,7 @@ class GainMapAnalysisSuite:
         hSector_clustSize_v_clustPos = self.FILE_IN.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
         
         #Calculate the iphi sector boundaries
-        list_sectBoundary = calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
+        list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
 
         #Print to user - Section Boundaries
         if self.DEBUG == True:
@@ -249,7 +257,7 @@ class GainMapAnalysisSuite:
                 
                 #Project out cluster size distribution for *this* slice
                 strPlotName = "h_iEta" + str(self.DETPOS_IETA) + "Slice" + str(i) + "_clustSize"
-                h_clustSize = h_clustSize_v_clustPos.ProjectionY(strPlotName, i, i, "")
+                h_clustSize = hSector_clustSize_v_clustPos.ProjectionY(strPlotName, i, i, "")
                 
                 fAvgClustSize = h_clustSize.GetMean()
         
@@ -297,7 +305,7 @@ class GainMapAnalysisSuite:
         #Calculate the iphi sector boundaries
         list_boundaries = []
         for i in range(0, params_geo.NBCONNECT+1):
-            list_sectBoundary.append(-0.5 * params_geo.SECTSIZE + i * params_geo.SECTSIZE / params_geo.NBCONNECT)
+            list_boundaries.append(-0.5 * params_geo.SECTSIZE + i * params_geo.SECTSIZE / params_geo.NBCONNECT)
     
         return list_boundaries
     
