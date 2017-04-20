@@ -57,26 +57,27 @@ if __name__ == "__main__":
         exit(1)
         pass
 
+    #Setup Gain Parameters
     params_gain = PARAMS_GAIN(gain_p0=options.gain_P0,
                               gain_p0_err=options.gain_P0_Err,
                               gain_p1=options.gain_P1,
                               gain_p1_err=options.gain_P1_Err)
 
-    params_det = PARAMS_DET(#sectorsize=options.det_sectSize,
-                            ieta=options.det_ieta,
+    #Setup Detector Parameters
+    params_det = PARAMS_DET(ieta=options.det_ieta,
                             iphi=options.det_iphi,
-                            #nbconnect=options.det_nbconnect,
                             imon0=options.hv_orig)
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
+    #Initialize analysis suite
     anaSuite = GainMapAnalysisSuite(options.filename, params_gain, params_det, debug=options.debug)
     anaSuite.ANA_UNI_GRANULARITY = 32
 
+    #Calculate Gain & P_D maps
     anaSuite.avgROSectorADCPkPos()
     anaSuite.avgROSectorAvgClustSize()
     anaSuite.calcROSectorLambda()
     anaSuite.calcGainMap(options.det_name)
-    anaSuite.calcClusterSizeMap(options.det_name)
 
     for hvPt in options.hv_list.split(','):
         anaSuite.calcGainMapHV(options.det_name, float(hvPt) )
@@ -84,4 +85,15 @@ if __name__ == "__main__":
     anaSuite.plotGainSummary(options.det_name)
     anaSuite.plotPDSummary(options.det_name)
 
+    #Calculate Cluster Size Map - Requires a rearrange since old test beam data was at (5,2)
+    params_det.DETPOS_IETA = 5
+    params_det.DETPOS_IPHI = 2
+
+    anaSuite.setDetector(params_det)
+    anaSuite.calcClusterSizeMap(options.det_name)
+
+    #Reset Everything
     anaSuite.reset()
+
+    print "Finished"
+    return

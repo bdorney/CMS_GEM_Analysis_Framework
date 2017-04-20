@@ -11,112 +11,8 @@
 #Imports
 import sys, os
 import numpy as np
+from Utilities import *
 from ROOT import gROOT, Double, TCanvas, TDirectory, TF1, TFile, TGraph2D, TGraphErrors, TH1F, TH2F, TLegend
-
-#Container for storing gain parameters
-#Gain is defined as:
-#
-#   G(x) = exp([0]*x+[1]) where x is Divider Current in uA
-#
-#The factor lambda is used such that:
-#
-#   G_ijk = lambda * ADCPkPos_ijk
-#
-class PARAMS_GAIN:
-    #def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1, lam, lam_err):
-    def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1):
-        self.GAIN_CURVE_P0      = gain_p0
-        self.GAIN_CURVE_P0_ERR  = gain_p0_err
-        self.GAIN_CURVE_P1      = gain_p1
-        self.GAIN_CURVE_P1_ERR  = gain_p1_err
-        
-        return
-
-    #G(x) = exp([0]*x+[1]) where x is hvPt
-    def calcGain(self, hvPt):
-        return np.exp(self.GAIN_CURVE_P0 * hvPt + self.GAIN_CURVE_P1)
-
-    #G(x) = exp([0]*x+[1]) where x is hvPt
-    def calcGainErr(self, hvPt):
-        return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
-
-class PARAMS_GEO:
-    def __init__(self):
-        self.IETA       = -1
-        self.SECTPOS    = 0.0
-        self.SECTSIZE   = 0.0
-        self.NBCONNECT  = 3
-
-class PARAMS_PD:
-    def __init__(self, const=-2.12136e+01, slope=2.49075e-05):
-        self.PD_CONST = const
-        self.PD_SLOPE = slope
-
-	return
-
-#Container
-class PARAMS_DET:
-    
-    #hvPoints = [650,660,670,680,690,700]  #Divider current valuves
-    
-    #def __init__(self, sectorsize=-1, ieta=4, iphi=2, nbconnect=3, imon0=600):
-    def __init__(self, ieta=4, iphi=2, imon0=600):
-        self.DETPOS_IETA            = ieta          #iEta Position QC5_Gain_Cal performed in
-        self.DETPOS_IPHI            = iphi          #iPhi "                                 "
-        
-        #self.DETGEO_SECSIZE         = sectorsize    #Width in mm corresponding to DETPOS_IETA row
-        #self.DETGEO_NCONNECTORS     = nbconnect     #Number of readout conncetors in DETPOS_IETA row
-
-        self.LIST_DET_GEO_PARAMS    = []
-
-        self.DET_IMON_QC5_RESP_UNI  = imon0         #Imon value QC5_Resp_Uni was performed at
-        
-        return
-
-    #Load the mapping information
-    def loadMapping(self, inputfilename, debug=False):
-        #Open the mapping file
-        file_Mapping = open(inputfilename, 'r')
-
-        #Loop over the file
-        for line in file_Mapping:
-            #Skip commented lines
-            if line[0] == "#":
-                continue
-        
-            #Segement line by removing white space and segmenting by commas
-            line.replace(" ","")
-            list_sectParams = line.split(",")
-        
-            if list_sectParams[0] == "DET":
-                detgeo = PARAMS_GEO()
-                detgeo.IETA       = int(    list_sectParams[4].replace("CMSSECTOR","") )
-                detgeo.SECTPOS    = float(  list_sectParams[5] )
-                detgeo.SECTSIZE   = float(  list_sectParams[6] )
-                detgeo.NBCONNECT  = int(  list_sectParams[7] )
-                
-                self.LIST_DET_GEO_PARAMS.append(detgeo)
-            else:
-                continue
-        
-        #Print the geometry to the user
-        if debug:
-            print "Loaded Mapping:"
-            for idx in range(0,len(self.LIST_DET_GEO_PARAMS)):
-                strLine = str(idx) + "\t" + str(self.LIST_DET_GEO_PARAMS[idx].IETA) + "\t"
-                strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].IETA) + "\t"
-                strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].SECTPOS) + "\t"
-                strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].SECTSIZE) + "\t"
-                strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].NBCONNECT) + "\n"
-                
-                print strLine
-        
-        #sectIdx = next((x for x in range(0, len(self.LIST_DET_GEO_PARAMS) ) if self.LIST_DET_GEO_PARAMS[x].IETA == self.DETPOS_IETA ), -1 )
-
-        #print self.LIST_DET_GEO_PARAMS[sectIdx].SECTSIZE
-        #print sectIdx
-
-        return
 
 class GainMapAnalysisSuite:
     
@@ -132,12 +28,14 @@ class GainMapAnalysisSuite:
         
         self.DEBUG                  = debug
         
-        self.DETPOS_IETA            = params_det.DETPOS_IETA
-        self.DETPOS_IPHI            = params_det.DETPOS_IPHI
+        #self.DETPOS_IETA            = params_det.DETPOS_IETA
+        #self.DETPOS_IPHI            = params_det.DETPOS_IPHI
         
-        self.DETGEO_NETASECTORS     = len(params_det.LIST_DET_GEO_PARAMS)
+        self.DETECTOR               = params_det
         
-        self.LIST_DET_GEO_PARAMS    = params_det.LIST_DET_GEO_PARAMS
+        #self.DETGEO_NETASECTORS     = len(params_det.LIST_DET_GEO_PARAMS)
+        
+        #self.LIST_DET_GEO_PARAMS    = params_det.LIST_DET_GEO_PARAMS
         
         self.DET_IMON_QC5_RESP_UNI  = params_det.DET_IMON_QC5_RESP_UNI
         self.DET_IMON_POINTS        = []
@@ -148,10 +46,11 @@ class GainMapAnalysisSuite:
         outputFileName	= "GainMapAnalysisSuiteOutput_" + outputFileName[len(outputFileName)-1]
         self.FILE_OUT	= TFile(str(outputFileName),"RECREATE","",1)
         
-        self.GAIN_CURVE_P0      = params_gain.GAIN_CURVE_P0
-        self.GAIN_CURVE_P0_ERR  = params_gain.GAIN_CURVE_P0_ERR
-        self.GAIN_CURVE_P1      = params_gain.GAIN_CURVE_P1
-        self.GAIN_CURVE_P1_ERR  = params_gain.GAIN_CURVE_P1_ERR
+        #self.GAIN_CURVE_P0      = params_gain.GAIN_CURVE_P0
+        #self.GAIN_CURVE_P0_ERR  = params_gain.GAIN_CURVE_P0_ERR
+        #self.GAIN_CURVE_P1      = params_gain.GAIN_CURVE_P1
+        #self.GAIN_CURVE_P1_ERR  = params_gain.GAIN_CURVE_P1_ERR
+        self.GAIN_CALCULATOR    = params_gain
         self.GAIN_LAMBDA        = 1.
         self.GAIN_LAMBDA_ERR    = 0.
 
@@ -165,21 +64,63 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_NORM = TGraph2D()   #Normalized "                   "
         self.G2D_MAP_GAIN_ORIG = TGraph2D()             #Effective Gain Map
         
-        self.PD_CONST	= params_discharge.PD_CONST
-        self.PD_SLOPE	= params_discharge.PD_SLOPE
+        #self.PD_CONST	= params_discharge.PD_CONST
+        #self.PD_SLOPE	= params_discharge.PD_SLOPE
+        self.PD_CALCULATOR      = params_discharge
 
-        self.PD_AVG_POINTS	= [] #Avg P_D over entire detector
+        self.PD_AVG_POINTS      = [] #Avg P_D over entire detector
         self.PD_STDDEV_POINTS	= [] #Std. Dev of P_D over entire detector
-        self.PD_MAX_POINTS	= [] #Max P_D over the entire detector
-        self.PD_MIN_POINTS	= [] #Min P_D over the entire detector
+        self.PD_MAX_POINTS      = [] #Max P_D over the entire detector
+        self.PD_MIN_POINTS      = [] #Min P_D over the entire detector
 
         return
     
     def reset(self, debug=False):
         
         #Close TFiles
-        self.FILE_IN.Close()
-        self.FILE_OUT.Close()
+        self.closeTFiles(debug)
+        #self.FILE_IN.Close()
+        #self.FILE_OUT.Close()
+        
+        #Reset Variables
+        self.DEBUG = debug
+        
+        self.ADCPKPOS_SECTOR_AVG    = 0.
+        self.ADCPKPOS_SECTOR_STDDEV = 0.
+        
+        self.ANA_UNI_GRANULARITY    = 32
+        
+        self.AVGCLUSTSIZE_SECTOR_AVG    = 0.
+        self.AVGCLUSTSIZE_SECTOR_STDDEV = 0.
+
+        self.DET_IMON_QC5_RESP_UNI  = 0.
+    
+        self.GAIN_LAMBDA        = 1.
+        self.GAIN_LAMBDA_ERR    = 0.
+        
+        #Reset classes
+        self.DETECTOR.reset()
+        #self.GAIN_CALCULATOR
+        #self.PD_CALCULATOR
+        
+        #Clear Lists
+        del self.DET_IMON_POINTS[:]
+        
+        del self.GAIN_AVG_POINTS[:]
+        del self.GAIN_STDDEV_POINTS[:]
+        del self.GAIN_MAX_POINTS[:]
+        del self.GAIN_MIN_POINTS[:]
+        
+        del self.PD_AVG_POINTS[:]
+        del self.PD_STDDEV_POINTS[:]
+        del self.PD_MAX_POINTS[:]
+        del self.PD_MIN_POINTS[:]
+        
+        #Clear TObjects?
+        #self.G2D_MAP_ABS_RESP_UNI
+        #self.G2D_MAP_AVG_CLUST_SIZE_ORIG
+        #self.G2D_MAP_AVG_CLUST_SIZE_NORM
+        #self.G2D_MAP_GAIN_ORIG
         
         return
     
@@ -190,10 +131,7 @@ class GainMapAnalysisSuite:
         gSector_clustADC_Fit_PkPos = self.FILE_IN.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
         
         #Calculate the iphi sector boundaries
-        #list_sectBoundary = []
-        #for i in range(0, self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].NBCONNECT+1):
-        #    list_sectBoundary.append(-0.5 * self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].SECTSIZE + i * self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].SECTSIZE / self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1].NBCONNECT)
-        list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
+        list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
         
         #Print to user - Section Boundaries
         if self.DEBUG == True:
@@ -219,7 +157,7 @@ class GainMapAnalysisSuite:
         
         #Store this list as a numpy array and then remove all outliers
         array_clustADC_Fit_PkPos = np.array(list_clustADC_Fit_PkPos)
-        array_clustADC_Fit_PkPos = self.rejectOutliers(array_clustADC_Fit_PkPos)
+        array_clustADC_Fit_PkPos = rejectOutliers(array_clustADC_Fit_PkPos)
 
         if self.DEBUG:
             print "np.mean(list_clustADC_Fit_PkPos) = " + str(np.mean(list_clustADC_Fit_PkPos))
@@ -240,8 +178,9 @@ class GainMapAnalysisSuite:
         hSector_clustSize_v_clustPos = self.FILE_IN.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
         
         #Calculate the iphi sector boundaries
-        list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
-
+        #list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
+        list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
+        
         #Print to user - Section Boundaries
         if self.DEBUG == True:
             for i in range(0,len(list_sectBoundary)):
@@ -270,7 +209,7 @@ class GainMapAnalysisSuite:
         
         #Store this list as a numpy array and then remove all outliers
         array_avgClustSize = np.array(list_avgClustSize)
-        array_avgClustSize = self.rejectOutliers(array_avgClustSize)
+        array_avgClustSize = rejectOutliers(array_avgClustSize)
 
         if self.DEBUG:
             print "np.mean(list_avgClustSize) = " + str(np.mean(list_avgClustSize))
@@ -289,30 +228,30 @@ class GainMapAnalysisSuite:
         return np.exp(self.GAIN_CURVE_P0 * (hvPt - self.DET_IMON_QC5_RESP_UNI) )
     
     #G(x) = exp([0]*x+[1]) where x is hvPt
-    def calcGain(self, hvPt):
-        return np.exp(self.GAIN_CURVE_P0 * hvPt + self.GAIN_CURVE_P1)
+    #def calcGain(self, hvPt):
+    #    return np.exp(self.GAIN_CURVE_P0 * hvPt + self.GAIN_CURVE_P1)
     
     #G(x) = exp([0]*x+[1]) where x is hvPt
-    def calcGainErr(self, hvPt):
-        return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
+    #def calcGainErr(self, hvPt):
+    #    return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
     
     #PD(x) = exp(slope*x+Const)
-    def calcPD(self, gain):
-        return np.exp(self.PD_SLOPE*gain+self.PD_CONST)
+    #def calcPD(self, gain):
+    #    return np.exp(self.PD_SLOPE*gain+self.PD_CONST)
 
     #Determines the Phi boundaries within an Eta Sector
-    def calcROSectorBoundaries(self, params_geo=PARAMS_GEO()):
-        #Calculate the iphi sector boundaries
-        list_boundaries = []
-        for i in range(0, params_geo.NBCONNECT+1):
-            list_boundaries.append(-0.5 * params_geo.SECTSIZE + i * params_geo.SECTSIZE / params_geo.NBCONNECT)
-    
-        return list_boundaries
+    #def calcROSectorBoundaries(self, params_eta=PARAMS_ETASECTOR()):
+    #    #Calculate the iphi sector boundaries
+    #    list_boundaries = []
+    #    for i in range(0, params_eta.NBCONNECT+1):
+    #        list_boundaries.append(-0.5 * params_eta.SECTSIZE + i * params_eta.SECTSIZE / params_eta.NBCONNECT)
+    #
+    #    return list_boundaries
     
     #Determines the linear correlation factor lambda which relates Gain to ADC counts
     def calcROSectorLambda(self):
-        gain = self.calcGain(self.DET_IMON_QC5_RESP_UNI)
-        gain_err = self.calcGainErr(self.DET_IMON_QC5_RESP_UNI)
+        gain = self.GAIN_CALCULATOR.calcGain(self.DET_IMON_QC5_RESP_UNI)
+        gain_err = self.GAIN_CALCULATOR.calcGainErr(self.DET_IMON_QC5_RESP_UNI)
         
         self.GAIN_LAMBDA = gain / self.ADCPKPOS_SECTOR_AVG
         self.GAIN_LAMBDA_ERR = ( 1. / self.ADCPKPOS_SECTOR_AVG ) * np.sqrt( np.square(gain_err) + np.square(self.ADCPKPOS_SECTOR_STDDEV * gain / self.ADCPKPOS_SECTOR_AVG) - 2. * gain_err * self.ADCPKPOS_SECTOR_STDDEV * gain / self.ADCPKPOS_SECTOR_AVG)
@@ -320,27 +259,6 @@ class GainMapAnalysisSuite:
         print "lambda = " + str(self.GAIN_LAMBDA) + "+/-" + str(self.GAIN_LAMBDA_ERR)
         
         return
-    
-    #Use Median absolute deviation (MAD) to reject outliers)
-    #See: http://stackoverflow.com/questions/22354094/pythonic-way-of-detecting-outliers-in-one-dimensional-observation-data
-    #And also: http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h.htm
-    def rejectOutliers(self, arrayData, thresh=3.5):
-        if len(arrayData.shape) == 1:
-            tempData = arrayData[:,None]
-
-        median = np.median(tempData, axis=0)
-
-        diff = np.sum((tempData - median)**2, axis=-1)
-        diff = np.sqrt(diff)
-
-        med_abs_deviation = np.median(diff)
-
-        modified_z_score = 0.6745 * diff / med_abs_deviation
-
-        arrayMask = (modified_z_score < thresh) #true if points are not outliers, false if points are outliers
-        arrayData = np.multiply(arrayData, arrayMask) #Now outliers are set to zero
-
-        return arrayData[(arrayData > 0)] #Return only the non-outlier versions
 
     #Determines the gain map from the absolute response uniformity map
     def calcGainMap(self, strDetName):
@@ -425,12 +343,12 @@ class GainMapAnalysisSuite:
         for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
             array_Gain_Vals[i] = array_fPz[i] * alpha
-            array_PD_Vals[i] = self.calcPD(array_fPz[i] * alpha)
+            array_PD_Vals[i] = self.PD_CALCULATOR.calcPD(array_fPz[i] * alpha)
             g2D_Map_Gain_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * alpha)
             g2D_Map_PD_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], self.calcPD(array_fPz[i] * alpha) )
     
         #Store Average, Std. Dev., Max, & Min Gain
-        array_Gain_Vals = self.rejectOutliers(array_Gain_Vals)
+        array_Gain_Vals = rejectOutliers(array_Gain_Vals)
         self.DET_IMON_POINTS.append(hvPt)
         self.GAIN_AVG_POINTS.append(np.mean(array_Gain_Vals) )
         self.GAIN_STDDEV_POINTS.append(np.std(array_Gain_Vals) )
@@ -438,7 +356,7 @@ class GainMapAnalysisSuite:
         self.GAIN_MIN_POINTS.append(np.min(array_Gain_Vals) )
             
         #Store Average, Std. Dev., Max & Min P_D
-        array_PD_Vals = self.rejectOutliers(array_PD_Vals)
+        array_PD_Vals = rejectOutliers(array_PD_Vals)
         self.PD_AVG_POINTS.append(np.mean(array_PD_Vals) )
         self.PD_STDDEV_POINTS.append(np.std(array_PD_Vals) )
         self.PD_MAX_POINTS.append(np.max(array_PD_Vals) )
@@ -449,16 +367,12 @@ class GainMapAnalysisSuite:
         canv_Gain_Map_hvPt.cd()
         canv_Gain_Map_hvPt.cd().SetLogz(1)
         g2D_Map_Gain_hvPt.Draw("TRI2Z")
-        #canv_Gain_Map_hvPt.SetTheta(90);
-        #canv_Gain_Map_hvPt.SetPhi(0.0);
 
         #Draw the discharge probability map
         canv_PD_Map_hvPt = TCanvas("canv_" + strDetName + "_PD_AllEta_" + str(int(hvPt)),"Discharge Probability Map - hvPt = " + str(hvPt),600,600)
         canv_PD_Map_hvPt.cd()
         canv_PD_Map_hvPt.cd().SetLogz(1)
         g2D_Map_PD_hvPt.Draw("TRI2Z")
-        #canv_PD_Map_hvPt.SetTheta(90);
-        #canv_PD_Map_hvPt.SetPhi(0.0);
         
         #Write the effective gain map to the output file
         dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(hvPt)) )
@@ -539,6 +453,16 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Write()
         canv_AvgClustSize_Map_Norm.Write()
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.Write()
+
+        return
+
+    #Closes TFiles
+    def closeTFiles(self, debug=False):
+        if self.FILE_IN.IsOpen():
+            self.FILE_IN.Close()
+
+        if self.FILE_OUT.IsOpen():
+            self.FILE_OUT.Close()
 
         return
 
@@ -638,3 +562,9 @@ class GainMapAnalysisSuite:
         gDet_MinPD.Write()
         
     	return
+
+    #Set the detector
+    def setDetector(self, params_det=PARAMS_DET()):
+        self.DETECTOR = params_det
+
+        return

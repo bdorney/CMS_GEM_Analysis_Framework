@@ -2,9 +2,18 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Apr 18 2017                     *
+*	LAST UPDATE: Apr 20 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 20th 2017
+==================================================
+->Moved python classes PARAMS_DET, PARAMS_GAIN, PARAMS_GEO, and PARAMS_PD from GainMapAnalysisSuite.py to Utilities.py
+->Renamed python class PARAMS_GEO to PARAMS_ETASECTOR
+->Moved methods calcGain, calcGainErr from python class GainMapAnalysisSuite to PARAMS_GAIN
+->Moved method calcPD from python class GainMapAnalysisSuite to PARAMS_PD
+->Moved method calcROSectorBoundaries from python class GainMapAnalysisSuite to PARAMS_DET
+->Moved method rejectOutliers from python class GainMapAnalysisSuite to a standalone function in Utilities.py
 
 Update: Apr 18th 2017
 ==================================================

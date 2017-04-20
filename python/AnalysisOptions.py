@@ -11,7 +11,7 @@ parser.add_option("-d","--deubg", type="int", dest="debug",
 
 #filenames
 parser.add_option("-f", "--file", type="string", dest="filename",
-                  help="physical filename of input QC5_Resp_Uni analyzed file", metavar="filename", default="FrameworkOutput.root")
+                  help="physical filename of input file", metavar="filename", default="FrameworkOutput.root")
 parser.add_option("--fileMap", type="string", dest="filename_Map",
                   help="physical filename of mapping config file", metavar="filename_Map", default="config/Mapping_GE11-VII-L.cfg")
 
@@ -29,17 +29,17 @@ parser.add_option("--gp1Err", type="float", dest="gain_P1_Err",
 parser.add_option("-n", "--name", type="string", dest="det_name",
                   help="Serial Number of Detector, note this must be the value used in the input file",
                   metavar="det_name")
-parser.add_option("-w", "--sectorSize", type="float", dest="det_sectSize",
-                  help="Width of ieta row, in mm, supplied to --ieta", metavar="det_sectSize", default=319.48)
+#parser.add_option("-w", "--sectorSize", type="float", dest="det_sectSize",
+#                  help="Width of ieta row, in mm, supplied to --ieta", metavar="det_sectSize", default=319.48)
 parser.add_option("--ieta", type="int", dest="det_ieta",
                   help="ieta for (ieta,iphi) sector that gain calibration measurement was performed in",
                   metavar="det_ieta", default=4)
 parser.add_option("--iphi", type="int", dest="det_iphi",
                   help="iphi for (ieta,iphi) sector that gain calibration measurement was performed in",
                   metavar="det_iphi", default=2)
-parser.add_option("--nbConnectRO", type="int", dest="det_nbconnect",
-                  help="number of total readout connectors in ieta row that gain cal was performed in",
-                  metavar="det_nbconnect", default=3)
+#parser.add_option("--nbConnectRO", type="int", dest="det_nbconnect",
+#                  help="number of total readout connectors in ieta row that gain cal was performed in",
+#                  metavar="det_nbconnect", default=3)
 
 #HV information
 parser.add_option("--hvPoint", type="float", dest="hv_orig",
