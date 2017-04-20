@@ -20,7 +20,7 @@ def getall(d, basepath="/"):
 #Use Median absolute deviation (MAD) to reject outliers)
 #See: http://stackoverflow.com/questions/22354094/pythonic-way-of-detecting-outliers-in-one-dimensional-observation-data
 #And also: http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h.htm
-def rejectOutliers(self, arrayData, thresh=3.5):
+def rejectOutliers(arrayData, thresh=3.5):
     if len(arrayData.shape) == 1:
         tempData = arrayData[:,None]
         
@@ -72,7 +72,7 @@ class PARAMS_ETASECTOR:
         self.SECTSIZE   = 0.0
         self.NBCONNECT  = 3     #Number of Phi Sectors within Eta Sector
     
-    return
+    	return
 
 #---------------------PARAMS_PD---------------------
 #Class for storing discharge probability parameters
@@ -125,7 +125,7 @@ class PARAMS_DET:
             list_sectParams = line.split(",")
             
             if list_sectParams[0] == "DET":
-                detgeo = PARAMS_GEO()
+                detgeo = PARAMS_ETASECTOR()
                 detgeo.IETA       = int(    list_sectParams[4].replace("CMSSECTOR","") )
                 detgeo.SECTPOS    = float(  list_sectParams[5] )
                 detgeo.SECTSIZE   = float(  list_sectParams[6] )
@@ -147,14 +147,14 @@ class PARAMS_DET:
                 
                 print strLine
     
-                    return
+        return
 
     #Given an eta sector, determines the Phi boundaries within an Eta Sector
     def calcROSectorBoundaries(self, params_eta=PARAMS_ETASECTOR()):
         #Calculate the iphi sector boundaries
         list_boundaries = []
-            for i in range(0, params_eta.NBCONNECT+1):
-                list_boundaries.append(-0.5 * params_eta.SECTSIZE + i * params_eta.SECTSIZE / params_eta.NBCONNECT)
+        for i in range(0, params_eta.NBCONNECT+1):
+            list_boundaries.append(-0.5 * params_eta.SECTSIZE + i * params_eta.SECTSIZE / params_eta.NBCONNECT)
 
         return list_boundaries
 

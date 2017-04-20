@@ -127,8 +127,8 @@ class GainMapAnalysisSuite:
     #Determines the Average & Std. Dev. ADC PkPos in the (DETPOS_IETA, DETPOS_IPHI) sector
     def avgROSectorADCPkPos(self):
         #Load the plot
-        strPlotName = "g_iEta" + str(self.DETPOS_IETA) + "_clustADC_Fit_PkPos"
-        gSector_clustADC_Fit_PkPos = self.FILE_IN.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
+        strPlotName = "g_iEta" + str(self.DETECTOR.DETPOS_IETA) + "_clustADC_Fit_PkPos"
+        gSector_clustADC_Fit_PkPos = self.FILE_IN.Get( "SectorEta" + str(self.DETECTOR.DETPOS_IETA) + "/" + strPlotName )
         
         #Calculate the iphi sector boundaries
         list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
@@ -147,7 +147,7 @@ class GainMapAnalysisSuite:
             gSector_clustADC_Fit_PkPos.GetPoint(i, fPx, fPy)
             
             #Check if this point is within the defined (ieta,iphi) sector, if so store it for later use
-            if list_sectBoundary[self.DETPOS_IPHI-1] <= fPx and fPx <= list_sectBoundary[self.DETPOS_IPHI]:
+            if list_sectBoundary[self.DETECTOR.DETPOS_IPHI-1] <= fPx and fPx <= list_sectBoundary[self.DETECTOR.DETPOS_IPHI]:
                 #Print to user - selected data points
                 if self.DEBUG == True:
                     print (str(i) + "\t" + str(fPx) + "\t" + str(fPy) )
@@ -174,11 +174,11 @@ class GainMapAnalysisSuite:
     #Determine the average of the average cluster sizes within a single readout sector
     def avgROSectorAvgClustSize(self):
         #Load the plot
-        strPlotName = "h_iEta" + str(self.DETPOS_IETA) + "_clustSize_v_clustPos"
-        hSector_clustSize_v_clustPos = self.FILE_IN.Get( "SectorEta" + str(self.DETPOS_IETA) + "/" + strPlotName )
+        strPlotName = "h_iEta" + str(self.DETECTOR.DETPOS_IETA) + "_clustSize_v_clustPos"
+        hSector_clustSize_v_clustPos = self.FILE_IN.Get( "SectorEta" + str(self.DETECTOR.DETPOS_IETA) + "/" + strPlotName )
         
         #Calculate the iphi sector boundaries
-        #list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETPOS_IETA-1])
+        #list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETECTOR.DETPOS_IETA-1])
         list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
         
         #Print to user - Section Boundaries
@@ -192,10 +192,10 @@ class GainMapAnalysisSuite:
             fBinCenter = hSector_clustSize_v_clustPos.GetXaxis().GetBinCenter(i)
         
             #Check if this point is within the defined (ieta,iphi) sector, if so store it for later use
-            if list_sectBoundary[self.DETPOS_IPHI-1] <= fBinCenter and fBinCenter <= list_sectBoundary[self.DETPOS_IPHI]:
+            if list_sectBoundary[self.DETECTOR.DETPOS_IPHI-1] <= fBinCenter and fBinCenter <= list_sectBoundary[self.DETECTOR.DETPOS_IPHI]:
                 
                 #Project out cluster size distribution for *this* slice
-                strPlotName = "h_iEta" + str(self.DETPOS_IETA) + "Slice" + str(i) + "_clustSize"
+                strPlotName = "h_iEta" + str(self.DETECTOR.DETPOS_IETA) + "Slice" + str(i) + "_clustSize"
                 h_clustSize = hSector_clustSize_v_clustPos.ProjectionY(strPlotName, i, i, "")
                 
                 fAvgClustSize = h_clustSize.GetMean()
@@ -225,7 +225,7 @@ class GainMapAnalysisSuite:
     
     #alpha(x) = exp([0]*(x-x0) ) where x is hvPt and x0 is self.DET_IMON_QC5_RESP_UNI
     def calcAlpha(self, hvPt):
-        return np.exp(self.GAIN_CURVE_P0 * (hvPt - self.DET_IMON_QC5_RESP_UNI) )
+        return np.exp(self.GAIN_CALCULATOR.GAIN_CURVE_P0 * (hvPt - self.DETECTOR.DET_IMON_QC5_RESP_UNI) )
     
     #G(x) = exp([0]*x+[1]) where x is hvPt
     #def calcGain(self, hvPt):
@@ -285,11 +285,11 @@ class GainMapAnalysisSuite:
         for i in range(0, self.G2D_MAP_ABS_RESP_UNI.GetN() ):
             #Set the i^th point in self.G2D_MAP_GAIN_ORIG
             array_Gain_Vals[i] = array_fPz[i] * self.GAIN_LAMBDA
-            array_PD_Vals[i] = self.calcPD(array_fPz[i] * self.GAIN_LAMBDA) 
+            array_PD_Vals[i] = self.PD_CALCULATOR.calcPD(array_fPz[i] * self.GAIN_LAMBDA) 
             self.G2D_MAP_GAIN_ORIG.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * self.GAIN_LAMBDA)
     
         #Store Average, Std. Dev., Max, & Min Gain
-        array_Gain_Vals = self.rejectOutliers(array_Gain_Vals)
+        array_Gain_Vals = rejectOutliers(array_Gain_Vals)
         self.DET_IMON_POINTS.append(self.DET_IMON_QC5_RESP_UNI)
         self.GAIN_AVG_POINTS.append(np.mean(array_Gain_Vals) )
         self.GAIN_STDDEV_POINTS.append(np.std(array_Gain_Vals) )
@@ -297,7 +297,7 @@ class GainMapAnalysisSuite:
         self.GAIN_MIN_POINTS.append(np.min(array_Gain_Vals) )
             
         #Store Average, Std. Dev., Max & Min P_D
-        array_PD_Vals = self.rejectOutliers(array_PD_Vals)
+        array_PD_Vals = rejectOutliers(array_PD_Vals)
         self.PD_AVG_POINTS.append(np.mean(array_PD_Vals) )
         self.PD_STDDEV_POINTS.append(np.std(array_PD_Vals) )
         self.PD_MAX_POINTS.append(np.max(array_PD_Vals) )
@@ -345,7 +345,7 @@ class GainMapAnalysisSuite:
             array_Gain_Vals[i] = array_fPz[i] * alpha
             array_PD_Vals[i] = self.PD_CALCULATOR.calcPD(array_fPz[i] * alpha)
             g2D_Map_Gain_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], array_fPz[i] * alpha)
-            g2D_Map_PD_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], self.calcPD(array_fPz[i] * alpha) )
+            g2D_Map_PD_hvPt.SetPoint(i, array_fPx[i], array_fPy[i], self.PD_CALCULATOR.calcPD(array_fPz[i] * alpha) )
     
         #Store Average, Std. Dev., Max, & Min Gain
         array_Gain_Vals = rejectOutliers(array_Gain_Vals)
@@ -388,7 +388,8 @@ class GainMapAnalysisSuite:
     def calcClusterSizeMap(self, strDetName):
         #Create the container which will store the clusterSize
         #array_shape = ( self.G2D_MAP_ABS_RESP_UNI.GetN(), 3)   #Not gauranteed to work since some points are thrown out during the fitting process in the C++ class AnalyzeResponseUniformityClusters
-        iNBinNum = self.ANA_UNI_GRANULARITY * self.DETGEO_NETASECTORS * self.LIST_DET_GEO_PARAMS[0].NBCONNECT
+	iNEtaSectors = len(self.DETECTOR.LIST_DET_GEO_PARAMS)
+        iNBinNum = self.ANA_UNI_GRANULARITY * iNEtaSectors * self.DETECTOR.LIST_DET_GEO_PARAMS[0].NBCONNECT
         array_shape = (iNBinNum, 3)
         array_clustSize = np.zeros(array_shape)
         
@@ -406,7 +407,10 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetName( strPlotName )
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetTitle("")
 
-        for iEta in range(1, self.DETGEO_NETASECTORS+1):
+        for iEta in range(1, iNEtaSectors+1):
+	    #Get the Eta Sector
+	    etaSector = self.DETECTOR.LIST_DET_GEO_PARAMS[iEta-1]
+
             #Load the cluster size vs cluster position plot for this iEta value
             strPlotName = "SectorEta" + str(iEta) + "/h_iEta" + str(iEta) + "_clustSize_v_clustPos"
             
@@ -423,13 +427,13 @@ class GainMapAnalysisSuite:
                 h_clustSize = h_clustSize_v_clustPos.ProjectionY(strPlotName, iSlice, iSlice, "")
     
                 #Store average cluster size, y-position and x-position
-                array_clustSize[ (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1 ] = (h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
+                array_clustSize[ (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1 ] = (h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), etaSector.SECTPOS, h_clustSize.GetMean() )
                 
                 #Set this point in the plot - Absolute
-                self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() )
+                self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), etaSector.SECTPOS, h_clustSize.GetMean() )
     
                 #Set this point in the plot - Normalized
-                self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), self.LIST_DET_GEO_PARAMS[iEta-1].SECTPOS, h_clustSize.GetMean() / self.AVGCLUSTSIZE_SECTOR_AVG )
+                self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetPoint( (iEta-1) * h_clustSize_v_clustPos.GetNbinsX() + iSlice-1, h_clustSize_v_clustPos.GetXaxis().GetBinCenter(iSlice), etaSector.SECTPOS, h_clustSize.GetMean() / self.AVGCLUSTSIZE_SECTOR_AVG )
     
         #Print the cluster map to the user if requested
         if self.DEBUG:
@@ -442,12 +446,12 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Draw("TRI2Z")
         
         #Draw the average cluster size map - Normalized
-        canv_AvgClustSize_Map_Norm = TCanvas("canv_" + strDetName + "_AvgClustSizeNormalized_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Normalized " + str(self.DET_IMON_QC5_RESP_UNI),600,600)
+        canv_AvgClustSize_Map_Norm = TCanvas("canv_" + strDetName + "_AvgClustSizeNormalized_AllEta_" + str(int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Normalized " + str(self.DETECTOR.DET_IMON_QC5_RESP_UNI),600,600)
         canv_AvgClustSize_Map_Norm.cd()
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.Draw("TRI2Z")
         
         #Write the average cluster size map to the output file
-        dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)), False, "GetDirectory" )
+        dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt" + str(int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)), False, "GetDirectory" )
         dir_hvOrig.cd()
         canv_AvgClustSize_Map_Orig.Write()
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Write()

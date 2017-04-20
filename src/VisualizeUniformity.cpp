@@ -58,14 +58,14 @@ void VisualizeUniformity::storeCanvasHisto2D(std::string & strOutputROOTFileName
     } //End Check if File Failed to Open Correctly
     
     //Call the method below
-    makeAndStoreCanvasHisto2D(ptr_fileOutput, strObsName, strDrawOption);
+    storeCanvasHisto2D(ptr_fileOutput, strObsName, strDrawOption);
     
     //Close the File
     //------------------------------------------------------
     ptr_fileOutput->Close();
     
     return;
-} //End VisualizeUniformity::makeAndStoreCanvasHisto2D()
+} //End VisualizeUniformity::storeCanvasHisto2D()
 
 //Makes a 2D plot of a given observable in the detector's active area
 //Takes a TFile *, which the canvas is writtent to, as input

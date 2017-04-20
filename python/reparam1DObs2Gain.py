@@ -87,4 +87,4 @@ if __name__ == "__main__":
         print str(list_IndepVar[i]) + "," + str(list_DepVar[i]) + "," + str(list_DepVar_Err[i])
 
     print "Finished"
-    return
+
