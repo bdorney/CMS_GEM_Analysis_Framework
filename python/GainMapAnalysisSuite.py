@@ -28,15 +28,8 @@ class GainMapAnalysisSuite:
         
         self.DEBUG                  = debug
         
-        #self.DETPOS_IETA            = params_det.DETPOS_IETA
-        #self.DETPOS_IPHI            = params_det.DETPOS_IPHI
-        
         self.DETECTOR               = params_det
-        
-        #self.DETGEO_NETASECTORS     = len(params_det.LIST_DET_GEO_PARAMS)
-        
-        #self.LIST_DET_GEO_PARAMS    = params_det.LIST_DET_GEO_PARAMS
-        
+                
         self.DET_IMON_QC5_RESP_UNI  = params_det.DET_IMON_QC5_RESP_UNI
         self.DET_IMON_POINTS        = []
         
@@ -46,10 +39,6 @@ class GainMapAnalysisSuite:
         outputFileName	= "GainMapAnalysisSuiteOutput_" + outputFileName[len(outputFileName)-1]
         self.FILE_OUT	= TFile(str(outputFileName),"RECREATE","",1)
         
-        #self.GAIN_CURVE_P0      = params_gain.GAIN_CURVE_P0
-        #self.GAIN_CURVE_P0_ERR  = params_gain.GAIN_CURVE_P0_ERR
-        #self.GAIN_CURVE_P1      = params_gain.GAIN_CURVE_P1
-        #self.GAIN_CURVE_P1_ERR  = params_gain.GAIN_CURVE_P1_ERR
         self.GAIN_CALCULATOR    = params_gain
         self.GAIN_LAMBDA        = 1.
         self.GAIN_LAMBDA_ERR    = 0.
@@ -64,8 +53,6 @@ class GainMapAnalysisSuite:
         self.G2D_MAP_AVG_CLUST_SIZE_NORM = TGraph2D()   #Normalized "                   "
         self.G2D_MAP_GAIN_ORIG = TGraph2D()             #Effective Gain Map
         
-        #self.PD_CONST	= params_discharge.PD_CONST
-        #self.PD_SLOPE	= params_discharge.PD_SLOPE
         self.PD_CALCULATOR      = params_discharge
 
         self.PD_AVG_POINTS      = [] #Avg P_D over entire detector
@@ -75,12 +62,9 @@ class GainMapAnalysisSuite:
 
         return
     
-    def reset(self, debug=False):
-        
+    def reset(self, debug=False):        
         #Close TFiles
         self.closeTFiles(debug)
-        #self.FILE_IN.Close()
-        #self.FILE_OUT.Close()
         
         #Reset Variables
         self.DEBUG = debug
@@ -227,27 +211,6 @@ class GainMapAnalysisSuite:
     def calcAlpha(self, hvPt):
         return np.exp(self.GAIN_CALCULATOR.GAIN_CURVE_P0 * (hvPt - self.DETECTOR.DET_IMON_QC5_RESP_UNI) )
     
-    #G(x) = exp([0]*x+[1]) where x is hvPt
-    #def calcGain(self, hvPt):
-    #    return np.exp(self.GAIN_CURVE_P0 * hvPt + self.GAIN_CURVE_P1)
-    
-    #G(x) = exp([0]*x+[1]) where x is hvPt
-    #def calcGainErr(self, hvPt):
-    #    return self.calcGain(hvPt)*np.sqrt(np.square(self.GAIN_CURVE_P0_ERR * hvPt)+np.square(self.GAIN_CURVE_P1_ERR))
-    
-    #PD(x) = exp(slope*x+Const)
-    #def calcPD(self, gain):
-    #    return np.exp(self.PD_SLOPE*gain+self.PD_CONST)
-
-    #Determines the Phi boundaries within an Eta Sector
-    #def calcROSectorBoundaries(self, params_eta=PARAMS_ETASECTOR()):
-    #    #Calculate the iphi sector boundaries
-    #    list_boundaries = []
-    #    for i in range(0, params_eta.NBCONNECT+1):
-    #        list_boundaries.append(-0.5 * params_eta.SECTSIZE + i * params_eta.SECTSIZE / params_eta.NBCONNECT)
-    #
-    #    return list_boundaries
-    
     #Determines the linear correlation factor lambda which relates Gain to ADC counts
     def calcROSectorLambda(self):
         gain = self.GAIN_CALCULATOR.calcGain(self.DET_IMON_QC5_RESP_UNI)
@@ -308,8 +271,6 @@ class GainMapAnalysisSuite:
         canv_Gain_Map_Orig.cd()
         canv_Gain_Map_Orig.cd().SetLogz(1)
         self.G2D_MAP_GAIN_ORIG.Draw("TRI2Z")
-        #canv_Gain_Map_Orig.SetTheta(90);
-        #canv_Gain_Map_Orig.SetPhi(0.0);
         
         #Write the effective gain map to the output file
         dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)) )

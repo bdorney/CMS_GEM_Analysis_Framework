@@ -1,7 +1,8 @@
 #Imports
 import sys, os
 import numpy as np
-import ROOT
+#import ROOT
+from ROOT import TKey, TFile, TDirectory, TDirectoryFile
 
 #=====================Functions=====================
 

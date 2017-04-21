@@ -59,6 +59,7 @@ numpy/*
 python/pip/
 python/pip/*
 scripts/installPythonPkgs.sh
+python/interpolationTest.py
 
 # ROOT Files #
 ##############
