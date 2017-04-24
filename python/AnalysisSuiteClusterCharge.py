@@ -116,7 +116,7 @@ class AnalysisSuiteClusterCharge:
         #Transform input observable name to uppercase
         strObsName = strObsName.upper()
         
-        if strObsName = self.STROBSNAME_ALL:
+        if strObsName == self.STROBSNAME_ALL:
             self.interpolateMean(strInterpolateKind)
             self.interpolateMPV(strInterpolateKind)
             self.interpolateSigma(strInterpolateKind)
@@ -168,14 +168,14 @@ class AnalysisSuiteClusterCharge:
         #Check to make sure the data is present
         if len(self.ARRAY_CLUSTQ_MPV)==0:
             print "Cluster Charge MPV Data has not been loaded"
-                print "Please load data and then try again"
-                print "Exiting"
+            print "Please load data and then try again"
+            print "Exiting"
                 
-                return
+            return
             
-            #Interpolate the data - MPV
-            if self.DEBUG:
-                print "Interpolating MPV"
+        #Interpolate the data - MPV
+        if self.DEBUG:
+            print "Interpolating MPV"
         
         self.INTERPOLATE_MPV = interpolate.interp2d(self.ARRAY_CLUSTSIZE,
                                                      self.ARRAY_HVORGAIN,
@@ -326,9 +326,12 @@ class AnalysisSuiteClusterCharge:
         self.ARRAY_HVORGAIN = np.unique(self.ARRAY_HVORGAIN)
         self.ARRAY_CLUSTSIZE = np.unique(self.ARRAY_CLUSTSIZE)
 
-        self.ARRAY_CLUSTQ_MPV	= np.reshape(self.ARRAY_CLUSTQ_MPV,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
-        self.ARRAY_CLUSTQ_MEAN	= np.reshape(self.ARRAY_CLUSTQ_MEAN,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
-        self.ARRAY_CLUSTQ_SIGMA	= np.reshape(self.ARRAY_CLUSTQ_SIGMA,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
+        if strObsName == self.STROBSNAME_MPV:
+           self.ARRAY_CLUSTQ_MPV	= np.reshape(self.ARRAY_CLUSTQ_MPV,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
+        elif strObsName == self.STROBSNAME_MEAN:
+           self.ARRAY_CLUSTQ_MEAN	= np.reshape(self.ARRAY_CLUSTQ_MEAN,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
+        elif strObsName == self.STROBSNAME_SIGMA:
+           self.ARRAY_CLUSTQ_SIGMA	= np.reshape(self.ARRAY_CLUSTQ_SIGMA,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
 
         return
 
