@@ -18,7 +18,7 @@ import sys, os
 if __name__ == "__main__":
 
     #Import Analysis Suit
-    from GainMapAnalysisSuite import *
+    from AnalysisSuiteGainMap import *
     from AnalysisOptions import *
 
     #Get input options
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
     #Initialize analysis suite
-    anaSuite = GainMapAnalysisSuite(options.filename, params_gain, params_det, debug=options.debug)
+    anaSuite = AnalysisSuiteGainMap(options.filename, params_gain, params_det, debug=options.debug)
     anaSuite.ANA_UNI_GRANULARITY = 32
 
     #Calculate Gain & P_D maps

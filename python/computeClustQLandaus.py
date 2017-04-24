@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     #Import Analysis Suit
     from AnalysisOptions import *
-    from ClusterChargeAnalysisSuite import *
+    from AnalysisSuiteClusterCharge import *
     from Utilities import PARAMS_GAIN
 
     #Specific Options
@@ -56,12 +56,16 @@ if __name__ == "__main__":
                               gain_p1_err=options.gain_P1_Err)
 
     #Initialize analysis suite
-    anaSuite = ClusterChargeAnalysisSuite(params_gain, True, False)
+    anaSuite = AnalysisSuiteClusterCharge(params_gain, True, False)
 
     #Make Landau Plots
     anaSuite.makePlot(options.filename, iSkip=2, strObsName=options.strObsVar)
 
     #Store Landau Plots
     anaSuite.storePlots("ClusterChargeLandauPlots.root", strFileOpt="UPDATE", strObsName=options.strObsVar)
+
+    #Interpolate Data - Note Data is already loaded
+    anaSuite.interpolateData(strInterpolateKind="cubic", strObsName=options.strObsVar)
+    print anaSuite.getInterpolatedData(iClustSize=2.5,fHVOrGain=5e3, strObsName=options.strObsVar)
 
     print "Finished"

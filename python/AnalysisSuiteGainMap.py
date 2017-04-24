@@ -6,7 +6,7 @@
     Created on Monday March 27
     
     @author: Brian L. Dorney
-    """
+"""
 
 #Imports
 import sys, os
@@ -14,7 +14,7 @@ import numpy as np
 from Utilities import *
 from ROOT import gROOT, Double, TCanvas, TDirectory, TF1, TFile, TGraph2D, TGraphErrors, TH1F, TH2F, TLegend
 
-class GainMapAnalysisSuite:
+class AnalysisSuiteGainMap:
     
     def __init__(self, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):
         
@@ -36,7 +36,7 @@ class GainMapAnalysisSuite:
         self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
 
         outputFileName	= inputfilename.split('/')
-        outputFileName	= "GainMapAnalysisSuiteOutput_" + outputFileName[len(outputFileName)-1]
+        outputFileName	= "AnaSuiteGainMapOutput_" + outputFileName[len(outputFileName)-1]
         self.FILE_OUT	= TFile(str(outputFileName),"RECREATE","",1)
         
         self.GAIN_CALCULATOR    = params_gain

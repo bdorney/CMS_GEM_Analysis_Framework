@@ -2,9 +2,18 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Apr 20 2017                     *
+*	LAST UPDATE: Apr 24 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 24th 2017
+==================================================
+->Added methods to AnalysisSuiteClusterCharge for interpolating (using scipy interpolate) cluster charge Mean, MPV, and Sigma data
+
+Update: Apr 21st 2017
+==================================================
+->Renanmed "GainMapAnalysisSuite" to "AnalysisSuiteGainMap" both the class name and also the *.py file
+->Renanmed "ClusterChargeAnalysisSuite" to "AnalysisSuiteClusterCharge" both the class name and also the *.py file
 
 Update: Apr 20th 2017
 ==================================================
