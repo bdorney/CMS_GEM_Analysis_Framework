@@ -26,7 +26,7 @@ class AnalysisSuiteEfficiencyPredictor:
     #   field_name  value
     #
     #The field_name is not case sensitive but the value is case sensitive (as it may be a filepaths!)
-    def __init__(self, inputfilename="config/configEffPredictor.cfg", debug=False)
+    def __init__(self, inputfilename="config/configEffPredictor.cfg", debug=False):
         #Set the debug flag
         self.DEBUG  = debug
 
@@ -46,6 +46,8 @@ class AnalysisSuiteEfficiencyPredictor:
         
         self.SECTOR_IPHI_CLUSTSIZENORM  = 2
         self.SECTOR_IPHI_QC5            = 2
+
+	self.ANA_UNI_GRANULARITY	= 32
 
         #Declare Gain Containers
         self.PARAMS_GAIN_DET_DUT        = PARAMS_GAIN()
@@ -72,7 +74,7 @@ class AnalysisSuiteEfficiencyPredictor:
             list_strLines = inputFile.readlines()
 
         #strip new line character ('\n') from the file
-        list_strLines = [x.strip() for x in content]
+        list_strLines = [x.strip() for x in list_strLines]
 
         if self.DEBUG:
             print "Field_Name\tValue"
@@ -81,7 +83,7 @@ class AnalysisSuiteEfficiencyPredictor:
         for iPos in range(0,len(list_strLines)):
             #Get this (field_name,value) pair
             strLine = list_strLines[iPos].split("\t")
-            
+           
             #Skip if commented (e.g. first character of first member is "#")
             if strLine[0][0] == "#":
                 continue
@@ -132,7 +134,7 @@ class AnalysisSuiteEfficiencyPredictor:
             elif strLine[0] == "DUT_SERIAL_NUMBER":
                 self.NAME_DET_DUT = strLine[1]
             elif strLine[0] == "DUT_SLICE_GRANULARITY":
-                self.ANASUITEGAIN.ANA_UNI_GRANULARITY = int(strLine[1])
+                self.ANA_UNI_GRANULARITY = int(strLine[1])
             elif strLine[0] == "DET_CLUSTQ_SERIAL_NUMBER":
                 self.NAME_DET_CLUSTQ = strLine[1]
             elif strLine[0] == "DET_CLUSTQ_GAIN_P0":
@@ -172,7 +174,7 @@ class AnalysisSuiteEfficiencyPredictor:
             print "Landau Cluster Charge Sigma Filename not found, problem!"
 
         self.ANASUITECLUSTQ.loadData(inputfilename_MEAN=self.FILE_CLUSTQ_MEAN,
-                                     inputfilename_MPV=self.FILE_CLUSTQ_MPV
+                                     inputfilename_MPV=self.FILE_CLUSTQ_MPV,
                                      inputfilename_SIGMA=self.FILE_CLUSTQ_SIGMA)
 
         #Interpolate the Landau Cluster Charge Data

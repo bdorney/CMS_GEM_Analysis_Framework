@@ -50,6 +50,7 @@ loopdir.C
 tmp/
 tmp/*
 config/configRun_RecoLong3.cfg
+*.swo
 
 # Python #
 ##########
@@ -60,6 +61,7 @@ python/pip/
 python/pip/*
 scripts/installPythonPkgs.sh
 python/interpolationTest.py
+python/test.py
 
 # ROOT Files #
 ##############

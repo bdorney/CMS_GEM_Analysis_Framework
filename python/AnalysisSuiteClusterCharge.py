@@ -217,8 +217,8 @@ class AnalysisSuiteClusterCharge:
                         iSkip=2):
         #Load the data from an input file
         ClustChargeData_MPV     = np.loadtxt(inputfilename_MPV,skiprows=iSkip)
-        ClustChargeData_Mean	= np.loadtxt(inputfilename_Mean,skiprows=iSkip)
-        ClustChargeData_Sigma	= np.loadtxt(inputfilename_Sigma,skiprows=iSkip)
+        ClustChargeData_Mean	= np.loadtxt(inputfilename_MEAN,skiprows=iSkip)
+        ClustChargeData_Sigma	= np.loadtxt(inputfilename_SIGMA,skiprows=iSkip)
 
         #Get the HVORGAIN & CLUSTSIZE values, note these are expected to be the same across the three files
         self.ARRAY_HVORGAIN = np.unique(ClustChargeData_MPV[:,0])
