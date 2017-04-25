@@ -33,7 +33,9 @@ class AnalysisSuiteGainMap:
         self.DET_IMON_QC5_RESP_UNI  = params_det.DET_IMON_QC5_RESP_UNI
         self.DET_IMON_POINTS        = []
         
-        self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
+        self.FILE_IN = []
+        if len(inputfilename) > 0:
+            self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
 
         outputFileName	= inputfilename.split('/')
         outputFileName	= "AnaSuiteGainMapOutput_" + outputFileName[len(outputFileName)-1]
@@ -343,34 +345,34 @@ class AnalysisSuiteGainMap:
         canv_PD_Map_hvPt.Write()
         g2D_Map_PD_hvPt.Write()
             
-        return
+        return g2D_Map_Gain_hvPt
 
     #Determines the average cluster size map for the entire detector
     def calcClusterSizeMap(self, strDetName):
         #Create the container which will store the clusterSize
         #array_shape = ( self.G2D_MAP_ABS_RESP_UNI.GetN(), 3)   #Not gauranteed to work since some points are thrown out during the fitting process in the C++ class AnalyzeResponseUniformityClusters
-	iNEtaSectors = len(self.DETECTOR.LIST_DET_GEO_PARAMS)
+        iNEtaSectors = len(self.DETECTOR.LIST_DET_GEO_PARAMS)
         iNBinNum = self.ANA_UNI_GRANULARITY * iNEtaSectors * self.DETECTOR.LIST_DET_GEO_PARAMS[0].NBCONNECT
         array_shape = (iNBinNum, 3)
         array_clustSize = np.zeros(array_shape)
         
         #Create the average cluster size map
-        strPlotName = "g2D_" + strDetName + "_AvgClustSize_AllEta"
+        strPlotName = "g2D_" + strDetName + "_AvgClustSize_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI))
         #self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )    #Set number of pts
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( iNBinNum ) #Set number of pts, see comments above
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetName( strPlotName )
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetTitle("")
 
         #Create the average cluster size map
-        strPlotName = "g2D_" + strDetName + "_AvgClustSizeNormalized_AllEta"
+        strPlotName = "g2D_" + strDetName + "_AvgClustSizeNormalized_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI))
         #self.G2D_MAP_AVG_CLUST_SIZE_NORM.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )    #Set number of pts
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.Set( iNBinNum ) #Set number of pts, see comments above
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetName( strPlotName )
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetTitle("")
 
         for iEta in range(1, iNEtaSectors+1):
-	    #Get the Eta Sector
-	    etaSector = self.DETECTOR.LIST_DET_GEO_PARAMS[iEta-1]
+            #Get the Eta Sector
+            etaSector = self.DETECTOR.LIST_DET_GEO_PARAMS[iEta-1]
 
             #Load the cluster size vs cluster position plot for this iEta value
             strPlotName = "SectorEta" + str(iEta) + "/h_iEta" + str(iEta) + "_clustSize_v_clustPos"
@@ -527,6 +529,12 @@ class AnalysisSuiteGainMap:
         gDet_MinPD.Write()
         
     	return
+
+    #Open Input File
+    def openInputFile(self, inputfilename):
+        self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
+
+        return
 
     #Set the detector
     def setDetector(self, params_det=PARAMS_DET()):

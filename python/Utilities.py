@@ -88,6 +88,9 @@ class PARAMS_PD:
     def calcPD(self, gain):
         return np.exp(self.PD_SLOPE*gain+self.PD_CONST)
 
+    #Note the error is not straight forward since we reported an 99% C.L. on the error band
+    #Suggest against attempting to do something like what is shown in PARAMS_GAIN.calcGainErr()
+
 #---------------------PARAMS_DET---------------------
 #Class for storing detector mapping information
 class PARAMS_DET:

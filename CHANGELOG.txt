@@ -6,6 +6,12 @@
 *                                                *
 **************************************************
 
+Update: Apr 25th 2017
+==================================================
+->The calcGainMapHV method of the python class AnalysisSuiteGainMap will now return the TGraph2D object it makes
+->New config file config/configEffPredictor.cfg for automatizing efficiency predictor and also calculating gain maps
+->New python class AnalysisSuiteEfficiencyPredictor added to python toolkit at python/AnalysisSuiteEfficiencyPredictor.py
+
 Update: Apr 24th 2017
 ==================================================
 ->Added methods to AnalysisSuiteClusterCharge for interpolating (using scipy interpolate) cluster charge Mean, MPV, and Sigma data

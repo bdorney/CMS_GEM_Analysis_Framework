@@ -211,8 +211,8 @@ class AnalysisSuiteClusterCharge:
 
     #Load data from file
     #Note X & Y coordinate points are expected to be identical, only Z values should change
-    def loadData(self,  inputfilename_MPV="data/TestBeam2013_FNAL_ClustCharge/ClustChargeData_MPV.txt",
-                        inputfilename_MEAN="data/TestBeam2013_FNAL_ClustCharge/ClustChargeData_Mean.txt",
+    def loadData(self,  inputfilename_MEAN="data/TestBeam2013_FNAL_ClustCharge/ClustChargeData_Mean.txt",
+                        inputfilename_MPV="data/TestBeam2013_FNAL_ClustCharge/ClustChargeData_MPV.txt",
                         inputfilename_SIGMA="data/TestBeam2013_FNAL_ClustCharge/ClustChargeData_Sigma.txt",
                         iSkip=2):
         #Load the data from an input file
