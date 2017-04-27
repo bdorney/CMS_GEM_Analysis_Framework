@@ -2,9 +2,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Apr 24 2017                     *
+*	LAST UPDATE: Apr 26 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 26th 2017
+==================================================
+->Python class AnalysisSuiteGainMap will now take an outputfilename and an outputfileoption upon initialization
 
 Update: Apr 25th 2017
 ==================================================

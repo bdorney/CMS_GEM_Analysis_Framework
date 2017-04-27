@@ -16,7 +16,7 @@ from ROOT import gROOT, Double, TCanvas, TDirectory, TF1, TFile, TGraph2D, TGrap
 
 class AnalysisSuiteGainMap:
     
-    def __init__(self, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):
+    def __init__(self, inputfilename="", outputfilename="AnaSuiteGainMapOutput.root", outputfileoption="RECREATE", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):
         
         self.ADCPKPOS_SECTOR_AVG    = 0. #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         self.ADCPKPOS_SECTOR_STDDEV = 0. #Std. Dev. of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
@@ -37,9 +37,11 @@ class AnalysisSuiteGainMap:
         if len(inputfilename) > 0:
             self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
 
-        outputFileName	= inputfilename.split('/')
-        outputFileName	= "AnaSuiteGainMapOutput_" + outputFileName[len(outputFileName)-1]
-        self.FILE_OUT	= TFile(str(outputFileName),"RECREATE","",1)
+        if len(outputfilename) == 0:
+            outputfilename	= inputfilename.split('/')
+            outputfilename	= "AnaSuiteGainMapOutput_" + outputfilename[len(outputFileName)-1]
+
+        self.FILE_OUT	= TFile(str(outputfilename),outputfileoption,"",1)
         
         self.GAIN_CALCULATOR    = params_gain
         self.GAIN_LAMBDA        = 1.

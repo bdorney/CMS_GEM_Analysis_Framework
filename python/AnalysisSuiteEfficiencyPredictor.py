@@ -47,7 +47,7 @@ class AnalysisSuiteEfficiencyPredictor:
         self.SECTOR_IPHI_CLUSTSIZENORM  = 2
         self.SECTOR_IPHI_QC5            = 2
 
-	self.ANA_UNI_GRANULARITY	= 32
+        self.ANA_UNI_GRANULARITY	= 32
 
         #Declare Gain Containers
         self.PARAMS_GAIN_DET_DUT        = PARAMS_GAIN()
@@ -62,6 +62,8 @@ class AnalysisSuiteEfficiencyPredictor:
         self.FILE_DUT_MAPPING           = "" #Mapping config file for detector under test
         
         self.FILE_MIP_AVG_CLUST_SIZE    = "" #File having a TF1 which is a fit of MIP <ClustSize> vs. Gain
+        
+        self.FILE_OUTPUT                = "" #Output filename to be created
         
         self.FILE_QC5_RESP_UNI          = "" #Framework output file
         
@@ -107,6 +109,8 @@ class AnalysisSuiteEfficiencyPredictor:
                 self.FILE_CLUSTQ_SIGMA = strLine[1]
             elif strLine[0] == "FILE_CLUSESIZE":
                 self.FILE_MIP_AVG_CLUST_SIZE = strLine[1]
+            elif strLine[0] == "FILE_OUTPUT":
+                self.FILE_OUTPUT = strLine[1]
             elif strLine[0] == "DUT_GAIN_P0":
                 self.PARAMS_GAIN_DET_DUT.GAIN_CURVE_P0 = float(strLine[1])
             elif strLine[0] == "DUT_GAIN_P0_ERR":
@@ -193,6 +197,8 @@ class AnalysisSuiteEfficiencyPredictor:
         self.PARAMS_DET_DUT.loadMapping(self.FILE_DUT_MAPPING, self.DEBUG)
 
         self.ANASUITEGAIN   = AnalysisSuiteGainMap(inputfilename=self.FILE_QC5_RESP_UNI,
+                                                   outputfilename=self.FILE_OUTPUT,
+                                                   outputfileoption="RECREATE",
                                                    params_gain=self.PARAMS_GAIN_DET_DUT,
                                                    params_det=self.PARAMS_DET_DUT,
                                                    debug=self.DEBUG)
@@ -246,3 +252,112 @@ class AnalysisSuiteEfficiencyPredictor:
         inputFile.Close() #This might fuck it
     
         return
+
+    #Calculate the gain map from the original QC5_Resp_Uni measurement
+    def calcGainMap(self):
+        #Make sure the right (ieta,iphi) sector is set for the gain map calculation
+        self.ANASUITEGAIN.DETECTOR.DETPOS_IETA = self.SECTOR_IETA_QC5
+        self.ANASUITEGAIN.DETECTOR.DETPOS_IPHI = self.SECTOR_IPHI_QC5
+        
+        #Average Readout Sector Fitted ADC Pk Positions
+        if self.DEBUG:
+            print "Starting Gain Map calculation for: " + self.NAME_DET_DUT
+            print "averaging ADC PkPositions in sector: (" + str(self.SECTOR_IETA_QC5) + "," + str(self.SECTOR_IPHI_QC5) + ")"
+        
+        self.ANASUITEGAIN.avgROSectorADCPkPos()
+        
+        #Compute lambda
+        if self.DEBUG:
+            print "Computing lambda"
+        
+        self.ANASUITEGAIN.calcROSectorLambda()
+
+        #Compute the Gain Map
+        if self.DEBUG:
+            print "Calculating Gain Map"
+        
+        self.ANASUITEGAIN.calcGainMap(self.NAME_DET_DUT)
+
+        return
+            
+    #Compute the normalized average cluster size map from the original QC5_Resp_Uni measurement
+    def calcNormAvgClustSizeMap(self):
+        #Make sure right (ieta,iphi) sector set for normalize avg clust size map calculation
+        #This should map with the sector for which the MIP cluster size vs. gain data is provided for
+        self.ANASUITEGAIN.DETECTOR.DETPOS_IETA = self.SECTOR_IETA_CLUSTSIZENORM
+        self.ANASUITEGAIN.DETECTOR.DETPOS_IPHI = self.SECTOR_IPHI_CLUSTSIZENORM
+
+        #Average Readout Sector Fitted ADC Pk Positions
+        if self.DEBUG:
+            print "Starting Normalized Average Cluster Size Map calculation for: " + self.NAME_DET_DUT
+            print "Averaging <Cluster Size> in sector: (" + str(self.SECTOR_IETA_CLUSTSIZENORM) + "," + str(self.SECTOR_IPHI_CLUSTSIZENORM) + ")"
+                
+        self.ANASUITEGAIN.avgROSectorAvgClustSize()
+
+        #Compute Normalized Average Cluster Size Map
+        if self.DEBUG:
+            print "Calculating Normalized Average Cluster Size Map"
+
+        self.ANASUITEGAIN.calcClusterSizeMap(self.NAME_DET_DUT)
+    
+        return
+
+    def predictEff(self, fHVPt, iNEvtPerPt=100):
+        #Calculate the original gain map of the detector, needed to determine gain at fHVOrGain
+        self.calcGainMap()
+
+        #Get the gain map at fHVPt
+        if self.DEBUG:
+            print "Calculating Gain Map at Input HV Pt: " + str(fHVPt)
+        
+        g2D_Map_Gain_HVPt = self.ANASUITEGAIN.calcGainMapHV(self.NAME_DET_DUT, fHVPt)
+
+        #Calculate the original normalized cluster map of the detector
+        self.calcNormAvgClustSizeMap()
+
+        #Now interesting problem N_pts in g2D_Map_Gain_HVPt <= N_pts in self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM
+        #We can make some numpy arrays
+        #Then the (clustPos,y) members from G2D_MAP_AVG_CLUST_SIZE_NORM that don't appear in g2D_Map_Gain_HVPt
+        
+        #Make the container for the gain data
+        array_fPx = g2D_Map_Gain_HVPt.GetX()
+        array_fPy = g2D_Map_Gain_HVPt.GetY()
+        array_fPz = g2D_Map_Gain_HVPt.GetZ()
+        
+        data_Gain = np.column_stack((array_fPx,array_fPy,array_fPz))
+        
+        #Make the container for the normalized average cluster size container
+        array_fPx = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetX()
+        array_fPy = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetY()
+        array_fPz = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetZ()
+        
+        data_NormAvgClustSize = np.column_stack((array_fPx,array_fPy,array_fPz))
+        
+        #Remove points in (X,Y) from data_NormAvgClustSize that are not in data_Gain
+        if self.DEBUG:
+            print "Shape of data_Gain = " + str(np.shape( data_Gain ) )
+            print "Shape of data_NormAvgClustSize = " + str(np.shape( data_NormAvgClustSize ) )
+        
+        data_NormAvgClustSize = data_NormAvgClustSize[np.logical_not(data_Gain[:,0] != data_NormAvgClustSize[:,0])]
+        
+        if self.DEBUG:
+            print "Shape of data_Gain = " + str(np.shape( data_Gain ) )
+            print "Shape of data_NormAvgClustSize = " + str(np.shape( data_NormAvgClustSize ) )
+        
+        for idx in range(0, len(data_NormAvgClustSize)):
+            if data_NormAvgClustSize[idx][1] != data_Gain[idx][1]:
+                print "Points not equal, unexpected!"
+                print "Norm <Clust Size>:"
+                print data_NormAvgClustSize[idx]
+                print "Gain"
+                print data_Gain[idx]
+                            
+        
+        #How do we store the Landaus then? Want to see what I am generating
+        #Idea was 2D histograms of ClustCharge vs. ClustPos, then we can do a 1D projection
+        #How do we get the binning right?
+        #We known analysis granularity so N_bins = 3*Ana_granularity
+        #We know the size of the iEta row
+
+        return
+
