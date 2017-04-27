@@ -48,6 +48,8 @@ def rejectOutliers(arrayData, thresh=3.5):
 #   G(x) = exp([0]*x+[1]) where x is an HV setpoint (either V_Drift in Volts or Divider Current in uA)
 #
 class PARAMS_GAIN:
+    __slots__ = ['GAIN_CURVE_P0','GAIN_CURVE_P0_ERR','GAIN_CURVE_P1','GAIN_CURVE_P1_ERR']
+    
     def __init__(self, gain_p0=1, gain_p0_err=1, gain_p1=1, gain_p1_err=1):
         self.GAIN_CURVE_P0      = gain_p0
         self.GAIN_CURVE_P0_ERR  = gain_p0_err
@@ -67,6 +69,8 @@ class PARAMS_GAIN:
 #---------------------PARAMS_ETASECTOR---------------------
 #Class for storing Eta Sector Parameters
 class PARAMS_ETASECTOR:
+    __slots__ = ['IETA', 'SECTPOS', 'SECTSIZE', 'NBCONNECT']
+    
     def __init__(self):
         self.IETA       = -1
         self.SECTPOS    = 0.0
@@ -78,6 +82,8 @@ class PARAMS_ETASECTOR:
 #---------------------PARAMS_PD---------------------
 #Class for storing discharge probability parameters
 class PARAMS_PD:
+    __slots__ = ['PD_CONST', 'PD_SLOPE']
+    
     def __init__(self, const=-2.12136e+01, slope=2.49075e-05):
         self.PD_CONST = const
         self.PD_SLOPE = slope
@@ -94,6 +100,8 @@ class PARAMS_PD:
 #---------------------PARAMS_DET---------------------
 #Class for storing detector mapping information
 class PARAMS_DET:
+    __slots__ = ['DETPOS_IETA', 'DETPOS_IPHI', 'LIST_DET_GEO_PARAMS', 'DET_IMON_QC5_RESP_UNI']
+    
     def __init__(self, ieta=4, iphi=2, imon0=600):
         self.DETPOS_IETA            = ieta          #iEta Position QC5_Gain_Cal performed in
         self.DETPOS_IPHI            = iphi          #iPhi "                                 "

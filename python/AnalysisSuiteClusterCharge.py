@@ -18,6 +18,24 @@ from ROOT import gROOT, TCanvas, TDirectory, TFile, TGraph2D
 #This class is designed to use experimentally measured data to predict
 #The Landau behaviors (MPV, Mean, and Sigma) for a given (gain, clustsize) pair
 class AnalysisSuiteClusterCharge:
+
+    __slots__ = ['DEBUG',
+                 'TRANSFORM2GAIN',
+                 'ARRAY_HVORGAIN',
+                 'ARRAY_CLUSTSIZE',
+                 'ARRAY_CLUSTQ_MPV',
+                 'ARRAY_CLUSTQ_MEAN',
+                 'ARRAY_CLUSTQ_SIGMA',
+                 'INTERPOLATE_MPV',
+                 'INTERPOLATE_MEAN',
+                 'INTERPOLATE_SIGMA',
+                 'GAIN_CALCULATOR',
+                 'STROBSNAME_ALL',
+                 'STROBSNAME_MPV',
+                 'STROBSNAME_MEAN',
+                 'STROBSNAME_SIGMA'
+                 ]
+    
     def __init__(self, params_gain=PARAMS_GAIN(), calcGain=False, debug=False ):
         self.DEBUG          = debug
         self.TRANSFORM2GAIN = calcGain

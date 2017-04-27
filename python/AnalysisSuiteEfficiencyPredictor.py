@@ -22,6 +22,33 @@ from ROOT import gROOT, TF1, TFile, TGraph2D
 
 class AnalysisSuiteEfficiencyPredictor:
 
+    __slots__ = ['DEBUG',
+                 'LIST_HVPTS',
+                 'NAME_DET_DUT',
+                 'NAME_DET_CLUSTQ',
+                 'NAME_DET_CLUSTSIZE',
+                 'PARAMS_DET_DUT',
+                 'SECTOR_IETA_CLUSTSIZENORM',
+                 'SECTOR_IETA_QC5',
+                 'SECTOR_IPHI_CLUSTSIZENORM',
+                 'SECTOR_IPHI_QC5',
+                 'ANA_UNI_GRANULARITY',
+                 'PARAMS_GAIN_DET_DUT',
+                 'PARAMS_GAIN_DET_CLUSTQ',
+                 'PARAMS_GAIN_DET_CLUSTSIZE',
+                 'FILE_CLUSTQ_MEAN',
+                 'FILE_CLUSTQ_MPV',
+                 'FILE_CLUSTQ_SIGMA',
+                 'FILE_DUT_MAPPING',
+                 'FILE_MIP_AVG_CLUST_SIZE',
+                 'FILE_OUTPUT',
+                 'FILE_QC5_RESP_UNI',
+                 'TOBJ_NAME_FUNC_AVGCLUSTSIZE',
+                 'ANASUITECLUSTQ',
+                 'ANASUITEGAIN',
+                 'FUNC_AVG_MIP_CLUSTSIZE'
+                 ]
+
     #Here inputfilename should be a tab delimited file in the form of:
     #   field_name  value
     #
@@ -74,7 +101,7 @@ class AnalysisSuiteEfficiencyPredictor:
         list_strLines = []
         with open(inputfilename) as inputFile:
             list_strLines = inputFile.readlines()
-	inputFile.close()
+        inputFile.close()
 
         #strip new line character ('\n') from the file
         list_strLines = [x.strip() for x in list_strLines]
@@ -162,7 +189,7 @@ class AnalysisSuiteEfficiencyPredictor:
                 print "Not recognized, please cross-check input file:"
                 print inputfilename
 
-	del list_strLines
+        del list_strLines
 
         #Declare Cluster Charge Analysis Suite
         self.ANASUITECLUSTQ = AnalysisSuiteClusterCharge(params_gain=self.PARAMS_GAIN_DET_CLUSTQ,

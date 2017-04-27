@@ -2,9 +2,14 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Apr 26 2017                     *
+*	LAST UPDATE: Apr 27 2017                     *
 *                                                *
 **************************************************
+
+Update: Apr 27th 2017
+==================================================
+->Attempting to reduce memory by using sloting in python classes
+->Attempting to reduce memory by using formating instead of string addition e.g. "{0}_{1}".format(a,b) instead of a + b
 
 Update: Apr 26th 2017
 ==================================================
