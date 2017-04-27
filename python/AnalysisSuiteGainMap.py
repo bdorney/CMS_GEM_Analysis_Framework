@@ -228,13 +228,14 @@ class AnalysisSuiteGainMap:
         return
 
     #Determines the gain map from the absolute response uniformity map
-    def calcGainMap(self, strDetName):
+    def calcGainMap(self, strDetName):        
+        #Load the absolute response uniformity map
+        strPlotName = "g2D_" + strDetName + "_ResponseFitPkPos_AllEta"
+
         if self.DEBUG:
             print "Attempted to Load:"
             print "Summary/" + strPlotName
-        
-        #Load the absolute response uniformity map
-        strPlotName = "g2D_" + strDetName + "_ResponseFitPkPos_AllEta"
+
         self.G2D_MAP_ABS_RESP_UNI = self.FILE_IN.Get( "Summary/" + strPlotName )
         
         #Setup the gain map

@@ -74,6 +74,7 @@ class AnalysisSuiteEfficiencyPredictor:
         list_strLines = []
         with open(inputfilename) as inputFile:
             list_strLines = inputFile.readlines()
+	inputFile.close()
 
         #strip new line character ('\n') from the file
         list_strLines = [x.strip() for x in list_strLines]
@@ -160,6 +161,8 @@ class AnalysisSuiteEfficiencyPredictor:
                 print strLine[0]
                 print "Not recognized, please cross-check input file:"
                 print inputfilename
+
+	del list_strLines
 
         #Declare Cluster Charge Analysis Suite
         self.ANASUITECLUSTQ = AnalysisSuiteClusterCharge(params_gain=self.PARAMS_GAIN_DET_CLUSTQ,

@@ -34,9 +34,9 @@ class AnalysisSuiteClusterCharge:
 
         self.GAIN_CALCULATOR    = params_gain
 
-        self.G2D_CLUSTQ_MPV     = TGraph2D() #Cluster Charge - MPV;   (x,y,z) = (HV or Gain, Clust Size, MPV   in fC)
-        self.G2D_CLUSTQ_MEAN	= TGraph2D() #Cluster Charge - Mean;  (x,y,z) = (HV or Gain, Clust Size, Mean  in fC)
-        self.G2D_CLUSTQ_SIGMA	= TGraph2D() #Cluster Charge - Sigma; (x,y,z) = (HV or Gain, Clust Size, Sigma in fC)
+        #self.G2D_CLUSTQ_MPV     = TGraph2D() #Cluster Charge - MPV;   (x,y,z) = (HV or Gain, Clust Size, MPV   in fC)
+        #self.G2D_CLUSTQ_MEAN	= TGraph2D() #Cluster Charge - Mean;  (x,y,z) = (HV or Gain, Clust Size, Mean  in fC)
+        #self.G2D_CLUSTQ_SIGMA	= TGraph2D() #Cluster Charge - Sigma; (x,y,z) = (HV or Gain, Clust Size, Sigma in fC)
 
         self.STROBSNAME_ALL     = "ALL"
         self.STROBSNAME_MPV     = "MPV"
@@ -258,23 +258,17 @@ class AnalysisSuiteClusterCharge:
     #	inputfilename	->	Text file that contains ordered triplets of the data in (x,y,z) format
     #	iSkip		->	Number of lines at start of inputfilename that should be skipped
     #	strObsName	->	Observable to plot, acceptable inputs are from set {MPV, MEAN, SIGMA}
-    def makePlot(self, inputfilename, iSkip=2, strObsName="MPV"):
+    def makeAndStorePlot(self, inputfilename, iSkip=2, strObsName="MPV", outputfilename="AnaSuiteClustQOutput.root", strFileOpt="RECREATE"):
         #Load the data from an input text file
         clustChargeData = np.loadtxt(inputfilename, skiprows=iSkip)
 
         #Splice the clustChargeData into HVORGAIN & CLUSTSIZE
-        #array_X = clustChargeData[:,0]
-        #array_Y = clustChargeData[:,1]
-        #array_Z = clustChargeData[:,2]
         self.ARRAY_HVORGAIN = clustChargeData[:,0]
         self.ARRAY_CLUSTSIZE= clustChargeData[:,1]
 
         #Print the shape if requested
         if self.DEBUG:
             print "Shape of clustChargeData = " + str(clustChargeData.shape)
-            #print "Shape of array_X = " + str(array_X.shape)
-            #print "Shape of array_Y = " + str(array_Y.shape)
-            #print "Shape of array_Z = " + str(array_Z.shape)
             print "Shape of self.ARRAY_HVORGAIN = " + str(self.ARRAY_HVORGAIN.shape)
             print "Shape of self.ARRAY_CLUSTSIZE = " + str(self.ARRAY_CLUSTSIZE.shape)
 
@@ -289,20 +283,25 @@ class AnalysisSuiteClusterCharge:
         strObsName = strObsName.upper()
 
         #Initialize the correct TGraph2D
+	g2D_ClustQ_Obs = TGraph2D(len(clustChargeData))
+	g2D_ClustQ_Obs.SetTitle("")
         if strObsName == self.STROBSNAME_MPV:
-           self.G2D_CLUSTQ_MPV.Set( len(clustChargeData) )
-           self.G2D_CLUSTQ_MPV.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
-           self.G2D_CLUSTQ_MPV.SetTitle("")
+           #self.G2D_CLUSTQ_MPV.Set( len(clustChargeData) )
+           #self.G2D_CLUSTQ_MPV.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
+           #self.G2D_CLUSTQ_MPV.SetTitle("")
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
            self.ARRAY_CLUSTQ_MPV = clustChargeData[:,2]
         elif strObsName == self.STROBSNAME_MEAN:
-           self.G2D_CLUSTQ_MEAN.Set( len(clustChargeData) )
-           self.G2D_CLUSTQ_MEAN.SetName("g2D_ClusterChargeMean_StripSize_vs_" + strIndepVarName)
-           self.G2D_CLUSTQ_MEAN.SetTitle("")
+           #self.G2D_CLUSTQ_MEAN.Set( len(clustChargeData) )
+           #self.G2D_CLUSTQ_MEAN.SetName("g2D_ClusterChargeMean_StripSize_vs_" + strIndepVarName)
+           #self.G2D_CLUSTQ_MEAN.SetTitle("")
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMean_StripSize_vs_" + strIndepVarName)
            self.ARRAY_CLUSTQ_MEAN = clustChargeData[:,2]
         elif strObsName == self.STROBSNAME_SIGMA:
-           self.G2D_CLUSTQ_SIGMA.Set( len(clustChargeData) )
-           self.G2D_CLUSTQ_SIGMA.SetName("g2D_ClusterChargeSigma_StripSize_vs_" + strIndepVarName)
-           self.G2D_CLUSTQ_SIGMA.SetTitle("")
+           #self.G2D_CLUSTQ_SIGMA.Set( len(clustChargeData) )
+           #self.G2D_CLUSTQ_SIGMA.SetName("g2D_ClusterChargeSigma_StripSize_vs_" + strIndepVarName)
+           #self.G2D_CLUSTQ_SIGMA.SetTitle("")
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeSigma_StripSize_vs_" + strIndepVarName)
            self.ARRAY_CLUSTQ_SIGMA = clustChargeData[:,2]
         else:
             print "Input Observable Name: " + strObsName
@@ -313,14 +312,14 @@ class AnalysisSuiteClusterCharge:
         #Set the points
         for i in range(0, len(clustChargeData)):
            if strObsName == self.STROBSNAME_MPV:
-               #self.G2D_CLUSTQ_MPV.SetPoint(i, array_X[i], array_Y[i], array_Z[i])
-               self.G2D_CLUSTQ_MPV.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MPV[i])
+               #self.G2D_CLUSTQ_MPV.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MPV[i])
+               g2D_ClustQ_Obs.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MPV[i])
            elif strObsName == self.STROBSNAME_MEAN:
-               #self.G2D_CLUSTQ_MEAN.SetPoint(i, array_X[i], array_Y[i], array_Z[i])
-               self.G2D_CLUSTQ_MEAN.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MEAN[i])
+               #self.G2D_CLUSTQ_MEAN.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MEAN[i])
+               g2D_ClustQ_Obs.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_MEAN[i])
            elif strObsName == self.STROBSNAME_SIGMA:
-               #self.G2D_CLUSTQ_SIGMA.SetPoint(i, array_X[i], array_Y[i], array_Z[i])
-               self.G2D_CLUSTQ_SIGMA.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_SIGMA[i])
+               #self.G2D_CLUSTQ_SIGMA.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_SIGMA[i])
+               g2D_ClustQ_Obs.SetPoint(i, self.ARRAY_HVORGAIN[i], self.ARRAY_CLUSTSIZE[i], self.ARRAY_CLUSTQ_SIGMA[i])
 
         #Reshape the arrays for later analysis
         self.ARRAY_HVORGAIN = np.unique(self.ARRAY_HVORGAIN)
@@ -333,30 +332,44 @@ class AnalysisSuiteClusterCharge:
         elif strObsName == self.STROBSNAME_SIGMA:
            self.ARRAY_CLUSTQ_SIGMA	= np.reshape(self.ARRAY_CLUSTQ_SIGMA,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
 
+	#Store the Plot
+        outputFile = TFile(outputfilename,strFileOpt,"",1)
+
+	dir_Out = []
+	if strFileOpt == "UPDATE":
+	   dir_Out = outputFile.GetDirectory("ClusterChargeData")
+	else:
+	   dir_Out = outputFile.mkdir("ClusterChargeData")
+
+	dir_Out.cd()
+	g2D_ClustQ_Obs.Write()
+
+	outputFile.Close()
+
         return
 
     #Here:
     #	outputfilename	->	Physical filename of the ROOT file to be created
     #	strFileOpt	->	Option of the root file, e.g. "RECREATE", "UPDATE", etc...
     #	strObsName	->	Observable to plot, acceptable inputs are from set {MPV, MEAN, SIGMA}
-    def storePlots(self, outputfilename, strFileOpt="RECREATE", strObsName="MPV"):
-        #Make the output file
-        outputFile = TFile(outputfilename,strFileOpt,"",1)
-
-        #Write the correct TGraph2D
-        if strObsName == self.STROBSNAME_MPV:
-           self.G2D_CLUSTQ_MPV.Write()
-        elif strObsName == self.STROBSNAME_MEAN:
-           self.G2D_CLUSTQ_MEAN.Write()
-        elif strObsName == self.STROBSNAME_SIGMA:
-           self.G2D_CLUSTQ_SIGMA.Write()
-        else:
-            print "Input Observable Name: " + strObsName
-            print "Was not recognized, please cross-check and re-run"
-            print "Exiting"
-            return
-
-        #Close the outputfile
-        outputFile.Close()
-
-        return
+#    def storePlots(self, outputfilename, strFileOpt="RECREATE", strObsName="MPV"):
+#        #Make the output file
+#        outputFile = TFile(outputfilename,strFileOpt,"",1)
+#
+#        #Write the correct TGraph2D
+#        if strObsName == self.STROBSNAME_MPV:
+#           self.G2D_CLUSTQ_MPV.Write()
+#        elif strObsName == self.STROBSNAME_MEAN:
+#           self.G2D_CLUSTQ_MEAN.Write()
+#        elif strObsName == self.STROBSNAME_SIGMA:
+#           self.G2D_CLUSTQ_SIGMA.Write()
+#        else:
+#            print "Input Observable Name: " + strObsName
+#            print "Was not recognized, please cross-check and re-run"
+#            print "Exiting"
+#            return
+#
+#        #Close the outputfile
+#        outputFile.Close()
+#
+#        return

@@ -70,7 +70,11 @@ if __name__ == "__main__":
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
     #Initialize analysis suite
-    anaSuite = AnalysisSuiteGainMap(options.filename, params_gain, params_det, debug=options.debug)
+    anaSuite = AnalysisSuiteGainMap(inputfilename=options.filename, 
+				    params_gain=params_gain, 
+				    params_det=params_det, 
+				    debug=options.debug)
+
     anaSuite.ANA_UNI_GRANULARITY = 32
 
     #Calculate Gain & P_D maps

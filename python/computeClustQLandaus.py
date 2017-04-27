@@ -59,10 +59,10 @@ if __name__ == "__main__":
     anaSuite = AnalysisSuiteClusterCharge(params_gain, True, False)
 
     #Make Landau Plots
-    anaSuite.makePlot(options.filename, iSkip=2, strObsName=options.strObsVar)
+    anaSuite.makeAndStorePlot(options.filename, iSkip=2, strObsName=options.strObsVar)
 
     #Store Landau Plots
-    anaSuite.storePlots("ClusterChargeLandauPlots.root", strFileOpt="UPDATE", strObsName=options.strObsVar)
+    #anaSuite.storePlots("ClusterChargeLandauPlots.root", strFileOpt="UPDATE", strObsName=options.strObsVar)
 
     #Interpolate Data - Note Data is already loaded
     anaSuite.interpolateData(strInterpolateKind="cubic", strObsName=options.strObsVar)
