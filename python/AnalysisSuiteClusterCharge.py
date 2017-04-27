@@ -70,15 +70,15 @@ class AnalysisSuiteClusterCharge:
         #Check to make sure (iClustSize, fHVOrGain) is inside the expected range
         if iClustSize < self.ARRAY_CLUSTSIZE.min() or iClustSize > self.ARRAY_CLUSTSIZE.max():
             if self.DEBUG:
-                print "Cluster size input: " + str(iClustSize)
-                print "Is outside given range: [" + str(self.ARRAY_CLUSTSIZE.min()) + "," + str(self.ARRAY_CLUSTSIZE.max()) + "]"
+                print "Cluster size input: {0}".format(iClustSize)
+                print "Is outside given range: [{0},{1}]".format(self.ARRAY_CLUSTSIZE.min(),self.ARRAY_CLUSTSIZE.max())
                 print "Calculation may not be reliable"
 
             return False
         elif fHVOrGain < self.ARRAY_HVORGAIN.min() or fHVOrGain > self.ARRAY_HVORGAIN.max():
             if self.DEBUG:
                 print "HV or Gain input: " + str(iClustSize)
-                print "Is outside given range: [" + str(self.ARRAY_HVORGAIN.min()) + "," + str(self.ARRAY_HVORGAIN.max()) + "]"
+                print "Is outside given range: [{0},{1}]".format(self.ARRAY_HVORGAIN.min(),self.ARRAY_HVORGAIN.max())
                 print "Calculation may not be reliable"
                     
             return False
@@ -96,7 +96,7 @@ class AnalysisSuiteClusterCharge:
             elif strObsName == self.STROBSNAME_SIGMA:
                 return self.getInterpolatedSigma(iClustSize, fHVOrGain)
             else:
-                print "Input Observable Name: " + strObsName
+                print "Input Observable Name: {0}".format(strObsName)
                 print "Was not recognized, please cross-check and re-run"
                 print "Exiting"
                 return -1
@@ -145,7 +145,7 @@ class AnalysisSuiteClusterCharge:
         elif strObsName == self.STROBSNAME_SIGMA:
             self.interpolateSigma(strInterpolateKind)
         else:
-            print "Input Observable Name: " + strObsName
+            print "Input Observable Name: {0}".format(strObsName)
             print "Was not recognized, please cross-check and re-run"
             print "Exiting"
             return
@@ -286,9 +286,9 @@ class AnalysisSuiteClusterCharge:
 
         #Print the shape if requested
         if self.DEBUG:
-            print "Shape of clustChargeData = " + str(clustChargeData.shape)
-            print "Shape of self.ARRAY_HVORGAIN = " + str(self.ARRAY_HVORGAIN.shape)
-            print "Shape of self.ARRAY_CLUSTSIZE = " + str(self.ARRAY_CLUSTSIZE.shape)
+            print "Shape of clustChargeData = {0}".format(clustChargeData.shape)
+            print "Shape of self.ARRAY_HVORGAIN = {0}".format(self.ARRAY_HVORGAIN.shape)
+            print "Shape of self.ARRAY_CLUSTSIZE = {0}".format(self.ARRAY_CLUSTSIZE.shape)
 
         #Reparameterize in terms of Gain?
         strIndepVarName = "VDrift"
@@ -307,22 +307,22 @@ class AnalysisSuiteClusterCharge:
            #self.G2D_CLUSTQ_MPV.Set( len(clustChargeData) )
            #self.G2D_CLUSTQ_MPV.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
            #self.G2D_CLUSTQ_MPV.SetTitle("")
-	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMPV_StripSize_vs_{0}".format(strIndepVarName))
            self.ARRAY_CLUSTQ_MPV = clustChargeData[:,2]
         elif strObsName == self.STROBSNAME_MEAN:
            #self.G2D_CLUSTQ_MEAN.Set( len(clustChargeData) )
            #self.G2D_CLUSTQ_MEAN.SetName("g2D_ClusterChargeMean_StripSize_vs_" + strIndepVarName)
            #self.G2D_CLUSTQ_MEAN.SetTitle("")
-	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMean_StripSize_vs_" + strIndepVarName)
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeMean_StripSize_vs_{0}".format(strIndepVarName))
            self.ARRAY_CLUSTQ_MEAN = clustChargeData[:,2]
         elif strObsName == self.STROBSNAME_SIGMA:
            #self.G2D_CLUSTQ_SIGMA.Set( len(clustChargeData) )
            #self.G2D_CLUSTQ_SIGMA.SetName("g2D_ClusterChargeSigma_StripSize_vs_" + strIndepVarName)
            #self.G2D_CLUSTQ_SIGMA.SetTitle("")
-	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeSigma_StripSize_vs_" + strIndepVarName)
+	   g2D_ClustQ_Obs.SetName("g2D_ClusterChargeSigma_StripSize_vs_{0}".format(strIndepVarName))
            self.ARRAY_CLUSTQ_SIGMA = clustChargeData[:,2]
         else:
-            print "Input Observable Name: " + strObsName
+            print "Input Observable Name: {0}".format(strObsName)
             print "Was not recognized, please cross-check and re-run"
             print "Exiting"
             return

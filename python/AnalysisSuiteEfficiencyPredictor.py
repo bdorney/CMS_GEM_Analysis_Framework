@@ -123,7 +123,7 @@ class AnalysisSuiteEfficiencyPredictor:
 
             #Print (field_name, value) pair
             if self.DEBUG:
-                print strLine[0] + "\t" + strLine[1]
+                print "{0}\t{1}".format(strLine[0],strLine[1])
 
             #Set values
             if strLine[0] == "FILE_FRAMEWORK_OUTPUT":
@@ -291,8 +291,8 @@ class AnalysisSuiteEfficiencyPredictor:
         
         #Average Readout Sector Fitted ADC Pk Positions
         if self.DEBUG:
-            print "Starting Gain Map calculation for: " + self.NAME_DET_DUT
-            print "averaging ADC PkPositions in sector: (" + str(self.SECTOR_IETA_QC5) + "," + str(self.SECTOR_IPHI_QC5) + ")"
+            print "Starting Gain Map calculation for: {0}".format(self.NAME_DET_DUT)
+            print "averaging ADC PkPositions in sector: ({0},{1})".format(self.SECTOR_IETA_QC5,self.SECTOR_IPHI_QC5)
         
         self.ANASUITEGAIN.avgROSectorADCPkPos()
         
@@ -320,8 +320,8 @@ class AnalysisSuiteEfficiencyPredictor:
         #Average Readout Sector Fitted ADC Pk Positions
         if self.DEBUG:
             print "Starting Normalized Average Cluster Size Map calculation for: " + self.NAME_DET_DUT
-            print "Averaging <Cluster Size> in sector: (" + str(self.SECTOR_IETA_CLUSTSIZENORM) + "," + str(self.SECTOR_IPHI_CLUSTSIZENORM) + ")"
-                
+            print "Averaging <Cluster Size> in sector: ({0},{1})".format(self.SECTOR_IETA_CLUSTSIZENORM,self.SECTOR_IPHI_CLUSTSIZENORM)
+    
         self.ANASUITEGAIN.avgROSectorAvgClustSize()
 
         #Compute Normalized Average Cluster Size Map
@@ -338,7 +338,7 @@ class AnalysisSuiteEfficiencyPredictor:
 
         #Get the gain map at fHVPt
         if self.DEBUG:
-            print "Calculating Gain Map at Input HV Pt: " + str(fHVPt)
+            print "Calculating Gain Map at Input HV Pt: {0}".format(fHVPt)
         
         g2D_Map_Gain_HVPt = self.ANASUITEGAIN.calcGainMapHV(self.NAME_DET_DUT, fHVPt)
 
@@ -365,14 +365,14 @@ class AnalysisSuiteEfficiencyPredictor:
         
         #Remove points in (X,Y) from data_NormAvgClustSize that are not in data_Gain
         if self.DEBUG:
-            print "Shape of data_Gain = " + str(np.shape( data_Gain ) )
-            print "Shape of data_NormAvgClustSize = " + str(np.shape( data_NormAvgClustSize ) )
+            print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
+            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
         
         data_NormAvgClustSize = data_NormAvgClustSize[np.logical_not(data_Gain[:,0] != data_NormAvgClustSize[:,0])]
         
         if self.DEBUG:
-            print "Shape of data_Gain = " + str(np.shape( data_Gain ) )
-            print "Shape of data_NormAvgClustSize = " + str(np.shape( data_NormAvgClustSize ) )
+            print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
+            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
         
         for idx in range(0, len(data_NormAvgClustSize)):
             if data_NormAvgClustSize[idx][1] != data_Gain[idx][1]:
@@ -381,8 +381,7 @@ class AnalysisSuiteEfficiencyPredictor:
                 print data_NormAvgClustSize[idx]
                 print "Gain"
                 print data_Gain[idx]
-                            
-        
+
         #How do we store the Landaus then? Want to see what I am generating
         #Idea was 2D histograms of ClustCharge vs. ClustPos, then we can do a 1D projection
         #How do we get the binning right?
