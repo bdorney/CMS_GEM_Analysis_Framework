@@ -301,8 +301,8 @@ class AnalysisSuiteClusterCharge:
         strObsName = strObsName.upper()
 
         #Initialize the correct TGraph2D
-	g2D_ClustQ_Obs = TGraph2D(len(clustChargeData))
-	g2D_ClustQ_Obs.SetTitle("")
+        g2D_ClustQ_Obs = TGraph2D(len(clustChargeData))
+        g2D_ClustQ_Obs.SetTitle("")
         if strObsName == self.STROBSNAME_MPV:
            #self.G2D_CLUSTQ_MPV.Set( len(clustChargeData) )
            #self.G2D_CLUSTQ_MPV.SetName("g2D_ClusterChargeMPV_StripSize_vs_" + strIndepVarName)
@@ -350,19 +350,19 @@ class AnalysisSuiteClusterCharge:
         elif strObsName == self.STROBSNAME_SIGMA:
            self.ARRAY_CLUSTQ_SIGMA	= np.reshape(self.ARRAY_CLUSTQ_SIGMA,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
 
-	#Store the Plot
+        #Store the Plot
         outputFile = TFile(outputfilename,strFileOpt,"",1)
 
-	dir_Out = []
-	if strFileOpt == "UPDATE":
-	   dir_Out = outputFile.GetDirectory("ClusterChargeData")
-	else:
-	   dir_Out = outputFile.mkdir("ClusterChargeData")
+        dir_Out = []
+        if strFileOpt == "UPDATE":
+           dir_Out = outputFile.GetDirectory("ClusterChargeData")
+        else:
+           dir_Out = outputFile.mkdir("ClusterChargeData")
 
-	dir_Out.cd()
-	g2D_ClustQ_Obs.Write()
+        dir_Out.cd()
+        g2D_ClustQ_Obs.Write()
 
-	outputFile.Close()
+        outputFile.Close()
 
         return
 

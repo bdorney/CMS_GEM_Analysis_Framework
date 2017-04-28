@@ -1,8 +1,9 @@
 #Imports
 import sys, os
 import numpy as np
+import root_numpy as rp
 #import ROOT
-from ROOT import TKey, TFile, TDirectory, TDirectoryFile
+from ROOT import TGraph2D, TKey, TFile, TDirectory, TDirectoryFile, TArrayD
 
 #=====================Functions=====================
 
@@ -17,6 +18,27 @@ def getall(d, basepath="/"):
                 yield i
         else:
             yield basepath+kname, d.Get(kname)
+
+#Returns a numpy array of form:
+#   [[x1, y1, z1],
+#    [x2, y2, z2],
+#    ...
+#    ...
+#    [xN, yN, zN]]
+#
+#Here:  g2D         -> input TGraph2D object
+#       round_xy    -> if the x & y values should be rounded
+#       decPts    -> decimal points to round xy arrays to
+def getDataTGraph2D(g2D, round_xy=True, decPts=3):
+    array_fPx = rp.array( TArrayD(g2D.GetN(), g2D.GetX() ) )
+    array_fPy = rp.array( TArrayD(g2D.GetN(), g2D.GetY() ) )
+    array_fPz = rp.array( TArrayD(g2D.GetN(), g2D.GetZ() ) )
+
+    if round_xy:
+        array_fPx = np.round(array_fPx, decimals=decPts)
+        array_fPy = np.round(array_fPy, decimals=decPts)
+
+    return np.column_stack((array_fPx, array_fPy, array_fPz))
 
 #Use Median absolute deviation (MAD) to reject outliers)
 #See: http://stackoverflow.com/questions/22354094/pythonic-way-of-detecting-outliers-in-one-dimensional-observation-data

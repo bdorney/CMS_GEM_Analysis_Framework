@@ -350,56 +350,37 @@ class AnalysisSuiteEfficiencyPredictor:
         #We can make some numpy arrays
         #Then the (clustPos,y) members from G2D_MAP_AVG_CLUST_SIZE_NORM that don't appear in g2D_Map_Gain_HVPt
         
-        #Make the container for the gain data
-        array_fPx = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetX() ) )
-        array_fPy = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetY() ) )
-        array_fPz = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetZ() ) )
-        
-	#print (array_fPx,array_fPy,array_fPz)
-
-	#Round the Coordinates
-	array_fPx = np.round(array_fPx,decimals=1)
-	array_fPy = np.round(array_fPy,decimals=1)
+        #Get the gain and normalized average clustersize data
+        data_Gain        = getDataTGraph2D(g2D_Map_Gain_HVPt)
+        data_NormAvgCS   = getDataTGraph2D(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM)
 	
-        data_Gain = np.column_stack((array_fPx,array_fPy,array_fPz)) 
-	
-	#Add this to the dictionary
-	dict_Coords_GainAndNormAvgClustSize = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
-
-        #Make the container for the normalized average cluster size container
-        array_fPx = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetX() ) )
-        array_fPy = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetY() ) )
-        array_fPz = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetZ() ) )
-        
-        #Round the Coordinates
-        array_fPx = np.round(array_fPx,decimals=1)
-        array_fPy = np.round(array_fPy,decimals=1)
-
-        data_NormAvgClustSize = np.column_stack((array_fPx,array_fPy,array_fPz))
-        
-        #Remove points in (X,Y) from data_NormAvgClustSize that are not in data_Gain
+        #Give the shape of the two data arrays
         if self.DEBUG:
             print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
             print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
-        
-	for idx in data_NormAvgClustSize:
-	    if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgClustSize:
-		dict_Coords_GainAndNormAvgClustSize[(idx[0],idx[1])].append(idx[2])
 
-	print dict_Coords_GainAndNormAvgClustSize
-	#print len(dict_Coords_GainAndNormAvgClustSize)
+        #Create a dictionary where the coordinate point (x,y) is mapped to the (gain, Norm <CS>)
+        dict_Coords_GainAndNormAvgCS = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
+        for idx in data_NormAvgCS:
+            if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgCS:
+            dict_Coords_GainAndNormAvgCS[(idx[0],idx[1])].append(idx[2])
 
-	print "Gain", data_Gain[0]
-	print "Norm Avg Clust Size", data_NormAvgClustSize[0]
+        print dict_Coords_GainAndNormAvgClustSize
 
-	#Get the keys & the values from the dict:
-#	>>> for i in c:
-#	...     print (i[0],i[1])
-#	... 
-#	(0, 1)
-#	(5, 6)
-#	>>> c
-#	{(0, 1): [6, 3], (5, 6): [8, 7]}
+        #Get the unique y coordinates
+        coords_y = np.unique(data_Gain[:,1])
+
+        for idx in range(0,len(self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS)):
+            print coords_y[idx], self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[idx]
+
+            #Get the keys & the values from the dict:
+        #	>>> for i in c:
+        #	...     print (i[0],i[1])
+        #	... 
+        #	(0, 1)
+        #	(5, 6)
+        #	>>> c
+        #	{(0, 1): [6, 3], (5, 6): [8, 7]}
 
         #How do we store the Landaus then? Want to see what I am generating
         #Idea was 2D histograms of ClustCharge vs. ClustPos, then we can do a 1D projection
