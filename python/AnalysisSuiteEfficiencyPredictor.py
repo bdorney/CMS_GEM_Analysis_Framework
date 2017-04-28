@@ -10,6 +10,7 @@
 #Imports
 import sys, os
 import numpy as np
+import root_numpy as rp
 #from scipy import interpolate
 
 #Python Toolkit Imports
@@ -18,7 +19,7 @@ from AnalysisSuiteClusterCharge import *
 from Utilities import *
 
 #ROOT Imports
-from ROOT import gROOT, TF1, TFile, TGraph2D
+from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D
 
 class AnalysisSuiteEfficiencyPredictor:
 
@@ -350,17 +351,30 @@ class AnalysisSuiteEfficiencyPredictor:
         #Then the (clustPos,y) members from G2D_MAP_AVG_CLUST_SIZE_NORM that don't appear in g2D_Map_Gain_HVPt
         
         #Make the container for the gain data
-        array_fPx = g2D_Map_Gain_HVPt.GetX()
-        array_fPy = g2D_Map_Gain_HVPt.GetY()
-        array_fPz = g2D_Map_Gain_HVPt.GetZ()
+        array_fPx = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetX() ) )
+        array_fPy = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetY() ) )
+        array_fPz = rp.array( TArrayD(g2D_Map_Gain_HVPt.GetN(), g2D_Map_Gain_HVPt.GetZ() ) )
         
-        data_Gain = np.column_stack((array_fPx,array_fPy,array_fPz))
-        
+	#print (array_fPx,array_fPy,array_fPz)
+
+	#Round the Coordinates
+	array_fPx = np.round(array_fPx,decimals=1)
+	array_fPy = np.round(array_fPy,decimals=1)
+	
+        data_Gain = np.column_stack((array_fPx,array_fPy,array_fPz)) 
+	
+	#Add this to the dictionary
+	dict_Coords_GainAndNormAvgClustSize = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
+
         #Make the container for the normalized average cluster size container
-        array_fPx = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetX()
-        array_fPy = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetY()
-        array_fPz = self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetZ()
+        array_fPx = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetX() ) )
+        array_fPy = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetY() ) )
+        array_fPz = rp.array( TArrayD(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetN(), self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM.GetZ() ) )
         
+        #Round the Coordinates
+        array_fPx = np.round(array_fPx,decimals=1)
+        array_fPy = np.round(array_fPy,decimals=1)
+
         data_NormAvgClustSize = np.column_stack((array_fPx,array_fPy,array_fPz))
         
         #Remove points in (X,Y) from data_NormAvgClustSize that are not in data_Gain
@@ -368,19 +382,24 @@ class AnalysisSuiteEfficiencyPredictor:
             print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
             print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
         
-        data_NormAvgClustSize = data_NormAvgClustSize[np.logical_not(data_Gain[:,0] != data_NormAvgClustSize[:,0])]
-        
-        if self.DEBUG:
-            print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
-            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
-        
-        for idx in range(0, len(data_NormAvgClustSize)):
-            if data_NormAvgClustSize[idx][1] != data_Gain[idx][1]:
-                print "Points not equal, unexpected!"
-                print "Norm <Clust Size>:"
-                print data_NormAvgClustSize[idx]
-                print "Gain"
-                print data_Gain[idx]
+	for idx in data_NormAvgClustSize:
+	    if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgClustSize:
+		dict_Coords_GainAndNormAvgClustSize[(idx[0],idx[1])].append(idx[2])
+
+	print dict_Coords_GainAndNormAvgClustSize
+	#print len(dict_Coords_GainAndNormAvgClustSize)
+
+	print "Gain", data_Gain[0]
+	print "Norm Avg Clust Size", data_NormAvgClustSize[0]
+
+	#Get the keys & the values from the dict:
+#	>>> for i in c:
+#	...     print (i[0],i[1])
+#	... 
+#	(0, 1)
+#	(5, 6)
+#	>>> c
+#	{(0, 1): [6, 3], (5, 6): [8, 7]}
 
         #How do we store the Landaus then? Want to see what I am generating
         #Idea was 2D histograms of ClustCharge vs. ClustPos, then we can do a 1D projection
