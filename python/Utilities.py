@@ -7,6 +7,10 @@ from ROOT import TGraph2D, TKey, TFile, TDirectory, TDirectoryFile, TArrayD
 
 #=====================Functions=====================
 
+#Turns an array into a dictionary
+def array2Dict(array):
+    return dict(((a,b),c) for (a,b,c) in set(map(tuple,array)))
+
 #From: https://root-forum.cern.ch/t/loop-over-all-objects-in-a-root-file/10807/4
 def getall(d, basepath="/"):
     "Generator function to recurse into a ROOT file/dir and yield (path, obj) pairs"

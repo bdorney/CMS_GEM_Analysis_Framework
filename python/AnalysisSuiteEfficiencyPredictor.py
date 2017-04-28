@@ -19,7 +19,7 @@ from AnalysisSuiteClusterCharge import *
 from Utilities import *
 
 #ROOT Imports
-from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TH2F
+from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TH2F, TRandom2
 
 class AnalysisSuiteEfficiencyPredictor:
 
@@ -243,6 +243,7 @@ class AnalysisSuiteEfficiencyPredictor:
 	    xUpper	= 0.5 * etaSector.SECTSIZE
 	    h_clustQ_vs_clustPos = TH2F("h_iEta{0}_clustQ_vs_clustPos".format(etaSector.IETA),
 					"",iNumBinsX,xLower,xUpper,400,0,200)
+	    h_clustQ_vs_clustPos.SetDirectory(gROOT)
 	    self.DICT_H_CLUSTQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_clustQ_vs_clustPos
 
 	#for idx in self.DICT_H_CLUSTQ_VS_CLUSTPOS:
@@ -367,6 +368,9 @@ class AnalysisSuiteEfficiencyPredictor:
         #Get the gain and normalized average clustersize data
         data_Gain        = getDataTGraph2D(g2D_Map_Gain_HVPt)
         data_NormAvgCS   = getDataTGraph2D(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM)
+
+	#Close TFiles that have been opened by self.ANASUITEGAIN
+	self.ANASUITEGAIN.closeTFiles()
 	
         #Give the shape of the two data arrays
         if self.DEBUG:
@@ -379,46 +383,83 @@ class AnalysisSuiteEfficiencyPredictor:
             if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgCS:
             	dict_Coords_GainAndNormAvgCS[(idx[0],idx[1])].append(idx[2])
 
-        print dict_Coords_GainAndNormAvgCS
+        #print dict_Coords_GainAndNormAvgCS
 
-        #Get the unique y coordinates
-        #coords_y = np.unique(data_Gain[:,1])
+	#Print to User
+	if self.DEBUG:
+	    print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma"
 
-	#if coords_y[len(coords_y)-1] == self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[0].SECTPOS:
-	    #coords_y = coords_y[::-1] #flip the y-coordinates order
+	#Create the Efficiency Plots
+	g2D_Map_Eff_Sig_HVPt = TGraph2D()
+	g2D_Map_Eff_Noise_HVPt = TGraph2D()
 
-        #for idx in range(0,len(self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS)):
-            #print coords_y[idx], self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[idx].SECTPOS
+	g2D_Map_Eff_Sig_HVPt.SetName("g2D_{0}_EffSig_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt))
+	g2D_Map_Eff_Noise_HVPt.SetName("g2D_{0}_EffNoise_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt))
 
-	#print self.DICT_H_CLUSTQ_VS_CLUSTPOS
+	#Create the random number generator
+	rndm = TRandom2(0)
 
-	#Begin ToyMC
-	print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma"
+	#Loop over all points of the detector
+	iNumPt = 0
 	for coordPt in dict_Coords_GainAndNormAvgCS:
+	    #Get the gain and MIP cluster size
 	    fGain 	= dict_Coords_GainAndNormAvgCS[coordPt][0]
 	    fNormAvgCS	= dict_Coords_GainAndNormAvgCS[coordPt][1]
 	    fMIPAvgCS	= fNormAvgCS * self.FUNC_AVG_MIP_CLUSTSIZE.Eval(fGain)
 	    
-	    fLandauMPV	= self.ANASUITECLUSTQ.getInterpolatedMPV(fMIPAvgCS, fGain)
+	    #Get the Landau Parameters
+	    fLandauMean	= self.ANASUITECLUSTQ.getInterpolatedMean(fMIPAvgCS, fGain)
+	    #fLandauMPV	= self.ANASUITECLUSTQ.getInterpolatedMPV(fMIPAvgCS, fGain)
 	    fLandauSigma= self.ANASUITECLUSTQ.getInterpolatedSigma(fMIPAvgCS, fGain)
 
-	    print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMPV, fLandauSigma
+	    #Print to User
+	    if self.DEBUG:
+	    	print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMean, fLandauSigma
+	    
+	    #Skip if the Landua parameters outside interpolated data
+	    if fLandauMean < 0 or fLandauSigma < 0:
+		continue
 
+	    #Begin ToyMC
+	    fThresh = 3. * 5000. * 1.602e-19 * 1e15
 
-            #Get the keys & the values from the dict:
-        #	>>> for i in c:
-        #	...     print (i[0],i[1])
-        #	... 
-        #	(0, 1)
-        #	(5, 6)
-        #	>>> c
-        #	{(0, 1): [6, 3], (5, 6): [8, 7]}
+	    fNumSig	= 0. #Number of Signal Events; Q_Sig > Q_Noise & Q_Sig > Thresh
+	    fNumFake	= 0. #Number of Noise Events; Q_Noise >= Q_Sig & Q_Noise > Thresh
+	    fNumMiss	= 0. #Number of Missed Events; Thresh > Q_Sig & Thresh > Q_Noise
+	    for evt in range(0,iNEvtPerPt):
+		fCharge_Sig = rndm.Landau(fLandauMean, fLandauSigma)
+		fCharge_Noise = rndm.Gaus(5000. * 1.602e-19 * 1e15, 2500. * 1.602e-19 * 1e15) #e^- * C/e^- * fC / C
 
-        #How do we store the Landaus then? Want to see what I am generating
-        #Idea was 2D histograms of ClustCharge vs. ClustPos, then we can do a 1D projection
-        #How do we get the binning right?
-        #We known analysis granularity so N_bins = 3*Ana_granularity
-        #We know the size of the iEta row
+		#Store charge distribution
+		self.DICT_H_CLUSTQ_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fCharge_Sig)
+
+		#Consider cases
+		if fCharge_Sig > fCharge_Noise and fCharge_Sig > fThresh:	fNumSig+=1.
+		elif fCharge_Noise >= fCharge_Sig and fCharge_Noise > fThresh:	fNumFake+=1.
+		elif fThresh > fCharge_Sig and fThresh > fCharge_Noise:		fNumMiss+=1.
+
+	    #print (coordPt[0],coordPt[1]), fNumSig, fNumFake, fNumMiss, fNumSig+fNumFake+fNumMiss
+
+	    #Store the results
+	    g2D_Map_Eff_Sig_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], (fNumSig+fNumFake) / iNEvtPerPt)
+	    g2D_Map_Eff_Noise_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], (fNumFake) / iNEvtPerPt)
+
+	    #Increment counter
+	    iNumPt+=1
+
+	#Open Output TFile (was opened already by self.ANASUITEGAIN)
+	file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
+
+	#Store output histograms
+	file_Out.cd()
+	coords_y = np.unique(data_Gain[:,1])
+	#for histo in self.DICT_H_CLUSTQ_VS_CLUSTPOS:
+	for idx in coords_y:
+	    print self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].GetName()
+	    self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].Write()
+
+	g2D_Map_Eff_Sig_HVPt.Write()
+	g2D_Map_Eff_Noise_HVPt.Write()
 
         return
 
