@@ -19,11 +19,12 @@ from AnalysisSuiteClusterCharge import *
 from Utilities import *
 
 #ROOT Imports
-from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D
+from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TH2F
 
 class AnalysisSuiteEfficiencyPredictor:
 
     __slots__ = ['DEBUG',
+		 'DICT_H_CLUSTQ_VS_CLUSTPOS',
                  'LIST_HVPTS',
                  'NAME_DET_DUT',
                  'NAME_DET_CLUSTQ',
@@ -234,6 +235,19 @@ class AnalysisSuiteEfficiencyPredictor:
                                                    params_det=self.PARAMS_DET_DUT,
                                                    debug=self.DEBUG)
 
+	#Make the dictionary for cluster charge vs cluster position histograms
+	self.DICT_H_CLUSTQ_VS_CLUSTPOS = {}
+	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+	    iNumBinsX	= self.ANA_UNI_GRANULARITY * etaSector.NBCONNECT
+	    xLower	= -0.5 * etaSector.SECTSIZE
+	    xUpper	= 0.5 * etaSector.SECTSIZE
+	    h_clustQ_vs_clustPos = TH2F("h_iEta{0}_clustQ_vs_clustPos".format(etaSector.IETA),
+					"",iNumBinsX,xLower,xUpper,400,0,200)
+	    self.DICT_H_CLUSTQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_clustQ_vs_clustPos
+
+	#for idx in self.DICT_H_CLUSTQ_VS_CLUSTPOS:
+	    #print self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].GetName()
+
         #Load the MIP average cluster size vs. gain formulat
         fileMIPAvgClustSize = TFile(self.FILE_MIP_AVG_CLUST_SIZE, "READ","", 1)
 
@@ -357,21 +371,39 @@ class AnalysisSuiteEfficiencyPredictor:
         #Give the shape of the two data arrays
         if self.DEBUG:
             print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
-            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgClustSize ) )
+            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgCS ) )
 
         #Create a dictionary where the coordinate point (x,y) is mapped to the (gain, Norm <CS>)
         dict_Coords_GainAndNormAvgCS = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
         for idx in data_NormAvgCS:
             if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgCS:
-            dict_Coords_GainAndNormAvgCS[(idx[0],idx[1])].append(idx[2])
+            	dict_Coords_GainAndNormAvgCS[(idx[0],idx[1])].append(idx[2])
 
-        print dict_Coords_GainAndNormAvgClustSize
+        print dict_Coords_GainAndNormAvgCS
 
         #Get the unique y coordinates
-        coords_y = np.unique(data_Gain[:,1])
+        #coords_y = np.unique(data_Gain[:,1])
 
-        for idx in range(0,len(self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS)):
-            print coords_y[idx], self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[idx]
+	#if coords_y[len(coords_y)-1] == self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[0].SECTPOS:
+	    #coords_y = coords_y[::-1] #flip the y-coordinates order
+
+        #for idx in range(0,len(self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS)):
+            #print coords_y[idx], self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[idx].SECTPOS
+
+	#print self.DICT_H_CLUSTQ_VS_CLUSTPOS
+
+	#Begin ToyMC
+	print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma"
+	for coordPt in dict_Coords_GainAndNormAvgCS:
+	    fGain 	= dict_Coords_GainAndNormAvgCS[coordPt][0]
+	    fNormAvgCS	= dict_Coords_GainAndNormAvgCS[coordPt][1]
+	    fMIPAvgCS	= fNormAvgCS * self.FUNC_AVG_MIP_CLUSTSIZE.Eval(fGain)
+	    
+	    fLandauMPV	= self.ANASUITECLUSTQ.getInterpolatedMPV(fMIPAvgCS, fGain)
+	    fLandauSigma= self.ANASUITECLUSTQ.getInterpolatedSigma(fMIPAvgCS, fGain)
+
+	    print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMPV, fLandauSigma
+
 
             #Get the keys & the values from the dict:
         #	>>> for i in c:
