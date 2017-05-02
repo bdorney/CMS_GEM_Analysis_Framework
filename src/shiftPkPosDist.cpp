@@ -24,7 +24,7 @@ using QualityControl::Timing::getCharSeparatedList;
 
 int main(){
     //Set file path
-    string strPFP = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna";
+    string strPFP = "/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/QC5_Resp_Uni";
 
     //Declare file name container
     vector<string> vec_strFilenames;
@@ -42,6 +42,7 @@ int main(){
     vec_strFilenames.push_back("GE11-VII-S-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0003_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0004_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_585uA_9633kEvt_TimeCorr_DPGGeo_AnaWithFits.root");
+    vec_strFilenames.push_back("GE11-VII-S-CERN-0005_Optimized_Analysis_612uA_XRay40kV100uA_Ana.root");
     vec_strFilenames.push_back("GE11-VII-S-CERN-0006_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_611uA_TimeCorr_DPGGeo_AnaWithFits.root");
     
     //TFile doesn't manage TH1F objects
@@ -122,6 +123,3 @@ int main(){
     
     return 0;
 } //End main()
-
-
-	
