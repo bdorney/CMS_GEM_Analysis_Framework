@@ -68,16 +68,16 @@ class AnalysisSuiteClusterCharge:
     #   Returns false if else
     def checkIfDataPtInRange(self, iClustSize, fHVOrGain):
         #Check to make sure (iClustSize, fHVOrGain) is inside the expected range
-        if iClustSize < self.ARRAY_CLUSTSIZE.min() or iClustSize > self.ARRAY_CLUSTSIZE.max():
+        if iClustSize < 0.8 * self.ARRAY_CLUSTSIZE.min() or iClustSize > 1.2 * self.ARRAY_CLUSTSIZE.max():
             if self.DEBUG:
                 print "Cluster size input: {0}".format(iClustSize)
                 print "Is outside given range: [{0},{1}]".format(self.ARRAY_CLUSTSIZE.min(),self.ARRAY_CLUSTSIZE.max())
                 print "Calculation may not be reliable"
 
             return False
-        elif fHVOrGain < self.ARRAY_HVORGAIN.min() or fHVOrGain > self.ARRAY_HVORGAIN.max():
+        elif fHVOrGain < 0.8 * self.ARRAY_HVORGAIN.min() or fHVOrGain > 1.2 *self.ARRAY_HVORGAIN.max():
             if self.DEBUG:
-                print "HV or Gain input: " + str(iClustSize)
+                print "HV or Gain input: " + str(fHVOrGain)
                 print "Is outside given range: [{0},{1}]".format(self.ARRAY_HVORGAIN.min(),self.ARRAY_HVORGAIN.max())
                 print "Calculation may not be reliable"
                     
@@ -268,7 +268,7 @@ class AnalysisSuiteClusterCharge:
             print "Cluster Charge Sigma Mean Values:"
             print self.ARRAY_CLUSTQ_SIGMA
             
-        print "Data Loaded"
+        print "Cluster Charge Data Loaded"
             
         return
 

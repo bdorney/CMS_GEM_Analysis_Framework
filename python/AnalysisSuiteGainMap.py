@@ -152,9 +152,9 @@ class AnalysisSuiteGainMap:
         list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
         
         #Print to user - Section Boundaries
-        if self.DEBUG == True:
-            for i in range(0,len(list_sectBoundary)):
-                print list_sectBoundary[i]
+        #if self.DEBUG == True:
+            #for i in range(0,len(list_sectBoundary)):
+                #print list_sectBoundary[i]
         
         #Loop over points in the plot
         list_clustADC_Fit_PkPos = []
@@ -167,9 +167,8 @@ class AnalysisSuiteGainMap:
             #Check if this point is within the defined (ieta,iphi) sector, if so store it for later use
             if list_sectBoundary[self.DETECTOR.DETPOS_IPHI-1] <= fPx and fPx <= list_sectBoundary[self.DETECTOR.DETPOS_IPHI]:
                 #Print to user - selected data points
-                if self.DEBUG == True:
-                    #print (str(i) + "\t" + str(fPx) + "\t" + str(fPy) )
-                    print "{0}\t{1}\t{2}".format(i, fPx, fPy)
+                #if self.DEBUG == True:
+                    #print "{0}\t{1}\t{2}".format(i, fPx, fPy)
                 
                 #store data point
                 list_clustADC_Fit_PkPos.append(fPy)

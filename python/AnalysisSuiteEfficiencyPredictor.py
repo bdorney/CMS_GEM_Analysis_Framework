@@ -16,6 +16,7 @@ import root_numpy as rp
 #Python Toolkit Imports
 from AnalysisSuiteGainMap import *
 from AnalysisSuiteClusterCharge import *
+from AnalysisSuiteVFATNoise import *
 from Utilities import *
 
 #ROOT Imports
@@ -24,7 +25,10 @@ from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TH2F, TRandom2
 class AnalysisSuiteEfficiencyPredictor:
 
     __slots__ = ['DEBUG',
+		 'DICT_H_CHON_VS_CLUSTPOS',
 		 'DICT_H_CLUSTQ_VS_CLUSTPOS',
+		 'DICT_H_NOISEQ_VS_CLUSTPOS',
+		 'DICT_H_THRESH_VS_CLUSTPOS',
                  'LIST_HVPTS',
                  'NAME_DET_DUT',
                  'NAME_DET_CLUSTQ',
@@ -41,13 +45,16 @@ class AnalysisSuiteEfficiencyPredictor:
                  'FILE_CLUSTQ_MEAN',
                  'FILE_CLUSTQ_MPV',
                  'FILE_CLUSTQ_SIGMA',
-                 'FILE_DUT_MAPPING',
+                 'FILE_MAPPING_DUT',
+		 'FILE_MAPPING_DUT_VFAT2DET',
                  'FILE_MIP_AVG_CLUST_SIZE',
                  'FILE_OUTPUT',
                  'FILE_QC5_RESP_UNI',
+		 'FILE_SCURVE_DATA',
                  'TOBJ_NAME_FUNC_AVGCLUSTSIZE',
                  'ANASUITECLUSTQ',
                  'ANASUITEGAIN',
+		 'ANASUITENOISE',
                  'FUNC_AVG_MIP_CLUSTSIZE'
                  ]
 
@@ -88,13 +95,15 @@ class AnalysisSuiteEfficiencyPredictor:
         self.FILE_CLUSTQ_MPV            = "" #As above but for MPV
         self.FILE_CLUSTQ_SIGMA          = "" #As above but for Sigma
 
-        self.FILE_DUT_MAPPING           = "" #Mapping config file for detector under test
+        self.FILE_MAPPING_DUT           = "" #Mapping config file for detector under test
+	self.FILE_MAPPING_DUT_VFAT2DET	= "" #Mapping config file for detectur under test which translates VFAT position to (ieta,iphi) coordinate
         
         self.FILE_MIP_AVG_CLUST_SIZE    = "" #File having a TF1 which is a fit of MIP <ClustSize> vs. Gain
         
         self.FILE_OUTPUT                = "" #Output filename to be created
         
         self.FILE_QC5_RESP_UNI          = "" #Framework output file
+	self.FILE_SCURVE_DATA		= "" #TFile containing the scurveFitTree TTree with SCurve data
         
         #TObject Names
         self.TOBJ_NAME_FUNC_AVGCLUSTSIZE= ""
@@ -157,12 +166,12 @@ class AnalysisSuiteEfficiencyPredictor:
                 self.SECTOR_IPHI_CLUSTSIZENORM = int(strLine[1])
             elif strLine[0] == "DUT_IPHI_QC5_GAIN_CAL":
                 self.SECTOR_IPHI_QC5 = int(strLine[1])
-            elif strLine[0] == "DUT_MAPPING_FILE":
-                #if self.DEBUG:
-                    #print "Loading Mapping"
-                
-                #self.PARAMS_DET_DUT.loadMapping(strLine[1], self.DEBUG)
-                self.FILE_DUT_MAPPING = strLine[1]
+            elif strLine[0] == "FILE_DUT_MAPPING_GEO":
+                self.FILE_MAPPING_DUT = strLine[1]
+	    elif strLine[0] == "FILE_DUT_MAPPING_VFATPOS2IETAIPHI":
+		self.FILE_MAPPING_DUT_VFAT2DET = strLine[1]
+	    elif strLine[0] == "FILE_DUT_SCURVEDATA":
+		self.FILE_SCURVE_DATA = strLine[1]
             elif strLine[0] == "DUT_QC5_RESP_UNI_HVPT":
                 self.PARAMS_DET_DUT.DET_IMON_QC5_RESP_UNI = float(strLine[1])
             elif strLine[0] == "DUT_SERIAL_NUMBER":
@@ -226,7 +235,7 @@ class AnalysisSuiteEfficiencyPredictor:
         if self.DEBUG:
             print "Loading Mapping"
 
-        self.PARAMS_DET_DUT.loadMapping(self.FILE_DUT_MAPPING, self.DEBUG)
+        self.PARAMS_DET_DUT.loadMapping(self.FILE_MAPPING_DUT, self.DEBUG)
 
         self.ANASUITEGAIN   = AnalysisSuiteGainMap(inputfilename=self.FILE_QC5_RESP_UNI,
                                                    outputfilename=self.FILE_OUTPUT,
@@ -235,6 +244,17 @@ class AnalysisSuiteEfficiencyPredictor:
                                                    params_det=self.PARAMS_DET_DUT,
                                                    debug=self.DEBUG)
 
+	#Make the dictionary for channels on vs cluster position histograms
+	self.DICT_H_CHON_VS_CLUSTPOS = {}
+	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+	    iNumBinsX	= self.ANA_UNI_GRANULARITY * etaSector.NBCONNECT
+	    xLower	= -0.5 * etaSector.SECTSIZE
+	    xUpper	= 0.5 * etaSector.SECTSIZE
+	    h_chOn_vs_clustPos = TH2F("h_iEta{0}_chOn_vs_clustPos".format(etaSector.IETA),
+					"",iNumBinsX,xLower,xUpper,125,0,1.25)
+	    h_chOn_vs_clustPos.SetDirectory(gROOT)
+	    self.DICT_H_CHON_VS_CLUSTPOS[etaSector.SECTPOS]=h_chOn_vs_clustPos
+
 	#Make the dictionary for cluster charge vs cluster position histograms
 	self.DICT_H_CLUSTQ_VS_CLUSTPOS = {}
 	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
@@ -242,12 +262,34 @@ class AnalysisSuiteEfficiencyPredictor:
 	    xLower	= -0.5 * etaSector.SECTSIZE
 	    xUpper	= 0.5 * etaSector.SECTSIZE
 	    h_clustQ_vs_clustPos = TH2F("h_iEta{0}_clustQ_vs_clustPos".format(etaSector.IETA),
-					"",iNumBinsX,xLower,xUpper,400,0,200)
+					"",iNumBinsX,xLower,xUpper,400,0,100)
 	    h_clustQ_vs_clustPos.SetDirectory(gROOT)
 	    self.DICT_H_CLUSTQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_clustQ_vs_clustPos
 
 	#for idx in self.DICT_H_CLUSTQ_VS_CLUSTPOS:
 	    #print self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].GetName()
+
+	#Make the dictionary for Noise vs cluster position histograms
+	self.DICT_H_NOISEQ_VS_CLUSTPOS = {}
+	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+	    iNumBinsX	= self.ANA_UNI_GRANULARITY * etaSector.NBCONNECT
+	    xLower	= -0.5 * etaSector.SECTSIZE
+	    xUpper	= 0.5 * etaSector.SECTSIZE
+	    h_noiseQ_vs_clustPos = TH2F("h_iEta{0}_noiseQ_vs_clustPos".format(etaSector.IETA),
+					"",iNumBinsX,xLower,xUpper,100,0,10)
+	    h_noiseQ_vs_clustPos.SetDirectory(gROOT)
+	    self.DICT_H_NOISEQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_noiseQ_vs_clustPos
+
+	#Make the dictionary for Thresh vs cluster position histograms
+	self.DICT_H_THRESH_VS_CLUSTPOS = {}
+	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+	    iNumBinsX	= self.ANA_UNI_GRANULARITY * etaSector.NBCONNECT
+	    xLower	= -0.5 * etaSector.SECTSIZE
+	    xUpper	= 0.5 * etaSector.SECTSIZE
+	    h_thresh_vs_clustPos = TH2F("h_iEta{0}_thresh_vs_clustPos".format(etaSector.IETA),
+					"",iNumBinsX,xLower,xUpper,100,0,10)
+	    h_thresh_vs_clustPos.SetDirectory(gROOT)
+	    self.DICT_H_THRESH_VS_CLUSTPOS[etaSector.SECTPOS]=h_thresh_vs_clustPos
 
         #Load the MIP average cluster size vs. gain formulat
         fileMIPAvgClustSize = TFile(self.FILE_MIP_AVG_CLUST_SIZE, "READ","", 1)
@@ -257,9 +299,16 @@ class AnalysisSuiteEfficiencyPredictor:
 
         self.FUNC_AVG_MIP_CLUSTSIZE = fileMIPAvgClustSize.Get(self.TOBJ_NAME_FUNC_AVGCLUSTSIZE)
 
+	#Initialize the VFAT noise analysis suite
+	self.ANASUITENOISE = AnalysisSuiteVFATNoise(detector=self.PARAMS_DET_DUT,
+						    inputMappingFile=self.FILE_MAPPING_DUT_VFAT2DET,
+						    inputSCurveFile=self.FILE_SCURVE_DATA,
+						    convert2fC=True,
+						    debug=self.DEBUG)
+
         #Tell user initialization completed successfully
-        if self.DEBUG:
-            print "Initialization completed successfully"
+        #if self.DEBUG:
+        print "AnalysisSuiteEfficiencyPredictor::init() - Initialization completed successfully"
 
         return
 
@@ -373,9 +422,9 @@ class AnalysisSuiteEfficiencyPredictor:
 	self.ANASUITEGAIN.closeTFiles()
 	
         #Give the shape of the two data arrays
-        if self.DEBUG:
-            print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
-            print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgCS ) )
+        #if self.DEBUG:
+            #print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
+            #print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgCS ) )
 
         #Create a dictionary where the coordinate point (x,y) is mapped to the (gain, Norm <CS>)
         dict_Coords_GainAndNormAvgCS = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
@@ -386,8 +435,8 @@ class AnalysisSuiteEfficiencyPredictor:
         #print dict_Coords_GainAndNormAvgCS
 
 	#Print to User
-	if self.DEBUG:
-	    print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma"
+	#if self.DEBUG:
+	    #print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma\tThresh"
 
 	#Create the Efficiency Plots
 	g2D_Map_Eff_Sig_HVPt = TGraph2D()
@@ -402,47 +451,95 @@ class AnalysisSuiteEfficiencyPredictor:
 	#Loop over all points of the detector
 	iNumPt = 0
 	for coordPt in dict_Coords_GainAndNormAvgCS:
+	    #Get Coordinate Info
+	    coordPt_iEtaiPhi	= self.PARAMS_DET_DUT.getiEtaiPhIndex(coordPt[0],coordPt[1])
+	    coordPt_iStripRange	= self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[coordPt_iEtaiPhi[0]-1].getStripRange(coordPt[0], self.ANA_UNI_GRANULARITY)
+	    coordPt_iThisSlice	= self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[coordPt_iEtaiPhi[0]-1].getSliceIdx(coordPt[0], self.ANA_UNI_GRANULARITY)
+
+	    #if self.DEBUG:
+		#print coordPt[0], coordPt[1], coordPt_iEtaiPhi
+
 	    #Get the gain and MIP cluster size
 	    fGain 	= dict_Coords_GainAndNormAvgCS[coordPt][0]
 	    fNormAvgCS	= dict_Coords_GainAndNormAvgCS[coordPt][1]
 	    fMIPAvgCS	= fNormAvgCS * self.FUNC_AVG_MIP_CLUSTSIZE.Eval(fGain)
 	    
 	    #Get the Landau Parameters
+	    #print "Getting Signal Charge Params with G={0} and <CSize>={1}".format(fGain,fMIPAvgCS)
 	    fLandauMean	= self.ANASUITECLUSTQ.getInterpolatedMean(fMIPAvgCS, fGain)
 	    #fLandauMPV	= self.ANASUITECLUSTQ.getInterpolatedMPV(fMIPAvgCS, fGain)
 	    fLandauSigma= self.ANASUITECLUSTQ.getInterpolatedSigma(fMIPAvgCS, fGain)
 
+	    #Get Threshold and Mask
+	    #fThresh 	= 3. * 5000. * 1.602e-19 * 1e15
+	    fThresh 	= self.ANASUITENOISE.getValByEtaPhiThreshAvg(coordPt_iEtaiPhi[0],coordPt_iEtaiPhi[1],coordPt_iStripRange[0],coordPt_iStripRange[1])
+	    fMask	= self.ANASUITENOISE.getValByEtaPhiSliceMaskAvg(coordPt_iEtaiPhi[0],coordPt_iEtaiPhi[1],coordPt_iStripRange[0],coordPt_iStripRange[1])
+
+	    self.DICT_H_THRESH_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fThresh)
+	    self.DICT_H_CHON_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fMask)
+
 	    #Print to User
-	    if self.DEBUG:
-	    	print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMean, fLandauSigma
+	    #if self.DEBUG:
+	    	#print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMean, fLandauSigma, fThresh
 	    
 	    #Skip if the Landua parameters outside interpolated data
 	    if fLandauMean < 0 or fLandauSigma < 0:
+		print "================================================================"
+		print "Bad Signal Charge Parameters"
+		print "Skipping (ieta,iphi,islice) = ({0},{1},{2}); strips = [{3},{4}]; coords = ({5},{6})".format(coordPt_iEtaiPhi[0],
+														     coordPt_iEtaiPhi[1],
+														     coordPt_iThisSlice,
+														     coordPt_iStripRange[0],
+														     coordPt_iStripRange[1],
+														     coordPt[0],
+														     coordPt[1])
+		print "================================================================"
 		continue
 
 	    #Begin ToyMC
-	    fThresh = 3. * 5000. * 1.602e-19 * 1e15
+	    if self.DEBUG:
+	    	print "Simulating (ieta,iphi,islice) = ({0},{1},{2}); strips = [{3},{4}]; coords = ({5},{6})".format(coordPt_iEtaiPhi[0],
+														     coordPt_iEtaiPhi[1],
+														     coordPt_iThisSlice,
+														     coordPt_iStripRange[0],
+														     coordPt_iStripRange[1],
+														     coordPt[0],
+														     coordPt[1])
 
 	    fNumSig	= 0. #Number of Signal Events; Q_Sig > Q_Noise & Q_Sig > Thresh
 	    fNumFake	= 0. #Number of Noise Events; Q_Noise >= Q_Sig & Q_Noise > Thresh
 	    fNumMiss	= 0. #Number of Missed Events; Thresh > Q_Sig & Thresh > Q_Noise
 	    for evt in range(0,iNEvtPerPt):
 		fCharge_Sig = rndm.Landau(fLandauMean, fLandauSigma)
-		fCharge_Noise = rndm.Gaus(5000. * 1.602e-19 * 1e15, 2500. * 1.602e-19 * 1e15) #e^- * C/e^- * fC / C
+		#fCharge_Noise = rndm.Gaus(5000. * 1.602e-19 * 1e15, 2500. * 1.602e-19 * 1e15) #e^- * C/e^- * fC / C
+		fCharge_Noise = rndm.Gaus(self.ANASUITENOISE.getValByEtaPhiNoiseAvg(coordPt_iEtaiPhi[0],
+										    coordPt_iEtaiPhi[1],
+										    coordPt_iStripRange[0],
+										    coordPt_iStripRange[1]),
+					  self.ANASUITENOISE.getValByEtaPhiNoiseStdDev(coordPt_iEtaiPhi[0],
+										       coordPt_iEtaiPhi[1],
+										       coordPt_iStripRange[0],
+										       coordPt_iStripRange[1]) )
 
-		#Store charge distribution
+		#Store the charges
 		self.DICT_H_CLUSTQ_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fCharge_Sig)
+		self.DICT_H_NOISEQ_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fCharge_Noise)
 
 		#Consider cases
 		if fCharge_Sig > fCharge_Noise and fCharge_Sig > fThresh:	fNumSig+=1.
 		elif fCharge_Noise >= fCharge_Sig and fCharge_Noise > fThresh:	fNumFake+=1.
 		elif fThresh > fCharge_Sig and fThresh > fCharge_Noise:		fNumMiss+=1.
 
+		#print fCharge_Sig, fCharge_Noise, fThresh
+
 	    #print (coordPt[0],coordPt[1]), fNumSig, fNumFake, fNumMiss, fNumSig+fNumFake+fNumMiss
 
 	    #Store the results
-	    g2D_Map_Eff_Sig_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], (fNumSig+fNumFake) / iNEvtPerPt)
-	    g2D_Map_Eff_Noise_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], (fNumFake) / iNEvtPerPt)
+	    g2D_Map_Eff_Sig_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], fMask * (fNumSig+fNumFake) / iNEvtPerPt)
+	    g2D_Map_Eff_Noise_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], fMask * (fNumFake) / iNEvtPerPt)
+
+	    #if ((fNumSig+fNumFake) / iNEvtPerPt) >= 0.99:
+		#print (coordPt[0],coordPt[1]), fThresh, fLandauMean, fLandauSigma
 
 	    #Increment counter
 	    iNumPt+=1
@@ -450,16 +547,36 @@ class AnalysisSuiteEfficiencyPredictor:
 	#Open Output TFile (was opened already by self.ANASUITEGAIN)
 	file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
 
-	#Store output histograms
-	file_Out.cd()
+	#Store output histograms - Charge
+	#file_Out.cd()
+	dir_Charge = file_Out.mkdir("ChargeData_HVPt{0}".format(fHVPt))
+	dir_Signal = dir_Charge.mkdir("Signal")
+	dir_Noise = dir_Charge.mkdir("Noise")
+	dir_Thresh = dir_Charge.mkdir("Thresh")
+	dir_ChOn = dir_Charge.mkdir("ChannelsOn")
 	coords_y = np.unique(data_Gain[:,1])
 	#for histo in self.DICT_H_CLUSTQ_VS_CLUSTPOS:
 	for idx in coords_y:
-	    print self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].GetName()
+	    dir_Signal.cd()
 	    self.DICT_H_CLUSTQ_VS_CLUSTPOS[idx].Write()
+	    
+	    dir_Noise.cd()
+	    self.DICT_H_NOISEQ_VS_CLUSTPOS[idx].Write()
 
+	    dir_Thresh.cd()
+	    self.DICT_H_THRESH_VS_CLUSTPOS[idx].Write()
+
+	    dir_ChOn.cd()
+	    self.DICT_H_CHON_VS_CLUSTPOS[idx].Write()	    
+
+	#Store Output Efficiency Maps
+	dir_EffMap = file_Out.mkdir("EffMap_HVPt{0}".format(fHVPt))
+	dir_EffMap.cd()
 	g2D_Map_Eff_Sig_HVPt.Write()
 	g2D_Map_Eff_Noise_HVPt.Write()
+
+	#Close the Output File
+	file_Out.Close()
 
         return
 

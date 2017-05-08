@@ -6,6 +6,14 @@
 *                                                *
 **************************************************
 
+Update: May 4th 2017
+==================================================
+->Added python class AnalysisSuiteVFATNoise for determining the avg & std. dev noise, pedestal, and threshold in a given (ieta,iphi) sector based on data from P5
+->Python class PARAMS_ETASECTOR in Utilities.py will now store a list of boundaries for the iphi sectors
+->Python class PARAMS_ETASECTOR has new method calcBoundaries() for determining boundaries for iphi sectors
+->Method calcROSectorBoundaries in python class PARAMS_DET will either return the stored list from the PARAMS_ETASECTOR object or calculate the boundaries and then return them
+->Python class AnalysisSuiteClusterCharge's method checkIfDataPtInRange will now accept a point that is within 10% of the data to be interpolated
+
 Update: Apr 27th 2017
 ==================================================
 ->Attempting to reduce memory by using sloting in python classes

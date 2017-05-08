@@ -95,15 +95,69 @@ class PARAMS_GAIN:
 #---------------------PARAMS_ETASECTOR---------------------
 #Class for storing Eta Sector Parameters
 class PARAMS_ETASECTOR:
-    __slots__ = ['IETA', 'SECTPOS', 'SECTSIZE', 'NBCONNECT']
+    __slots__ = ['BOUNDARIES_SET','IETA', 'SECTPOS', 'SECTSIZE', 'NBCONNECT', 'LIST_IPHI_BOUNDARIES']
     
     def __init__(self):
+	self.BOUNDARIES_SET = False
+
         self.IETA       = -1
+        self.NBCONNECT  = 3     	#Number of Phi Sectors within Eta Sector
+	self.NBCONNECT_NSTRIP = 128	#Number of strips in a Phi Sector 
         self.SECTPOS    = 0.0
         self.SECTSIZE   = 0.0
-        self.NBCONNECT  = 3     #Number of Phi Sectors within Eta Sector
-    
+	
+	self.LIST_IPHI_BOUNDARIES = []  #Boundaries across  
+
     	return
+
+    #Determines the Phi boundaries within an Eta Sector
+    def calcBoundaries(self):
+        #Calculate the iphi sector boundaries
+        for i in range(0, self.NBCONNECT+1):
+            self.LIST_IPHI_BOUNDARIES.append(-0.5 * self.SECTSIZE + i * self.SECTSIZE / self.NBCONNECT)
+
+	self.BOUNDARIES_SET = True
+
+        return
+
+    #Determines the Phi boundaries within an Eta Sector
+    def getiPhiIndex(self, fPos):
+	for idx in range(0, self.NBCONNECT+1):
+            if self.LIST_IPHI_BOUNDARIES[idx] <= fPos and fPos <= self.LIST_IPHI_BOUNDARIES[idx+1]:
+		return idx+1
+
+    #Returns the strips in a given partition of the detector centered on fPos
+    def getStripRange(self, fPos, iSlices=32):
+	iThisSlice = self.getSliceIdx(fPos, iSlices)
+	
+	#print "PARAMS_ETASECTOR::getStripRange() - fPos = " + str(fPos)
+	#print "PARAMS_ETASECTOR::getStripRange() - iSlices = " + str(iSlices)
+	#print "PARAMS_ETASECTOR::getStripRange() - Current Slice = " + str(iThisSlice)
+	#print "PARAMS_ETASECTOR::getStripRange() - (self.NBCONNECT_NSTRIP / iSlices) = " + str(self.NBCONNECT_NSTRIP / iSlices)
+	#print "PARAMS_ETASECTOR::getStripRange() - First Strip = " + str((self.NBCONNECT_NSTRIP / iSlices) * (iThisSlice -1))
+	#print "PARAMS_ETASECTOR::getStripRange() - Last Strip = " + str((self.NBCONNECT_NSTRIP / iSlices) * (iThisSlice))
+
+	return [ (self.NBCONNECT_NSTRIP / iSlices) * (iThisSlice - 1), (self.NBCONNECT_NSTRIP / iSlices) * (iThisSlice) - 1 ] #Strip number goes 0 to 127
+
+    #def getSliceIdx(self, iphi, fPos, iSlices=32):
+    def getSliceIdx(self, fPos, iSlices=32):
+	iPhi = self.getiPhiIndex(fPos)
+	fSliceWidth = (self.LIST_IPHI_BOUNDARIES[iPhi]-self.LIST_IPHI_BOUNDARIES[iPhi-1])
+	fStepSize = fSliceWidth / iSlices
+	thisSlice = int(np.round(( 1. / fStepSize) * (self.LIST_IPHI_BOUNDARIES[iPhi] + 0.5 * fStepSize - fPos)))
+
+	if thisSlice > iSlices:
+	    print "PARAMS_ETASECTOR::getSliceIdx - fPhi_Min = " + str(self.LIST_IPHI_BOUNDARIES[iPhi-1])
+	    print "PARAMS_ETASECTOR::getSliceIdx - fPos = " + str(fPos)
+	    print "PARAMS_ETASECTOR::getSliceIdx - fPhi_Max = " + str(self.LIST_IPHI_BOUNDARIES[iPhi])
+	    print "PARAMS_ETASECTOR::getSliceIdx - iPhi = " + str(iPhi)
+	    print "PARAMS_ETASECTOR::getSliceIdx - fSliceWidth = " + str(fSliceWidth)
+	    print "PARAMS_ETASECTOR::getSliceIdx - Distance From Max Edge = " + str((self.LIST_IPHI_BOUNDARIES[iPhi] - fPos))
+	    print "PARAMS_ETASECTOR::getSliceIdx - Slice = " + str(thisSlice)
+
+	#return iSlices - 0.5 * ( fSliceWidth / (self.LIST_IPHI_BOUNDARIES[self.getiPhiIndex(fPos)] - fPos) )
+	#return int(np.round(2. * ((self.LIST_IPHI_BOUNDARIES[iPhi] - fPos) * (iSlices / fSliceWidth) )))
+	return thisSlice
 
 #---------------------PARAMS_PD---------------------
 #Class for storing discharge probability parameters
@@ -169,6 +223,8 @@ class PARAMS_DET:
                 detgeo.SECTSIZE   = float(  list_sectParams[6] )
                 detgeo.NBCONNECT  = int(  list_sectParams[7] )
                 
+		detgeo.calcBoundaries()
+
                 self.LIST_DET_GEO_PARAMS.append(detgeo)
             else:
                 continue
@@ -178,7 +234,7 @@ class PARAMS_DET:
             print "Loaded Mapping:"
             for idx in range(0,len(self.LIST_DET_GEO_PARAMS)):
                 strLine = str(idx) + "\t" + str(self.LIST_DET_GEO_PARAMS[idx].IETA) + "\t"
-                strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].IETA) + "\t"
+                #strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].IETA) + "\t"
                 strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].SECTPOS) + "\t"
                 strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].SECTSIZE) + "\t"
                 strLine = strLine + str(self.LIST_DET_GEO_PARAMS[idx].NBCONNECT) + "\n"
@@ -189,13 +245,43 @@ class PARAMS_DET:
 
     #Given an eta sector, determines the Phi boundaries within an Eta Sector
     def calcROSectorBoundaries(self, params_eta=PARAMS_ETASECTOR()):
-        #Calculate the iphi sector boundaries
-        list_boundaries = []
-        for i in range(0, params_eta.NBCONNECT+1):
-            list_boundaries.append(-0.5 * params_eta.SECTSIZE + i * params_eta.SECTSIZE / params_eta.NBCONNECT)
+	#Calc iPhi Sector Boundaries if they have not been calculated	
+	if params_eta.BOUNDARIES_SET == False:
+	    params_eta.calcBoundaries()
 
-        return list_boundaries
+        return params_eta.LIST_IPHI_BOUNDARIES
 
     #Given a specific ieta index, determines the Phi boundaries within an Eta Sector
     def calcROSectorBoundariesByEta(self, iEta=4):
         return self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[iEta-1])
+
+    #Given an input (x,y) coordinate, return a tuple that is the (ieta,iphi) coordinate
+    def getiEtaiPhIndex(self, fPos_X, fPos_Y):
+	for idx in range(0, len(self.LIST_DET_GEO_PARAMS)):
+	    fEtaLim_Low = 0.
+	    fEtaLim_High= 0.
+
+	    #Setup Evaluation Limits
+	    if self.LIST_DET_GEO_PARAMS[idx].SECTPOS > 0:	#Case: iEta Y-Pos > 0
+		fEtaLim_Low = self.LIST_DET_GEO_PARAMS[idx].SECTPOS - (0.1 * self.LIST_DET_GEO_PARAMS[idx].SECTPOS);
+                fEtaLim_High= self.LIST_DET_GEO_PARAMS[idx].SECTPOS + (0.1 * self.LIST_DET_GEO_PARAMS[idx].SECTPOS);
+	    else:						#Case: iEta Y-Pos <=0
+		fEtaLim_Low = self.LIST_DET_GEO_PARAMS[idx].SECTPOS + (0.1 * self.LIST_DET_GEO_PARAMS[idx].SECTPOS);
+                fEtaLim_High= self.LIST_DET_GEO_PARAMS[idx].SECTPOS - (0.1 * self.LIST_DET_GEO_PARAMS[idx].SECTPOS);
+
+	    #print fEtaLim_Low, fPos_Y, fEtaLim_High
+
+	    if(fEtaLim_Low < fPos_Y and fPos_Y < fEtaLim_High):
+		#print self.LIST_DET_GEO_PARAMS[idx].LIST_IPHI_BOUNDARIES
+		#print fPos_X
+
+		return (idx+1, self.LIST_DET_GEO_PARAMS[idx].getiPhiIndex(fPos_X))
+
+    #def getStripRange(self, fPos_X, fPos_Y, iSlices=32):
+	#tuple_iEtaiPhi = self.getiEtaiPhIndex(fPos_X, fPos_Y)
+	#list_StripRange = self.LIST_DET_GEO_PARAMS[tuple_iEtaiPhi[0]-1].getStripRange(fPos_X, iSlices)
+	#iThisSlice = self.LIST_DET_GEO_PARAMS[tuple_iEtaiPhi[0]-1].getSliceIdx(tuple_iEtaiPhi[1], fPos_X, iSlices)
+
+	#print fPos_X, fPos_Y, tuple_iEtaiPhi[0], tuple_iEtaiPhi[1], list_StripRange, iThisSlice
+
+	#return list_StripRange
