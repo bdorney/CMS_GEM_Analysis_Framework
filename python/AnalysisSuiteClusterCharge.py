@@ -26,6 +26,7 @@ class AnalysisSuiteClusterCharge:
                  'ARRAY_CLUSTQ_MPV',
                  'ARRAY_CLUSTQ_MEAN',
                  'ARRAY_CLUSTQ_SIGMA',
+		 'FILE_OUT',
                  'INTERPOLATE_MPV',
                  'INTERPOLATE_MEAN',
                  'INTERPOLATE_SIGMA',
@@ -36,7 +37,7 @@ class AnalysisSuiteClusterCharge:
                  'STROBSNAME_SIGMA'
                  ]
     
-    def __init__(self, params_gain=PARAMS_GAIN(), calcGain=False, debug=False ):
+    def __init__(self, file_out, params_gain=PARAMS_GAIN(), calcGain=False, debug=False ):
         self.DEBUG          = debug
         self.TRANSFORM2GAIN = calcGain
 
@@ -45,6 +46,8 @@ class AnalysisSuiteClusterCharge:
         self.ARRAY_CLUSTQ_MPV	= np.zeros(0) #Array of MIP Cluster Charge Landua MPV, shape will be (col x row) = ( len(self.ARRAY_CLUSTSIZE) x len(self.ARRAY_HVPTS) )
         self.ARRAY_CLUSTQ_MEAN	= np.zeros(0) #Array of MIP Cluster Charge Landau Mean, shape as above
         self.ARRAY_CLUSTQ_SIGMA	= np.zeros(0) #Array of MIP Cluster Charge Landua Sigma, shape as above
+
+	self.FILE_OUT		= file_out
 
         self.INTERPOLATE_MPV    = [] #Interpolator for Cluster Charge MPV null for now, will be a interpolate.interp2d() later
         self.INTERPOLATE_MEAN   = [] #As above but for Cluster Charge Mean
@@ -351,14 +354,15 @@ class AnalysisSuiteClusterCharge:
            self.ARRAY_CLUSTQ_SIGMA	= np.reshape(self.ARRAY_CLUSTQ_SIGMA,(len(self.ARRAY_HVORGAIN),len(self.ARRAY_CLUSTSIZE)),order='F')
 
         #Store the Plot
-        outputFile = TFile(outputfilename,strFileOpt,"",1)
+        #outputFile = TFile(outputfilename,strFileOpt,"",1)
 
-        dir_Out = []
-        if strFileOpt == "UPDATE":
-           dir_Out = outputFile.GetDirectory("ClusterChargeData")
-        else:
-           dir_Out = outputFile.mkdir("ClusterChargeData")
+        #dir_Out = []
+        #if strFileOpt == "UPDATE":
+           #dir_Out = outputFile.GetDirectory("ClusterChargeData")
+        #else:
+           #dir_Out = outputFile.mkdir("ClusterChargeData")
 
+	dir_Out = self.FILE_OUT.mkdir("ClusterChargeData")
         dir_Out.cd()
         g2D_ClustQ_Obs.Write()
 

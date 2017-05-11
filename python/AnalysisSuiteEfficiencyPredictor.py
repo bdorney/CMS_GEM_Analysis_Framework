@@ -20,13 +20,15 @@ from AnalysisSuiteVFATNoise import *
 from Utilities import *
 
 #ROOT Imports
-from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TH2F, TRandom2
+from ROOT import gROOT, TArrayD, TF1, TFile, TGraph2D, TGraphErrors, TH2F, TRandom2
 
 class AnalysisSuiteEfficiencyPredictor:
 
     __slots__ = ['DEBUG',
-                 'DICT_AVGEFF_READOUT',         #(Avg Eff, Std. Dev Eff)
+                 #'DICT_AVGEFF_READOUT',         #(Avg Eff, Std. Dev Eff)
                  'DICT_EFF_READOUT',            #Efficiency Pts by readout sector
+                 'DICT_G_EFF_VS_HVPTS_RO',       #TGraphErrors by readout sector
+		 'DICT_G_ANASLICE_VS_HVPTS_RO',
                  'DICT_H_CHON_VS_CLUSTPOS',
                  'DICT_H_CLUSTQ_VS_CLUSTPOS',
                  'DICT_H_NOISEQ_VS_CLUSTPOS',
@@ -152,7 +154,8 @@ class AnalysisSuiteEfficiencyPredictor:
             elif strLine[0] == "FILE_CLUSESIZE":
                 self.FILE_MIP_AVG_CLUST_SIZE = strLine[1]
             elif strLine[0] == "FILE_OUTPUT":
-                self.FILE_OUTPUT = strLine[1]
+                #self.FILE_OUTPUT = strLine[1]
+		self.FILE_OUTPUT = TFile(strLine[1],"RECREATE","",1)
             elif strLine[0] == "DUT_GAIN_P0":
                 self.PARAMS_GAIN_DET_DUT.GAIN_CURVE_P0 = float(strLine[1])
             elif strLine[0] == "DUT_GAIN_P0_ERR":
@@ -206,7 +209,8 @@ class AnalysisSuiteEfficiencyPredictor:
         del list_strLines
 
         #Declare Cluster Charge Analysis Suite
-        self.ANASUITECLUSTQ = AnalysisSuiteClusterCharge(params_gain=self.PARAMS_GAIN_DET_CLUSTQ,
+        self.ANASUITECLUSTQ = AnalysisSuiteClusterCharge(file_out=self.FILE_OUTPUT,
+							 params_gain=self.PARAMS_GAIN_DET_CLUSTQ,
                                                          calcGain=True,
                                                          debug=self.DEBUG)
 
@@ -240,9 +244,10 @@ class AnalysisSuiteEfficiencyPredictor:
 
         self.PARAMS_DET_DUT.loadMapping(self.FILE_MAPPING_DUT, self.DEBUG)
 
-        self.ANASUITEGAIN   = AnalysisSuiteGainMap(inputfilename=self.FILE_QC5_RESP_UNI,
-                                                   outputfilename=self.FILE_OUTPUT,
-                                                   outputfileoption="RECREATE",
+        self.ANASUITEGAIN   = AnalysisSuiteGainMap(file_out=self.FILE_OUTPUT,
+						   inputfilename=self.FILE_QC5_RESP_UNI,
+                                                   #outputfilename=self.FILE_OUTPUT,
+                                                   #outputfileoption="RECREATE",
                                                    params_gain=self.PARAMS_GAIN_DET_DUT,
                                                    params_det=self.PARAMS_DET_DUT,
                                                    debug=self.DEBUG)
@@ -294,13 +299,13 @@ class AnalysisSuiteEfficiencyPredictor:
             h_thresh_vs_clustPos.SetDirectory(gROOT)
             self.DICT_H_THRESH_VS_CLUSTPOS[etaSector.SECTPOS]=h_thresh_vs_clustPos
 
-            #Load the MIP average cluster size vs. gain formulat
-            fileMIPAvgClustSize = TFile(self.FILE_MIP_AVG_CLUST_SIZE, "READ","", 1)
+        #Load the MIP average cluster size vs. gain formulat
+        fileMIPAvgClustSize = TFile(self.FILE_MIP_AVG_CLUST_SIZE, "READ","", 1)
 
-            if self.DEBUG:
-                print "Loading function for MIP <Clust Size> vs. Gain"
+        if self.DEBUG:
+            print "Loading function for MIP <Clust Size> vs. Gain"
 
-            self.FUNC_AVG_MIP_CLUSTSIZE = fileMIPAvgClustSize.Get(self.TOBJ_NAME_FUNC_AVGCLUSTSIZE)
+        self.FUNC_AVG_MIP_CLUSTSIZE = fileMIPAvgClustSize.Get(self.TOBJ_NAME_FUNC_AVGCLUSTSIZE)
 
         #Initialize the VFAT noise analysis suite
         self.ANASUITENOISE = AnalysisSuiteVFATNoise(detector=self.PARAMS_DET_DUT,
@@ -312,7 +317,17 @@ class AnalysisSuiteEfficiencyPredictor:
         #Make the Dictionary for Efficiency by Readout Sector
         #Here each value is a tuple average, std. dev, num pts
         self.DICT_EFF_READOUT = {key:[] for key in self.ANASUITENOISE.DICT_MAPPING}
-        self.DICT_AVGEFF_READOUT = {}
+        #self.DICT_AVGEFF_READOUT = {}
+        
+        #Make the Dictionary for Efficiency TGraphErrs by Readout Sector
+        self.DICT_G_EFF_VS_HVPTS_RO = {}
+        for key in self.DICT_EFF_READOUT:
+            g_Eff_vs_HVPts = TGraphErrors(len(self.LIST_HVPTS))
+            g_Eff_vs_HVPts.SetName("g_iEta{0}iPhi{1}_avgEff_vs_HVPts".format( int(key[0]), int(key[1]) ) )
+            g_Eff_vs_HVPts.SetTitle("")
+            g_Eff_vs_HVPts.SetMarkerStyle(21)
+            #g_Eff_vs_HVPts.SetDirectory(gROOT)
+            self.DICT_G_EFF_VS_HVPTS_RO[key]=g_Eff_vs_HVPts
 
         #Tell user initialization completed successfully
         #if self.DEBUG:
@@ -405,9 +420,41 @@ class AnalysisSuiteEfficiencyPredictor:
     
         return
 
-    def predictEff(self, fHVPt, iNEvtPerPt=100):
+    #Predict the efficiency maps and make summary curves for *all* points
+    def predictEffCurves(self, iNEvtPerPt=100):
         #Calculate the original gain map of the detector, needed to determine gain at fHVOrGain
         self.calcGainMap()
+
+        #Calculate the original normalized cluster map of the detector
+        self.calcNormAvgClustSizeMap()
+
+        #Simulate the Efficiency Map for *each* HV point
+        for iHVPt in range(0,len(self.LIST_HVPTS)):
+            array_EffData = self.predictEffHVPt(float(self.LIST_HVPTS[iHVPt]), iNEvtPerPt)
+            self.calcROSectorEff(array_EffData, float(self.LIST_HVPTS[iHVPt]), iHVPt)
+
+        #Load the output file
+        #file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
+        #dir_Summary = file_Out.mkdir("Summary")
+        dir_Summary = self.FILE_OUTPUT.mkdir("Summary")
+
+        #Store the output curves
+        dir_Summary.cd() 
+        #for key in self.DICT_G_EFF_VS_HVPTS_RO:
+            #self.DICT_G_EFF_VS_HVPTS_RO[key].Write()
+	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+	    for iPhi in range (0, etaSector.NBCONNECT):
+		self.DICT_G_EFF_VS_HVPTS_RO[(etaSector.IETA,iPhi+1)].Write()	
+
+        #Close the Output File
+        #file_Out.Close()
+
+        return
+
+    #For each HV Point, predict the efficiency map of the detector
+    def predictEffHVPt(self, fHVPt, iNEvtPerPt=100):
+        #Calculate the original gain map of the detector, needed to determine gain at fHVOrGain
+        #self.calcGainMap()
 
         #Get the gain map at fHVPt
         if self.DEBUG:
@@ -416,7 +463,7 @@ class AnalysisSuiteEfficiencyPredictor:
         g2D_Map_Gain_HVPt = self.ANASUITEGAIN.calcGainMapHV(self.NAME_DET_DUT, fHVPt)
 
         #Calculate the original normalized cluster map of the detector
-        self.calcNormAvgClustSizeMap()
+        #self.calcNormAvgClustSizeMap()
 
         #Now interesting problem N_pts in g2D_Map_Gain_HVPt <= N_pts in self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM
         #We can make some numpy arrays
@@ -427,24 +474,13 @@ class AnalysisSuiteEfficiencyPredictor:
         data_NormAvgCS   = getDataTGraph2D(self.ANASUITEGAIN.G2D_MAP_AVG_CLUST_SIZE_NORM)
 
         #Close TFiles that have been opened by self.ANASUITEGAIN
-        self.ANASUITEGAIN.closeTFiles()
+        #self.ANASUITEGAIN.closeTFiles()
 	
-        #Give the shape of the two data arrays
-        #if self.DEBUG:
-            #print "Shape of data_Gain = {0}".format(np.shape( data_Gain ) )
-            #print "Shape of data_NormAvgClustSize = {0}".format(np.shape( data_NormAvgCS ) )
-
         #Create a dictionary where the coordinate point (x,y) is mapped to the (gain, Norm <CS>)
         dict_Coords_GainAndNormAvgCS = {(idx[0],idx[1]):[idx[2]] for idx in data_Gain}
         for idx in data_NormAvgCS:
             if (idx[0],idx[1]) in dict_Coords_GainAndNormAvgCS:
             	dict_Coords_GainAndNormAvgCS[(idx[0],idx[1])].append(idx[2])
-
-        #print dict_Coords_GainAndNormAvgCS
-
-        #Print to User
-        #if self.DEBUG:
-            #print "(x,y)\tGain\tNormAvgCS\tMIPAvgCS\tMPV\tSigma\tThresh"
 
         #Create the Efficiency Plots
         g2D_Map_Eff_Sig_HVPt = TGraph2D()
@@ -465,56 +501,51 @@ class AnalysisSuiteEfficiencyPredictor:
             coordPt_iStripRange	= self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[coordPt_iEtaiPhi[0]-1].getStripRange(coordPt[0], self.ANA_UNI_GRANULARITY)
             coordPt_iThisSlice	= self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS[coordPt_iEtaiPhi[0]-1].getSliceIdx(coordPt[0], self.ANA_UNI_GRANULARITY)
 
-            #if self.DEBUG:
-            #print coordPt[0], coordPt[1], coordPt_iEtaiPhi
-
             #Get the gain and MIP cluster size
             fGain 	= dict_Coords_GainAndNormAvgCS[coordPt][0]
             fNormAvgCS	= dict_Coords_GainAndNormAvgCS[coordPt][1]
             fMIPAvgCS	= fNormAvgCS * self.FUNC_AVG_MIP_CLUSTSIZE.Eval(fGain)
             
             #Get the Landau Parameters
-            #print "Getting Signal Charge Params with G={0} and <CSize>={1}".format(fGain,fMIPAvgCS)
             fLandauMean	= self.ANASUITECLUSTQ.getInterpolatedMean(fMIPAvgCS, fGain)
             #fLandauMPV	= self.ANASUITECLUSTQ.getInterpolatedMPV(fMIPAvgCS, fGain)
             fLandauSigma= self.ANASUITECLUSTQ.getInterpolatedSigma(fMIPAvgCS, fGain)
 
             #Get Threshold and Mask
-            #fThresh 	= 3. * 5000. * 1.602e-19 * 1e15
             fThresh 	= self.ANASUITENOISE.getValByEtaPhiThreshAvg(coordPt_iEtaiPhi[0],coordPt_iEtaiPhi[1],coordPt_iStripRange[0],coordPt_iStripRange[1])
             fMask	= self.ANASUITENOISE.getValByEtaPhiSliceMaskAvg(coordPt_iEtaiPhi[0],coordPt_iEtaiPhi[1],coordPt_iStripRange[0],coordPt_iStripRange[1])
 
             self.DICT_H_THRESH_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fThresh)
             self.DICT_H_CHON_VS_CLUSTPOS[coordPt[1]].Fill(coordPt[0], fMask)
-
-            #Print to User
-            #if self.DEBUG:
-                #print (coordPt[0],coordPt[1]), fGain, fNormAvgCS, fMIPAvgCS, fLandauMean, fLandauSigma, fThresh
             
             #Skip if the Landua parameters outside interpolated data
             if fLandauMean < 0 or fLandauSigma < 0:
                 print "================================================================"
                 print "Bad Signal Charge Parameters"
-                print "Skipping (ieta,iphi,islice) = ({0},{1},{2}); strips = [{3},{4}]; coords = ({5},{6})".format(coordPt_iEtaiPhi[0],
-                                                                                                                   coordPt_iEtaiPhi[1],
-                                                                                                                   coordPt_iThisSlice,
-                                                                                                                   coordPt_iStripRange[0],
-                                                                                                                   coordPt_iStripRange[1],
-                                                                                                                   coordPt[0],
-                                                                                                                   coordPt[1])
+                print "For HV = {0}: Skipping (ieta,iphi,islice) = ({1},{2},{3}); strips = [{4},{5}]; coords = ({6},{7})".format(
+			fHVPt,
+			coordPt_iEtaiPhi[0],
+			coordPt_iEtaiPhi[1],
+			coordPt_iThisSlice,
+			coordPt_iStripRange[0],
+			coordPt_iStripRange[1],
+			coordPt[0],                                                                                                                   
+			coordPt[1])
                 print "================================================================"
 		iNumPt_Skipped+=1
                 continue
 
             #Begin ToyMC
             if self.DEBUG:
-                print "Simulating (ieta,iphi,islice) = ({0},{1},{2}); strips = [{3},{4}]; coords = ({5},{6})".format(coordPt_iEtaiPhi[0],
-                                                                                                                     coordPt_iEtaiPhi[1],
-                                                                                                                     coordPt_iThisSlice,
-                                                                                                                     coordPt_iStripRange[0],
-                                                                                                                     coordPt_iStripRange[1],
-                                                                                                                     coordPt[0],
-                                                                                                                     coordPt[1])
+                print "For HV = {0}: Simulating (ieta,iphi,islice) = ({1},{2},{3}); strips = [{4},{5}]; coords = ({6},{7})".format(
+			fHVPt,
+			coordPt_iEtaiPhi[0],
+			coordPt_iEtaiPhi[1],
+			coordPt_iThisSlice,
+			coordPt_iStripRange[0],
+			coordPt_iStripRange[1],
+			coordPt[0],
+			coordPt[1])
 
             fNumSig	= 0. #Number of Signal Events; Q_Sig > Q_Noise & Q_Sig > Thresh
             fNumFake	= 0. #Number of Noise Events; Q_Noise >= Q_Sig & Q_Noise > Thresh
@@ -543,18 +574,15 @@ class AnalysisSuiteEfficiencyPredictor:
             g2D_Map_Eff_Sig_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], fMask * (fNumSig+fNumFake) / iNEvtPerPt)
             g2D_Map_Eff_Noise_HVPt.SetPoint(iNumPt, coordPt[0], coordPt[1], fMask * (fNumFake) / iNEvtPerPt)
 
-            #if ((fNumSig+fNumFake) / iNEvtPerPt) >= 0.99:
-            #print (coordPt[0],coordPt[1]), fThresh, fLandauMean, fLandauSigma
-
             #Increment counter
             iNumPt+=1
 
         #Open Output TFile (was opened already by self.ANASUITEGAIN)
-        file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
+        #file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
 
         #Store output histograms - Charge
         #file_Out.cd()
-        dir_Charge = file_Out.mkdir("ChargeData_HVPt{0}".format(fHVPt))
+        dir_Charge = self.FILE_OUTPUT.mkdir("ChargeData_HVPt{0}".format(fHVPt))
         dir_Signal = dir_Charge.mkdir("Signal")
         dir_Noise = dir_Charge.mkdir("Noise")
         dir_Thresh = dir_Charge.mkdir("Thresh")
@@ -574,33 +602,49 @@ class AnalysisSuiteEfficiencyPredictor:
             dir_ChOn.cd()
             self.DICT_H_CHON_VS_CLUSTPOS[idx].Write()	    
 
+	#Draw the output efficiency Maps
+	canv_Eff_Sig_HVPt = TCanvas("canv_{0}_EffSig_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Signal Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
+	g2D_Map_Eff_Sig_HVPt.Draw("COLZ")
+
+	canv_Eff_Noise_HVPt = TCanvas("canv_{0}_EffNoise_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Noise Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
+	g2D_Map_Eff_Noise_HVPt.Draw("COLZ")
+
         #Store Output Efficiency Maps
-        dir_EffMap = file_Out.mkdir("EffMap_HVPt{0}".format(fHVPt))
+        #dir_EffMap = file_Out.mkdir("EffMap_HVPt{0}".format(fHVPt))
+        dir_EffMap = self.FILE_OUTPUT.mkdir("EffMap_HVPt{0}".format(fHVPt))
         dir_EffMap.cd()
+	canv_Eff_Sig_HVPt.Write()
         g2D_Map_Eff_Sig_HVPt.Write()
+	canv_Eff_Noise_HVPt.Write()
         g2D_Map_Eff_Noise_HVPt.Write()
 
         #Calculate the avg eff by readout sector
-        self.calcROSectorEff(getDataTGraph2D(g2D_Map_Eff_Sig_HVPt))
+        #self.calcROSectorEff(getDataTGraph2D(g2D_Map_Eff_Sig_HVPt))
+
+        #Store the efficiency map as an array
+        array_EffData = getDataTGraph2D(g2D_Map_Eff_Sig_HVPt)
 
         #Close the Output File
-        file_Out.Close()
+        #file_Out.Close()
 
-	print "Total Number of Skipped Slices = {0}".format(iNumPt_Skipped)
+	print "For HV Pt {0}, Total Number of Skipped Slices = {1}".format(fHVPt, iNumPt_Skipped)
 
-        return
+        return array_EffData
 
     #Calculate the efficiency of a given readout sector
-    def calcROSectorEff(self, array_EffData):
+    def calcROSectorEff(self, array_EffData, fHVPt, iDataPt):
         #Loop Over all the data poitns and assign them to a readout sector
         for dataPt in array_EffData:
             tuple_iEtaiPhi = self.PARAMS_DET_DUT.getiEtaiPhIndex(dataPt[0], dataPt[1])
-            
             self.DICT_EFF_READOUT[tuple_iEtaiPhi].append(dataPt[2])
+         
+	    #if tuple_iEtaiPhi == (8,3): print dataPt[0], dataPt[1], dataPt[2]
 
+        #Store the (Avg Eff +/- Std Dev Eff, fHVPt) in the plots defined for each graph in
         for key in self.DICT_EFF_READOUT:
-            self.DICT_AVGEFF_READOUT[key] = (np.mean(self.DICT_EFF_READOUT[key] ), np.std(self.DICT_EFF_READOUT[key]) )
+	    #if key == (8,3): print np.mean(self.DICT_EFF_READOUT[key] ), np.std(self.DICT_EFF_READOUT[key] )
 
-            print key, self.DICT_AVGEFF_READOUT[key]
+            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPoint( iDataPt, fHVPt, np.mean(self.DICT_EFF_READOUT[key] ) )
+            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPointError( iDataPt, 0, np.std(self.DICT_EFF_READOUT[key] ) )
 
         return

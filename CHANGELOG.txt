@@ -2,9 +2,14 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 3.2                                 *
-*	LAST UPDATE: Apr 27 2017                     *
+*	LAST UPDATE: May 11 2017                     *
 *                                                *
 **************************************************
+
+Update: May 11th 2017
+==================================================
+->Renamed method predictEff of python class AnalysisSuiteEfficiencyPredictor to predictEffHVPt
+->Added new method predictEffCurves to python class AnalysisSuiteEfficiencyPredictor, this method will call predictEffHVPt for each input HV Pt
 
 Update: May 4th 2017
 ==================================================
