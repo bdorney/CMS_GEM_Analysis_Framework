@@ -458,6 +458,7 @@ class AnalysisSuiteEfficiencyPredictor:
 
         #Loop over all points of the detector
         iNumPt = 0
+	iNumPt_Skipped = 0
         for coordPt in dict_Coords_GainAndNormAvgCS:
             #Get Coordinate Info
             coordPt_iEtaiPhi	= self.PARAMS_DET_DUT.getiEtaiPhIndex(coordPt[0],coordPt[1])
@@ -502,6 +503,7 @@ class AnalysisSuiteEfficiencyPredictor:
                                                                                                                    coordPt[0],
                                                                                                                    coordPt[1])
                 print "================================================================"
+		iNumPt_Skipped+=1
                 continue
 
             #Begin ToyMC
@@ -584,6 +586,8 @@ class AnalysisSuiteEfficiencyPredictor:
         #Close the Output File
         file_Out.Close()
 
+	print "Total Number of Skipped Slices = {0}".format(iNumPt_Skipped)
+
         return
 
     #Calculate the efficiency of a given readout sector
@@ -594,7 +598,7 @@ class AnalysisSuiteEfficiencyPredictor:
             
             self.DICT_EFF_READOUT[tuple_iEtaiPhi].append(dataPt[2])
 
-        for key in DICT_EFF_READOUT:
+        for key in self.DICT_EFF_READOUT:
             self.DICT_AVGEFF_READOUT[key] = (np.mean(self.DICT_EFF_READOUT[key] ), np.std(self.DICT_EFF_READOUT[key]) )
 
             print key, self.DICT_AVGEFF_READOUT[key]
