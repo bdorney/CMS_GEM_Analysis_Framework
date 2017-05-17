@@ -3,8 +3,8 @@
 
 	Software tools for the analysis of experimental data collected by the CMS GEM community
 
-	Designed to work on lxplus running slc6 with ROOT version 6.00.02 or higher and g++
-    version 4.8.4.
+	Designed to work on lxplus running slc6 with ROOT version 6.00.02 or higher, g++
+    version 4.8.4, and python version 2.7.4.
 
     Instructions below assume the user is using a sh/bash/zsh shell.  Scripts for csh/tsch
     have not been implemented yet.
@@ -33,6 +33,10 @@
             3.a.iv              Helper Script - Run Mode: Series
             3.a.v               Helper Script - Run Mode: Comparison
         3.b. genericPlotter
+            3.b.i               Helper Script - Make All Plots
+        3.c. Python Scripts
+            3.c.i               Analysis Suite - Gain Map
+            3.c.ii              Analysis Suite - Efficiency Predictions
     4. Documentation
         4.a. Namespaces
         4.b. Class Map
@@ -65,6 +69,7 @@
                 4.b.vi.III      PlotterGraph2D
                 4.b.vi.IV       PlotterGraphErrors
                 4.b.vi.V        PlotterHisto
+                4.b.vi.VI       PlotterHisto2D
             4.b.vii.            Readouts
                 4.b.vii.I       ReadoutSector
                 4.b.vii.II      ReadoutSectorEta
@@ -115,6 +120,13 @@
                 4.e.iv.VII      Example Config File - TGraph2D
                 4.e.iv.VIII     Example Config File - TGraphErrors
                 4.e.iv.IX       Example Config File - TH1F
+                4.e.iv.X        Example Config File - TH2F
+            4.e.v Efficiency Predictor Config File
+                4.e.v.I         PARAMETERS - Input Files
+                4.e.v.II        PARAMETERS - Device Under Test (DUT)
+                4.e.v.III       PARAMETERS - Cluster Charge
+                4.e.v.IV        PARAMETERS - Cluster Size
+                4.e.v.V         PARAMETERS - Efficiency Info
         4.f. Output Files
             4.f.i               Output ROOT File - Analysis Mode
                 4.f.i.I         "Segmented" Plots Stored in "Summary" folder
@@ -124,6 +136,8 @@
             4.f.ii              Output ROOT File - Comparison Mode
             4.f.iii             Output ROOT File - genericPlotter
             4.f.iv              Output Text File
+            4.f.v               Output ROOT File - Gain Map
+            4.f.vi              Output ROOT File - Efficiency Map
         4.g. Source Code Name Conventions
             4.g.i   STL Objects
             4.g.ii  ROOT Objects
@@ -153,6 +167,12 @@
     available at (http://www.partow.net/programming/exprtk/index.html), and referred to as ExprTk.
     ExprTk is available under the "Common Public License" from the the url above, but has been
     included in this repository for convenience.
+
+    Additionally as a convenience for the user we have included the "get-pip.py" script taken from:
+
+        https://packaging.python.org/installing/#install-pip-setuptools-and-wheel
+
+    This will handle the installation of pip in python version 2.7.4 automaticaly.
 
     The CMS_GEM_Analysis_Framework is licensed under the "GNU General Public License."
 
@@ -186,8 +206,10 @@
 
         make -f MakefilePlotter.gpp
 
-    The repository is now compiled.  Additionally the base directory of the repository
-    has been exported to the shell variable "$GEM_BASE".
+    The repository is now compiled.  Please note the first execution of scripts/setup_CMS_GEM.sh
+    might make a local installation of pip and several other python packages that are required for
+    the python analysis tools described in Section 3.c.  Additionally the base directory of the
+    repository has been exported to the shell variable "$GEM_BASE".
 
     Please check https://github.com/bdorney/CMS_GEM_Analysis_Framework for the most-up-to-date
     release.  You migrate your master branch to the most-up-to-date branch via:
@@ -542,7 +564,8 @@
         For executing:  ./genericPlotter <PFN of Plot Config File> <Verbose Mode true/false>
 
     The Plot Config file is described in Section 4.e.iv.  The executable can take in comma separted data
-    or TObjects from an input TFile.  Presently TGraph, TGraph2D, TGraphErrors, and TH1F objects are supported.
+    or TObjects from an input TFile.  Presently TGraph, TGraph2D, TGraphErrors, TH1F, and TH2F objects
+    are supported.
 
     The genericPlotter will create a canvas following the official style guide for figures defined by the
     CMS Collaboration at:
@@ -558,8 +581,8 @@
     For a full explanation of the available configurations please consult Section 4.e.iv.  The contents and
     layout of the output files are described in Section 4.f.iii.
 
-    Three example plot config files for plotting: 1) TGraph, 2) TGraph2D, 3) TGraphErrors, and 4) TH1F objects
-    have been provided in the default repository.  A usage example is given as:
+    Five example plot config files for plotting: 1) TGraph, 2) TGraph2D, 3) TGraphErrors, 4) TH1F,
+    and 5) TH2F objects have been provided in the default repository.  A usage example is given as:
 
         ./genericPlotter config/configPlot_Graph.cfg true
 
@@ -567,6 +590,121 @@
     have been saved in the output TFile.  Additionally your rootlogon.C script may define a different style
     than the used in the official CMS guide.  As a result it is strongly suggested to relying on the output
     image files created by genericPlotter and not the otuput ROOT file.
+
+        # 3.b.i  Helper Script - Make All Plots
+        # --------------------------------------------------------
+
+        The helper script:
+
+            scripts/makeAllPlots.sh
+
+        Has been created for you to easily make plots for all plot config files that are defined in a given
+        directory.  This can help automatize the plot making procedure.
+
+        The expected syntax is:
+
+            source scripts/makeAllPlots.sh <Plot Config File Directory>
+
+        Where "Plot Config File Directory" is the directory where your plot config files are found.  Note
+        your plot config files must have the *.cfg extension to be recognized.
+
+        An example call is given as:
+
+            source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
+
+        This will then execute genericPlotter taking each *.cfg file in the figures/ResponseUniformityMaps
+        directory.
+
+    # 3.b. Python Scripts
+    # --------------------------------------------------------
+
+    A set of python analysis tools has been added to assist the user in further analysis of data created
+    with the Framework.  The mathematical framework for the following sections is described in:
+
+        https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf
+
+    This may be helpful in attempting to understand the results produced by the python tools described below
+
+        # 3.c.i  Analysis Suite - Gain Map
+        # --------------------------------------------------------
+
+        This tool takes results from the effective gain calibration (QC5_Gain_Cal) and response uniformity (QC5_Resp_Uni)
+        measurements to determine the gain at every point across the detector.  As with frameworkMain for each
+        new shell navigate to the base directory of the repository and setup the environment via:
+
+            source scripts/setup_CMS_GEM.sh
+
+        The usage for the computeGainMap.py script is:
+
+            python2.7 python/computeGainMap.py --file=<Framework Output File> --gp0=<Gain P0> --gp0Err=<Gain P0Err> --gp1=<Gain P1> --gp1Err=<Gain P1Err> --name=<Detector Name> --hvPoint=<HV Val> --hvlist=<HV List> --fileMap=<Config File - Mapping>
+
+        Where: 1) "Framework Output File" is the PFN of the analyzed framework output file produced from the
+        QC5_Resp_Uni measurement; 2) "Gain P0," "Gain P0Err," "Gain P1," and "Gain P1Err" are values of the
+        parameters, and their errors, of a fit to the QC5_Gain_Call data where the equation of fit is described
+        as G(x) = exp([0]*x+[1]) with x some hvPt observable (either drift voltage or divider current);
+        3) "Detector Name" is the exact string assigned to the "Detector_Name" field in the run config file you
+        supplied when creating the given Framework Output File; 4) "HV Val" is the value of the hvPt observable
+        (either drift voltage or divider current) for which the QC5_Resp_Uni measurement was carried out at (note:
+        this must match with how the gain curve is parameterized); 5) "HV List" is a comma separated list of HV
+        points you would like the gain map calculated at (again this must match how gain curve is parameterized),
+        and 6) "Config File - Mapping" is the input mapping config file used to produce the analyzed framework
+        output file.
+
+        An example call is given as:
+
+            python2.7 python/computeGainMap.py --file=FrameworkOutput.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=config/Mapping_GE11-VII-L.cfg
+
+        Here the gain curve was parameterized in terms of divider current and as a result the hvPoint and hvlist
+        fields are also given in terms of divider current
+
+        If you would like to analyze multiple files simultaneously, or prefer to not type everything in on command
+        line, the helper script:
+
+            scripts/makeGainMaps.sh
+
+        Has been created to assist you.  The expected synatx is:
+
+            source makeGainMaps.sh <Summary File>
+
+        Where "Summary File" is a tab delimited data file where each line has the command line arguments you would
+        pass for a single single detector.  Specifically the order is expected as:
+
+            file	gp0	gp0Err	gp1	gp1Err	name	hvPoint	hvlist  fileMap
+
+        Where:
+            file	physical filename of the Framework output file
+            gp0     Value of p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            gp0Err	Error on p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            gp1     Value of p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            gp1Err	Error on p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            name	String assigned to "Detector_Name" field in the run config file used to make the Framework output file
+            hvPoint	HV value at which the original QC5_Resp_Uni measurement was performed at (input either divider current or V_Drift)
+            hvlist	comma separated list of hv points for which the gain map should be calculated at
+            fileMap physical filename of the mapping config file used to generate the Framework output file
+
+        For each entry in the "Summary File" the python/computeGainMap.py script will be called and generate the
+        appropriate output file.
+
+        # 3.c.ii Analysis Suite - Efficiency Predictions
+        # --------------------------------------------------------
+
+        This tool takes results from the effective gain calibration (QC5_Gain_Cal), response uniformity (QC5_Resp_Uni)
+        measurements, MIP cluster charge measurements, and MIP cluster size measurements to determine the gain and
+        efficiency at every point across the detector.  As with frameworkMain for each new shell navigate to the base
+        directory of the repository and setup the environment via:
+
+            source scripts/setup_CMS_GEM.sh
+
+        The usage for the computeEffCurves.py script is:
+
+            python2.7 python/computeEffCurves.py  --file=<Efficiency Predictor Config File> --debug=<True/False>
+
+        Where the "Efficiency Predictor Config File" is described in Section 4.e.v and the debug flag is a True/False
+        value which will print more verbose information to the terminal.
+
+        An example call is given as:
+
+            python2.7 python/computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
 
 # 4. Documentation
 # ========================================================
@@ -633,6 +771,7 @@
             |--->PlotterGraph2D
             |--->PlotterGraphErrors
             |--->PlotterHisto
+            |--->PlotterHisto2D
 
         ReadoutSector
             |
@@ -980,12 +1119,6 @@
         # 4.b.iii. Interfaces
         # --------------------------------------------------------
 
-Defined in include/VisualizeUniformity.h
-Inherits from Visualizer.
-Non-inherited member attributes shown below.
-
-Public Member Functions
-
             # 4.b.iii.I Interface
             # --------------------------------------------------------
 
@@ -1076,12 +1209,17 @@ Public Member Functions
 
             Coming "soon"
 
-            # 4.b.vi.III PlotterGraphErrors
+            # 4.b.vi.IV PlotterGraphErrors
             # --------------------------------------------------------
 
             Coming "soon"
 
-            # 4.b.vi.IV PlotterHisto
+            # 4.b.vi.V PlotterHisto
+            # --------------------------------------------------------
+
+            Coming "soon"
+
+            # 4.b.vi.VI PlotterHisto2D
             # --------------------------------------------------------
 
             Coming "soon"
@@ -3021,7 +3159,170 @@ Public Member Functions
             [END_CANVAS]
 
         Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
-        the physical path to the TGraphErrors object "h_Summary_ResponseFitPkPosDataset".
+        the physical path to the TH1F object "h_Summary_ResponseFitPkPosDataset".
+
+        # 4.e.iv.X  Example Config File - TH2F
+        # --------------------------------------------------------
+
+        The following example shows the case where a TH2F object is plotted.  Note the Canv_Plot_Type
+        in the [BEGIN_CANVAS] header is set to TH2F. Here the TH2F is loaded from an input TFile.
+
+        [BEGIN_CANVAS]
+            Canv_Axis_NDiv = '507,510'; #X, Y
+            Canv_Dim = '1000,1000'; #X, Y
+            Canv_DrawOpt = 'COLZTEXT';
+            Canv_Grid_XY = 'false,false'; #X, Y
+            Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+            Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+            Canv_Legend_Draw = 'false';
+            Canv_Log_XY = 'false,false'; #X, Y
+            Canv_Logo_Pos = '0';
+            Canv_Logo_Prelim = 'true';
+            Canv_Margin_Top = '0.08';
+            Canv_Margin_Bot = '0.14';
+            Canv_Margin_Lf = '0.13';
+            Canv_Margin_Rt = '0.19';
+            Canv_Mono_Color = 'false';
+            Canv_Name = 'GE11-VII-L-CERN-0001_FitSuccess_RGB';
+            Canv_Plot_Type = 'TH2F';
+            Canv_Range_Y = '1,9'; #Y1, Y2
+            Canv_Range_Z = '0,1'; #Y1, Y2
+            Canv_Title_Offset_X = '1.2';
+            Canv_Title_Offset_Y = '1.2';
+            Canv_Title_Offset_Z = '1.65';
+            Canv_Title_X = 'Detector #it{i#phi} index';
+            Canv_Title_Y = 'Detector #it{i#eta} index';
+            Canv_Title_Z = 'GE1/1-VII-L-CERN-0001 Fit Success';
+            [BEGIN_PLOT]
+                Plot_Name = 'h_Summary_FitSuccess';
+                Plot_Root_File = '/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/QC5_Resp_Uni/GE11-VII-L-CERN-0001_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_588uA_TimeCorr_DPGGeo_AnaWithFits.root';
+                Plot_Root_Path = 'Summary';
+            [END_PLOT]
+        [END_CANVAS]
+
+        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
+        the physical path to the TH2F object "h_Summary_FitSuccess".
+
+        # 4.e.v Efficiency Predictor Config File
+        # --------------------------------------------------------
+
+        Unlike most other config files used in the framewok the Efficiency Predictor Config File does
+        not use a nested header style to load in information.  Instead each line consists of tab
+        delimited data, the field name appears first, followed by a tab, and then the value to be assigned
+        to the field.  For example:
+
+            field_name\tValue
+
+        Where the tab '\t' character has been shown explicitly.  The possible field names are shown in the
+        following subsections
+
+        # 4.e.v.I   PARAMETERS - Input Files
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+
+                File_Framework_Output               string, PFN of the input framework out file produced in
+                                                    the QC5_Resp_Uni measurement
+
+                File_ClustQ_Mean
+
+                File_ClustQ_MPV
+
+                File_ClustQ_Sigma
+
+                File_CluseSize
+
+                File_DUT_Mapping_Geo                string, PFN of the mapping config file used to create
+                                                    the given File_Framework_Output
+
+                File_DUT_Mapping_VFATPos2iEtaiPhi
+
+                File_DUT_SCurveData
+
+                File_Output                         string, PFN of the output file to be produced by
+                                                    calling computeEffCurves.py
+
+        # 4.e.v.II  PARAMETERS - Device Under Test (DUT)
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+
+                DUT_GAIN_P0
+
+                DUT_GAIN_P0_Err
+
+                DUT_GAIN_P1
+
+                DUT_GAIN_P1_Err
+
+                DUT_iEta_Clust_Size_Norm
+
+                DUT_iEta_QC5_Gain_Cal
+
+                DUT_iPhi_Clust_Size_Norm
+
+                DUT_iPhi_QC5_Gain_Cal
+
+                DUT_Num_Sim_Pts_Per_RO
+
+                DUT_QC5_Resp_Uni_HVPt
+
+                DUT_Serial_Number                   string, value assigned to the Detector_Name field in the
+                                                    input run config file used to create the given
+                                                    File_Framework_Output.  Note: "Detector" should be used
+                                                    if the user did not supply a value to this field in the
+                                                    run config file when generating the File_Framework_Output
+
+                DUT_Slice_Granularity               int, value assigned to the Uniformity_Granularity field
+                                                    in the input analysis config file used to create the
+                                                    given File_Framework_Output
+
+        # 4.e.v.III PARAMETERS - Cluster Charge
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+
+                Det_ClustQ_Serial_Number
+
+                Det_ClustQ_GAIN_P0
+
+                Det_ClustQ_GAIN_P0_Err
+
+                Det_ClustQ_GAIN_P1
+
+                Det_ClustQ_GAIN_P1_Err
+
+        # 4.e.v.IV  PARAMETERS - Cluster Size
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+
+                Det_ClustSize_Serial_Number
+
+                Det_ClustSize_TF1_TName
+
+        # 4.e.v.V   PARAMETERS - Efficiency Info
+        # --------------------------------------------------------
+
+        The table below describes the allowed input fields and their data types.
+
+        The following parameters are supported:
+        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+
+                Eff_HVPt_List                       comma separated list of ints, list of HV Pt's the efficiency
+                                                    should be predicted at.
 
     # 4.f. Output File - Analysis Mode
     # --------------------------------------------------------
@@ -3256,6 +3557,12 @@ Public Member Functions
         as dead.  Also when identifying dead strips it is important to understand if
         the problem is a dead strip on the detector or a dead channel on the front end
         used to readout the sector.
+
+        # 4.f.v Output ROOT File - Gain Map
+        # --------------------------------------------------------
+
+        # 4.f.vi Output ROOT File - Efficiency Map
+        # --------------------------------------------------------
 
     # 4.g. Source Code Name Conventions
     # --------------------------------------------------------

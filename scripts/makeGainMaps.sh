@@ -4,7 +4,7 @@
 #
 # Here the "Summary File" is a text file with tab delimited data in the format:
 #	
-#	file	gp0	gp0Err	gp1	gp1Err	name	hvPoint	hvlist
+#	file	gp0	gp0Err	gp1	gp1Err	name	hvPoint	hvlist  fileMap
 #
 # Where:
 #	file	physical filename of the Framework output file
@@ -15,6 +15,7 @@
 #	name	String assigned to "Detector_Name" field in the run config file used to make the Framework output file
 #	hvPoint	HV value at which the original QC5_Resp_Uni measurement was performed at (input either divider current or V_Drift)
 #	hvlist	comma separated list of hv points for which the gain map should be calculated at
+#   fileMap physical filename of the mapping config file used to generate the Framework output file
 
 while IFS=$'\t' read -r -A argList
 do

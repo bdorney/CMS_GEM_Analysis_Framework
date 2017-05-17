@@ -1,10 +1,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 3.2                                 *
-*	LAST UPDATE: May 11 2017                     *
+*	VERSION: 4.0                                 *
+*	LAST UPDATE: May 17 2017                     *
 *                                                *
 **************************************************
+
+Update: May 17th 2017
+==================================================
+->Method calcROSectorEff of python class AnalysisSuiteEfficiencyPredictor will now use the average eff to compute errors following binomial description rather than use std. deviation of ponts used to compute the average
+->Updated the README.txt
 
 Update: May 11th 2017
 ==================================================

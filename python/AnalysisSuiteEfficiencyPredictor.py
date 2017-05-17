@@ -29,19 +29,19 @@ class AnalysisSuiteEfficiencyPredictor:
                  'DICT_EFF_READOUT',            #Efficiency Pts by readout sector
                  'DICT_G_EFF_VS_HVPTS_RO',       #TGraphErrors by readout sector vs. HV
                  'DICT_G_EFF_VS_GAIN_RO',       #TGraphErrors by readout sector vs. Gain
-		 'DICT_G_ANASLICE_VS_HVPTS_RO',
+                 'DICT_G_ANASLICE_VS_HVPTS_RO',
                  'DICT_H_CHON_VS_CLUSTPOS',
                  'DICT_H_CLUSTQ_VS_CLUSTPOS',
                  'DICT_H_NOISEQ_VS_CLUSTPOS',
                  'DICT_H_THRESH_VS_CLUSTPOS',
-		 'DIR_CHARGE',
-		 'DIR_MAP_EFF',
-		 #'DIR_MAP_GAIN',
+                 'DIR_CHARGE',
+                 'DIR_MAP_EFF',
+                 #'DIR_MAP_GAIN',
                  'LIST_HVPTS',
                  'NAME_DET_DUT',
                  'NAME_DET_CLUSTQ',
                  'NAME_DET_CLUSTSIZE',
-		 'NUMSIMPTS_PER_RO',
+                 'NUMSIMPTS_PER_RO',
                  'PARAMS_DET_DUT',
                  'SECTOR_IETA_CLUSTSIZENORM',
                  'SECTOR_IETA_QC5',
@@ -160,10 +160,10 @@ class AnalysisSuiteEfficiencyPredictor:
                 self.FILE_MIP_AVG_CLUST_SIZE = strLine[1]
             elif strLine[0] == "FILE_OUTPUT":
                 #self.FILE_OUTPUT = strLine[1]
-		self.FILE_OUTPUT= TFile(strLine[1],"RECREATE","",1)
-	        self.DIR_CHARGE	= self.FILE_OUTPUT.mkdir("ChargeData")
-		self.DIR_MAP_EFF= self.FILE_OUTPUT.mkdir("EffMaps")
-		#self.DIR_MAP_GAIN=self.FILE_OUTPUT.mkdir("GainMaps")
+                self.FILE_OUTPUT= TFile(strLine[1],"RECREATE","",1)
+                self.DIR_CHARGE	= self.FILE_OUTPUT.mkdir("ChargeData")
+                self.DIR_MAP_EFF= self.FILE_OUTPUT.mkdir("EffMaps")
+                #self.DIR_MAP_GAIN=self.FILE_OUTPUT.mkdir("GainMaps")
             elif strLine[0] == "FILE_DUT_MAPPING_GEO":
                 self.FILE_MAPPING_DUT = strLine[1]
             elif strLine[0] == "FILE_DUT_MAPPING_VFATPOS2IETAIPHI":
@@ -186,8 +186,8 @@ class AnalysisSuiteEfficiencyPredictor:
                 self.SECTOR_IPHI_CLUSTSIZENORM = int(strLine[1])
             elif strLine[0] == "DUT_IPHI_QC5_GAIN_CAL":
                 self.SECTOR_IPHI_QC5 = int(strLine[1])
-	    elif strLine[0] == "DUT_NUM_SIM_PTS_PER_RO":
-		self.NUMSIMPTS_PER_RO = int(strLine[1])
+            elif strLine[0] == "DUT_NUM_SIM_PTS_PER_RO":
+                self.NUMSIMPTS_PER_RO = int(strLine[1])
             elif strLine[0] == "DUT_QC5_RESP_UNI_HVPT":
                 self.PARAMS_DET_DUT.DET_IMON_QC5_RESP_UNI = float(strLine[1])
             elif strLine[0] == "DUT_SERIAL_NUMBER":
@@ -220,7 +220,7 @@ class AnalysisSuiteEfficiencyPredictor:
 
         #Declare Cluster Charge Analysis Suite
         self.ANASUITECLUSTQ = AnalysisSuiteClusterCharge(file_out=self.FILE_OUTPUT,
-							 params_gain=self.PARAMS_GAIN_DET_CLUSTQ,
+                                                         params_gain=self.PARAMS_GAIN_DET_CLUSTQ,
                                                          calcGain=True,
                                                          debug=self.DEBUG)
 
@@ -255,7 +255,7 @@ class AnalysisSuiteEfficiencyPredictor:
         self.PARAMS_DET_DUT.loadMapping(self.FILE_MAPPING_DUT, self.DEBUG)
 
         self.ANASUITEGAIN   = AnalysisSuiteGainMap(file_out=self.FILE_OUTPUT,
-						   inputfilename=self.FILE_QC5_RESP_UNI,
+                                                   inputfilename=self.FILE_QC5_RESP_UNI,
                                                    #outputfilename=self.FILE_OUTPUT,
                                                    #outputfileoption="RECREATE",
                                                    params_gain=self.PARAMS_GAIN_DET_DUT,
@@ -272,27 +272,27 @@ class AnalysisSuiteEfficiencyPredictor:
             xLower	= -0.5 * etaSector.SECTSIZE
             xUpper	= 0.5 * etaSector.SECTSIZE
 
-	    #Channels On vs cluster position histograms
+            #Channels On vs cluster position histograms
             h_chOn_vs_clustPos = TH2F("h_iEta{0}_chOn_vs_clustPos".format(etaSector.IETA),
-                        "",iNumBinsX,xLower,xUpper,125,0,1.25)
+                                      "",iNumBinsX,xLower,xUpper,125,0,1.25)
             h_chOn_vs_clustPos.SetDirectory(gROOT)
             self.DICT_H_CHON_VS_CLUSTPOS[etaSector.SECTPOS]=h_chOn_vs_clustPos
 
-	    #Cluster charge vs cluster position histograms
+            #Cluster charge vs cluster position histograms
             h_clustQ_vs_clustPos = TH2F("h_iEta{0}_clustQ_vs_clustPos".format(etaSector.IETA),
-                        "",iNumBinsX,xLower,xUpper,400,0,100)
+                                        "",iNumBinsX,xLower,xUpper,400,0,100)
             h_clustQ_vs_clustPos.SetDirectory(gROOT)
             self.DICT_H_CLUSTQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_clustQ_vs_clustPos
 
-	    #Noise vs cluster position histograms
+            #Noise vs cluster position histograms
             h_noiseQ_vs_clustPos = TH2F("h_iEta{0}_noiseQ_vs_clustPos".format(etaSector.IETA),
-                        "",iNumBinsX,xLower,xUpper,100,0,10)
+                                        "",iNumBinsX,xLower,xUpper,100,0,10)
             h_noiseQ_vs_clustPos.SetDirectory(gROOT)
             self.DICT_H_NOISEQ_VS_CLUSTPOS[etaSector.SECTPOS]=h_noiseQ_vs_clustPos
 
-	    #Thresh vs cluster position histograms
+            #Thresh vs cluster position histograms
             h_thresh_vs_clustPos = TH2F("h_iEta{0}_thresh_vs_clustPos".format(etaSector.IETA),
-                        "",iNumBinsX,xLower,xUpper,100,0,10)
+                                        "",iNumBinsX,xLower,xUpper,100,0,10)
             h_thresh_vs_clustPos.SetDirectory(gROOT)
             self.DICT_H_THRESH_VS_CLUSTPOS[etaSector.SECTPOS]=h_thresh_vs_clustPos
 
@@ -318,24 +318,24 @@ class AnalysisSuiteEfficiencyPredictor:
         
         #Make the Dictionary for Efficiency TGraphErrs by Readout Sector
         self.DICT_G_EFF_VS_HVPTS_RO = {}
-	self.DICT_G_ANASLICE_VS_HVPTS_RO = {}
-	self.DICT_G_EFF_VS_GAIN_RO = {}
+        self.DICT_G_ANASLICE_VS_HVPTS_RO = {}
+        self.DICT_G_EFF_VS_GAIN_RO = {}
         for key in self.DICT_EFF_READOUT:
-	    #Avg Eff +/- Std Dev Eff vs. HVPts
+            #Avg Eff +/- Std Dev Eff vs. HVPts
             g_Eff_vs_HVPts = TGraphErrors(len(self.LIST_HVPTS))
             g_Eff_vs_HVPts.SetName("g_iEta{0}iPhi{1}_avgEff_vs_HVPts".format( int(key[0]), int(key[1]) ) )
             g_Eff_vs_HVPts.SetTitle("")
             g_Eff_vs_HVPts.SetMarkerStyle(21)
             self.DICT_G_EFF_VS_HVPTS_RO[key]=g_Eff_vs_HVPts
 
-	    #Avg Eff +/- Std Dev Eff vs. HVPts
+            #Avg Eff +/- Std Dev Eff vs. HVPts
             g_Eff_vs_Gain = TGraphErrors(len(self.LIST_HVPTS))
             g_Eff_vs_Gain.SetName("g_iEta{0}iPhi{1}_avgEff_vs_Gain".format( int(key[0]), int(key[1]) ) )
             g_Eff_vs_Gain.SetTitle("")
             g_Eff_vs_Gain.SetMarkerStyle(21)
             self.DICT_G_EFF_VS_GAIN_RO[key]=g_Eff_vs_Gain
 
-	    #Number of Slices used for analysis (here a slice is counted if the landau charge interpolation was valid)
+            #Number of Slices used for analysis (here a slice is counted if the landau charge interpolation was valid)
             g_AnaSlices_vs_HVPts = TGraph(len(self.LIST_HVPTS))
             g_AnaSlices_vs_HVPts.SetName("g_iEta{0}iPhi{1}_anaSlices_vs_HVPts".format( int(key[0]), int(key[1]) ) )
             g_AnaSlices_vs_HVPts.SetTitle("")
@@ -450,19 +450,19 @@ class AnalysisSuiteEfficiencyPredictor:
         #file_Out = TFile(self.FILE_OUTPUT,"UPDATE","",1)
         #dir_Summary = file_Out.mkdir("Summary")
         dir_Summary = self.FILE_OUTPUT.mkdir("Summary")
-	dir_EffCurves = dir_Summary.mkdir("EffCurves")
-	dir_AnaSlices = dir_Summary.mkdir("AnaSlices")
+        dir_EffCurves = dir_Summary.mkdir("EffCurves")
+        dir_AnaSlices = dir_Summary.mkdir("AnaSlices")
 
         #Store the output curves
         #dir_Summary.cd()
-	for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
-	    for iPhi in range (0, etaSector.NBCONNECT):
-		dir_EffCurves.cd()
-		self.DICT_G_EFF_VS_HVPTS_RO[(etaSector.IETA,iPhi+1)].Write()
-		self.DICT_G_EFF_VS_GAIN_RO[(etaSector.IETA,iPhi+1)].Write()
+        for etaSector in self.PARAMS_DET_DUT.LIST_DET_GEO_PARAMS:
+            for iPhi in range (0, etaSector.NBCONNECT):
+                dir_EffCurves.cd()
+                self.DICT_G_EFF_VS_HVPTS_RO[(etaSector.IETA,iPhi+1)].Write()
+                self.DICT_G_EFF_VS_GAIN_RO[(etaSector.IETA,iPhi+1)].Write()
 
-		dir_AnaSlices.cd()
-		self.DICT_G_ANASLICE_VS_HVPTS_RO[(etaSector.IETA,iPhi+1)].Write()
+                dir_AnaSlices.cd()
+                self.DICT_G_ANASLICE_VS_HVPTS_RO[(etaSector.IETA,iPhi+1)].Write()
 
         #Close the Output File
         #file_Out.Close()
@@ -512,7 +512,7 @@ class AnalysisSuiteEfficiencyPredictor:
 
         #Loop over all points of the detector
         iNumPt = 0
-	iNumPt_Skipped = 0
+        iNumPt_Skipped = 0
         for coordPt in dict_Coords_GainAndNormAvgCS:
             #Get Coordinate Info
             coordPt_iEtaiPhi	= self.PARAMS_DET_DUT.getiEtaiPhIndex(coordPt[0],coordPt[1])
@@ -541,29 +541,29 @@ class AnalysisSuiteEfficiencyPredictor:
                 print "================================================================"
                 print "Bad Signal Charge Parameters"
                 print "For HV = {0}: Skipping (ieta,iphi,islice) = ({1},{2},{3}); strips = [{4},{5}]; coords = ({6},{7})".format(
-			fHVPt,
-			coordPt_iEtaiPhi[0],
-			coordPt_iEtaiPhi[1],
-			coordPt_iThisSlice,
-			coordPt_iStripRange[0],
-			coordPt_iStripRange[1],
-			coordPt[0],                                                                                                                   
-			coordPt[1])
+                        fHVPt,
+                        coordPt_iEtaiPhi[0],
+                        coordPt_iEtaiPhi[1],
+                        coordPt_iThisSlice,
+                        coordPt_iStripRange[0],
+                        coordPt_iStripRange[1],
+                        coordPt[0],                                                                                                                   
+                        coordPt[1])
                 print "================================================================"
-		iNumPt_Skipped+=1
+                iNumPt_Skipped+=1
                 continue
 
             #Begin ToyMC
             if self.DEBUG:
                 print "For HV = {0}: Simulating (ieta,iphi,islice) = ({1},{2},{3}); strips = [{4},{5}]; coords = ({6},{7})".format(
-			fHVPt,
-			coordPt_iEtaiPhi[0],
-			coordPt_iEtaiPhi[1],
-			coordPt_iThisSlice,
-			coordPt_iStripRange[0],
-			coordPt_iStripRange[1],
-			coordPt[0],
-			coordPt[1])
+                        fHVPt,
+                        coordPt_iEtaiPhi[0],
+                        coordPt_iEtaiPhi[1],
+                        coordPt_iThisSlice,
+                        coordPt_iStripRange[0],
+                        coordPt_iStripRange[1],
+                        coordPt[0],
+                        coordPt[1])
 
             fNumSig	= 0. #Number of Signal Events; Q_Sig > Q_Noise & Q_Sig > Thresh
             fNumFake	= 0. #Number of Noise Events; Q_Noise >= Q_Sig & Q_Noise > Thresh
@@ -620,20 +620,20 @@ class AnalysisSuiteEfficiencyPredictor:
             dir_ChOn.cd()
             self.DICT_H_CHON_VS_CLUSTPOS[idx].Write()	    
 
-	#Draw the output efficiency Maps
-	canv_Eff_Sig_HVPt = TCanvas("canv_{0}_EffSig_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Signal Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
-	g2D_Map_Eff_Sig_HVPt.Draw("COLZ")
+        #Draw the output efficiency Maps
+        canv_Eff_Sig_HVPt = TCanvas("canv_{0}_EffSig_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Signal Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
+        g2D_Map_Eff_Sig_HVPt.Draw("COLZ")
 
-	canv_Eff_Noise_HVPt = TCanvas("canv_{0}_EffNoise_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Noise Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
-	g2D_Map_Eff_Noise_HVPt.Draw("COLZ")
+        canv_Eff_Noise_HVPt = TCanvas("canv_{0}_EffNoise_AllEta_{1}".format(self.NAME_DET_DUT,fHVPt),"Noise Eff Map for HVPt = {0}".format(fHVPt), 600,600)	
+        g2D_Map_Eff_Noise_HVPt.Draw("COLZ")
 
         #Store Output Efficiency Maps
         #dir_EffMap = file_Out.mkdir("EffMap_HVPt{0}".format(fHVPt))
         dir_EffMap = self.DIR_MAP_EFF.mkdir("HVPt{0}".format(fHVPt))
         dir_EffMap.cd()
-	canv_Eff_Sig_HVPt.Write()
+        canv_Eff_Sig_HVPt.Write()
         g2D_Map_Eff_Sig_HVPt.Write()
-	canv_Eff_Noise_HVPt.Write()
+        canv_Eff_Noise_HVPt.Write()
         g2D_Map_Eff_Noise_HVPt.Write()
 
         #Calculate the avg eff by readout sector
@@ -645,7 +645,7 @@ class AnalysisSuiteEfficiencyPredictor:
         #Close the Output File
         #file_Out.Close()
 
-	print "For HV Pt {0}, Total Number of Skipped Slices = {1}".format(fHVPt, iNumPt_Skipped)
+        print "For HV Pt {0}, Total Number of Skipped Slices = {1}".format(fHVPt, iNumPt_Skipped)
 
         return array_EffData
 
@@ -653,24 +653,28 @@ class AnalysisSuiteEfficiencyPredictor:
     def calcROSectorEff(self, array_EffData, fHVPt, iDataPt):
         #Loop Over all the data poitns and assign them to a readout sector
         for dataPt in array_EffData:
+            #if tuple_iEtaiPhi == (8,3): print dataPt[0], dataPt[1], dataPt[2]
+            
             tuple_iEtaiPhi = self.PARAMS_DET_DUT.getiEtaiPhIndex(dataPt[0], dataPt[1])
             self.DICT_EFF_READOUT[tuple_iEtaiPhi].append(dataPt[2])
-         
-	    #if tuple_iEtaiPhi == (8,3): print dataPt[0], dataPt[1], dataPt[2]
 
         #Store the (Avg Eff +/- Std Dev Eff, fHVPt) in the plots defined for each graph in
         for key in self.DICT_EFF_READOUT:
-	    #if key == (8,3): print np.mean(self.DICT_EFF_READOUT[key] ), np.std(self.DICT_EFF_READOUT[key] )
+            #if key == (8,3): print np.mean(self.DICT_EFF_READOUT[key] ), np.std(self.DICT_EFF_READOUT[key] )
 
-            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPoint( iDataPt, fHVPt, np.mean(self.DICT_EFF_READOUT[key] ) )
-            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPointError( iDataPt, 0, np.std(self.DICT_EFF_READOUT[key] ) )
+            fEffVal     = np.mean(self.DICT_EFF_READOUT[key])
+            #fEffVal_Err = np.std(self.DICT_EFF_READOUT[key] )
+            fEffVal_Err = np.sqrt( fEffVal * (1. - fEffVal) / self.NUMSIMPTS_PER_RO )
 
-            self.DICT_G_EFF_VS_GAIN_RO[key].SetPoint( iDataPt, self.PARAMS_GAIN_DET_DUT.calcGain(fHVPt), np.mean(self.DICT_EFF_READOUT[key] ) )
-            self.DICT_G_EFF_VS_GAIN_RO[key].SetPointError( iDataPt, self.PARAMS_GAIN_DET_DUT.calcGainErr(fHVPt), np.std(self.DICT_EFF_READOUT[key] ) )
+            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPoint( iDataPt, fHVPt, fEffVal )
+            self.DICT_G_EFF_VS_HVPTS_RO[key].SetPointError( iDataPt, 0, fEffVal_Err )
 
-	    self.DICT_G_ANASLICE_VS_HVPTS_RO[key].SetPoint( iDataPt, fHVPt, len(self.DICT_EFF_READOUT[key]) )
+            self.DICT_G_EFF_VS_GAIN_RO[key].SetPoint( iDataPt, self.PARAMS_GAIN_DET_DUT.calcGain(fHVPt), fEffVal )
+            self.DICT_G_EFF_VS_GAIN_RO[key].SetPointError( iDataPt, self.PARAMS_GAIN_DET_DUT.calcGainErr(fHVPt), fEffVal_Err )
 
-	    #Wipe the efficiency data before the next HV Pt
-	    self.DICT_EFF_READOUT[key]=[]
+            self.DICT_G_ANASLICE_VS_HVPTS_RO[key].SetPoint( iDataPt, fHVPt, len(self.DICT_EFF_READOUT[key]) )
+
+            #Wipe the efficiency data before the next HV Pt
+            self.DICT_EFF_READOUT[key]=[]
 
         return
