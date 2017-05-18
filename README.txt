@@ -675,8 +675,8 @@
             file	physical filename of the Framework output file
             gp0     Value of p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
             gp0Err	Error on p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            gp1     Value of p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            gp1Err	Error on p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            gp1     Value of p1 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
+            gp1Err	Error on p1 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
             name	String assigned to "Detector_Name" field in the run config file used to make the Framework output file
             hvPoint	HV value at which the original QC5_Resp_Uni measurement was performed at (input either divider current or V_Drift)
             hvlist	comma separated list of hv points for which the gain map should be calculated at
@@ -732,6 +732,8 @@
 
     # 4.b. Class Map
     # --------------------------------------------------------
+
+    Following is for C++ classes only.
 
     Inheritance relations:
 
@@ -846,13 +848,14 @@
             |               |       |->AnalyzeResponseUniformityClusters makes distributions from selected clusters
             |               |       |
             |               |       |->After all input files are processed AnalyzeResponseUniformityClusters makes & fits slice distributions
+            |               |       |
             |               |       |->VisualizeUniformity creates summary plots
             |               |
             |               |->Framework output file as input?
             |                       |
             |                       |->AnalyzeResponseUniformityClusters loads all previously created TObjects from file
             |                       |
-            |                       |->AnalyzeResponseUniformityClusters then makes & fits slice distributions
+            |                       |->AnalyzeResponseUniformityClusters then makes then fits slice distributions
             |                       |
             |                       |->VisualizeUniformity creates summary plots
             |
@@ -3227,20 +3230,33 @@
                 File_Framework_Output               string, PFN of the input framework out file produced in
                                                     the QC5_Resp_Uni measurement
 
-                File_ClustQ_Mean
+                File_ClustQ_Mean                    string, PFN of a tab deliminted file storing cluster
+                                                    charge landau data collected with triple-GEM detectors.
+                                                    The data is ordered as V_Drift, Cluster Size, and the
+                                                    Landau mean parameter.  Note the first two lines of this
+                                                    file are assumed to consist of column headers and units
+                                                    and are thus skipped.
 
-                File_ClustQ_MPV
+                File_ClustQ_MPV                     string, as File_ClustQ_Mean but for Landau MPV parameter
 
-                File_ClustQ_Sigma
+                File_ClustQ_Sigma                   string, as File_ClustQ_Mean but for Landau Sigma (e.g.
+                                                    scale) parameter
 
-                File_CluseSize
+                File_ClustSize                      string, PFN of a TFile storing a TF1 object which gives
+                                                    MIP cluster size parameterized in terms of triple-GEM
+                                                    detector gain.
 
                 File_DUT_Mapping_Geo                string, PFN of the mapping config file used to create
                                                     the given File_Framework_Output
 
-                File_DUT_Mapping_VFATPos2iEtaiPhi
+                File_DUT_Mapping_VFATPos2iEtaiPhi   string, PFN of a tab deliminted mapping file which gives
+                                                    the correspondance between detector (ieta,iphi) coordinate
+                                                    to VFAT position.  Note the first line of this file is
+                                                    assume to consist of column headers and is thus skipped
 
-                File_DUT_SCurveData
+                File_DUT_SCurveData                 string, PFN of a TFile storing the scurveFitTree TTree
+                                                    object which contains the analyzed S-Curve data recorded
+                                                    with a detector instrumented with the v2b GEM Electronics.
 
                 File_Output                         string, PFN of the output file to be produced by
                                                     calling computeEffCurves.py
@@ -3253,25 +3269,35 @@
         The following parameters are supported:
         #		<FIELD>                             <DATA TYPE, DESCRIPTION>
 
-                DUT_GAIN_P0
+                DUT_GAIN_P0                         float, for the detector corresponding to the QC5 data
+                                                    stored in File_Framework_Output, this is value of p0 in
+                                                    G(x) = exp(p0*x+p1); here x is either divider current
+                                                    or V_Drift
 
-                DUT_GAIN_P0_Err
+                DUT_GAIN_P0_Err                     float, error on DUT_GAIN_P0
 
-                DUT_GAIN_P1
+                DUT_GAIN_P1                         float, as DUT_GAIN_P0 but for p1 in G(x) = exp(p0*x+p1)
 
-                DUT_GAIN_P1_Err
+                DUT_GAIN_P1_Err                     float, error on DUT_GAIN_P1
 
-                DUT_iEta_Clust_Size_Norm
+                DUT_iEta_Clust_Size_Norm            int, iEta index corresponding to (ieta,iphi) sector that
+                                                    data in File_CluseSize was obtained from
 
-                DUT_iEta_QC5_Gain_Cal
+                DUT_iEta_QC5_Gain_Cal               int, iEta index corresponding to (ieta,iphi) sector that
+                                                    QC5_Gain_Cal was performed in
 
-                DUT_iPhi_Clust_Size_Norm
+                DUT_iPhi_Clust_Size_Norm            int, as DUT_iEta_Clust_Size_Norm but for iPhi index
 
-                DUT_iPhi_QC5_Gain_Cal
+                DUT_iPhi_QC5_Gain_Cal               int, as DUT_iEta_QC5_Gain_Cal but for iPhi index
 
-                DUT_Num_Sim_Pts_Per_RO
+                DUT_Num_Sim_Pts_Per_RO              int, number of Toy MC events to simulate for each slice
+                                                    of the detector found in File_Framework_Output
 
-                DUT_QC5_Resp_Uni_HVPt
+                DUT_QC5_Resp_Uni_HVPt               float, HV value at which the QC5_Resp_Uni measurement was
+                                                    performed at (e.g. HV value used to obtain File_Framework_Output).
+                                                    Note the HV observable here, either divider current or
+                                                    V_Drift, should match the observable that was used to
+                                                    parameterize the Gain curve.
 
                 DUT_Serial_Number                   string, value assigned to the Detector_Name field in the
                                                     input run config file used to create the given
@@ -3291,15 +3317,19 @@
         The following parameters are supported:
         #		<FIELD>                             <DATA TYPE, DESCRIPTION>
 
-                Det_ClustQ_Serial_Number
+                Det_ClustQ_Serial_Number            string, serial number of the detector used to obtain
+                                                    the data found in File_ClustQ_Mean, File_ClustQ_MPV,
+                                                    and File_ClustQ_Sigma files
 
-                Det_ClustQ_GAIN_P0
+                Det_ClustQ_GAIN_P0                  float, for Det_ClustQ_Serial_Number this is value of p0 in
+                                                    G(V_Drift) = exp(p0*V_Drift+p1)
 
-                Det_ClustQ_GAIN_P0_Err
+                Det_ClustQ_GAIN_P0_Err              float, error on Det_ClustQ_GAIN_P0
 
-                Det_ClustQ_GAIN_P1
+                Det_ClustQ_GAIN_P1                  float, as Det_ClustQ_GAIN_P0 but for p1 in
+                                                    G(V_Drift) = exp(p0*V_Drift+p1)
 
-                Det_ClustQ_GAIN_P1_Err
+                Det_ClustQ_GAIN_P1_Err              float, error on Det_ClustQ_GAIN_P1
 
         # 4.e.v.IV  PARAMETERS - Cluster Size
         # --------------------------------------------------------
@@ -3309,9 +3339,12 @@
         The following parameters are supported:
         #		<FIELD>                             <DATA TYPE, DESCRIPTION>
 
-                Det_ClustSize_Serial_Number
+                Det_ClustSize_Serial_Number         string, serial number of the detecotr used to obtain the
+                                                    data found in File_ClustSize
 
-                Det_ClustSize_TF1_TName
+                Det_ClustSize_TF1_TName             string, name of the TF1 object in File_ClustSize which
+                                                    parameterizes MIP cluster size parameterized in terms of
+                                                    triple-GEM detector gain.
 
         # 4.e.v.V   PARAMETERS - Efficiency Info
         # --------------------------------------------------------
@@ -3560,6 +3593,33 @@
 
         # 4.f.v Output ROOT File - Gain Map
         # --------------------------------------------------------
+
+        This file will have a series of TDirectories of the form:
+
+            GainMap_HVPt<X>
+
+        Where X corresponds to the HV values given to parameters {hvPoint,hvlist} either
+        as command line arguments or entries in the provided Summary File.  Additionally
+        there will be one TDirectory named "Summary."
+
+        Inside each of the GainMap_HVPt<X> TDirectories you will find TCanvas objects
+        whose TNames follow the form:
+
+            canv_<name>_<Observable>_AllEta_<hvPoint>
+
+        Where: "name" is the string given to the "--name" argument at command line or
+        provided in the Summary File, "Observable" is from the set {EffGain, PD}, and
+        "hvPoint" is either the value given to the command line argument "hvPoint" or
+        one of the values given to the command line argument hvlist, or their respective
+        entries in the Summary File.  Note that the PD observable is only calculated
+        for HV values found in the hvlist parameter.
+
+        Additionally, inside each of the GainMap_HVPt<X> TDirectories you will find
+        TGraph2D objects whose TNames follow the form:
+
+            g2D_<name>_<Observable>_AllEta_<hvPoint>
+
+        Where the "name," "Observable," and "hvPoint" are as above.
 
         # 4.f.vi Output ROOT File - Efficiency Map
         # --------------------------------------------------------

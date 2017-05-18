@@ -156,7 +156,7 @@ class AnalysisSuiteEfficiencyPredictor:
                 self.FILE_CLUSTQ_MPV = strLine[1]
             elif strLine[0] == "FILE_CLUSTQ_SIGMA":
                 self.FILE_CLUSTQ_SIGMA = strLine[1]
-            elif strLine[0] == "FILE_CLUSESIZE":
+            elif strLine[0] == "FILE_CLUSTSIZE":
                 self.FILE_MIP_AVG_CLUST_SIZE = strLine[1]
             elif strLine[0] == "FILE_OUTPUT":
                 #self.FILE_OUTPUT = strLine[1]
