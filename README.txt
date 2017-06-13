@@ -3611,8 +3611,9 @@
         provided in the Summary File, "Observable" is from the set {EffGain, PD}, and
         "hvPoint" is either the value given to the command line argument "hvPoint" or
         one of the values given to the command line argument hvlist, or their respective
-        entries in the Summary File.  Note that the PD observable is only calculated
-        for HV values found in the hvlist parameter.
+        entries in the Summary File.  Note that PD corresponds to "discharge probability"
+        induced by alpha-particles observable is only calculated for HV values found in
+        the hvlist parameter.
 
         Additionally, inside each of the GainMap_HVPt<X> TDirectories you will find
         TGraph2D objects whose TNames follow the form:
@@ -3620,6 +3621,17 @@
             g2D_<name>_<Observable>_AllEta_<hvPoint>
 
         Where the "name," "Observable," and "hvPoint" are as above.
+
+        Inside the "Summary" TDirectory you will find TCanvas objects whose TNames follow
+        the form:
+
+            canv_<name>_<Observable>
+
+        Where: "name" is as given above and "Observable" is from the set {EffGainAvg, PDAvg}.  Additionally you will find a set of TGraphError objects whose TNames follow the form:
+
+            g_<name>_<Observable>
+
+Where: "name" is as given above and "Observable" is from the set {EffGainAvg, EffGainMax, EffGainMin, PDAvg, PDMax, and PDMin}.  The error bars depicted on EffGainAvg and PDAvg
 
         # 4.f.vi Output ROOT File - Efficiency Map
         # --------------------------------------------------------
