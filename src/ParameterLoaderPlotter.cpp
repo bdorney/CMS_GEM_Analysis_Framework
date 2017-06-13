@@ -399,6 +399,9 @@ void ParameterLoaderPlotter::loadParametersPlot(std::ifstream & file_Input, Info
             if ( pair_strParam.first.compare("PLOT_COLOR") == 0 ) {
                 inputPlotInfo.m_iColor = convert2Color(pair_strParam.second);
             }
+            else if ( pair_strParam.first.compare("PLOT_DRAWOPT") == 0 ) {
+                inputPlotInfo.m_strOptionDraw = pair_strParam.second;
+            }
             else if ( pair_strParam.first.compare("PLOT_LEGENTRY") == 0 ) {
                 inputPlotInfo.m_strLegEntry = pair_strParam.second;
             }

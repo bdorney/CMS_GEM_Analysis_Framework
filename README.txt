@@ -3555,7 +3555,7 @@
 
         Since the style defined by genericPlotter may not persist in the created TObjects once they have been saved
         to the output TFile and loaded again in ROOT two image files will also be produced.  In the working directory
-        you will also find one Canvas_TName.pdf and Canvas_TName.png file.  These two files should be used for
+        you will also find Canvas_TName.C, *.eps, *.pdf, and *.png file.  These two files should be used for
         plot approval in publication since they are gauranteed to have the style settings created by genericPlotter.
 
         # 4.f.iv Output Text File

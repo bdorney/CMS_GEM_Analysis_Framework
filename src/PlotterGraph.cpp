@@ -73,7 +73,7 @@ void PlotterGraph::addPlot(TLegend & inputLegend, InfoPlot & plotInfo){
 void PlotterGraph::drawPlots(){
     //Ensure axis is drawn!
     if( m_canvInfo.m_strOptionDraw.find("A") == std::string::npos){
-	m_canvInfo.m_strOptionDraw += "A";
+        m_canvInfo.m_strOptionDraw += "A";
     }
     
     //Draw (root hack)

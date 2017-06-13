@@ -135,7 +135,7 @@ namespace QualityControl {
             std::string m_strFilePath;      //Path in input ROOT File where data is found
             std::string m_strLegEntry;      //Legend Entry
             std::string m_strName;          //TName of TGraph
-            //std::string m_strOptionDraw;    //Draw Option
+            std::string m_strOptionDraw;    //Draw Option
             //std::string m_strTitle_X;       //X-Axis Title
             //std::string m_strTitle_Y;       //Y-Axis Title
             
@@ -158,7 +158,7 @@ namespace QualityControl {
                 
                 m_strFileName = "";
                 m_strFilePath = "";
-                //m_strOptionDraw = "E1";
+                m_strOptionDraw = "";
                 //m_strTitle_Y = "N";
             }
             

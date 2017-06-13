@@ -2,9 +2,15 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 4.0                                 *
-*	LAST UPDATE: May 17 2017                     *
+*	LAST UPDATE: June 13 2017                    *
 *                                                *
 **************************************************
+
+Update: June 13th 2017
+==================================================
+->Added InfoPlot::m_strOptionDraw in include/PlotterUtilityTypes.h
+->ParameterLoaderPlotter::loadParametersPlot() will now set the plot level draw option
+->PlotterGeneric will now produce *.C and *.eps files in addition to *.pdf and *.png
 
 Update: May 17th 2017
 ==================================================

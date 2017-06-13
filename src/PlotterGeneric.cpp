@@ -274,7 +274,9 @@ void PlotterGeneric::performAndDrawFit(TLegend & inputLegend, InfoFit & fitInfo,
 void PlotterGeneric::save2ImgFile(std::shared_ptr<TCanvas> inputCanvas){
     //Variable Declaration
     string strName = inputCanvas->GetName();
-    
+
+    inputCanvas->SaveAs( ( strName + ".C" ).c_str(), "RECREATE" );
+    inputCanvas->SaveAs( ( strName + ".eps" ).c_str(), "RECREATE" );
     inputCanvas->SaveAs( ( strName + ".pdf" ).c_str(), "RECREATE" );
     inputCanvas->SaveAs( ( strName + ".png" ).c_str(), "RECREATE" );
     
