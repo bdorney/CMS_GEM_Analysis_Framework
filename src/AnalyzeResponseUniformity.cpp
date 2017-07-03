@@ -83,20 +83,8 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     inputStatObs.mset_fOutliers = mset_fInputObs;
     for (auto iterSet = inputStatObs.mset_fOutliers.begin(); iterSet != inputStatObs.mset_fOutliers.end(); ++iterSet) { //Loop Over input multiset
         inputStatObs.hDist->Fill( (*iterSet) );
-        
-        /*if (inDataRange( (*iterSet) ) ) {
-            iterSet = inputStatObs.mset_fOutliers.erase(iterSet);
-        }*/
     } //End Loop Over input multiset
     
-    //Fit distribution
-    //inputStatObs.fitDist = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
-    //inputStatObs.fitDist->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
-    //inputStatObs.fitDist->SetParameter(1, inputStatObs.hDist->GetMean() );
-    //inputStatObs.fitDist->SetParameter(2, inputStatObs.hDist->GetRMS() );
-    
-    //inputStatObs.hDist->Fit(inputStatObs.fitDist.get(),"QM","", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev );
-
     shared_ptr<TF1> fitDist_Gaus = std::make_shared<TF1>( TF1( getNameByIndex(-1, -1, -1, "fit", strObsName + "Dataset" ).c_str(), "gaus(0)", inputStatObs.fMean - 5. * inputStatObs.fStdDev, inputStatObs.fMean + 5. * inputStatObs.fStdDev) );
     fitDist_Gaus->SetParameter(0, inputStatObs.hDist->GetBinContent( inputStatObs.hDist->GetMaximumBin() ) );
     fitDist_Gaus->SetParameter(1, inputStatObs.hDist->GetMean() );
@@ -113,8 +101,6 @@ void AnalyzeResponseUniformity::calcStatistics(SummaryStatistics &inputStatObs, 
     
     float fNormChi2_Gaus = fitDist_Gaus->GetChisquare() / fitDist_Gaus->GetNDF();
     float fNormChi2_Landau = fitDist_Landau->GetChisquare() / fitDist_Landau->GetNDF();
-    //bool bNormChi2Bad_Gaus = (std::isinf(fNormChi2_Gaus) || std::isnan(fNormChi2_Gaus) );
-    //bool bNormChi2Bad_Landau = (std::isinf(fNormChi2_Landau) || std::isnan(fNormChi2_Landau) );
     
     if (fNormChi2_Gaus < fNormChi2_Landau) {
         inputStatObs.fitDist = fitDist_Gaus;
@@ -149,27 +135,15 @@ bool AnalyzeResponseUniformity::isQualityFit(shared_ptr<TF1> fitInput, int iPar)
 	fitInput->GetParLimits(iPar,dParLimit_Lower,dParLimit_Upper);
 
 	if (dPar == 0) {
-		//cout<<"Failed, Parameter " << iPar << " is zero\n";
-		//cout<<"dPar = " << dPar << endl;
 		return false;
 	}
 	else if ( ( fabs(dPar - dParLimit_Lower) / dPar ) < 0.001 ){
-		//cout<<"Failed, Parameter " << iPar << " is too close to lower boundary\n";
-		//cout<<"dPar = " << dPar << endl;
-		//cout<<"dParLimit_Lower = " << dParLimit_Lower << endl;
 		return false;
 	}
 	else if ( ( fabs(dPar - dParLimit_Upper) / dPar) < 0.001 ){
-		//cout<<"Failed, Parameter " << iPar << " is too close to upper boundary\n";
-		//cout<<"dPar = " << dPar << endl;
-		//cout<<"dParLimit_Upper = " << dParLimit_Upper << endl;		
 		return false;
 	}
 	else if ( ( dPar_Err / dPar ) > 0.1 ) {
-		//cout<<"Failed, Parameter " << iPar << " has too large of an uncertainty\n";
-		//cout<<"dPar = " << dPar << endl;
-		//cout<<"dPar_Err = " << dPar_Err << endl;
-		//cout<<"Percent Error = " << dPar_Err / dPar << endl;
 		return false;
 	}
 

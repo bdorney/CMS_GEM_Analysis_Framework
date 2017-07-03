@@ -12,7 +12,6 @@
 DIR_ORIG=$PWD
 
 #store the run config file
-#FILE_RUN=$GEM_BASE/config/configRun.cfg
 FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Grid.cfg
 
 #setup input variables

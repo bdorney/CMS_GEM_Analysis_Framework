@@ -1,10 +1,17 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 4.0                                 *
-*	LAST UPDATE: June 13 2017                    *
+*	VERSION: 4.1                                 *
+*	LAST UPDATE: July 3 2017                     *
 *                                                *
 **************************************************
+
+Update: July 3rd 2017
+==================================================
+->Fit Success distribution made by VisualizeUniformity will now have bins centered on integer values
+->DetectorMPGD::setEtaSector() no longer incorretly assume there are exactly 3 phi sectors
+->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution for phi distribution did not have correct y axis range
+->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution's TName did not reflect the observables plotted
 
 Update: June 13th 2017
 ==================================================

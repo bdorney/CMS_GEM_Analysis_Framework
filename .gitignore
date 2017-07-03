@@ -51,6 +51,8 @@ tmp/
 tmp/*
 config/configRun_RecoLong3.cfg
 *.swo
+testing/
+testing/*
 
 # Python #
 ##########

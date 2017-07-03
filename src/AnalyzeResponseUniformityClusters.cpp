@@ -105,12 +105,6 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
                 (*iterPhi).second.clustHistos.hADC_v_Time->Fill( (*iterClust).second.iTimeBin, (*iterClust).second.fADC );
                 (*iterPhi).second.clustHistos.hSize_v_Pos->Fill( (*iterClust).second.fPos_X, (*iterClust).second.iSize );
             } //End Loop Over Stored Clusters
-            
-            //Slices
-            //Now that all clusters have been analyzed we extract the slices
-            /*for (int i=1; i<= aSetup.iUniformityGranularity; ++i) { //Loop Over Slices
-                (*iterPhi).second.map_slices[i].hSlice_ClustADC = make_shared<TH1F>( *( (TH1F*) (*iterPhi).second.clustHistos.hADC_v_Pos->ProjectionY( ("h_iEta" + getString( (*iterEta).first ) + "iPhi" + getString( (*iterPhi).first ) + "Slice" + getString(i) + "_clustADC").c_str(),i,i,"") ) );
-            }*/ //End Loop Over Slices
         } //End Loop Over iPhi Sectors
     } //End Loop Over iEta Sectors
     
@@ -120,8 +114,6 @@ void AnalyzeResponseUniformityClusters::fillHistos(DetectorMPGD & inputDet){
 //Assumes Histos have been filled already (obviously)
 void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
     //Variable Declaration
-    //bool bIsQuality;	//If fit passes basic quality requirements
-    
     Double_t *dPeakPos;
     
     float fMin = -1e12, fMax = 1e12;
@@ -162,7 +154,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 dPeakPos = specADC.GetPositionX();
                 
                 //Initialize Fit
-                //(*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.histoSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 (*iterSlice).second.fitSlice_ClustADC = make_shared<TF1>( getFit( (*iterEta).first, (*iterPhi).first, (*iterSlice).first, aSetup.fitSetup_clustADC, (*iterSlice).second.hSlice_ClustADC, specADC) );
                 
                 //Clear the calculated fit range from the previous slice
@@ -176,8 +167,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                 
                 TVirtualFitter::SetMaxIterations(10000);
                 
-                //cout<<"TVirtualFitter::GetMaxIterations() = " << TVirtualFitter::GetMaxIterations() << endl;
-                //cout<<"ROOT::Math::MinimizerOptions::DefaultMaxFunctionCalls() = " << ROOT::Math::MinimizerOptions::DefaultMaxFunctionCalls() << endl;
                 if (vec_fFitRange.size() > 1) { //Case: Fit within the user specific range
                     fMin = (*std::min_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
                     fMax = (*std::max_element(vec_fFitRange.begin(), vec_fFitRange.end() ) );
@@ -251,8 +240,6 @@ void AnalyzeResponseUniformityClusters::fitHistos(DetectorMPGD & inputDet){
                     (*iterSlice).second.bFitAccepted = true;
                     
                     //Store Fit parameters - NormChi2
-                    //if ( std::isinf(fNormChi2) ){ fNormChi2 = -1; }
-                    //if ( std::isnan(fNormChi2) ){ fNormChi2 = -1; }
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPoint(iPoint, (*iterSlice).second.fPos_Center,  fNormChi2  );
                     (*iterEta).second.gEta_ClustADC_Fit_NormChi2->SetPointError(iPoint, 0.5 * (*iterSlice).second.fWidth, 0. );
                     
@@ -332,7 +319,6 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(DetectorMPGD & inputD
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         
         //Grab Eta Sector width (for clustPos Histo)
-        //aSetup.histoSetup_clustPos.iHisto_nBins  = 3. * aSetup.iUniformityGranularity;
         aSetup.histoSetup_clustPos.iHisto_nBins  = (*iterEta).second.map_sectorsPhi.size() * aSetup.iUniformityGranularity;
         aSetup.histoSetup_clustPos.fHisto_xLower = -0.5*(*iterEta).second.fWidth;
         aSetup.histoSetup_clustPos.fHisto_xUpper = 0.5*(*iterEta).second.fWidth;
@@ -393,8 +379,6 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(DetectorMPGD & inputD
 
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet){
-	//cout<<"AnalyzeResponseUniformityClusters::initHistosClustersByRun() - iInputRunNo = " << iInputRunNo << endl;
-
     //Loop Over Stored iEta Sectors
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Initialize iEta Histograms - 1D
@@ -402,9 +386,6 @@ void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo,
             //Placeholder
         
         //Initialize iEta Histograms - 2D
-        //preliminary test, come back and improve this
-        //cout<<"getNameByIndex() = " << getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str() << endl;
-
         (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, -1, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
         (*iterEta).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
         
@@ -418,7 +399,6 @@ void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo,
                 //Placeholder
             
             //Initialize iPhi Histograms - 2D
-            //preliminary test, come back and improve this
             (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo] = make_shared<TH2F>( TH2F(getNameByIndex( (*iterEta).first, (*iterPhi).first, -1, "h", "clustADC_v_EvtNum_Run" + getString(iInputRunNo) ).c_str(), "", 50, 0, 500000, aSetup.histoSetup_clustADC.iHisto_nBins, aSetup.histoSetup_clustADC.fHisto_xLower, aSetup.histoSetup_clustADC.fHisto_xUpper ) );
             (*iterPhi).second.clustHistos.map_hADC_v_EvtNum_by_Run[iInputRunNo]->Sumw2();
             
@@ -636,8 +616,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( string & strOutputROOTFileN
 //Takes a TFile * which the histograms are written to as input
 void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile, DetectorMPGD & inputDet){
     //Variable Declaration
-    //int iRunFirst = -1; //First run number
-    //int iRunLast = -1;  //Last run number
     
     //Check if File Failed to Open Correctly
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -770,23 +748,6 @@ void AnalyzeResponseUniformityClusters::storeHistos( TFile * file_InputRootFile,
                 (*iterHistoTime).second->Write();
                 ++iterHistoTime;
             }
-        
-            //Slices
-            //Now that all clusters have been analyzed we extract the slices
-            /*for (auto iterSlice = (*iterPhi).second.map_slices.begin(); iterSlice != (*iterPhi).second.map_slices.end(); ++iterSlice ) { //Loop Over Slices
-                //Get Directory
-                //-------------------------------------
-                //Check to see if dir_Slice exists already, if not create it
-                TDirectory *dir_Slice = dir_SectorPhi->GetDirectory( ( "Slice" + getString( (*iterSlice).first ) ).c_str(), false, "GetDirectory"  );
-                if (dir_Slice == nullptr) { //Case: Directory did not exist in file, CREATE
-                    dir_Slice = dir_SectorPhi->mkdir( ( "Slice" + getString( (*iterSlice).first ) ).c_str() );
-                } //End Case: Directory did not exist in file, CREATE
-                
-                //Store Histograms - Slice Level
-                //-------------------------------------
-                dir_Slice->cd();
-                (*iterSlice).second.hSlice_ClustADC->Write();
-            }*/ //End Loop Over Slices
         } //End Loop Over Stored iPhi Sectors
     } //End Loop Over Stored iEta Sectors
     
@@ -821,7 +782,6 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
     
     //Call the store fits sequence
     storeFits(ptr_fileOutput, inputDet);
-    //storeFits(ptr_fileOutput);
     
     //Close the ROOT file
     ptr_fileOutput->Close();
@@ -832,9 +792,6 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
 //Stores booked cluster fits (for those fits that are non-null)
 //Takes a TFile * which the histograms are written to as input
 void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, DetectorMPGD & inputDet){
-    //TFile does not manage objects
-    //TH1::AddDirectory(kFALSE);
-
     //Variable Declaration
     
     //Check if File Failed to Open Correctly

@@ -69,11 +69,7 @@ void SelectorCluster::setClusters(std::string &strInputRootFileName, Uniformity:
 //Input is a TFile *
 void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::DetectorMPGD &inputDet){
     //Variable Declaration
-    //int iFirstEvt = aSetup.iEvt_First;
-    //int iNEvt = aSetup.iEvt_Total;
-    
     Int_t iClustMulti;  //I cry a little inside because of this
-    //Int_t iClustPos_Y[3072];
     Int_t iClustSize[3072];
     Int_t iClustTimeBin[3072];
     
@@ -113,7 +109,6 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     tree_Clusters->SetBranchAddress("clustSize",&iClustSize);
     tree_Clusters->SetBranchAddress("clustADCs",&fClustADC);
     tree_Clusters->SetBranchAddress("clustTimebin",&iClustTimeBin);
-    //tree_Clusters->SetBranchAddress("planeID",&iClustPos_Y);
     tree_Clusters->SetBranchAddress("planeID",&fClustPos_Y);    
 
     //Determine Event Range
@@ -122,7 +117,6 @@ void SelectorCluster::setClusters(TFile * file_InputRootFile, Uniformity::Detect
     
     //Get data event-by-event
     //------------------------------------------------------
-    //for (int i=iFirstEvt; i < iNEvt; ++i) {
     for (int i=pair_iEvtRange.first; i < pair_iEvtRange.second; ++i) {
         //Needed to implement a Hack
         //First check to make sure the cluster multiplicity is within the selection
@@ -181,20 +175,15 @@ bool SelectorCluster::clusterPassesSelection(Cluster &inputClust){
     //Cluster Selection
     
     //Cluster with ADC below noise threshold?
-	//cout<<"inputClust.fADC = " << inputClust.fADC << std::endl;
     if (inputClust.fADC < aSetup.selClust.iCut_ADCNoise){ return false; }
     
     //Cluster Size too small or too large?
     if (inputClust.iSize < aSetup.selClust.iCut_SizeMin){ return false; }
     if (inputClust.iSize > aSetup.selClust.iCut_SizeMax) {return false; }
-    //if (inputClust.iSize <= aSetup.selClust.iCut_SizeMin){ return false; }
-    //if (inputClust.iSize >= aSetup.selClust.iCut_SizeMax) {return false; }
     
     //Cluster Time too early or too late?
     if (inputClust.iTimeBin < aSetup.selClust.iCut_TimeMin){ return false; }
     if (inputClust.iTimeBin > aSetup.selClust.iCut_TimeMax) {return false; }
-    //if (inputClust.iTimeBin <= aSetup.selClust.iCut_TimeMin){ return false; }
-    //if (inputClust.iTimeBin >= aSetup.selClust.iCut_TimeMax) {return false; }
     
     //If we arrive here the cluster passes our selection; give true
     return true;
