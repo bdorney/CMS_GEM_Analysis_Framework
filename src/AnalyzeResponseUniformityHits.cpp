@@ -78,17 +78,14 @@ void AnalyzeResponseUniformityHits::fillHistos(DetectorMPGD & inputDet){
                 (*iterEta).second.hitHistos.hADC->Fill( (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
                 (*iterEta).second.hitHistos.hPos->Fill( (*iterHit).second.iStripNum );
                 (*iterEta).second.hitHistos.hTime->Fill( (*iterHit).second.iTimeBin );
-		(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
+	        	(*iterEta).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
 
                 //Fill iPhi Histograms
                 (*iterPhi).second.hitHistos.hADC->Fill( (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
                 (*iterPhi).second.hitHistos.hTime->Fill( (*iterHit).second.iTimeBin);
-		(*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
+		        (*iterPhi).second.hitHistos.hADCMax_v_ADCInt->Fill( (*iterHit).second.sADCIntegral, (*iterHit).second.vec_sADC[(*iterHit).second.iTimeBin] );
             } //End Loop Over Stored Hits
         } //End Loop Over iPhi Sectors
-        
-        //Debugging
-        //std::cout<<"(*iterEta).second.hitHistos.hPos->Integral() = " << (*iterEta).second.hitHistos.hPos->Integral() << std::endl;
     } //End Loop Over iEta Sectors
     
     return;
@@ -98,7 +95,6 @@ void AnalyzeResponseUniformityHits::fillHistos(DetectorMPGD & inputDet){
 void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, string & strOutputTextFileName){
     //Variable Declaration
     int iNbinsX = 0;
-    //int iReadoutStripNum_Max = -1;  //Eta sector
     
     int iReadoutStripNum = -1;  //From [1,128]
     int iReadoutPhi = 1;
@@ -123,7 +119,6 @@ void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, stri
     } //End Case: Input Not Understood
     
     file_DeadStripList<<"Cut_HitAdc_Min = "<<aSetup.selHit.iCut_ADCNoise<<endl;
-    //file_DeadStripList<<"Cut_HitAdc_Max = "<<aSetup.selHit.iCut_ADCSat
     file_DeadStripList<<"iEta\tiPhi\tiStrip\n";
     
     //Check for dead strips
@@ -133,7 +128,6 @@ void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, stri
         
         //Set the number of bins in this histogram (should be the same for all iEta);
         iNbinsX = (*iterEta).second.hitHistos.hPos->GetNbinsX();
-        //iReadoutStripNum_Max = iNbinsX / (*iterEta).second.map_sectorsPhi.size();
         
         for(int i=1; i <=iNbinsX; ++i ){ //Loop Over Bins of (*iterEta).second.hitHistos.hPos
             
@@ -144,8 +138,6 @@ void AnalyzeResponseUniformityHits::findDeadStrips(DetectorMPGD & inputDet, stri
                 //cout<<(*iterEta).first<<"\t"<<i<<endl;
                 iReadoutPhi     = getPhiSectorVal(i, 128);
                 iReadoutStripNum= getPhiStripNum(i, 128);
-                
-                //cout<<(*iterEta).first<<"\t"<<iReadoutPhi<<"\t"<<iReadoutStripNum<<endl;
                 
                 file_DeadStripList<<(*iterEta).first<<"\t"<<iReadoutPhi<<"\t"<<iReadoutStripNum<<endl;
             } //End Case: Dead Strip
@@ -222,8 +214,6 @@ void AnalyzeResponseUniformityHits::loadHistosFromFile( std::string & strInputMa
 //Takes a std::string which stores the physical filename as input
 void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet){
     //Variable Declaration
-    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
-    
     TFile * ptr_fileOutput = new TFile(strOutputROOTFileName.c_str(), strOption.c_str(),"",1);
     
     //Check if File Failed to Open Correctly
@@ -249,7 +239,6 @@ void AnalyzeResponseUniformityHits::storeHistos( string & strOutputROOTFileName,
 //Takes a TFile * which the histograms are written to as input
 void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet){
     //Variable Declaration
-    //HistosPhysObj summaryHistos; //Histograms for the entire Detector
     
     //Check if File Failed to Open Correctly
     if ( !file_InputRootFile->IsOpen() || file_InputRootFile->IsZombie()  ) {
@@ -271,12 +260,6 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
                     //Create/Load file structure
                     //store slice level histograms
     //Close File
-    
-    //Debugging
-    //cout<<"AnalyzeResponseUniformityHits::storeHistos()\n";
-    //cout<<"aSetup.histoSetup_hitADC.iHisto_nBins = " << aSetup.histoSetup_hitADC.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitPos.iHisto_nBins = " << aSetup.histoSetup_hitPos.iHisto_nBins << endl;
-    //cout<<"aSetup.histoSetup_hitTime.iHisto_nBins = " << aSetup.histoSetup_hitTime.iHisto_nBins << endl;
     
     //Setup the summary histograms
     TH1F hHitADC_All( getHistogram(-1, -1, aSetup.histoSetup_hitADC) );
@@ -302,9 +285,6 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
             dir_SectorEta = file_InputRootFile->mkdir( ( "SectorEta" + getString( (*iterEta).first ) ).c_str() );
         } //End Case: Directory did not exist in file, CREATE
         
-        //Debugging
-        //cout<<"dir_SectorEta->GetName() = " << dir_SectorEta->GetName()<<endl;
-        
         //Add this sector to the summary histogram
         hHitADC_All.Add((*iterEta).second.hitHistos.hADC.get() );
         hHitPos_All.Add((*iterEta).second.hitHistos.hPos.get() );
@@ -328,9 +308,6 @@ void AnalyzeResponseUniformityHits::storeHistos(TFile * file_InputRootFile, Dete
             if (dir_SectorPhi == nullptr) { //Case: Directory did not exist in file, CREATE
                 dir_SectorPhi = dir_SectorEta->mkdir( ( "SectorPhi" + getString( (*iterPhi).first ) ).c_str() );
             } //End Case: Directory did not exist in file, CREATE
-            
-            //Debugging
-            //cout<<"dir_SectorPhi->GetName() = " << dir_SectorPhi->GetName()<<endl;
             
             //Store Histograms - ReadoutSectorPhi Level
             //-------------------------------------
@@ -359,4 +336,3 @@ void AnalyzeResponseUniformityHits::storeFits( string & strOutputROOTFileName, s
     //Placeholder
     
 } //End storeHistos()
-

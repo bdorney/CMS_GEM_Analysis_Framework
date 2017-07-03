@@ -119,14 +119,10 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
         hObs = getObsHisto(strObsName, etaSector);
         
         //Fill the points of the 2D graph
-        //cout<<"iEta\ti\tL.B.\tU.B.\tPx\tPy\tPz\n";
         float fPx=0, fPy=etaSector.fPos_Y, fObs=0;
         for (int i = ( 1 + (iEta-1) * hObs->GetNbinsX() ); i < ( 1 + iEta * hObs->GetNbinsX() ); ++i) { //Loop Over Points of hObs
             fPx = hObs->GetBinCenter( (iEta * hObs->GetNbinsX() ) - i );
             fObs = hObs->GetBinContent( (iEta * hObs->GetNbinsX() ) - i );
-            
-            //Debugging
-            cout<<iEta<<"\t"<<i<<"\t"<<( (iEta-1) * hObs->GetNbinsX() )<<"\t"<<(iEta * hObs->GetNbinsX() )<<"\t"<<fPx<<"\t"<<fPy<<"\t"<<fObs<<endl;
             
             //Need to prevent (0,Y,0)'s from being drawn (causes coincidence points in drawing, bad)
             //First we store all non (0,Y,0) points then in another loop we fill g2DObs
@@ -170,14 +166,6 @@ void VisualizeUniformity::storeCanvasHisto2D(TFile * file_InputRootFile, std::st
     TLatex latex_CMSPrelim;
     latex_CMSPrelim.SetTextSize(0.05);
     latex_CMSPrelim.DrawLatexNDC(0.1, 0.905, "CMS Preliminary" );
-    
-    /*cout<<"Points Stored In 2D Graph\n";
-    cout<<"====================================================\n";
-    cout<<"i\tPx\tPy\tPz\n";
-    Double_t *Px = g2DObs->GetX(), *Py = g2DObs->GetY(), *Pz = g2DObs->GetZ();
-    for(int i=0; i<g2DObs->GetN(); ++i){
-        cout<<i<<"\t"<<Px[i]<<"\t"<<Py[i]<<"\t"<<Pz[i]<<endl;
-    }*/
     
     //Write the Canvas to the File
     //------------------------------------------------------
@@ -235,8 +223,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
 
     SummaryStatistics statObs;
     
-    //TLegend *legObs = new TLegend(0.2,0.2,0.6,0.4);
-    
     //Make the Canvas
     //------------------------------------------------------
     TCanvas canv_DetSum( ("canv_" + detMPGD.getNameNoSpecial() + "_" + strObsName + "Dataset_AllEta" ).c_str(), ( strObsName + " for All Eta" ).c_str(), 600, 600);
@@ -260,12 +246,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
         dir_Summary = file_InputRootFile->mkdir("Summary");
     } //End Case: Directory did not exist in file, CREATE
     
-    //Setup the Legend
-    //------------------------------------------------------
-    //legObs->SetNColumns(2);
-    //legObs->SetFillColor(kWhite);
-    //legObs->SetLineColor(kBlack);
-    
     //Get the requested dataset
     //------------------------------------------------------
     statObs = getObsData(strObsName);
@@ -275,13 +255,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     int iNbinsX = statObs.hDist->GetNbinsX();
     shared_ptr<TGraphErrors> gDistShifted = std::make_shared<TGraphErrors>( TGraphErrors( iNbinsX+2) );
     for (int i=1; i<=iNbinsX; ++i) {
-        //Print to user
-        //cout<<"\t\t";
-        //cout<<hSummaryDist->GetBinCenter(i)- hDataset->GetMean()<<",";
-        //cout<<hSummaryDist->GetBinWidth(i)*0.5<<",";
-        //cout<<hSummaryDist->GetBinContent(i)<<",";
-        //cout<<hSummaryDist->GetBinError(i)*0.5<<endl;
-        
         //Set values
         gDistShifted->SetPoint( i-1, statObs.hDist->GetBinCenter(i) - statObs.hDist->GetMean(), statObs.hDist->GetBinContent(i) );
         gDistShifted->SetPointError( i-1, 0., statObs.hDist->GetBinError(i) );
@@ -294,7 +267,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     //Make Shifted Fit
     //------------------------------------------------------
     string strShifted = "Shifted";
-    //shared_ptr<TF1> fitDistShifted = make_shared<TF1>( statObs.fitDist->Clone( (statObs.fitDist->GetName() + strShifted).c_str() ) );
     TF1 * fitDistShifted = (TF1*) statObs.fitDist->Clone( (statObs.fitDist->GetName() + strShifted).c_str() );
 
     float fXmax= statObs.fitDist->GetXmax();
@@ -340,10 +312,6 @@ void VisualizeUniformity::storeCanvasData(TFile * file_InputRootFile, std::strin
     
     latex_Obs_PerErr.SetTextSize(0.03);
     latex_Obs_PerErr.DrawLatexNDC(0.14, 0.7, ("#frac{#sigma}{#mu} = " + getString( fPerErr ) + " #pm " + getString( fErr_PerErr) ).c_str() );
-    
-    //Draw the Legend
-    //------------------------------------------------------
-    //legObs->Draw("same");
     
     //Write the Canvas to the File
     //------------------------------------------------------
@@ -398,7 +366,7 @@ void VisualizeUniformity::storeCanvasFits(TFile * file_InputRootFile, std::strin
     
     ReadoutSectorEta etaSector = detMPGD.getEtaSector(1);
     
-    TH2F *hFitSucess2D = new TH2F("h_Summary_FitSuccess","",etaSector.map_sectorsPhi.size(),1,etaSector.map_sectorsPhi.size(), iNumEta, 1, iNumEta+1 );
+    TH2F *hFitSucess2D = new TH2F("h_Summary_FitSuccess","",etaSector.map_sectorsPhi.size(),0.5,etaSector.map_sectorsPhi.size()+0.5, iNumEta, 0.5, iNumEta+0.5 );
     
     //Check if File Failed to Open Correctly
     //------------------------------------------------------
@@ -688,7 +656,6 @@ void VisualizeUniformity::storeCanvasGraph2D(TFile * file_InputRootFile, std::st
     
     ReadoutSectorEta etaSector;
     
-    //std::vector<shared_ptr<TGraphErrors> > vec_gObs;
 	vector<tuple<double,double,double> > vec_tup3DPt;
 
     TGraph2D *g2DObs = new TGraph2D();   //Two dimmensional graph
@@ -899,11 +866,9 @@ void VisualizeUniformity::storeCanvasHisto(TFile * file_InputRootFile, std::stri
         
         canv_DetSum.cd();
         if( 1 == iEta ){
-            //vec_hObs.back()->Draw( strDrawOption.c_str() );
             vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         }
         else{
-            //vec_hObs.back()->Draw( (strDrawOption + "same").c_str() );
             vec_hObs[iEta-1]->Draw( (strDrawOption + "same").c_str() );
         }
     } //End Loop Over Detector's Eta Sector
@@ -1059,8 +1024,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
     
     //Round fMaxBinVal to the nearest power of ten
     //------------------------------------------------------
-    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 0);
-    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 1, 0);
     fMaxBinVal = std::ceil(1.1 * (fMaxBinVal / 1e3) ) * 1e3;
 
     //Loop Over the detector's Eta Sectors to make the TCanvas
@@ -1073,14 +1036,10 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
         
         canv_DetSum.cd();
-        //vec_padSectorObs.back()->Draw();
-        //vec_padSectorObs.back()->cd();
         vec_padSectorObs[iEta-1]->Draw();
         vec_padSectorObs[iEta-1]->cd();
         
         //Draw the histogram
-        //vec_hObs.back()->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
-        //vec_hObs.back()->Draw( strDrawOption.c_str() );
         vec_hObs[iEta-1]->GetYaxis()->SetRangeUser(1e-1, fMaxBinVal);
         vec_hObs[iEta-1]->Draw( strDrawOption.c_str() );
         
@@ -1100,7 +1059,6 @@ void VisualizeUniformity::storeCanvasHistoSegmented(TFile * file_InputRootFile, 
         if(bShowPhiSegmentation){ //Case: Show iPhi Segmentation
             for(auto iterPhi = etaSector.map_sectorsPhi.begin(); iterPhi != etaSector.map_sectorsPhi.end(); ++iterPhi){
                 //Ensure the pad is the active pad (it should be already but who knows...)
-                //vec_padSectorObs.back()->cd();
                 vec_padSectorObs[iEta-1]->cd();
                 
                 //Declare the TLatex
@@ -1181,7 +1139,6 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
     map<int, shared_ptr<TH2F> > map_hObs2DRunHistory;
     shared_ptr<TH2F> hObs2D;    //Maybe this should be a map?
     
-    //std::vector<shared_ptr<TH2F> > vec_hObs2D;
     map<int, map<int, shared_ptr<TH2F> > > map_hObs2DSummaries; //Outer key -> iEta; inner key-> iPhi
     std::vector<TPad *> vec_padSectorObs;
     
@@ -1256,8 +1213,6 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
 
     //Round fMaxBinVal to the nearest power of ten
     //------------------------------------------------------
-    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 0);
-    //fMaxBinVal = Uniformity::ceilPowerTen(fMaxBinVal, 1, 0);
     fMaxBinVal = std::ceil(1.1 * (fMaxBinVal / 1e3) ) * 1e3;
 
     //Loop Over map_hObs2DSummaries to make the TCanvas
@@ -1277,8 +1232,6 @@ void VisualizeUniformity::storeCanvasHisto2DHistorySegmented(TFile * file_InputR
             vec_padSectorObs.push_back(pad_SectorObs);	//Need to keep this pointer alive outside of Loop?
             
             canv_DetSum.cd();
-            //vec_padSectorObs.back()->Draw();
-            //vec_padSectorObs.back()->cd();
             vec_padSectorObs[vec_padSectorObs.size()-1]->Draw();
             vec_padSectorObs[vec_padSectorObs.size()-1]->cd();
             (*iterPhi).second->GetZaxis()->SetRangeUser(1e-1,fMaxBinVal);
@@ -1504,8 +1457,6 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     TCanvas * ret_Canvas = new TCanvas( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str(), "Cluster ADC Fit", 600, 600 );
     
     TF1 *func_fitSig, *func_fitBkg;
-    
-    //std::shared_ptr<TH1F> hDataOverFit;
     TH1F *hDataOverFit;
     
     TLegend *legSlice;
@@ -1579,9 +1530,9 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
         //std::shared_ptr<TH1F> hDataOverFit = std::make_shared<TH1F>( *( (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() ) ) );
         hDataOverFit = (TH1F*) inputSlice.hSlice_ClustADC->Clone( getNameByIndex(iEta, iPhi, iSlice, "canv", strName).c_str() );
         
-	hDataOverFit->GetXaxis()->SetRangeUser(inputSlice.fitSlice_ClustADC->GetXmin(), inputSlice.fitSlice_ClustADC->GetXmax() );
+        hDataOverFit->GetXaxis()->SetRangeUser(inputSlice.fitSlice_ClustADC->GetXmin(), inputSlice.fitSlice_ClustADC->GetXmax() );
         hDataOverFit->GetYaxis()->SetTitle("Data Over Fit #left(A.U.#right)");
-	hDataOverFit->GetYaxis()->SetRangeUser(0.5,1.5);
+        hDataOverFit->GetYaxis()->SetRangeUser(0.5,1.5);
         hDataOverFit->Divide( inputSlice.fitSlice_ClustADC.get() );
         hDataOverFit->Draw();
         
@@ -1632,10 +1583,6 @@ TCanvas * VisualizeUniformity::getCanvasSliceFit(SectorSlice & inputSlice, int i
     latex_PkPos.SetTextSize(0.03);
     latex_PkPos.DrawLatexNDC(0.55, 0.50, ("Fitted PkPos = " + getString(fPkPos) + " #pm " + getString(fPkPosErr) ).c_str() );	
 
-    //TLatex latex_PkPerErr;
-    //latex_PkPerErr.SetTextSize(0.03);
-    //latex_PkPerErr.DrawLatexNDC(0.55,0.45, ("Percent Error = " + getString( fPkPosErr / fPkPos ) ).c_str() );
-
     double dPkLimit_Min, dPkLimit_Max;
     inputSlice.fitSlice_ClustADC->GetParLimits(iIdxPk, dPkLimit_Min, dPkLimit_Max);
     TLatex latex_PkLimits;
@@ -1666,9 +1613,6 @@ SummaryStatistics VisualizeUniformity::getObsData(std::string strObsName){
         cout<<"QualityControl::Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
-    //Debugging
-    //cout<<"ret_graph = " << ret_graph << endl;
-    
     return ret_stat;
 } //End VisualizeUniformity::getObsGraph()
 
@@ -1693,18 +1637,12 @@ std::shared_ptr<TGraphErrors> VisualizeUniformity::getObsGraph(std::string strOb
         cout<<"QualityControl::Uniformity::VisualizeUniformity::getObsHisto() - Parameter " << strObsName.c_str() << " not recognized!!!\n";
     } //End Case: Unrecognized Parameter
     
-	//Debugging
-    //cout<<"ret_graph = " << ret_graph << endl;
-
     return ret_graph;
 } //End VisualizeUniformity::getObsGraph()
 
 std::shared_ptr<TH1F> VisualizeUniformity::getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector){
     //Variable Declaration
     std::shared_ptr<TH1F> ret_histo;
-    
-    //Debugging
-    //std::cout<<"Calling VisualizeUniformity::getRootObject()\n";
     
     std::transform(strObsName.begin(),strObsName.end(),strObsName.begin(),toupper);
     
@@ -1780,8 +1718,6 @@ std::map<int, std::shared_ptr<TH2F> > VisualizeUniformity::getMapObsHisto2D(std:
 //At this stage if it returns a null pointer there was a problem elsewhere!
 shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi ){
     //Variable Declaration
-    //float fBinWidth_X = -1;
-    
     Timing::HistoSetup setupHisto_RunHistory_X, setupHisto_RunHistory_Y;
     
     map<int, shared_ptr<TH2F> >::iterator iterTempHisto2D = inputMapHisto2D.begin();
@@ -1799,8 +1735,6 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
     setupHisto_RunHistory_X.fHisto_xUpper 	= inputMapHisto2D.rbegin()->first+1;
     setupHisto_RunHistory_X.iHisto_nBins 	= setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower;
     setupHisto_RunHistory_X.strHisto_Title_X	= "Run Number";
-    
-    //fBinWidth_X = (setupHisto_RunHistory_X.fHisto_xUpper - setupHisto_RunHistory_X.fHisto_xLower) / setupHisto_RunHistory_X.iHisto_nBins;
     
     //Initialize setupHisto_RunHistory_Y
     //------------------------------------------------------
@@ -1828,7 +1762,6 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
         std::shared_ptr<TH1F> hTempHisto = make_shared<TH1F>( *( (TH1F*) (*iterHisto2D).second->ProjectionY( "hTempHisto",1, setupHisto_RunHistory_Y.iHisto_nBins, "" ) ) );
         
         //Fill the slice of ret_histo2D that this corresponds too
-        //int iBinX = ( (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower ) / fBinWidth_X;
         int iBinX = (*iterHisto2D).first - setupHisto_RunHistory_X.fHisto_xLower + 1;
         for (int j=1; j <= hTempHisto->GetNbinsX(); ++j) {
             ret_histo2D->SetBinContent(iBinX, j, hTempHisto->GetBinContent(j) );
@@ -1838,4 +1771,3 @@ shared_ptr<TH2F> VisualizeUniformity::getSummarizedRunHistoryHisto2D(map<int, sh
     
     return ret_histo2D;
 } //End VisualizeUniformity::getSummarizedRunHistoryHisto2D()
-
