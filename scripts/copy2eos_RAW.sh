@@ -17,7 +17,7 @@ else
 fi
 
 #Get the files to send
-FILES=$(ls $2/*dataTree.root)
+FILES=$(ls $2/*.raw)
 
 #Tell the user which group of files will be copied
 echo "The list of files to be copied is:"

@@ -311,26 +311,27 @@
             is for running the framework with the analysis option with the lxplus batch submission
             system using the scheduler bsub.
 
-            This script will setup the run config file and launch one job for each input file in the
-            data file directory below.  The expected synatx is:
+            This script will setup the run config file and launch one job for each input *dataTree.root
+            file found in the detector's file directory on EOS.  The expected synatx is:
 
-                source scripts/runMode_Grid.sh <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Queue Names>
+                runMode_Grid.sh <Detector Name> <Config File - Analysis> <Config File - Mapping> <Queue Names> <Output Dir>
 
-            Where: "Data File Directory" is the physical file path (PFP) where the input data files to
-            be analyzed are located, "Config File - Analysis" is the PFN of the input analysis config
-            file, "Config File - Mapping" is the input mapping config file, and "Queue Names" are the
-            requested submission queue on the lxplus batch submmission system.  The available queues
-            on lxplus are {8nm, 1nh, 8nh, 1nd} for 8 natural minutes, 1 natural hour, 8 natural hours,
-            and 1 natural day, respectively.  It is expected the input files found in the "Data File
-            Directory" end with the expressiong "*dataTree.root".
+            Where: "Detector Name" is the serial number of the detector, omitting slashes (i.e. "/")
+            for example "GE11-X-S-CERN-0001" or "GE11-X-L-CERN-0015" be analyzed are located, 
+            "Config File - Analysis" is the PFN of the input analysis config file, "Config File - Mapping" 
+            is the input mapping config file, and "Queue Names" are the requested submission queue on 
+            the lxplus batch submmission system.  The available queues on lxplus are {8nm, 1nh, 8nh, 1nd} 
+            for 8 natural minutes, 1 natural hour, 8 natural hours, and 1 natural day, respectively.  And
+            finally, "Output Dir" is the physical file path (PFP) of the desired output data directory
+            where output files will be moved once the job completes.
 
             Additionally for each job a run config file (described in Section 4.e.iii.V), named
-            config/configRun_RunNoX.cfg where X is the job number, will be created.  One script per job, named
-            scripts/submitFrameworkJob_RunNoX.sh, will created; this script will be what the job executes when
+            config/configRun_JobNoX.cfg where X is the job number, will be created.  One script per job, named
+            scripts/submitFrameworkJob_JobNoX.sh, will created; this script will be what the job executes when
             it runs.  Three directories will also be created, if they do not already exist, called $GEM_BASE/stderr,
             $GEM_BASE/stdlog, and $GEM_BASE/stdout.  Each of these directories will respectively store the
-            stderr (stderr/frameworkErr_RunNoX.txt), stdlog (stdlog/frameworkLog_RunNoX.txt), and stdout
-            (stdout/frameworkOut_RunNoX.txt) files produced for each job.  The stderr file for a job should be
+            stderr (stderr/frameworkErr_JobNoX.txt), stdlog (stdlog/frameworkLog_JobNoX.txt), and stdout
+            (stdout/frameworkOut_JobNoX.txt) files produced for each job.  The stderr file for a job should be
             checked if a job fails to produce an output TFile.  The stdlog file for a job shows any output to
             terminal that would be created if the executable was run locally.  The stdout file shows a summary
             of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
@@ -348,12 +349,12 @@
 
             Example:
 
-                source scripts/runMode_Grid.sh $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh
-                cd $DATA_QC5/GE11-VII-L-CERN-0001
+                runMode_Grid.sh GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
+                cd $DATA_DIR/GE11-VII-L-CERN-0001
                 hadd summaryFile_Ana.root *Ana.root
                 cd $GEM_BASE
                 source scripts/cleanGridFiles.sh
-                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
 
             NOTE: Modications to config/configRun_Template_Grid.cfg may lead to undefined behavior or failures;
             it is recommended to not modify the template config file.
@@ -369,7 +370,7 @@
             is the PFP where the input data files to be merged are located; and "Comma and/or Dash Delimited Run List"
             is the list of input runs to be considered for merging.  Example:
 
-                source mergeSelectedRuns.sh GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root YY $DATA_QC5/GE11-VII-S-CERN-0002 133,135,137-158
+                source mergeSelectedRuns.sh GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root YY $DATA_DIR/GE11-VII-S-CERN-0002 133,135,137-158
 
             Here the key phrase is "YY" and runs 133, 135, and 137 through 158 will be merged together to make
             GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root with YY replaced
@@ -388,11 +389,11 @@
             This script will setup the run config file and launch one job for each input file in the
             data file directory below.  The expected synatx is:
 
-                source scripts/runMode_Grid_Reco.sh <Data File Directory> <Config File - Reco> <Config File - Mapping> <Queue Names>
+                runMode_Grid_Reco.sh <Detector Name> <Config File - Reco> <Config File - Mapping> <Queue Names> <Output Dir>
 
             Where: the inputs are as in Section 3.a.i except that "Config File - Reco" is the PFN of the
             input reco config file.  The behavior of this script is identical to runMode_Grid.sh except
-            that the input files found in the "Data File Directory" end with the expression "*.raw".
+            that the input files found in the detector's file directory on EOS end with the expression "*.raw".
             For furhter details consult Section 3.a.i.
 
             After all your jobs have completed you are ready to process the created "*dataTree.root" files
@@ -400,12 +401,12 @@
 
             Example:
 
-                source scripts/runMode_Grid_Reco.sh $DATA_QC5/GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh
-                cd $DATA_QC5/GE11-VII-L-CERN-0004
+                runMode_Grid_Reco.sh GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
+                cd $DATA_DIR/GE11-VII-L-CERN-0004
                 ls
                 cd $GEM_BASE
                 source scripts/cleanGridFiles.sh
-                source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_QC5/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+                source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_DIR/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
 
             It is important to note that, unfortunately, the mapping file must be provided in two locations: 1) the Run Config file, and
             2) the Reco Config file.  If you reconstruct one set of data with one mapping file, but then use a different mapping file to
@@ -438,7 +439,7 @@
 
             Example:
 
-                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
                 ./frameworkMain config/configRun.cfg true
 
             NOTE: Modications to config/configRun_Template_Rerun.cfg may lead to undefined behavior or failures;
@@ -465,7 +466,7 @@
 
             Example:
 
-                source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_QC5/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
+                source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
                 ./frameworkMain config/configRun.cfg true
 
             Right now no helper script exists for running the reconstruction or combined options in the series mode.

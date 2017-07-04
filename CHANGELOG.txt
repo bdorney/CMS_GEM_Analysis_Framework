@@ -1,10 +1,15 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 4.1                                 *
+*	VERSION: 4.1.1 (GRID Mode HotFix)            *
 *	LAST UPDATE: July 3 2017                     *
 *                                                *
 **************************************************
+
+Update: July 4th 2017
+==================================================
+->Scripts runMode_Grid.sh and runMode_Grid_Reco.sh will now stage data in from EOS to the node /tmp directory when analyzing a *dataTree.root file or when reco'ing a *.raw file
+->Scripts copy2eos_ROOT.sh and copy2eos_RAW.sh now updated and included in the framework rather than data directory of DAQ machines
 
 Update: July 3rd 2017
 ==================================================

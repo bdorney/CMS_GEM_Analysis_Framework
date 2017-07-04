@@ -7,10 +7,10 @@ DIR_ORIG=$PWD
 mkdir $GEM_BASE/tmp
 
 # Move run config files
-mv $GEM_BASE/config/configRun_RunNo*.cfg $GEM_BASE/tmp
+mv $GEM_BASE/config/configRun_JobNo*.cfg $GEM_BASE/tmp
 
 # Move submission scripts
-mv $GEM_BASE/scripts/submitFrameworkJob_RunNo*.sh $GEM_BASE/tmp
+mv $GEM_BASE/scripts/submitFrameworkJob_JobNo*.sh $GEM_BASE/tmp
 
 # Move std err, log, and out files
 mv $GEM_BASE/stderr/*.txt $GEM_BASE/tmp
