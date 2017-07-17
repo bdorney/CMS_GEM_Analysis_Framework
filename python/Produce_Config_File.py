@@ -46,33 +46,6 @@ args = parser.parse_args()
 
 
 
-#if str(args.test)== 'QC4_HV':
-	#CanvTitleX = 'Divider Current #left(#muA#right)'
-	#CanvTitleY = 'Applied Voltage #left(kV#right)'
-	#CanvRangeX= '0,1000'
-	#CanvRangeY= '0,7'
-	#ColumnX=int(3)
-	#ColumnY= int(1)
-	#pass
-
-#if str(args.test)=='QC4_SS':
-#	CanvTitleX = 'Divider Current #left(#muA#right)'
-#	CanvTitleY = 'Spurious Signal R_{SS} #left(Hz#right)'
-#	CanvRangeX= '0,1000'
-#	CanvRangeY= '0,50'
-#	ColumnX=int(3)
-#	ColumnY= int(7)
-#	pass
-
-#if str(args.test)=='QC3':
-#	CanvTitleX = 'Time #left(s#right)'
-#	CanvTitleY = 'Pressure #left(mbar#right)'
-#	CanvRangeX= '0,3600'
-#	CanvRangeY= '0,35'
-#	ColumnX=int(1)
-#	ColumnY= int(2)
-#	pass	
-
 
 
 text_file = open(str(args.OutputName)+".cfg", "w")
