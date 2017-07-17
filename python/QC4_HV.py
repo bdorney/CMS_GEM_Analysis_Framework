@@ -4,15 +4,24 @@ from subprocess import CalledProcessError
 from wrappers import runCommand
 from options import parser
 
-#parser.add_argument('--file',dest="file", nargs='+')
 args = parser.parse_args()
 #print args.file
 
 cmd1 = ["python","/Users/anastasia/desktop/QC_Plotting_Tools/Produce_Config_File.py"]
-#cmd1.append("--infilename=%s"%(filename_thresh))
+
+#string = "--file="
+#j=0
 for f in args.file:
-	cmd1.append("--file="+str(f))
+	cmd1.append(str(f))
+#	if j==0:
+#		string=string+str(f)
+#		j=j+1
+#	else:
+#		string=string+" "+str(f)
 	pass
+
+#print string
+	
 
 cmd1.append("--CanvTitleX=Divider Current #left(#muA#right)")
 cmd1.append("--CanvTitleY=Applied Voltage #left(kV#right)")
@@ -23,9 +32,9 @@ cmd1.append("--SelectRowEnd= 37")
 cmd1.append("--CanvRangeX= 0,1000")
 cmd1.append("--CanvRangeY= 0,7")
 cmd1.append("--YaxisScale= True")
+cmd1.append("--OutputName= QC4_LS2_V_vs_Imon_AllDet")
 
 
-#cmd1.append("--fileScurveFitTree=%s"%(filename_scurve))
-#cmd1.append("--vfatmask=0x0")
+
 
 runCommand(cmd1)

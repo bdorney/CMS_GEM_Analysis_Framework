@@ -2,7 +2,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--file',dest="file", nargs='+')
+parser.add_argument('file', nargs='+')
 parser.add_argument('--OutputName',action="store",dest="OutputName",default="Myconfig",help="Set Output file name, default is: Myconfig")
 parser.add_argument('--SelectSheetNum',action="store",dest="SelectSheetNum",type=int,default=0,help="Select the Excel sheet for reading, default is: 0")
 parser.add_argument('--SelectColumnX',action="store",dest="SelectColumnX",type=int,default=0,help= "Select Column number for X data, default value is 0")
@@ -40,5 +40,5 @@ parser.add_argument('--SetErrY',action="store",dest="SetErrY",type=bool,default=
 parser.add_argument('--SelectColumnErrX',action="store",dest="SelectColumnErrX",type=int,default=0,help="If SetErrX=True choose the Column for XError, Default is: 0")
 parser.add_argument('--SelectColumnErrY',action="store",dest="SelectColumnErrY",type=int,default=0,help="If SetErrY=True choose the Column for YError, Default is: 0")
 
-#parser.add_argument('--YaxisScale',action="",dest="",default="",help="")
+
 
