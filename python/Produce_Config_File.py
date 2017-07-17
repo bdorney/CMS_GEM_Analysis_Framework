@@ -17,6 +17,31 @@ if len(sys.argv)==1:
     parser.print_help()
     sys.exit(1)
 
+
+
+
+def Color(j):
+	if j % 7 == 0:
+		ret_int='kRed'
+	elif j % 7 == 1:
+		ret_int='kRed+2'
+	elif j % 7 == 2:
+		ret_int='kRed+3'
+	elif j % 7 == 3:
+		ret_int='kBlue'
+	elif j % 7 == 4:
+		ret_int='kBlue+2'
+	elif j % 7 == 5:
+		ret_int='kGreen'
+	elif j % 7 == 6:
+		ret_int='kGreen+2'
+	
+
+	return ret_int
+
+
+				
+
 args = parser.parse_args()
 
 
@@ -85,19 +110,19 @@ for f in args.file:
 	ws = workbook.sheet_by_index(int(args.SelectSheetNum))
 	Gcharacter=int(f.index('G'))
 	legEntry=f[int(Gcharacter):int(Gcharacter+18)]
-	j=j+1
+	
 	Marker_Style = int(20+j)
 	text_file.write("    [BEGIN_PLOT]\n" )
-	text_file.write("        Plot_Color = 'kRed+"+str(j)+  "';\n" )
+	text_file.write("        Plot_Color = '"+str(Color(j))+ "';\n" )
 	text_file.write("        Plot_LegEntry = '"+str(legEntry)+"';\n" )
 	text_file.write("        Plot_Line_Size = '1';\n" )
 	text_file.write("        Plot_Line_Style = '1';\n" )
 	text_file.write("        Plot_Marker_Size = '1';\n" )
 	text_file.write("        Plot_Marker_Style = '"+str(Marker_Style)+"';\n" )
-	text_file.write("        Plot_Name = ''; \n" )
+	text_file.write("        Plot_Name = '"+str(legEntry)+"'; \n" )
 	text_file.write("        [BEGIN_DATA]\n" )
 	text_file.write("          VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
-	
+	j=j+1
 
 	for i in range(int(args.SelectRowStart),int(args.SelectRowEnd)):
 		if bool(args.YaxisScale)==True:
