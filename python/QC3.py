@@ -15,8 +15,8 @@ for f in args.file:
 
 cmd1.append("--CanvTitleX=Time #left(s#right)")
 cmd1.append("--CanvTitleY=Pressure #left(mbar#right)")
-cmd1.append("--SelectColumnX= 3")
-cmd1.append("--SelectColumnY= 7")
+cmd1.append("--SelectColumnX= 1")
+cmd1.append("--SelectColumnY= 2")
 cmd1.append("--SelectRowStart= 1")
 cmd1.append("--SelectRowEnd= 61")
 cmd1.append("--CanvRangeX= 0,3600")

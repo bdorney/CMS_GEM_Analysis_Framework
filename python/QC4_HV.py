@@ -13,11 +13,6 @@ cmd1 = ["python","/Users/anastasia/desktop/QC_Plotting_Tools/Produce_Config_File
 #j=0
 for f in args.file:
 	cmd1.append(str(f))
-#	if j==0:
-#		string=string+str(f)
-#		j=j+1
-#	else:
-#		string=string+" "+str(f)
 	pass
 
 #print string
