@@ -9,7 +9,7 @@ export PATH=$PATH:$GEM_BASE/scripts
 
 #Setup eos
 alias eos='/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select'
-export CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem
+export CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem/QualityControl
 
 #Setup gcc/g++
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6/setup.sh

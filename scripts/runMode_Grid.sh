@@ -40,7 +40,7 @@ NAME_QUEUE=$4
 DIR_OUTPUT=$5
 
 # Setup eos
-CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem
+CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem/QualityControl
 EOS=/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select
 
 #Check for the stderr directory
