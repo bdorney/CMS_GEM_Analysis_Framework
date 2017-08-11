@@ -1,5 +1,4 @@
 import logging
-import logging.config
 
 class colors:
     class foreground:
