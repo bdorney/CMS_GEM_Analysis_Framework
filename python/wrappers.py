@@ -1,3 +1,5 @@
+# @author: Jared Sturdy  
+
 def runCommand(cmd,log=None):
     """
     Provides a wrapper around the subprocess.call command
