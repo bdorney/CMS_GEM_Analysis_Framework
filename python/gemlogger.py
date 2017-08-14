@@ -1,3 +1,5 @@
+# @author: Jared Sturdy 
+
 import logging
 
 class colors:

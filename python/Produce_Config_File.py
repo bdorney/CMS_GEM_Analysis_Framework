@@ -35,7 +35,7 @@ def Color(j):
 	return ret_int
 
 args = parser.parse_args()
-text_file = open(str(args.OutputName)+".cfg", "w")
+text_file = open(args.OutputName+".cfg", "w")
 
 j=0
 
@@ -72,8 +72,8 @@ text_file.write("\tCanv_Title_Y = '"+args.CanvTitleY+"';\n")
 for file in args.file:
 	workbook = xlrd.open_workbook(file)
 	ws = workbook.sheet_by_index(args.SelectSheetNum)
-	Gcharacter=int(f.index('G'))
-	legEntry=f[Gcharacter:Gcharacter+18]
+	Gcharacter=int(file.index('G'))
+	legEntry=file[Gcharacter:Gcharacter+18]
 	Marker_Style = int(20+j)
 
 	text_file.write("\t\t[BEGIN_PLOT]\n" )
@@ -82,32 +82,32 @@ for file in args.file:
 	text_file.write("\t\t\tPlot_Line_Size = '"+args.PlotLineSize+"';\n" )
 	text_file.write("\t\t\tPlot_Line_Style = '"+args.PlotLineStyle+"';\n" )
 	text_file.write("\t\t\tPlot_Marker_Size = '"+args.PlotMarkerSize+"';\n" )
-	text_file.write("\t\t\tPlot_Marker_Style = '"+Marker_Style+"';\n" )
+	text_file.write("\t\t\tPlot_Marker_Style = '"+str(Marker_Style)+"';\n" )
 	text_file.write("\t\t\tPlot_Name = '"+str(legEntry)+"'; \n" )
 	text_file.write("\t\t\t[BEGIN_DATA]\n" )
 	text_file.write("\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
 	j=j+1
 
 	for i in range(args.SelectRowStart,args.SelectRowEnd):
-		if bool(args.YaxisScale)==True:
-			Y= float(ws.cell_value(i,int(args.SelectColumnY))/1000)
+		if bool(args.YaxisScale):
+			Y= float(ws.cell_value(i,args.SelectColumnY)/1000)
 		else:
-			Y= ws.cell_value(i,int(args.SelectColumnY))
+			Y= ws.cell_value(i,args.SelectColumnY)
 			pass
 
 		if bool(args.SetErrX)==True:
-			ErrX=ws.cell_value(i,int(args.SelectColumnErrX))
+			ErrX=ws.cell_value(i,args.SelectColumnErrX)
 		else:
 			ErrX=0.
 			pass
 
 		if bool(args.SetErrY)==True:
-			ErrY=ws.cell_value(i,int(args.SelectColumnErrY))
+			ErrY=ws.cell_value(i,args.SelectColumnErrY)
 		else:
 			ErrY=0.
 			pass
 
-		X= ws.cell_value(i,int(args.SelectColumnX)) 
+		X= ws.cell_value(i,args.SelectColumnX) 
 		text_file.write(str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
 		pass
 

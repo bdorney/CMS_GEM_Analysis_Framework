@@ -3,10 +3,10 @@ from wrappers import runCommand
 from options import parser
 
 args = parser.parse_args()
-cmd = ["python","/Users/anastasia/desktop/QC_Plotting_Tools/Produce_Config_File.py"]
+cmd = ["python","$GEM_BASE/python/Produce_Config_File.py"]
 
 for f in args.file:
-	cmd.append(str(f))
+	cmd.append(f)
 	pass
 
 cmd.append("--CanvTitleX=Divider Current #left(#muA#right)")
@@ -19,6 +19,15 @@ cmd.append("--SelectRowEnd= 37")
 cmd.append("--CanvRangeX= 0,1000")
 cmd.append("--CanvRangeY= 0,7")
 cmd.append("--YaxisScale= True")
-cmd.append("--OutputName= QC4_LS2_V_vs_Imon_AllDet")
+
+
+if len(args.file)==1:
+	filetype=f[int(f.index('.')):]
+	filename = f
+	filename= filename.replace(filetype,"")
+	cmd.append("--OutputName=V_vs_Imon_"+filename)
+else:
+	cmd.append("--OutputName= QC4_LS2_V_vs_Imon_AllDet")
+	pass
 
 runCommand(cmd)

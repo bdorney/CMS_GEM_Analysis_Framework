@@ -1,12 +1,14 @@
 from subprocess import CalledProcessError
 from wrappers import runCommand
 from options import parser
+import os
 
 args = parser.parse_args()
-cmd = ["python","/Users/anastasia/desktop/QC_Plotting_Tools/Produce_Config_File.py"]
+dataPath  = os.getenv('GEM_BASE')
+cmd = ["python","%s/python/Produce_Config_File.py"%(dataPath)]
 
 for f in args.file:
-	cmd.append(str(f))
+	cmd.append(f)
 	pass
 
 cmd.append("--CanvTitleX=Divider Current #left(#muA#right)")
@@ -26,6 +28,14 @@ cmd.append("--CanvLogXY=false,true")
 cmd.append("--CanvRangeY= 10,1000000")
 cmd.append("--SetErrY=True")
 cmd.append("--SelectColumnErrY=12")
-cmd.append("--OutputName= QC5_LS2_Gain_vs_Imon_AllDet")
+
+if len(args.file)==1:
+	filetype=f[int(f.index('.')):]
+	filename = f
+	filename= filename.replace(filetype,"")
+	cmd.append("--OutputName=Gain_vs_Imon_"+filename)
+else:
+	cmd.append("--OutputName= QC5_LS2_Gain_vs_Imon_AllDet")
+	pass
 
 runCommand(cmd)

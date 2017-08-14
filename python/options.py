@@ -45,6 +45,3 @@ parser.add_argument('--SelectColumnErrY',action="store",dest="SelectColumnErrY",
 parser.add_argument('--PlotLineSize',action="store",dest="PlotLineSize",type=str,default="1",help="Set Plot Line Size (default is: 1)")
 parser.add_argument('--PlotLineStyle',action="store",dest="PlotLineStyle",type=str,default="1",help="Set Plot Line Style (default is: 1)")
 parser.add_argument('--PlotMarkerSize',action="store",dest="PlotMarkerSize",type=str,default="0.8",help="Set Plot Marker Size (default is: 0.8)")
-
-
-
