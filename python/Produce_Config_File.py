@@ -101,7 +101,7 @@ for file in args.file:
 			ErrX=0.
 			pass
 
-		if bool(args.SetErrY)==True:
+		if bool(args.SetErrY):
 			ErrY=ws.cell_value(i,args.SelectColumnErrY)
 		else:
 			ErrY=0.
