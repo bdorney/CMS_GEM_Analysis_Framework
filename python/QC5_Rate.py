@@ -1,13 +1,15 @@
 from subprocess import CalledProcessError
-from wrappers import runCommand
+from wrappers import runCommand,envCheck
 from options import parser
+import os
 
 args = parser.parse_args()
+envCheck('GEM_BASE')
+dataPath  = os.getenv('GEM_BASE')
+cmd = ["python","%s/python/Produce_Config_File.py"%(dataPath)]
 
-cmd = ["python","$GEM_BASE/python/Produce_Config_File.py"]
-
-for f in args.file:
-	cmd.append(f)
+for filelist in args.file:
+	cmd.append(filelist)
 	pass
 
 cmd.append("--CanvTitleX=Divider Current #left(#muA#right)")
@@ -27,14 +29,14 @@ cmd.append("--CanvRangeY= 0,1800")
 cmd.append("--SetErrY=True")
 cmd.append("--SelectColumnErrY=8")
 
-
 if len(args.file)==1:
-	filetype=f[int(f.index('.')):]
-	filename = f
+	filetype=filelist[int(filelist.index('.')):]
+	filename = filelist
 	filename= filename.replace(filetype,"")
-	cmd.append("--OutputName=Rate_vs_Imon_"+filename)
+	cmd.append("--OutputName=config_Rate_vs_Imon_"+filename)
+	pass
 else:
-	cmd.append("--OutputName= QC5_LS2_Rate_vs_Imon_AllDet")
+	cmd.append("--OutputName=config_QC5_LS2_Rate_vs_Imon_AllDet")
 	pass
 
 runCommand(cmd)

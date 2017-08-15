@@ -10,26 +10,26 @@ if len(sys.argv)==1:
     sys.exit(1)
     pass
 
-def Color(j):
-	if j % 7 == 0:
+def CyclicColor(DrawArg):
+	if DrawArg % 7 == 0:
 		ret_int='kRed'
 		pass
-	elif j % 7 == 1:
+	elif DrawArg % 7 == 1:
 		ret_int='kRed+1'
 		pass
-	elif j % 7 == 2:
+	elif DrawArg % 7 == 2:
 		ret_int='kRed+2'
 		pass
-	elif j % 7 == 3:
+	elif DrawArg % 7 == 3:
 		ret_int='kRed+3'
 		pass
-	elif j % 7 == 4:
+	elif DrawArg % 7 == 4:
 		ret_int='kBlue'
 		pass
-	elif j % 7 == 5:
+	elif DrawArg % 7 == 5:
 		ret_int='kBlue+1'
 		pass
-	elif j % 7 == 6:
+	elif DrawArg % 7 == 6:
 		ret_int='kBlue+2'
 		pass
 	return ret_int
@@ -37,7 +37,7 @@ def Color(j):
 args = parser.parse_args()
 text_file = open(args.OutputName+".cfg", "w")
 
-j=0
+DrawArg=0
 
 text_file.write("[BEGIN_CANVAS]\n")
 text_file.write("\tCanv_Axis_NDiv = '%s';#X,Y\n"%(args.AxisNDiv))
@@ -74,10 +74,10 @@ for file in args.file:
 	ws = workbook.sheet_by_index(args.SelectSheetNum)
 	Gcharacter=int(file.index('G'))
 	legEntry=file[Gcharacter:Gcharacter+18]
-	Marker_Style = int(20+j)
+	Marker_Style = int(20+DrawArg)
 
 	text_file.write("\t\t[BEGIN_PLOT]\n" )
-	text_file.write("\t\t\tPlot_Color = '%s';\n"%(Color(j)))
+	text_file.write("\t\t\tPlot_Color = '%s';\n"%(CyclicColor(DrawArg)))
 	text_file.write("\t\t\tPlot_LegEntry = '%s';\n"%(legEntry))
 	text_file.write("\t\t\tPlot_Line_Size = '%s';\n"%(args.PlotLineSize))
 	text_file.write("\t\t\tPlot_Line_Style = '%s';\n"%(args.PlotLineStyle))
@@ -86,28 +86,31 @@ for file in args.file:
 	text_file.write("\t\t\tPlot_Name = '%s';\n"%(str(legEntry)))
 	text_file.write("\t\t\t[BEGIN_DATA]\n" )
 	text_file.write("\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
-	j=j+1
+	DrawArg=DrawArg+1
 
-	for i in range(args.SelectRowStart,args.SelectRowEnd):
+	for row in range(args.SelectRowStart,args.SelectRowEnd):
 		if bool(args.YaxisScale):
-			Y= float(ws.cell_value(i,args.SelectColumnY)/1000)
+			Y= float(ws.cell_value(row,args.SelectColumnY)/1000)
+			pass
 		else:
-			Y= ws.cell_value(i,args.SelectColumnY)
+			Y= ws.cell_value(row,args.SelectColumnY)
 			pass
 
 		if bool(args.SetErrX)==True:
-			ErrX=ws.cell_value(i,args.SelectColumnErrX)
+			ErrX=ws.cell_value(row,args.SelectColumnErrX)
+			pass
 		else:
 			ErrX=0.
 			pass
 
 		if bool(args.SetErrY):
-			ErrY=ws.cell_value(i,args.SelectColumnErrY)
+			ErrY=ws.cell_value(row,args.SelectColumnErrY)
+			pass
 		else:
 			ErrY=0.
 			pass
 
-		X= ws.cell_value(i,args.SelectColumnX) 
+		X= ws.cell_value(row,args.SelectColumnX) 
 		text_file.write(str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
 		pass
 

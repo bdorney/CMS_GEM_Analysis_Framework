@@ -49,7 +49,7 @@ class colors:
 
     # resets
     ENDC      = '\033[0m'
-
+    
     # log levels
     colorlevels = {
         "FATAL"   :"%s%s%s"%(background.RED,style.BRIGHT,YELLOW),
@@ -63,124 +63,6 @@ class colors:
         }
 
     pass
-
-# from https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output#384125
-class ColoredFormatter(logging.Formatter):
-    def __init__(self, fmt=None, datefmt=None, use_color=True):
-        logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt)
-        self.use_color = use_color
-
-    def format(self, record):
-        orig = logging.Formatter.format(self, record)
-        levelname = record.levelname
-        if self.use_color and levelname in colors.colorlevels.keys():
-            orig = "%s%s%s"%(colors.colorlevels[levelname],orig,colors.colorlevels["NOTSET"])
-        return orig
-
-# dictLogConfig = {
-#     ## doesn't work in python26
-#     "version":1,
-#     "handlers":{
-#         "file":{
-#             "class":"logging.FileHandler",
-#             "formatter":"nocolor",
-#             "filename":"gemlogger.log"
-#             },
-#         "console":{
-#             "class":"logging.StreamHandler",
-#             "formatter":"color",
-#             }
-#         },
-#     "loggers":{
-#         "root":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tools.amc_user_functions_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tools.optohybrid_user_functions_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tools.vfat_user_functions_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tools.scan_utils_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.utils.registers_uhal":{
-#             "handlers":["console","file"],
-#             "level":"WARNING",
-#             },
-#         "gempython.tests.amc_info_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tests.optohybrid_info_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         "gempython.tests.vfat_info_uhal":{
-#             "handlers":["console","file"],
-#             "level":"INFO",
-#             },
-#         },
-
-#     "formatters":{
-#         "nocolor":{
-#             ():"gempython.utils.gemlogger.ColoredFormatter",
-#             "format": '%(asctime)s.%(msecs)03d [%(thread)x] %(levelname)s - %(module)s::%(funcName)s <> - %(message)s',
-#             "datefmt":'%d %b %Y %H:%M:%S',
-#             "use_color":"False"
-#             },
-#         "color":{
-#             ():"gempython.utils.gemlogger.ColoredFormatter",
-#             "format": '%(asctime)s.%(msecs)03d [%(thread)x] %(levelname)s - %(module)s::%(funcName)s <> - %(message)s',
-#             "datefmt":'%d %b %Y %H:%M:%S',
-#             "use_color":"True"
-#             },
-#         }
-#     }
-
-def getGEMLogger(logclassname=logging.getLoggerClass(), loglevel=logging.WARN,
-                 logfile=None,logfilelevel=logging.DEBUG):
-    """
-    Extend a logger object, add a file handler, if specified, with a specific log level
-    """
-    import sys,os
-    # # logfmt  = '%(asctime)s.%(msecs)03d [%(thread)x] %(levelname)s:%(levelno)d  '
-    # logfmt  = '%(asctime)s.%(msecs)03d [%(thread)x] %(levelname)s - '
-    # logfmt += '%(module)s::%(funcName)s <> - '
-    # logfmt += '%(message)s'
-    # datefmt = '%d %b %Y %H:%M:%S'
-
-    # nocolor_formatter = ColoredFormatter(fmt=logfmt,datefmt=datefmt,use_color=False)
-    # file_handler = None
-    # if not logfile:
-    #     file_handler = logging.FileHandler("/tmp/%s/python_log_file.txt"%(os.getenv("USER")))
-    # else:
-    #     file_handler = logging.FileHandler("%s"%(logfile))
-
-    # file_handler.setLevel(logfilelevel)
-    # file_handler.setFormatter(nocolor_formatter)
-
-    # # improve colorized logging
-    # color_formatter = ColoredFormatter(fmt=logfmt,datefmt=datefmt,use_color=True)
-    # stream_handler  = logging.StreamHandler()
-    # stream_handler.setLevel(loglevel)
-    # stream_handler.setFormatter(color_formatter)
-
-    # logging.config.dictConfig(dictLogConfig)
-    logcfg = "%s/gempython/utils/gemlogging_config.cfg"%(os.getenv("GEM_PYTHON_PATH"))
-    logging.config.fileConfig(logcfg)
-
-    logger = logging.getLogger(logclassname)
-
-    return logger
 
 def colormsg(msg, loglevel=logging.NOTSET,printonly=False):
     openfmt = colors.ENDC
@@ -210,37 +92,3 @@ def colormsg(msg, loglevel=logging.NOTSET,printonly=False):
         pass
     return "%s%s%s"%(openfmt,msg,colors.ENDC)
 
-def printmsg(msg, loglevel=logging.NOTSET,printonly=False):
-    print colormsg(msg,loglevel,printonly)
-    pass
-
-def printmsg(msg, foreground, background):
-    openfmt = "%s"%(colors.ENDC)
-    print "%s%s%s%s"%(background,foreground,msg,colors.ENDC)
-    pass
-
-# will modify the source of the logger message, so not super helpful
-# better to get the colorized formatter working properly
-def gemdebug(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.DEBUG)
-    loclogger.debug(msg)
-
-def geminfo(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.INFO)
-    loclogger.info(msg)
-
-def gemwarning(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.WARNING)
-    loclogger.warning(msg)
-
-def gemerror(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.ERROR)
-    loclogger.error(msg)
-
-def gemfatal(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.FATAL)
-    loclogger.fatal(msg)
-
-def gemcritical(loclogger,msg):
-    msg = colormsg(msg,loglevel=logging.CRITICAL)
-    loclogger.critical(msg)
