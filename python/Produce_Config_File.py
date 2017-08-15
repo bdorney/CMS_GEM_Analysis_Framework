@@ -69,11 +69,11 @@ text_file.write("\tCanv_Title_Offset_Y = '%s';\n"%(args.CanvTitleOffsetX))
 text_file.write("\tCanv_Title_X = '%s';\n"%(args.CanvTitleX))
 text_file.write("\tCanv_Title_Y = '%s';\n"%(args.CanvTitleY))
 
-for file in args.file:
-	workbook = xlrd.open_workbook(file)
+for filelist in args.file:
+	workbook = xlrd.open_workbook(filelist)
 	ws = workbook.sheet_by_index(args.SelectSheetNum)
-	Gcharacter=int(file.index('G'))
-	legEntry=file[Gcharacter:Gcharacter+18]
+	Gcharacter=int(filelist.index('G'))
+	legEntry=filelist[Gcharacter:Gcharacter+18]
 	Marker_Style = int(20+DrawArg)
 
 	text_file.write("\t\t[BEGIN_PLOT]\n" )
@@ -86,24 +86,23 @@ for file in args.file:
 	text_file.write("\t\t\tPlot_Name = '%s';\n"%(str(legEntry)))
 	text_file.write("\t\t\t[BEGIN_DATA]\n" )
 	text_file.write("\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
-	DrawArg=DrawArg+1
 
 	for row in range(args.SelectRowStart,args.SelectRowEnd):
-		if bool(args.YaxisScale):
+		if args.YaxisScale=='true':
 			Y= float(ws.cell_value(row,args.SelectColumnY)/1000)
 			pass
 		else:
 			Y= ws.cell_value(row,args.SelectColumnY)
 			pass
 
-		if bool(args.SetErrX)==True:
+		if args.SetErrX=='true':
 			ErrX=ws.cell_value(row,args.SelectColumnErrX)
 			pass
 		else:
 			ErrX=0.
 			pass
 
-		if bool(args.SetErrY):
+		if args.SetErrY=='true':
 			ErrY=ws.cell_value(row,args.SelectColumnErrY)
 			pass
 		else:
@@ -115,6 +114,23 @@ for file in args.file:
 		pass
 
 	text_file.write("\t\t\t[END_DATA]\n" )
+
+	if args.Fit=='true':
+		text_file.write("\t\t\t[BEGIN_FIT]\n" )
+		text_file.write("\t\t\tFit_Color = '%s';\n"%(CyclicColor(DrawArg)))
+		text_file.write("\t\t\tFit_Formula = '%s';\n"%(args.FitFormula))
+		text_file.write("\t\t\tFit_LegEntry = 'Fit_%s';\n"%(legEntry))
+		text_file.write("\t\t\tFit_Line_Size = '%s';\n"%(args.FitLineSize))
+		text_file.write("\t\t\tFit_Line_Style = '%s';\n"%(args.FitLineStyle))
+		text_file.write("\t\t\tFit_Name = 'Fit_%s';\n"%(legEntry))
+		text_file.write("\t\t\tFit_Option = '%s';\n"%(args.FitOption))
+		text_file.write("\t\t\tFit_Param_IGuess = '%s';\n"%(args.FitParamIGuess))
+		text_file.write("\t\t\tFit_Perform = '%s';\n"%(args.FitPerform))
+		text_file.write("\t\t\tFit_Range = '%s';\n"%(args.FitRange))
+		text_file.write("\t\t\t[END_FIT]\n" )
+		pass
+
+	DrawArg=DrawArg+1
 	text_file.write("\t\t[END_PLOT]\n" )
 
 text_file.write("[END_CANVAS]\n" )
