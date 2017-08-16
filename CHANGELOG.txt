@@ -6,6 +6,21 @@
 *                                                *
 **************************************************
 
+Update: August 16th 2017
+==================================================
+scripts/setup_CMS_GEM.sh: add pip2.7 install --user xlrd (library used by produce_config_file.py)
+
+
+Update: August 15th 2017
+==================================================
+->Produce_Config_File.py: Added code to fit the plotted data (only when —Fit option is true)
+->Produce_Config_File.py and options.py: Changed all bool statements to strings after addressing a problem with bool(args.Fit) argument being true/false when appending to cmd 
+->options.py: Added arguments to choose the details for the fit
+->QC3.py: Added Arguments to perform the Pressure-Time fit if the —Fit option is true
+->QC4_HV.py: Added Arguments to perform the Vmon-Imon fit if the —Fit option is true
+->wrappers.py: add function envCheck to check that the $GEM_BASE variable has been declared.
+->gemlogger.py: removed unnecessary functions and commented lines
+
 Update: June 13th 2017
 ==================================================
 ->Added InfoPlot::m_strOptionDraw in include/PlotterUtilityTypes.h

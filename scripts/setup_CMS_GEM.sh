@@ -44,7 +44,7 @@ if [[ !  -d $DIR_PIP ]]; then
 	#echo "-----"
 
 	#Installing packages
-	#pip2.7 install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy
+	#pip2.7 install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy xlrd
 	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy
 else
 	#Update environment	
