@@ -53,5 +53,3 @@ parser.add_argument('--FitOption',action="store",dest="FitOption",type=str,defau
 parser.add_argument('--FitParamIGuess',action="store",dest="FitParamIGuess",type=str,default="0",help="Set Fit Parameters initial values")
 parser.add_argument('--FitPerform',action="store",dest="FitPerform",type=str,default="true",help="if true (default) perform a fit to the TObject defined in the [BEGIN_PLOT]header this [BEGIN_FIT] header is found in")
 parser.add_argument('--FitRange',action="store",dest="FitRange",type=str,default="0,1",help="Set the Fit range, default is 0,1")
-
-

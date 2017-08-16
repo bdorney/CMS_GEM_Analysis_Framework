@@ -130,7 +130,7 @@ for filelist in args.file:
 		text_file.write("\t\t\t[END_FIT]\n" )
 		pass
 
-	DrawArg=DrawArg+1
+	DrawArg+=1
 	text_file.write("\t\t[END_PLOT]\n" )
 
 text_file.write("[END_CANVAS]\n" )
