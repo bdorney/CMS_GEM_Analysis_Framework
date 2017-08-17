@@ -23,10 +23,12 @@ cmd.append("--CanvRangeX= 0,3600")
 cmd.append("--CanvRangeY= 0,35")
 
 # Fit the Pressure vs Time curves
-cmd.append("--Fit=%s"%(args.Fit))
-cmd.append("--FitFormula=[0]*TMath::Exp([1]*x)")
-cmd.append("--FitParamIGuess=AMPLITUDE,6.2e-05")
-cmd.append("--FitRange=0,3600")
+if bool(args.Fit):
+	cmd.append("--Fit")
+	cmd.append("--FitFormula=[0]*TMath::Exp([1]*x)")
+	cmd.append("--FitParamIGuess=AMPLITUDE,6.2e-05")
+	cmd.append("--FitRange=0,3600")
+	pass
 
 if len(args.file)==1:
 	filetype=filelist[int(filelist.index('.')):]

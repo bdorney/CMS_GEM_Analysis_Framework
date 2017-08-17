@@ -21,7 +21,7 @@ cmd.append("--SelectRowStart= 3")
 cmd.append("--SelectRowEnd= 37")
 cmd.append("--CanvRangeX= 0,1000")
 cmd.append("--CanvRangeY= 0,7")
-cmd.append("--YaxisScale=true")
+cmd.append("--YaxisScale")
 
 if len(args.file)==1:
 	filetype=filelist[int(filelist.index('.')):]
@@ -39,8 +39,11 @@ else:
 	pass
 
 # Fit the Vmon vs Imon curves
-cmd.append("--Fit=%s"%(args.Fit))
-cmd.append("--FitFormula=[0]*x+[1]")
-cmd.append("--FitParamIGuess=%s,5"%(Req))
-cmd.append("--FitRange=0,1000")	
+if bool(args.Fit):
+	cmd.append("--Fit")
+	cmd.append("--FitFormula=[0]*x+[1]")
+	cmd.append("--FitParamIGuess=%s,5"%(Req))
+	cmd.append("--FitRange=0,1000")
+	pass
+
 runCommand(cmd)

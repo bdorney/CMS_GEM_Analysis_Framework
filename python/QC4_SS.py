@@ -21,7 +21,7 @@ cmd.append("--SelectRowStart=3")
 cmd.append("--SelectRowEnd=37")
 cmd.append("--CanvRangeX= 0,1000")
 cmd.append("--CanvRangeY= 0,50")
-cmd.append("--SetErrY=true")
+cmd.append("--SetErrY")
 cmd.append("--SelectColumnErrY=8")
 
 if len(args.file)==1:

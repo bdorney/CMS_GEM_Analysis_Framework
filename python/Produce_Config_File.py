@@ -88,21 +88,21 @@ for filelist in args.file:
 	text_file.write("\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
 
 	for row in range(args.SelectRowStart,args.SelectRowEnd):
-		if args.YaxisScale=='true':
+		if bool(args.YaxisScale):
 			Y= float(ws.cell_value(row,args.SelectColumnY)/1000)
 			pass
 		else:
 			Y= ws.cell_value(row,args.SelectColumnY)
 			pass
 
-		if args.SetErrX=='true':
+		if bool(args.SetErrX):
 			ErrX=ws.cell_value(row,args.SelectColumnErrX)
 			pass
 		else:
 			ErrX=0.
 			pass
 
-		if args.SetErrY=='true':
+		if bool(args.SetErrY):
 			ErrY=ws.cell_value(row,args.SelectColumnErrY)
 			pass
 		else:
@@ -115,7 +115,7 @@ for filelist in args.file:
 
 	text_file.write("\t\t\t[END_DATA]\n" )
 
-	if args.Fit=='true':
+	if bool(args.Fit):
 		text_file.write("\t\t\t[BEGIN_FIT]\n" )
 		text_file.write("\t\t\tFit_Color = '%s';\n"%(CyclicColor(DrawArg)))
 		text_file.write("\t\t\tFit_Formula = '%s';\n"%(args.FitFormula))
