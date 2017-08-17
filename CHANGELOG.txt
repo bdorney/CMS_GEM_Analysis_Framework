@@ -1,10 +1,17 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 5.0.0                               *
-*	LAST UPDATE: Aug 8 2017                      *
+*	VERSION: 5.0.1                               *
+*	LAST UPDATE: Aug 17 2017                     *
 *                                                *
 **************************************************
+
+Update: August 17th 2017
+==================================================
+->Added repo structure files showing guidelines for contributing, issue templates, and pull request templates
+->Updated .gitignore to be cleaner
+->README.txt renamed to README.md
+->Started process of re-writting README.md in Markdown
 
 Update: August 8th 2017
 ==================================================

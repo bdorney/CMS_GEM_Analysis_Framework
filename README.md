@@ -1,1477 +1,1152 @@
 # CMS_GEM_Analysis_Framework
 # ========================================================
+Software tools for the analysis of experimental data collected by the CMS GEM community
 
-	Software tools for the analysis of experimental data collected by the CMS GEM community
+Designed to work on `lxplus` running slc6 with `ROOT` version `6.00.02` or higher, `g++` version `4.8.4`, and `python` version `2.7.4`.
 
-	Designed to work on lxplus running slc6 with ROOT version 6.00.02 or higher, g++
-    version 4.8.4, and python version 2.7.4.
+Instructions below assume the user is using a `sh/bash/zsh` shell.  Scripts for `csh/tsch` have not been implemented yet.
 
-    Instructions below assume the user is using a sh/bash/zsh shell.  Scripts for csh/tsch
-    have not been implemented yet.
+If you are having problems please consult Section 5 "Known & Outstanding Issues" first.  The problem and solution may already be present.  If you do not find your issue please navigate to:
 
-    This README serves as the single point of entry for all installation and usage instructions.
-    Significant documentation for users (developers not yet!) has also been included.
+    https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues
 
-    If you are having problems please consult Section 5 "Known & Outstanding Issues" first.  The
-    problem and solution may already be present.  If you do not find your issue please navigate to:
-
-        https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues
-
-    and submit an issue that describes your problem (commands you executed, output, etc...).  You
-    may need to provide any input files or a link to the fork of the repository for us to troubleshoot.
-
-# Table of Contents
-# ========================================================
-
-    1. Contributors & License
-    2. Installation Instructions
-    3. Usage
-        3.a. frameworkMain
-            3.a.i               Helper Script - Run Mode: Grid (Analysis)
-            3.a.ii              Helper Script - Run Mode: Grid (Reconstruction)
-            3.a.iii             Helper Script - Run Mode: Rerun
-            3.a.iv              Helper Script - Run Mode: Series
-            3.a.v               Helper Script - Run Mode: Comparison
-        3.b. genericPlotter
-            3.b.i               Helper Script - Make All Plots
-        3.c. Python Scripts
-            3.c.i               Analysis Suite - Gain Map
-            3.c.ii              Analysis Suite - Efficiency Predictions
-    4. Documentation
-        4.a. Namespaces
-        4.b. Class Map
-            4.b.i.              FrameworkBase
-            4.b.ii.             Analyzers & Visualization
-                4.b.ii.I        AnalyzeResponseUniformity
-                4.b.ii.II       AnalyzeResponseUniformityClusters
-                4.b.ii.III      AnalyzeResponseUniformityHits
-                4.b.ii.IV       Visualizer
-                4.b.ii.V        VisualizerComparison
-                4.b.ii.VI       VisualizerUniformity
-            4.b.iii.            Interfaces
-                4.b.iii.I       Interface
-                4.b.iii.II      InterfaceAnalysis
-                4.b.iii.III     InterfaceReco
-                4.b.iii.IV      InterfaceRun
-            4.b.iv.             Selectors
-                4.b.iv.I        Selector
-                4.b.iv.II       SelectorCluster
-                4.b.iv.III      SelectorHit
-            4.b.v.              Loaders
-                4.b.v.I         ParameterLoaderAnalysis
-                4.b.v.II        ParameterLoaderDetector
-                4.b.v.III       ParameterLoaderFit
-                4.b.v.IV        ParameterLoaderPlotter
-                4.b.v.V         ParameterLoaderRun
-            4.b.vi.             Plotters
-                4.b.vi.I        PlotterGeneric
-                4.b.vi.II       PlotterGraph
-                4.b.vi.III      PlotterGraph2D
-                4.b.vi.IV       PlotterGraphErrors
-                4.b.vi.V        PlotterHisto
-                4.b.vi.VI       PlotterHisto2D
-            4.b.vii.            Readouts
-                4.b.vii.I       ReadoutSector
-                4.b.vii.II      ReadoutSectorEta
-                4.b.vii.III     ReadoutSectorPhi
-            4.b.viii.           DetectorMPGD
-        4.c. Utilities
-            4.c.i   Timing
-            4.c.ii  Uniformity
-            4.c.iii Plotter
-        4.d. Types
-            4.d.i   Timing
-            4.d.ii  Uniformity
-                4.d.ii.I        AnalysisSetupUniformity
-                4.d.ii.II       Cluster
-                4.d.ii.III      Event
-                4.d.ii.IV       HistosPhysObj
-                4.d.ii.V        Hit
-                4.d.ii.VI       RunSetup
-                4.d.ii.VII      SectorSlice
-                4.d.ii.VIII     SelParam
-                4.d.ii.IX       SummaryStatistics
-            4.d.iii Plotter
-        4.e. Configuration Files
-            4.e.i   amoreSRS Mapping Config File
-            4.e.ii  Analysis Config File
-                4.e.ii.I        HEADER PARAMETERS - ANALYSIS_INFO
-                4.e.ii.II       HEADER PARAMETERS - TIMING_INFO
-                4.e.ii.III      HEADER PARAMETERS - UNIFORMITY_INFO
-                4.e.ii.IV       HEADER PARAMETERS - ADC_FIT_INFO
-                4.e.ii.V        HEADER PARAMETERS - HISTO_INFO
-                4.e.ii.VI       Example Config File
-            4.e.iii Run Config File
-                4.e.iii.I       HEADER PARAMETERS - RUN_INFO
-                4.e.iii.II      HEADER PARAMETERS - RUN_LIST
-                4.e.iii.III     HEADER PARAMETERS - COMP_INFO
-                4.e.iii.IV      Configuration Options
-                4.e.iii.V       Example Config File - Mode: Series
-                4.e.iii.VI      Example Config File - Mode: Grid
-                4.e.iii.VII     Example Config File - Mode: Re-Run
-                4.e.iii.VIII    Example Config File - Mode: Comparison
-            4.e.iv Plot Config File
-                4.e.iv.I        HEADER PARAMETERS - CANVAS
-                4.e.iv.II       HEADER PARAMETERS - PLOT
-                4.e.iv.III      HEADER PARAMETERS - DATA
-                4.e.iv.IV       HEADER PARAMETERS - FIT
-                4.e.iv.V        Configuration Options
-                4.e.iv.VI       Example Config File - TGraph
-                4.e.iv.VII      Example Config File - TGraph2D
-                4.e.iv.VIII     Example Config File - TGraphErrors
-                4.e.iv.IX       Example Config File - TH1F
-                4.e.iv.X        Example Config File - TH2F
-            4.e.v Efficiency Predictor Config File
-                4.e.v.I         PARAMETERS - Input Files
-                4.e.v.II        PARAMETERS - Device Under Test (DUT)
-                4.e.v.III       PARAMETERS - Cluster Charge
-                4.e.v.IV        PARAMETERS - Cluster Size
-                4.e.v.V         PARAMETERS - Efficiency Info
-        4.f. Output Files
-            4.f.i               Output ROOT File - Analysis Mode
-                4.f.i.I         "Segmented" Plots Stored in "Summary" folder
-                4.f.i.II        "Dataset" Plots Stored in "Summary" folder
-                4.f.i.III       1D Fit Summary Plots Stored in "Summary" folder
-                4.f.i.IV        2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-            4.f.ii              Output ROOT File - Comparison Mode
-            4.f.iii             Output ROOT File - genericPlotter
-            4.f.iv              Output Text File
-            4.f.v               Output ROOT File - Gain Map
-            4.f.vi              Output ROOT File - Efficiency Map
-        4.g. Source Code Name Conventions
-            4.g.i   STL Objects
-            4.g.ii  ROOT Objects
-    5. Known & Outstanding Issues
+and submit an issue that describes your problem following the examples in the issue template.  You may need to provide any input files or a link to the fork of the repository for us to troubleshoot.
 
 # 1. Contributors & License
 # ========================================================
+This repository is the work of:
 
-    Main Developer: Brian Dorney
+- Main Developer: Brian Dorney
+- Contributors: Marcello Maggi
+- amoreSRS Team:  Kondo Gnanvo, Mike Staib, Stefano Colafranchescci, Dorothea Pfeiffer
 
-    Contributors: Marcello Maggi
+This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi. The event unpacking and reconstruction code was ported from `amoreSRS` by Marcello Maggi. The original selection & analysis algorithms are based off work done by J. Merlin.  This package makes use of several features from the `CMS_GEM_TB_Timing` repository (also by B. Dorney).
 
-    amoreSRS Team:  Kondo Gnanvo, Mike Staib, Stefano Colafranchescci, Dorothea Pfeiffer
+This package has adapted the `tdrstyle.C`, `CMS_lumi.h`, and `CMS_lumi.C` scripts (taken from [here](https://ghm.web.cern.ch/ghm/plots/)), for setting the style of output plots to match with the official guidelines of the CMS Experiment.
 
-    This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi.
-    The event unpacking and reconstruction code was ported from amoreSRS by Marcello Maggi.
-    The original selection & analysis algorithms are based off work done by J. Merlin.  This
-    package makes use of several features from the CMS_GEM_TB_Timing repository (also by B. Dorney).
-    Hopefully one day the CMS_GEM_TB_Timing repository will be fully integrated into this
-    repository.
+This package makes use of the `C++ Mathematical Expression Library` designed by Arash Partow, available [here](http://www.partow.net/programming/exprtk/index.html), and referred to as `ExprTk`. `ExprTk` is available under the "Common Public License" from the the url above, but has been included in this repository for convenience.
 
-    This package has adapted the tdrstyle.C, CMS_lumi.h, and CMS_lumi.C scripts, available from
-    https://ghm.web.cern.ch/ghm/plots/, for setting the style of output plots to match with the
-    official guidelines of the CMS Experiment.
+Additionally as a convenience for the user we have included the `get-pip.py` script taken from [here](https://packaging.python.org/installing/#install-pip-setuptools-and-wheel). This will handle the installation of `pip` in `python` version `2.7.4` automaticaly.
 
-    This package makes use of the "C++ Mathematical Expression Library" designed by Arash Partow,
-    available at (http://www.partow.net/programming/exprtk/index.html), and referred to as ExprTk.
-    ExprTk is available under the "Common Public License" from the the url above, but has been
-    included in this repository for convenience.
-
-    Additionally as a convenience for the user we have included the "get-pip.py" script taken from:
-
-        https://packaging.python.org/installing/#install-pip-setuptools-and-wheel
-
-    This will handle the installation of pip in python version 2.7.4 automaticaly.
-
-    The CMS_GEM_Analysis_Framework is licensed under the "GNU General Public License."
+The `CMS_GEM_Analysis_Framework` is licensed under the "GNU General Public License."
 
 # 2. Installation Instructions
 # ========================================================
+This repository follows the guidelines of Vincent Driessen in [A successful Git branching model](http://nvie.com/posts/a-successful-git-branching-model/). The source code available in the `origin/master` branch always reflects a "production-ready" state.  The `origin/develop` branch reflects a state with the latest implemented changes for the next release.  This branch is not gauranteed to be stable.
 
-    This repository follows the guidelines of Vincent Driessen in
-    "A successful Git branching model" available at:
+To checkout the repository:
 
-    http://nvie.com/posts/a-successful-git-branching-model/
+```
+git clone https://github.com/bdorney/CMS_GEM_Analysis_Framework.git
+cd CMS_GEM_Analysis_Framework
+git pull origin master
+```
 
-    The source code available in the origin/master branch always reflects a "production-ready"
-    state.  The origin/develop branch reflects a state with the latest implemented changes
-    for the next release.  This branch is not gauranteed to be stable.
+You will now have the latest version of the `master` branch.  To compile the repository:
 
-    To checkout the repository:
+```
+source scripts/setup_CMS_GEM.sh
+make -f Makefile.gpp clean
+make -f Makefile.gpp
+make -f MakefilePlotter.gpp
+```
 
-        git clone https://github.com/bdorney/CMS_GEM_Analysis_Framework.git
+The repository is now compiled.  Please note the first execution of `scripts/setup_CMS_GEM.sh` might make a local installation of `pip` and several other `python` packages that are required for the python analysis tools described in Section 3.c.  Additionally the base directory of the repository has been exported to the shell variable `$GEM_BASE`.
 
-        cd CMS_GEM_Analysis_Framework
+Please check [here](https://github.com/bdorney/CMS_GEM_Analysis_Framework) for the most-up-to-date release.  You migrate your `master` branch to the most-up-to-date branch via:
 
-        git pull origin master
+```
+git checkout -b <local_branch_name>
+git pull origin <remote_branch_name>
+make -f Makefile.gpp clean
+make -f Makefile.gpp
+make -f MakefilePlotter.gpp
+```
 
-    You will now have the latest version of the master branch.  To compile the repository:
+The `local_branch_name` is the name of the branch on your local machine. The `remote_branch_name` is the name of the branch you are checking out from the remote repository. It is a good practice to make `local_branch_name = remote_branch_name`.  You can see the list of available branches from command line via:
 
-        source scripts/setup_CMS_GEM.sh
+```
+git fetch
+git branch -a
+```
 
-        make -f Makefile.gpp clean
+The branch you are currently on will have the `*` character next to it.
 
-        make -f Makefile.gpp
-
-        make -f MakefilePlotter.gpp
-
-    The repository is now compiled.  Please note the first execution of scripts/setup_CMS_GEM.sh
-    might make a local installation of pip and several other python packages that are required for
-    the python analysis tools described in Section 3.c.  Additionally the base directory of the
-    repository has been exported to the shell variable "$GEM_BASE".
-
-    Please check https://github.com/bdorney/CMS_GEM_Analysis_Framework for the most-up-to-date
-    release.  You migrate your master branch to the most-up-to-date branch via:
-
-        git checkout -b <local_branch_name>
-
-        git pull origin <remote_branch_name>
-
-        make -f Makefile.gpp clean
-
-        make -f Makefile.gpp
-
-        make -f MakefilePlotter.gpp
-
-    The local_branch_name is the name of the branch on your local machine.The
-    remote_branch_name is the name of the branch you are checking out from the remote repository.
-    It is a good practice to make local_branch_name = remote_branch_name.  You can see the list
-    of available branches from command line via:
-
-        git fetch
-
-        git branch -a
-
-    The branch you are currently on will have the "*" character next to it.
-
-    NOTE: a make file for clang has been included "Makefile.clang" for MAC OS users.  However
-    presently there is no support for any installation/runtime errors on a MAC OS environemnt.
-    It is strongly urged that you use the Linux computing environment mentioned above (since it
-    is so readily available to us).
+NOTE: a make file for clang has been included "Makefile.clang" for MAC OS users.  However presently there is no support for any installation/runtime errors on a MAC OS environemnt. It is strongly urged that you use the Linux computing environment mentioned above (since it is so readily available to us).
 
 # 3. Usage
 # ========================================================
+The following gives the usage case for each of the executables produced during the installation. It is assumed that you have successfully performed the steps listed in Section 2.
 
-    The following gives the usage case for each of the executables produced during the installation.
-    It is assumed that you have successfully performed the steps listed in Section 2.
+## 3.a. frameworkMain
+## --------------------------------------------------------
+For each new shell navigate to the base directory of the repository and setup the environment via:
 
-    # 3.a. frameworkMain
-    # --------------------------------------------------------
+```
+source scripts/setup_CMS_GEM.sh
+```
 
-    For each new shell navigate to the base directory of the repository and setup the environment via:
+The usage for the `frameworkMain` executable is:
 
-        source scripts/setup_CMS_GEM.sh
+```
+./frameworkMain <PFN of Run Config File> <Verbose Mode true/false>
+```
 
-    The usage for the frameworkMain executable is:
+Here the physical file name (PFN) represents the full path+filename to the file in question. The configuration files, including the run config file, are described in Section 4.e.  The executable can analyze files produced either by `amoreSRS`, `amoreSRS_ZS`, or the `CMS_GEM_Analysis_Framework` (referred to as "the framework" henceforth).  Additionally the framework can unpack, decode, and reconstruct raw data recorded by the RD51 SRS system with FEC's running on the zero suppression firmware.  The unpacking, decoding, and reconstruction of RD51 SRS raw data is referred to as "reconstruction" henceforth.  Reconstruction of data recorded when not using the zero suppression firmware is not presently supported.
 
-        For help menu:  ./frameworkMain -h
-        For executing:  ./frameworkMain <PFN of Run Config File> <Verbose Mode true/false>
+For a full explanation of the available configurations please consult Sections 4.e for a description, and Sections 3.a.i through 3.a.iii for examples. The contents and layout of the output files are described in Section 4.f.
 
-    Here the physical file name (PFN) represents the full path+filename to the file in question.
-    The configuration files, including the run config file, are described in Section 4.e.  The
-    executable can analyze files produced either by amoreSRS/amoreSRS_ZS or by the
-    CMS_GEM_Analysis_Framework (referred to as "the framework" henceforth).  Additionally the
-    framework can unpack, decode, and reconstruct raw data recorded by the RD51 SRS system with
-    FEC's running on the zero suppression firmware.  The unpacking, decoding, and reconstruction
-    of RD51 SRS raw data is referred to as "reconstruction" henceforth.  Reconstruction of data
-    recorded when not using the zero suppression firmware is not presently supported.
+Four example config files: 1) *mapping* config file, 2) *analysis* config file, 3) *reco* config file, and 4) *run* config file have been provided in the default repository.  A usage example is given as:
 
-    For a full explanation of the available configurations please consult Sections 4.e for a description,
-    and Sections 3.a.i through 3.a.iii for examples. The contents and layout of the output files are
-    described in Section 4.f.
+```
+./frameworkMain config/configRun.cfg true
+```
 
-    Four example config files: 1) mapping config file, 2) analysis config file, 3) reco config
-    file, and 4) run config file have been provided in the default repository.  A usage example
-    is given as:
+As a general rule each detector you are testing will usually have a series of raw files associated with it.  It is recommended each raw file should have a run number associated with it.  The set of run numbers for a given detector should be unique (i.e. two different detectors can have a run 1 but for a specific detector run 1 is unique).  The framework expects that you provide a run number, form `_RunX_` for `X` some integer, in each of the input files defined in your `config/configRun.cfg` (see Section 4.e.iii).
 
-        ./frameworkMain config/configRun.cfg true
+In addition to analyzing raw data to produce a framework output `ROOT` file it is also possible to analyze a series of framework outpt files to plot comparisons of any `TH1F` object stored in the output `ROOT` file.  For more details on running in this mode see Sections 3.a.iv and 4.e.iii.
 
-    As a general rule each detector you are testing will usually have a series of raw files associated
-    with it.  It is recommended each raw file should have a run number associated with it.  The set of
-    run numbers for a given detector should be unique (i.e. two different detectors can have a run 1
-    but for a specific detector run 1 is unique).  The framework expects that you provide a run number,
-    form "_RunX_" for X some integer, in each of the input files defined in your config/configRun.cfg
-    (see Section 4.e.iii).
+In summary the running options of the frameowrk are:
 
-    In addition to analyzing raw data to produce a framework output ROOT file it is also possible to
-    analyze a series of framework outpt files to plot comparisons of any TH1F object stored in the
-    output ROOT file.  For more details on running in this mode see Sections 3.a.iv and 4.e.iii.
+    1. Analysis, analyzing an input reconstructed SRS `TTree` file
+    2. Comparison, comparing one or more framework output `ROOT` files produced in otion #1,
+    3. Reconstruction, performing the reconstruction on an RD51 SRS input raw data file,
+    4. Combinded Reconstruction and Analysis (referred to as Combined), doing option 3 followed by option 1
 
-    In summary the running options of the frameowrk are:
+Configuring for each of these options is described Secton 4.e.iii.  Option 1 can be executed in all modes: Grid, Series, or Re-run.  Option 3 can be executed in Grid or Series mode; but in series mode only one input RD51 SRS raw file should be supplied.  Option 4 can only be executed in Series mode, again the only one RD51 SRS raw file should be supplied. run modes while option #1 can be additionally exectued in the re-run mode.  See sections 3.a.i through 3.a.iv and 4.e.iii for further details.
 
-        1) Analysis, analyzing an input reconstructed SRS Tree file
-        2) Comparison, comparing one or more framework output ROOT files produced in otion #1,
-        3) Reconstruction, performing the reconstruction on an RD51 SRS input raw data file,
-        4) Combinded Reconstruction and Analysis (referred to as Combined), doing option 3 followed by option 1
+### 3.a.i Helper Script - Run Mode: Grid (Analysis)
+### --------------------------------------------------------
+The script:
 
-    Configuring for each of these options is described Secton 4.e.iii.  Option 1 can be executed in all
-    modes: Grid, Series, or Re-run.  Option 3 can be executed in Grid or Series mode; but in series mode
-    only one input RD51 SRS raw file should be supplied.  Option 4 can only be executed in Series mode,
-    again the only one RD51 SRS raw file should be supplied. run modes while option #1 can be additionally
-    exectued in the re-run mode.  See sections 3.a.i through 3.a.iv and 4.e.iii for further details.
+```
+scripts/runMode_Grid.sh
+```
 
-            # 3.a.i Helper Script - Run Mode: Grid (Analysis)
-            # --------------------------------------------------------
+is for running the framework with the analysis option with the lxplus batch submission system using the scheduler `bsub`. This script will setup the *run config file* and launch one job for each input `*dataTree.root` file found in the detector's file directory on `EOS`.  The expected synatx is:
 
-            The script:
+```
+runMode_Grid.sh <Detector Name> <Config File - Analysis> <Config File - Mapping> <Queue Names> <Output Dir>
+```
 
-                scripts/runMode_Grid.sh
+Where: **Detector Name** is the serial number of the detector, omitting slashes (i.e. "/") for example "GE11-X-S-CERN-0001" or "GE11-X-L-CERN-0015" be analyzed are located, **Config File - Analysis** is the PFN of the input analysis config file, **Config File - Mapping**  is the input mapping config file, and **Queue Names** are the requested submission queue on  the lxplus batch submmission system.  The available queues on lxplus are {`8nm`, `1nh`, `8nh`, `1nd`}  for 8 natural minutes, 1 natural hour, 8 natural hours, and 1 natural day, respectively.  And finally, **Output Dir** is the physical file path (PFP) of the desired output data directory where output files will be moved once the job completes.
 
-            is for running the framework with the analysis option with the lxplus batch submission
-            system using the scheduler bsub.
+Additionally for each job a run config file (described in Section 4.e.iii.V), named `config/configRun_JobNoX.cfg` where `X` is the job number, will be created.  One script per job, named `scripts/submitFrameworkJob_JobNoX.sh`, will created; this script will be what the job executes when it runs.  Three directories will also be created, if they do not already exist, called `$GEM_BASE/stderr`, `$GEM_BASE/stdlog`, and `$GEM_BASE/stdout`.  Each of these directories will respectively store the stderr (`stderr/frameworkErr_JobNoX.txt`), stdlog (`stdlog/frameworkLog_JobNoX.txt`), and stdout (`stdout/frameworkOut_JobNoX.txt`) files produced for each job.  The stderr file for a job should be checked if a job fails to produce an output `TFile`.  The stdlog file for a job shows any output to terminal that would be created if the executable was run locally.  The stdout file shows a summary of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
 
-            This script will setup the run config file and launch one job for each input *dataTree.root
-            file found in the detector's file directory on EOS.  The expected synatx is:
+After `scripts/runMode_Grid.sh` has submitted all your jobs it will dump some useful information for how to check running jobs and kill running jobs if necessary.  The `scripts/runMode_Grid.sh` will also show how to add all output `TFiles` together from command line using `hadd`.  After you have added all `TFiles` together you should run the framework over this summary `TFile` in re-run mode to perform the fitting and uniformity analysis.
 
-                runMode_Grid.sh <Detector Name> <Config File - Analysis> <Config File - Mapping> <Queue Names> <Output Dir>
+After you have had a chance to investigate the created run config files, submission scripts, stderr, stdlog, and stdout files you can safely remove them by calling:
 
-            Where: "Detector Name" is the serial number of the detector, omitting slashes (i.e. "/")
-            for example "GE11-X-S-CERN-0001" or "GE11-X-L-CERN-0015" be analyzed are located, 
-            "Config File - Analysis" is the PFN of the input analysis config file, "Config File - Mapping" 
-            is the input mapping config file, and "Queue Names" are the requested submission queue on 
-            the lxplus batch submmission system.  The available queues on lxplus are {8nm, 1nh, 8nh, 1nd} 
-            for 8 natural minutes, 1 natural hour, 8 natural hours, and 1 natural day, respectively.  And
-            finally, "Output Dir" is the physical file path (PFP) of the desired output data directory
-            where output files will be moved once the job completes.
+```
+source scripts/cleanGridFiles.sh
+```
 
-            Additionally for each job a run config file (described in Section 4.e.iii.V), named
-            config/configRun_JobNoX.cfg where X is the job number, will be created.  One script per job, named
-            scripts/submitFrameworkJob_JobNoX.sh, will created; this script will be what the job executes when
-            it runs.  Three directories will also be created, if they do not already exist, called $GEM_BASE/stderr,
-            $GEM_BASE/stdlog, and $GEM_BASE/stdout.  Each of these directories will respectively store the
-            stderr (stderr/frameworkErr_JobNoX.txt), stdlog (stdlog/frameworkLog_JobNoX.txt), and stdout
-            (stdout/frameworkOut_JobNoX.txt) files produced for each job.  The stderr file for a job should be
-            checked if a job fails to produce an output TFile.  The stdlog file for a job shows any output to
-            terminal that would be created if the executable was run locally.  The stdout file shows a summary
-            of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
+For full example:
 
-            After scripts/runMode_Grid.sh has submitted all your jobs it will dump some useful information for
-            how to check running jobs and kill running jobs if necessary.  The scripts/runMode_Grid.sh will also
-            show how to add all output TFiles together from command line using the "hadd" command.  After you have
-            added all TFiles together you should run the framework over this summary TFile in re-run mode to
-            perform the fitting and uniformity analysis.
+```
+runMode_Grid.sh GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
+cd $DATA_DIR/GE11-VII-L-CERN-0001
+hadd summaryFile_Ana.root *Ana.root
+cd $GEM_BASE
+source scripts/cleanGridFiles.sh
+source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+```
 
-            After you have had a chance to investigate the created run config files, submission scripts, stderr,
-            stdlog, and stdout files you can safely remove them by calling:
+NOTE: Modications to `config/configRun_Template_Grid.cfg` may lead to undefined behavior or failures; it is recommended to not modify the template config file.
 
-                source scripts/cleanGridFiles.sh
+If you are interested in merging only a subset of the output TFile's the `scripts/mergeSelectedRuns.sh` is provided to perform this task.  The expected syntax is:
 
-            Example:
+```
+source mergeSelectedRuns.sh <Output ROOT Filename w/Key Phrase> <Key Phrase> <Data File Directory> <Comma and/or Dash Delimited Run List>
+```
 
-                runMode_Grid.sh GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
-                cd $DATA_DIR/GE11-VII-L-CERN-0001
-                hadd summaryFile_Ana.root *Ana.root
-                cd $GEM_BASE
-                source scripts/cleanGridFiles.sh
-                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+Where: the **Output ROOT Filename w/Key Phrase** is the name of the merged ROOT file which includes a **Key Phrase** that the script will use string replacement to indicate the total number of events from the input run list (provided each input run has the field **YYkEvt** present in the filename); **Data Directory** is the PFP where the input data files to be merged are located; and **Comma and/or Dash Delimited Run List** is the list of input runs to be considered for merging.  Example:
 
-            NOTE: Modications to config/configRun_Template_Grid.cfg may lead to undefined behavior or failures;
-            it is recommended to not modify the template config file.
+```
+source mergeSelectedRuns.sh GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root YY $DATA_DIR/GE11-VII-S-CERN-0002 133,135,137-158
+```
 
-            If you are interested in merging only a subset of the output TFile's the scripts/mergeSelectedRuns.sh
-            is provided to perform this task.  The expected syntax is:
+Here the key phrase is **YY** and runs 133, 135, and 137 through 158 will be merged together to make `GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root` with `YY` replaced with the total event number indicated in the filenames.
 
-                source mergeSelectedRuns.sh <Output ROOT Filename w/Key Phrase> <Key Phrase> <Data File Directory> <Comma and/or Dash Delimited Run List>
+### 3.a.ii Helper Script - Run Mode: Grid (Reconstruction)
+### --------------------------------------------------------
+The script:
 
-            Where: the "Output ROOT Filename w/Key Phrase" is the name of the merged ROOT file which includes a
-            "Key Phrase" that the script will use string replacement to indicate the total number of events from
-            the input run list (provided each input run has the field "YYkEvt" present in the filename); "Data Directory"
-            is the PFP where the input data files to be merged are located; and "Comma and/or Dash Delimited Run List"
-            is the list of input runs to be considered for merging.  Example:
+```
+scripts/runMode_Grid_Reco.sh
+```
 
-                source mergeSelectedRuns.sh GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root YY $DATA_DIR/GE11-VII-S-CERN-0002 133,135,137-158
+is for running the framework with the reconstruction option with the lxplus batch submission system using the scheduler `bsub`. This script will setup the run config file and launch one job for each input file in the data file directory below.  The expected synatx is:
 
-            Here the key phrase is "YY" and runs 133, 135, and 137 through 158 will be merged together to make
-            GE11-VII-S-CERN-0002_Summary_Physics_RandTrig_XRay40kV99uA_580uA_YYkEvt_Ana.root with YY replaced
-            with the total event number indicated in the filenames.
+```
+runMode_Grid_Reco.sh <Detector Name> <Config File - Reco> <Config File - Mapping> <Queue Names> <Output Dir>
+```
 
-            # 3.a.ii Helper Script - Run Mode: Grid (Reconstruction)
-            # --------------------------------------------------------
+Where: the inputs are as in Section 3.a.i except that **Config File - Reco** is the PFN of the input reco config file.  The behavior of this script is identical to `runMode_Grid.sh` except that the input files found in the detector's file directory on `EOS` end with the expression `*.raw`. For furhter details consult Section 3.a.i.
 
-            The script:
+After all your jobs have completed you are ready to process the created `*dataTree.root` files with the framework in the analysis option (see Sections 3.a & 4.e.iii).
 
-                scripts/runMode_Grid_Reco.sh
+Full example:
+```
+runMode_Grid_Reco.sh GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
+cd $DATA_DIR/GE11-VII-L-CERN-0004
+ls
+cd $GEM_BASE
+source scripts/cleanGridFiles.sh
+source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_DIR/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+```
 
-            is for running the framework with the reconstruction option with the lxplus batch submission
-            system using the scheduler bsub.
+It is important to note that, unfortunately, the mapping file must be provided in two locations: 
 
-            This script will setup the run config file and launch one job for each input file in the
-            data file directory below.  The expected synatx is:
+    1. the Run Config file, and
+    2. the Reco Config file.  
 
-                runMode_Grid_Reco.sh <Detector Name> <Config File - Reco> <Config File - Mapping> <Queue Names> <Output Dir>
+If you reconstruct one set of data with one mapping file, but then use a different mapping file to perform the analysis it is likely only empty histograms will be generated.
 
-            Where: the inputs are as in Section 3.a.i except that "Config File - Reco" is the PFN of the
-            input reco config file.  The behavior of this script is identical to runMode_Grid.sh except
-            that the input files found in the detector's file directory on EOS end with the expression "*.raw".
-            For furhter details consult Section 3.a.i.
+NOTE: Modications to `config/configRun_Template_Grid_Reco.cfg` may lead to undefined behavior or failures; it is recommended to not modify the template config file.
 
-            After all your jobs have completed you are ready to process the created "*dataTree.root" files
-            with the framework in the analysis option (see Sections 3.a & 4.e.iii).
+### 3.a.iii Helper Script - Run Mode: Rerun
+### --------------------------------------------------------
+The script:
 
-            Example:
+```
+scripts/runMode_Rerun.sh
+```
 
-                runMode_Grid_Reco.sh GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
-                cd $DATA_DIR/GE11-VII-L-CERN-0004
-                ls
-                cd $GEM_BASE
-                source scripts/cleanGridFiles.sh
-                source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_DIR/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+is for running the framework with the analysis option over a previously produced framework output `TFile`. This script will setup the run config file to re-run over each input file found in the data file directory below. One output `TFile` will be produced for each input file.  The expected synatx is:
 
-            It is important to note that, unfortunately, the mapping file must be provided in two locations: 1) the Run Config file, and
-            2) the Reco Config file.  If you reconstruct one set of data with one mapping file, but then use a different mapping file to
-            perform the analysis it is likely only empty histograms will be generated.
+```
+source scripts/runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+```
 
-            NOTE: Modications to config/configRun_Template_Grid_Reco.cfg may lead to undefined behavior or failures;
-            it is recommended to not modify the template config file.
+Where: **Detector Name** is the detector serial number; and **Data File Directory**, **Config File - Analysis**, and **Config File - Mapping** are as described in Section 3.a.i. After calling this script it is recommended to cross-check the created `config/configRun.cfg` file before executing the framework.  This will let you ensure the correct set of input files will be re-analyzed.
 
-            # 3.a.iii Helper Script - Run Mode: Rerun
-            # --------------------------------------------------------
+The script will only consider files that end in `*Ana.root`, the output of each will be `*NewAna.root`.
 
-            The script:
+Full example:
 
-                scripts/runMode_Rerun.sh
+```
+source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
+./frameworkMain config/configRun.cfg true
+```
 
-            is for running the framework with the analysis option over a previously produced framework output
-            TFile. This script will setup the run config file to re-run over each input file found in the data
-            file directory below. One output TFile will be produced for each input file.  The expected synatx is:
+NOTE: Modications to `config/configRun_Template_Rerun.cfg` may lead to undefined behavior or failures; it is recommended to not modify the template config file.
 
-                source scripts/runMode_Rerun.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping>
+### 3.a.iv Helper Script - Run Mode: Series
+### --------------------------------------------------------
+The script:
 
-            Where: "Detector Name" is the detector serial number; and "Data File Directory," "Config File - Analysis,"
-            and "Config File - Mapping" are as described in Section 3.a.i.
+```
+scripts/runMode_Series.sh
+```
 
-            After calling this script it is recommended to cross-check the created config/configRun.cfg file
-            before executing the framework.  This will let you ensure the correct set of input files will be
-            re-analyzed.
+is for running the framework with the analysis option over a set of input files in series, i.e. one after the other, and creating a single output `TFile`.  The expected syntax is:
 
-            The script will only consider files that end in *Ana.root, the output of each will be *NewAna.root.
+```
+source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+```
 
-            Example:
+Where: **Detector Name**, **Data File Directory**, **Config File - Analysis**, and **Config File - Mapping** are as described in Sections 3.a.i and 3.a.ii; and **Output Data Filename** is the desired name of the output `TFile` to be created. After calling this script it is recommended to cross-check the created `config/configRun.cfg` file before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
 
-                source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
-                ./frameworkMain config/configRun.cfg true
+Full example:
 
-            NOTE: Modications to config/configRun_Template_Rerun.cfg may lead to undefined behavior or failures;
-            it is recommended to not modify the template config file.
+```
+source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
+./frameworkMain config/configRun.cfg true
+```
 
-            # 3.a.iv Helper Script - Run Mode: Series
-            # --------------------------------------------------------
+Right now no helper script exists for running the reconstruction or combined options in the series mode. Presently these modes can only be run over a single input file.  Manual configuration of the run config file is required (See Section 4.e.iii).
 
-            The script:
+NOTE: Modications to `config/configRun_Template_Series.cfg` may lead to undefined behavior or failures; it is recommended to not modify the template config file.
 
-                scripts/runMode_Series.sh
+### 3.a.v  Helper Script - Run Mode: Comparison
+### --------------------------------------------------------
+The script:
 
-            is for running the framework with the analysis option over a set of input files in series, i.e.
-            one after the other, and creating a single output TFile.  The expected syntax is:
+```
+scripts/runMode_Comparison.sh
+```
 
-                source runMode_Series.sh <Detector Name> <Data File Directory> <Config File - Analysis> <Config File - Mapping> <Output Data Filename>
+is for running the framework with the analysis option over a set of framework output files and creating a single output `TFile` containing a `TCanvas` with a set of `TH1F` objects drawn on it (and also stored in the ROOT file).  The expected syntax is:
 
-            Where: "Detector Name," "Data File Directory," "Config File - Analysis," and "Config File - Mapping"
-            are as described in Sections 3.a.i and 3.a.ii; and "Output Data Filename" is the desired name of
-            the output TFile to be created.
+```
+source runMode_Comparison.sh <Data File Directory> <Output Data Filename> <Obs Name> <iEta,iPhi,iSlice> <Identifier>
+```
 
-            After calling this script it is recommended to cross-check the created config/configRun.cfg file
-            before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
+Where: **Data File Directory** is as above; **Output Data Filename** is the name of the output `TFile`; **Obs Name** is a regular expression found in the `TName` of the `TH1F` objects you wish to compare from your set of input files; **iEta,iPhi,iSlice** is a comma separated triplet of the `(iEta,iPhi,iSlice)` coordinate within the detector; and **Identifier** is a regular expression contained in the filenames of each of your input files found in the **Data File Directory**. When giving the **Obs Name** this is the `ObservableNameX` referred to in Section 4.f.i. To familiarize yourself with the possible inputs it is suggestion to run the framework in one of the above outputs and study the produced `TFile`.
 
-            Example:
+For the **iEta,iPhi,iSlice** field you must always enter a set of three integers.  However, you can access observables created at either the `Summary`, `SectorEta`, `SectorPhi`, or `Slice` level (Again see Section 4.f.i) based on the input that is given.  The following table shows how to access observables at each level:
 
-                source runMode_Series.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg GE11-VII-L-CERN-0001_FrameworkAna.root
-                ./frameworkMain config/configRun.cfg true
+Obs Level | iEta | iPhi | iSlice
+--------- | ---- | ---- | ------
+Summary | -1 | -1 | -1
+SectorEta | iEta | -1 | -1
+SectorPhi | iEta | iPhi | -1
+Slice | iEta | iPhi | iSlice
 
-            Right now no helper script exists for running the reconstruction or combined options in the series mode.
-            Presently these modes can only be run over a single input file.  Manual configuration of the run config
-            file is required (See Section 4.e.iii).
+As you can see by placing `-1` in the relevant coordinate point you can select the level you are interested in. 
 
-            NOTE: Modications to config/configRun_Template_Series.cfg may lead to undefined behavior or failures;
-            it is recommended to not modify the template config file.
+Since this is a different run mode, to prevent any previous Run Config file from being over-written, this script will produce a Run Config file called:
 
-            # 3.a.v  Helper Script - Run Mode: Comparison
-            # --------------------------------------------------------
+```
+config/configComp.cfg
+```
 
-            The script:
+this should help you distinguish your different configurations. After calling this script it is recommended to cross-check the created `config/configComp.cfg` file before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
 
-                scripts/runMode_Comparison.sh
+Full example:
 
-            is for running the framework with the analysis option over a set of framework output files and creating
-            a single output TFile containing a TCanvas with a set of TH1F objects drawn on it (and also stored in the
-            ROOT file).  The expected syntax is:
+```
+source runMode_Comparison.sh data/clustSelStudy/GE11-VII-L-CERN-0002 GE11-VII-L-CERN-0002_ClustSize_Comparison.root clustADC 4,2,-1 ClustSize
+```
 
-                source runMode_Comparison.sh <Data File Directory> <Output Data Filename> <Obs Name> <iEta,iPhi,iSlice> <Identifier>
+In this example the contents of my Data File Directory are:
 
-            Where: "Data File Directory" is as above; "Output Data Filename" is the name of the output TFile;
-            "Obs Name" is a regular expression found in the TName of the TH1F objects you wish to compare from your
-            set of input files; "iEta,iPhi,iSlice" is a comma separated triplet of the (iEta,iPhi,iSlice) coordinate
-            within the detector; and "Identifier" is a regular expression contained in the filenames of each of your
-            input files found in the "Data File Directory."
+```
+% ls data/clustSelStudy/GE11-VII-L-CERN-0002
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize2_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize3_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize4_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize5_Ana.root
+GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize6_Ana.root
+```
 
-            When giving the "Obs Name" this is the "ObservableNameX" referred to in Section 4.f.i. To familiarize
-            yourself with the possible inputs it is suggestion to run the framework in one of the above outputs and
-            study the produced TFile.
+you can see the **Identifier** regular expression is **ClustSize** which is contained in each filename as `ClustSizeX` for `X` = {`1to20`,`1`,`2`,...,`5`,`6`}.  And the observable I will be comparing across these files is the clustADC `TH1F` found in the `(iEta,iPhi) = (4,2)` sector.  Since `iSlice = -1` the full `SectorPhi` is considered.
 
-            For the "iEta,iPhi,iSlice" field you must always enter a set of three integers.  However, you can access
-            observables created at either the "Summary," "SectorEta," "SectorPhi," or "Slice" level (Again see
-            Section 4.f.i) based on the input that is given.  The following table shows how to access observables at
-            each level:
+Right now this mode is somewhat primitive.  If you enter an **Obs Name** and `(iEta,iPhi,iSlice)` combination that does not exist it will crash and seg-fault.  If this occurs please double-check your input file. Note that there is a difference between `clustADC` and `ClustADC` with the former working, and the latter causing a seg fault (i.e. the "c" is not capitalized).
 
-                                            Obs Level       "iEta,iPhi,iSlice"
+NOTE: Modications to `config/configComp_Template.cfg` may lead to undefined behavior or failures; it is recommended to not modify the template config file.
 
-                                            Summary         -1,-1,-1
-                                            SectorEta       iEta,-1,-1
-                                            SectorPhi       iEta,iPhi,-1
-                                            Slice           iEta,iPhi,iSlice
+## 3.b. genericPlotter
+## --------------------------------------------------------
+As with `frameworkMain` for each new shell navigate to the base directory of the repository and setup the environment via:
 
-            As you can see by placing "-1" in the relevant coordinate point you can select the level you are interested in.
+```
+source scripts/setup_CMS_GEM.sh
+```
 
-            Since this is a different run mode, to prevent any previous Run Config file from being over-written, this
-            script will produce a Run Config file called:
+The usage for the `genericPlotter` executable is:
 
-                config/configComp.cfg
+```
+./genericPlotter <PFN of Plot Config File> <Verbose Mode true/false>
+```
 
-            This should help you distinguish your different configurations.
+The **Plot Config** file is described in Section 4.e.iv.  The executable can take in comma separted data or `TObjects` from an input `TFile`.  Presently `TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, and `TH2F` objects are supported.
 
-            After calling this script it is recommended to cross-check the created config/configRun.cfg file
-            before executing the framework.  This will let you ensure the correct set of input files will be analyzed.
+The `genericPlotter` will create a canvas following the official [CMS style guide](https://ghm.web.cern.ch/ghm/plots/) for figures defined by the [CMS Collaboration](https://twiki.cern.ch/twiki/bin/view/CMS/Internal/PubGuidelines#Figures_and_tables). Developers should periodically check for updates to these guidelines.  This executable has been adaptered from the `tdrstyle.C`, `CMS_lumi.h`, and `CMS_lumi.C` scripts available from the first link. Bob Brown, Gautier Hamel de Monchenault, and Dino Ferencek are the authors/contributors to these three scripts at the time of their adaptation.
 
-            Example:
+For a full explanation of the available configurations please consult Section 4.e.iv.  The contents and layout of the output files are described in Section 4.f.iii.
 
-                source runMode_Comparison.sh data/clustSelStudy/GE11-VII-L-CERN-0002 GE11-VII-L-CERN-0002_ClustSize_Comparison.root clustADC 4,2,-1 ClustSize
+Five example plot config files for plotting: 
 
-            In this example the contents of my Data File Directory are:
+    1. TGraph, 
+    2. TGraph2D, 
+    3. TGraphErrors, 
+    4. TH1F, and
+    5. TH2F 
 
-                ls data/clustSelStudy/GE11-VII-L-CERN-0002
+objects have been provided in the default repository.  A usage example is given as:
 
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize2_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize3_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize4_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize5_Ana.root
-                GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize6_Ana.root
+```
+./genericPlotter config/configPlot_Graph.cfg true
+```
 
-            You can see the "Identifier" regular expression is "ClustSize" which is contained in each filename as
-            "ClustSizeX" for X = {"1to20","1","2",...,"5","6"}.  And the observable I will be comparing across these
-            files is the clustADC TH1F found in the (iEta,iPhi) = (4,2) sector.  Since "iSlice = -1" the full SectorPhi
-            is considered.
+As a general rule the style defined by `genericPlotter` may not persist in the created `TObjects` once they have been saved in the output `TFile`.  Additionally your `rootlogon.C` script may define a different style than the used in the official CMS guide.  As a result it is strongly suggested to relying on the output image files created by `genericPlotter` and not the output `ROOT` file.
 
-            Right now this mode is somewhat primitive.  If you enter an "Obs Name" and "iEta,iPhi,iSlice" combination
-            that does not exist it will crash and seg-fault.  If this occurs please double-check your input file.
-            Note that there is a difference between "clustADC" and "ClustADC" with the former working, and the latter
-            causing a seg fault (i.e. the "c" is not capitalized).
+### 3.b.i  Helper Script - Make All Plots
+### --------------------------------------------------------
+The helper script:
 
-            NOTE: Modications to config/configComp_Template.cfg may lead to undefined behavior or failures;
-            it is recommended to not modify the template config file.
+```
+scripts/makeAllPlots.sh
+```
 
-    # 3.b. genericPlotter
-    # --------------------------------------------------------
+Has been created for you to easily make plots for all plot config files that are defined in a given directory.  This can help automatize the plot making procedure. The expected syntax is:
 
-    As with frameworkMain for each new shell navigate to the base directory of the repository and setup the
-    environment via:
+```
+source scripts/makeAllPlots.sh <Plot Config File Directory>
+```
 
-        source scripts/setup_CMS_GEM.sh
+Where **Plot Config File Directory** is the directory where your plot config files are found.  Note your plot config files must have the `*.cfg` extension to be recognized. An example call is given as:
 
-    The usage for the genericPlotter executable is:
+```
+source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
+```
 
-        For executing:  ./genericPlotter <PFN of Plot Config File> <Verbose Mode true/false>
+this will then execute genericPlotter taking each `*.cfg` file in the `figures/ResponseUniformityMaps` directory.
 
-    The Plot Config file is described in Section 4.e.iv.  The executable can take in comma separted data
-    or TObjects from an input TFile.  Presently TGraph, TGraph2D, TGraphErrors, TH1F, and TH2F objects
-    are supported.
+## 3.b. Python Scripts
+## --------------------------------------------------------
+A set of python analysis tools has been added to assist the user in further analysis of data created with the Framework.  The mathematical framework for the following sections is described [here](https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf). This may be helpful in attempting to understand the results produced by the python tools described below.
 
-    The genericPlotter will create a canvas following the official style guide for figures defined by the
-    CMS Collaboration at:
+### 3.c.i  Analysis Suite - Gain Map
+### --------------------------------------------------------
+This tool takes results from the effective gain calibration (`QC5_Eff_Gain`) and response uniformity (`QC5_Resp_Uni`) measurements to determine the gain at every point across the detector.  As with `frameworkMain` for each new shell navigate to the base directory of the repository and setup the environment via:
 
-        https://ghm.web.cern.ch/ghm/plots/
-        https://twiki.cern.ch/twiki/bin/view/CMS/Internal/PubGuidelines#Figures_and_tables
+```
+source scripts/setup_CMS_GEM.sh
+```
 
-    Developers should periodically check for updates to these guidelines.  This executable has been
-    adaptered from the tdrstyle.C, CMS_lumi.h, and CMS_lumi.C scripts available from the first link above.
-    Bob Brown, Gautier Hamel de Monchenault, and Dino Ferencek are the authors/contributors to these three
-    scripts at the time of their adaptation.
+The usage for the `computeGainMap.py` script is:
 
-    For a full explanation of the available configurations please consult Section 4.e.iv.  The contents and
-    layout of the output files are described in Section 4.f.iii.
+```
+    python2.7 python/computeGainMap.py --file=<Framework Output File> --gp0=<Gain P0> --gp0Err=<Gain P0Err> --gp1=<Gain P1> --gp1Err=<Gain P1Err> --name=<Detector Name> --hvPoint=<HV Val> --hvlist=<HV List> --fileMap=<Config File - Mapping>
+```
 
-    Five example plot config files for plotting: 1) TGraph, 2) TGraph2D, 3) TGraphErrors, 4) TH1F,
-    and 5) TH2F objects have been provided in the default repository.  A usage example is given as:
+Where: 
 
-        ./genericPlotter config/configPlot_Graph.cfg true
+    1. **Framework Output File** is the PFN of the analyzed framework output file produced from the
+`QC5_Resp_Uni` measurement; 
+    2. **Gain P0**, **Gain P0Err**, **Gain P1**, and **Gain P1Err** are values of the parameters, and their errors, of a fit to the `QC5_Eff_Gain` data where the equation of fit is described as `G(x) = exp([0]*x+[1])` with `x` some `hvPt` observable (either drift voltage or divider current);
+    3. **Detector Name** is the exact string assigned to the `Detector_Name` field in the run config file you supplied when creating the given Framework Output File; 
+    4. **HV Val** is the value of the `hvPt` observable (either drift voltage or divider current) for which the `QC5_Resp_Uni` measurement was carried out at (note: this must match with how the gain curve is parameterized); 
+    5. **HV List** is a comma separated list of HV points you would like the gain map calculated at (again this must match how gain curve is parameterized); and 
+    6. **Config File - Mapping** is the input mapping config file used to produce the analyzed framework output file.
 
-    As a general rule the style defined by genericPlotter may not persist in the created TObjects once they
-    have been saved in the output TFile.  Additionally your rootlogon.C script may define a different style
-    than the used in the official CMS guide.  As a result it is strongly suggested to relying on the output
-    image files created by genericPlotter and not the otuput ROOT file.
+An example call is given as:
 
-        # 3.b.i  Helper Script - Make All Plots
-        # --------------------------------------------------------
+```
+    python2.7 python/computeGainMap.py --file=FrameworkOutput.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=config/Mapping_GE11-VII-L.cfg
+```
 
-        The helper script:
+Here the gain curve was parameterized in terms of divider current and as a result the `hvPoint` and `hvlist` fields are also given in terms of divider current. If you would like to analyze multiple files simultaneously, or prefer to not type everything in on command line, the helper script:
 
-            scripts/makeAllPlots.sh
+```
+scripts/makeGainMaps.sh
+```
 
-        Has been created for you to easily make plots for all plot config files that are defined in a given
-        directory.  This can help automatize the plot making procedure.
+has been created to assist you.  The expected synatx is:
 
-        The expected syntax is:
+```
+source makeGainMaps.sh <Summary File>
+```
 
-            source scripts/makeAllPlots.sh <Plot Config File Directory>
+where **Summary File** is a tab delimited data file where each line has the command line arguments you would pass for a single single detector.  Specifically the order is expected as:
 
-        Where "Plot Config File Directory" is the directory where your plot config files are found.  Note
-        your plot config files must have the *.cfg extension to be recognized.
+```
+file	gp0	gp0Err	gp1	gp1Err	name	hvPoint	hvlist  fileMap
+```
 
-        An example call is given as:
+Where these fields are described in the following table:
 
-            source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
+Field | Description
+----- | -----------
+file | physical filename of the Framework output file
+gp0 | Value of `p0` in `G(x) = exp(p0*x+p1)`
+gp0Err | Error on `p0` in `G(x) = exp(p0*x+p1)` 
+gp1 | Value of `p1` in `G(x) = exp(p0*x+p1)`
+gp1Err | Error on `p1` in `G(x) = exp(p0*x+p1)` 
+name | String assigned to `Detector_Name` field in the run config file used to make the Framework output file
+hvPoint | HV value at which the original `QC5_Resp_Uni` measurement was performed at
+hvlist | comma separated list of hv points for which the gain map should be calculated at
+fileMap | physical filename of the mapping config file used to generate the Framework output file
 
-        This will then execute genericPlotter taking each *.cfg file in the figures/ResponseUniformityMaps
-        directory.
+in the above table `x` in `G(x) = exp(p0*x+p1)` is either in terms divider current or `V_Drift`. For each entry in the **Summary File** the `python/computeGainMap.py` script will be called and generate the appropriate output file.
 
-    # 3.b. Python Scripts
-    # --------------------------------------------------------
+### 3.c.ii Analysis Suite - Efficiency Predictions
+### --------------------------------------------------------
+This tool takes results from the effective gain calibration (`QC5_Eff_Gain`), response uniformity (`QC5_Resp_Uni`) measurements, MIP cluster charge measurements, and MIP cluster size measurements to determine the gain and efficiency at every point across the detector.  As with `frameworkMain` for each new shell navigate to the base directory of the repository and setup the environment via:
 
-    A set of python analysis tools has been added to assist the user in further analysis of data created
-    with the Framework.  The mathematical framework for the following sections is described in:
+```
+source scripts/setup_CMS_GEM.sh
+```
 
-        https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf
+The usage for the `computeEffCurves.py` script is:
 
-    This may be helpful in attempting to understand the results produced by the python tools described below
+```
+python2.7 python/computeEffCurves.py  --file=<Efficiency Predictor Config File> --debug=<True/False>
+```
 
-        # 3.c.i  Analysis Suite - Gain Map
-        # --------------------------------------------------------
+Where the **Efficiency Predictor Config File** is described in Section 4.e.v and the debug flag is a True/False value which will print more verbose information to the terminal. An example call is given as:
 
-        This tool takes results from the effective gain calibration (QC5_Gain_Cal) and response uniformity (QC5_Resp_Uni)
-        measurements to determine the gain at every point across the detector.  As with frameworkMain for each
-        new shell navigate to the base directory of the repository and setup the environment via:
-
-            source scripts/setup_CMS_GEM.sh
-
-        The usage for the computeGainMap.py script is:
-
-            python2.7 python/computeGainMap.py --file=<Framework Output File> --gp0=<Gain P0> --gp0Err=<Gain P0Err> --gp1=<Gain P1> --gp1Err=<Gain P1Err> --name=<Detector Name> --hvPoint=<HV Val> --hvlist=<HV List> --fileMap=<Config File - Mapping>
-
-        Where: 1) "Framework Output File" is the PFN of the analyzed framework output file produced from the
-        QC5_Resp_Uni measurement; 2) "Gain P0," "Gain P0Err," "Gain P1," and "Gain P1Err" are values of the
-        parameters, and their errors, of a fit to the QC5_Gain_Call data where the equation of fit is described
-        as G(x) = exp([0]*x+[1]) with x some hvPt observable (either drift voltage or divider current);
-        3) "Detector Name" is the exact string assigned to the "Detector_Name" field in the run config file you
-        supplied when creating the given Framework Output File; 4) "HV Val" is the value of the hvPt observable
-        (either drift voltage or divider current) for which the QC5_Resp_Uni measurement was carried out at (note:
-        this must match with how the gain curve is parameterized); 5) "HV List" is a comma separated list of HV
-        points you would like the gain map calculated at (again this must match how gain curve is parameterized),
-        and 6) "Config File - Mapping" is the input mapping config file used to produce the analyzed framework
-        output file.
-
-        An example call is given as:
-
-            python2.7 python/computeGainMap.py --file=FrameworkOutput.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=config/Mapping_GE11-VII-L.cfg
-
-        Here the gain curve was parameterized in terms of divider current and as a result the hvPoint and hvlist
-        fields are also given in terms of divider current
-
-        If you would like to analyze multiple files simultaneously, or prefer to not type everything in on command
-        line, the helper script:
-
-            scripts/makeGainMaps.sh
-
-        Has been created to assist you.  The expected synatx is:
-
-            source makeGainMaps.sh <Summary File>
-
-        Where "Summary File" is a tab delimited data file where each line has the command line arguments you would
-        pass for a single single detector.  Specifically the order is expected as:
-
-            file	gp0	gp0Err	gp1	gp1Err	name	hvPoint	hvlist  fileMap
-
-        Where:
-            file	physical filename of the Framework output file
-            gp0     Value of p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            gp0Err	Error on p0 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            gp1     Value of p1 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            gp1Err	Error on p1 in G(x) = exp(p0*x+p1); here x is either divider current or V_Drift
-            name	String assigned to "Detector_Name" field in the run config file used to make the Framework output file
-            hvPoint	HV value at which the original QC5_Resp_Uni measurement was performed at (input either divider current or V_Drift)
-            hvlist	comma separated list of hv points for which the gain map should be calculated at
-            fileMap physical filename of the mapping config file used to generate the Framework output file
-
-        For each entry in the "Summary File" the python/computeGainMap.py script will be called and generate the
-        appropriate output file.
-
-        # 3.c.ii Analysis Suite - Efficiency Predictions
-        # --------------------------------------------------------
-
-        This tool takes results from the effective gain calibration (QC5_Gain_Cal), response uniformity (QC5_Resp_Uni)
-        measurements, MIP cluster charge measurements, and MIP cluster size measurements to determine the gain and
-        efficiency at every point across the detector.  As with frameworkMain for each new shell navigate to the base
-        directory of the repository and setup the environment via:
-
-            source scripts/setup_CMS_GEM.sh
-
-        The usage for the computeEffCurves.py script is:
-
-            python2.7 python/computeEffCurves.py  --file=<Efficiency Predictor Config File> --debug=<True/False>
-
-        Where the "Efficiency Predictor Config File" is described in Section 4.e.v and the debug flag is a True/False
-        value which will print more verbose information to the terminal.
-
-        An example call is given as:
-
-            python2.7 python/computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
+```
+python2.7 python/computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
+```
 
 # 4. Documentation
 # ========================================================
-
-    This section describes the contents of the repository, the expected inputs, and the produced outputs.
-    Developers should have a firm grasp of this entire section; users need only be concerned with sections
-    4.e and 4.f.  However users may be interested in understanding what TObjects are created/stored in the
-    output ROOT file and may wish to browse the sections below.
-
-    # 4.a. Namespaces
-    # --------------------------------------------------------
-
-    This repository has declared the following namespaces: Luminosity, Plotter, Timing, Uniformity.
-    The last three of these namespaces reside within the QualityControl namespace.
-
-    The Luminosity and Plotter namespaces include tools necessary for creating plots conforming to
-    the offical CMS Style Guide.
-
-    The Timing namespace includes several operators, types, and utility functions that were developed
-    in CMS_GEM_TB_Timing; the contents of the Timing namespace offer substantial utility and "quality
-    of life features."
-
-    The Uniformity namespace contains the majority of source code for analyzing response uniformity
-    measurements performed for GE1/1 detectors; and hopefully GE2/1 & ME0 detectors in the future.
-
-    # 4.b. Class Map
-    # --------------------------------------------------------
-
-    Following is for C++ classes only.
-
-    Inheritance relations:
-
-        FrameworkBase
-            |
-            |--->AnalyzeResponseUniformity
-            |       |
-            |       |--->AnalyzeResponseUniformityClusters
-            |       |--->AnalyzerResponseUniformityHits
-            |       |--->Visualizer
-            |               |
-            |               |--->VisualizeComparison
-            |               |--->VisualizeUniformity
-            |
-            |--->Interface
-            |       |
-            |       |--->InterfaceAnalysis
-            |       |--->InterfaceReco  (Skeleton, not implemented yet)
-            |       |--->InterfaceRun   (Depreciated)
-            |
-            |--->Selector
-                    |
-                    |--->SelectorCluster
-                    |--->SelectorHit
-
-        ParameterLoader
-            |
-            |--->ParameterLoaderAnalysis
-            |--->ParameterLoaderDetector
-            |--->ParameterLoaderFit
-            |--->ParameterLoaderPlotter
-            |--->ParameterLoaderRun
-
-        PlotterGeneric
-            |
-            |--->PlotterGraph
-            |--->PlotterGraph2D
-            |--->PlotterGraphErrors
-            |--->PlotterHisto
-            |--->PlotterHisto2D
-
-        ReadoutSector
-            |
-            |--->ReadoutSectorEta
-            |--->ReadoutSectorPhi
-
-    The following classes have no children presently
-
-        DetectorMPGD
-        SRSAPVEvent
-        SRSCluster
-        SRSConfiguration
-        SRSEventBuilder
-        SRSFECDecoder
-        SRSHit
-        SRSMain
-        SRSMapping
-        SRSOutputROOT
-
-    Friendship relations:
-
-        AnalyzeResponseUniformity, AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits,
-        InterfaceAnalysis, and ParameterLoaderDetector are all friend classes to DetectorMPGD.
-
-    Interactions:
-
-        Classes ParameterLoaderDetector, those inheriting from Selector, and those inheriting from
-        AnalyzeResponseUniformity all act on an object of DetectorMPGD.
-
-        The ParameterLoaderAnalysis class interacts with objects who inherit from Selector and
-        AnalyzResponseUniformity classes.
-
-        InterfaceAnalysis -> interface between main() and the analysis portion of the framework; runs the analysis for loaded case.
-        ParameterLoaderAnalysis -> sets up the user specified analysis; this info is passed separately to Selector & AnalyzeResponseUniformity classes (and their inherited classes).
-        ParameterLoaderDetector -> creates a DetectorMPGD object
-        ParameterLoaderFit -> loads necessary information for fits
-        ParameterLoaderPlotter -> loads necessary information for making a plot conforming to the CMS Style Guide
-        ParameterLoaderRun -> sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
-        PlotterGeneric -> And it's inherited classes create a TCanvas with one or more TObjects drawn on it such that it conforms to the CMS Style Guide
-        ReadoutSector -> A single readout sector, used by DetectorMPGD to track distributions in a certain portion of the detector
-        ReadoutSectorEta -> As ReadoutSector, but for an iEta row inside the detector, stores the detectors ReadoutSectorPhi objects
-        ReadoutSectorPhi -> As ReadoutSectorEta, but for an iPhi sector within an iEta row, stores the detector's hits, clusters, and slices
-        SelectorCluster -> Assigned an input DetectorMPGD object the opens an input root file and performs the cluster selection; selected clusters are stored based on their location in the DetectorMPGD object.
-        SelectorHit -> As SelectorCluster but for hits (e.g. single strips).
-        AnalyzeResponseUniformityCluster -> Acts on a DetectorMPGD object that has stored clusters and performs the user requested analysis
-        AnalyzeResponseUniformityHit -> As AnalyzeResponseUniformityCluster but for hits.
-        VisualizeUniformity -> Takes the raw plots produced by AnalyzeResponseUniformity and presents them in a user friendly manner.
-        VisualizeComparison -> Compares TH1F objects from different Framework output files and makes simple comparison plots
-
-    An example process-flow of what frameworkMain does in a given execution is shown as:
-
-        frameworkMain
-            |
-            |->ParameterLoaderRun loads run parameters from run config file
-            |
-            |->Run Option Analysis
-            |       |
-            |       |->ParameterLoaderDetector creates a DetectorMPGD Object
-            |       |
-            |       |->ParameterLoaderAnalysis & ParameterLoaderFit load analysis parameters from analysis config file
-            |       |
-            |       |->InterfaceAnalysis is given run & analyiss setup structs, and DetectorMPGD object
-            |               |
-            |               |->Reconstructed Tree File Input?
-            |               |       |
-            |               |       |->SelectorHit performs hit selection and stores selected hits in DetectorMPGD object
-            |               |       |
-            |               |       |->AnalyzeResponseUniformityHits makes distributions from selected hits
-            |               |       |
-            |               |       |->SelectorCluster does the same for clusters
-            |               |       |
-            |               |       |->AnalyzeResponseUniformityClusters makes distributions from selected clusters
-            |               |       |
-            |               |       |->After all input files are processed AnalyzeResponseUniformityClusters makes & fits slice distributions
-            |               |       |
-            |               |       |->VisualizeUniformity creates summary plots
-            |               |
-            |               |->Framework output file as input?
-            |                       |
-            |                       |->AnalyzeResponseUniformityClusters loads all previously created TObjects from file
-            |                       |
-            |                       |->AnalyzeResponseUniformityClusters then makes then fits slice distributions
-            |                       |
-            |                       |->VisualizeUniformity creates summary plots
-            |
-            |->Run Option Comparison
-            |       |
-            |       |->VisualizeComparison collects all TH1F objects for comparison from all input files
-            |       |
-            |       |->VisualizeComparison collected TH1F objects and sets up a legend for identification
-            |
-            |->Run Option Reconstruction
-            |       |
-            |       |->SRSMain produces a Tree file from a RD51 SRS raw file (BLACK BOX!!!)
-            |
-            |->Run Option Combined
-                    |
-                    |->Run Option Reconstruction is executed
-                    |
-                    |->Run Option Analysis is executed
-
-        # 4.b.i. FrameworkBase
-        # --------------------------------------------------------
-
-        Defined in include/FrameworkBase.h
-        Non-inherited member attributes shown below.
-
-        Public Constructors
-            FrameworkBase();
-
-        Public Member Functions
-            virtual Uniformity::DetectorMPGD getDetector();
-            virtual int getRunNum();
-
-            virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup);
-            virtual void setDetector(Uniformity::DetectorMPGD & inputDet);
-            virtual void setRunNum(int iInput);
-            virtual void setRunParameters(Uniformity::RunSetup inputSetup);
-            virtual void setVerboseMode(bool bInput);
-
-        Protected Attributes
-            bool bVerboseMode;
-            int iNum_Run;
-
-            QualityControl::Uniformity::RunSetup rSetup;
-            QualityControl::Uniformity::AnalysisSetupUniformity aSetup;
-            QualityControl::Uniformity::DetectorMPGD detMPGD;
-
-        # 4.b.ii. Analyzers & Visualization
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-            # 4.b.ii.I AnalyzeResponseUniformity
-            # --------------------------------------------------------
-
-            Defined in include/AnalyzeResponseUniformity.h
-            Inherits from FrameworkBase.
-            Non-inherited member attributes shown below.
-
-            Public Types
-                typedef exprtk::symbol_table<float> symbol_table_t;
-                typedef exprtk::expression<float> expression_t;
-                typedef exprtk::parser<float> parser_t;
-
-            Public Constructors
-                AnalyzeResponseUniformity()
-                AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
-
-            Protected Member Functions
-                void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, multiset<float> &mset_fInputObs, std::string strObsName);
-                bool isQualityFit(std::shared_ptr<TF1> fitInput);
-                bool isQualityFit(std::shared_ptr<TF1> fitInput, int iPar);
-                TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput );
-                float getParsedInput(string &strInputExp, shared_ptr<TH1F> hInput, TSpectrum &specInput);
-                TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
-                TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
-                TH2F getHistogram2D(int iEta, int iPhi, Timing::HistoSetup &setupHisto_X, Timing::HistoSetup &setupHisto_Y);
-                string getNameByIndex(int iEta, int iPhi, int iSlice, string & strInputPrefix, string & strInputName);
-                string getNameByIndex(int iEta, int iPhi, int iSlice, const string & strInputPrefix, const string & strInputName);
-                float getParam( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
-                float getParamError( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
-                float getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput);
-
-            Protected Attributes
-                string strAnalysisName;
-                vector<string> vec_strSupportedKeywords;
-
-            # 4.b.ii.II AnalyzeResponseUniformityClusters
-            # --------------------------------------------------------
-
-            Defined in include/AnalyzeResponseUniformityClusters.h
-            Inherits from AnalyzeResponseUniformity.
-            Non-inherited member attributes shown below.
-
-            Public Constructors
-                AnalyzeResponseUniformityClusters()
-                AnalyzeResponseUniformityClusters(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
-
-            Public Member Functions
-                virtual void fillHistos(DetectorMPGD & inputDet)
-                virtual void fitHistos(DetectorMPGD & inputDet)
-
-                virtual void initGraphsClusters(DetectorMPGD & inputDet);
-                virtual void initHistosClusters(DetectorMPGD & inputDet);
-                virtual void initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet);
-
-                virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
-                virtual void loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile);
-
-                void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
-                void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
-
-                void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
-                void storeFits(TFile * file_InputRootFile, DetectorMPGD & inputDet);
-
-            # 4.b.ii.III AnalyzeResponseUniformityHits
-            # --------------------------------------------------------
-
-            Defined in include/AnalyzeResponseUniformityHits.h
-            Inherits from AnalyzeResponseUniformity.
-            Non-inherited member attributes shown below.
-
-            Public Constructors
-                AnalyzeResponseUniformityHits();
-                AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup);
-
-            Public Member Functions
-                virtual void fillHistos(DetectorMPGD & inputDet);
-                virtual void findDeadStrips(DetectorMPGD & inputDet, std::string & strOutputTextFileName);
-                virtual void fitHistos(DetectorMPGD & inputDet);
-
-                virtual void initHistosHits(DetectorMPGD & inputDet);
-
-                virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
-
-                void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
-                void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
-
-                void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
-
-            # 4.b.ii.IV Visualizer
-            # --------------------------------------------------------
-
-            Defined in include/Visualizer.h
-            Inherits from AnalyzeResponseUniformity.
-            Non-inherited member attributes shown below.
-
-            Public Constructors
-                Visualizer()
-
-            Public Member Functions
-                virtual void setAutoSaveCanvas(bool bInput){ m_bSaveCanvases = bInput; return; };
-
-            Protected Member Functions
-                virtual void save2png(TCanvas & inputCanvas);
-                virtual TPad *getPadEta(int iEta, int iNumEta);
-                virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
-
-            Protected Attributes
-                bool m_bSaveCanvases;
-
-            # 4.b.ii.V VisualizeComparison
-            # --------------------------------------------------------
-
-            Defined in include/VisualizeComparison.h
-            Inherits from Visualizer.
-            Non-inherited member attributes shown below.
-
-            Public Constructors
-                VisualizeComparison();
-
-            Public Member Functions
-                virtual void storeCanvasComparisonHisto()
-                virtual void storeCanvasComparisonHisto(std::string strOutputROOTFileName, std::string strOption, std::string strObsName)
-                virtual void storeCanvasComparisonHisto(TFile * file_InputRootFile, std::string strObsName)
-
-                virtual void setDrawOption(std::string strInput)
-
-                virtual void setIdentifier(std::string strInput)
-
-                virtual void setInputFiles(std::vector<std::string> vec_strInput)
-
-                virtual void setNormalize(bool bInput)
-
-                virtual void setPosEta(int iInput);
-                virtual void setPosEtaPhi(int iInputEta, int iInputPhi)
-                virtual void setPosFull(int iInputEta, int iInputPhi, int iInputSlice)
-                virtual void setPosPhi(int iInput)
-                virtual void setPosSlice(int iInput)
-
-                virtual void setRunParameters(Uniformity::RunSetup inputSetup)  //Intentially overrides FrameworkBase::setRunParameters(Uniformity::RunSetup inputSetup)
-
-            Private Methods
-                virtual std::shared_ptr<TH1F> getObsHisto(TFile * file_InputRootFile, std::string strObsName)
-                virtual std::map<std::string, std::shared_ptr<TH1F> > getObsHistoMap(std::string strObsName)
-
-            Private Attributes
-                bool m_bNormalize
-
-                int m_iEta
-                int m_iPhi
-                int m_iSlice
-
-                std::string m_strIdent
-                std::string m_strDrawOption
-
-                std::vector<std::string> m_vec_strFileList;
-
-            # 4.b.ii.VI VisualizeUniformity
-            # --------------------------------------------------------
-
-            Defined in include/VisualizeUniformity.h
-            Inherits from Visualizer.
-            Non-inherited member attributes shown below.
-
-            Public Constructors
-                VisualizeUniformity();
-                VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
-
-            Public Member Functions
-                virtual void makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-                virtual void makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-
-                virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
-                virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
-
-                virtual void storeCanvasFits(std::string & strOutputROOTFileName, std::string strOption, std::string strDrawOption);
-                virtual void storeCanvasFits(TFile * file_InputRootFile, std::string strDrawOption);
-
-                virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-                virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-
-                virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
-                virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
-
-                virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-                virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-
-                virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-                virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
-
-                virtual void storeCanvasHisto2DHistorySegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bIsEta);
-                virtual void storeCanvasHisto2DHistorySegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bIsEta);
-
-                virtual void storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-                virtual void storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-
-                virtual void storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-                virtual void storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-
-                virtual void storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-                virtual void storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
-
-            Private Methods
-                virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit);
-
-                virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);
-                virtual std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
-                virtual std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
-
-                virtual std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
-
-                virtual std::shared_ptr<TH2F> getSummarizedRunHistoryHisto2D(std::map<int, std::shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi );
-
-        # 4.b.iii. Interfaces
-        # --------------------------------------------------------
-
-            # 4.b.iii.I Interface
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.iii.II InterfaceAnalysis
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.iii.III InterfaceReco
-            # --------------------------------------------------------
-
-            Skeleton class, not yet implemented
-
-            # 4.b.iii.IV InterfaceRun
-            # --------------------------------------------------------
-
-            Depreciated class, no longer used but kept in Framework.
-
-        # 4.b.iv. Selectors
-        # --------------------------------------------------------
-
-        These classes are for performing the cluster/event/hit selection specified by the user.
-
-            # 4.b.iv.I Selector
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.iv.II SelectorCluster
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.iv.III SelectorHit
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-        # 4.b.v. Loaders
-        # --------------------------------------------------------
-
-        These classes are loading user specified parameters at runtime.
-
-            # 4.b.v.I ParameterLoaderAnalysis
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.v.II ParameterLoaderDetector
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.v.III ParameterLoaderFit
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.v.IV ParameterLoaderPlotter
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.v.V ParameterLoaderRun
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-        # 4.b.vi. Plotters
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-            # 4.b.vi.I PlotterGeneric
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.vi.II PlotterGraph
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.vi.III PlotterGraph2D
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.vi.IV PlotterGraphErrors
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.vi.V PlotterHisto
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-            # 4.b.vi.VI PlotterHisto2D
-            # --------------------------------------------------------
-
-            Coming "soon"
-
-        # 4.b.vii. Readouts
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-            # 4.b.vii.I ReadoutSector
-            # --------------------------------------------------------
-
-            More coming "soon"
-
-            Defined in include/ReadoutSector.h
-            Non-inherited member attributes shown below.
-
-            Public Member Functions
-                ReadoutSector();
-                ReadoutSector(const ReadoutSector & other);
-
-            Public Attributs
-                float fWidth;
-
-                Uniformity::HistosPhysObj clustHistos;
-                Uniformity::HistosPhysObj hitHistos;
-
-
-            Each of these are described below:
-
-                fWidth      //Width of sector in mm along the x-dir at the sector's y-location;
-
-                clustHistos //Tracks observables for clusters
-                hitHistos   //Tracls observables for hits
-
-            # 4.b.vii.II ReadoutSectorEta
-            # --------------------------------------------------------
-
-            The Uniformity::ReadoutSectorEta represents one iEta row of a detector. Each instance of a
-            Uniformity::ReadoutSectorEta will store nbConnect objects of a Uniformity::ReadoutSectorPhi
-            class where nbConnect is a field found in the amoreSRS mapping file defining the number of
-            readout conncetors per iEta row. Each object of a Uniformity::ReadoutSectorPhi will store
-            Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice
-            struct objects.  An object of a Uniformity::DetectorMPGD class will store a number of objects
-            of Uniformity::ReadoutSectorEta as defined in the amoreSRS mapping file (e.g. number of "DET" rows).
-
-            Defined in include/ReadoutSectorEta.h
-            Inherits from ReadoutSector.
-            Non-inherited member attributes shown below.
-
-            Public Member Functions
-                ReadoutSectorEta();
-                ReadoutSectorEta(const ReadoutSectorEta & other);
-
-            Public Attributs
-                float fPos_Y;
-
-                std::map<int, Uniformity::ReadoutSectorPhi> map_sectorsPhi;
-
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkRes;
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_Failures;
-
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
-                std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
-
-            Operators
-                ReadoutSectorEta & operator=(const ReadoutSectorEta & other);
-
-            Each of these items are described below:
-
-
-                fPos_Y                       //Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
-
-                map_sectorsPhi               //Container storing nbConnect instances of ReadoutSectorPhi objects
-
-                gEta_ClustADC_Fit_NormChi2   //NormChi2 of fits from all SectorSlice::hSlice_ClustADC
-                gEta_ClustADC_Fit_PkPos      //ADC spec peak position from fits of all SectorSlice::hSlice_ClustADC
-                gEta_ClustADC_Fit_PkRes      //ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all SectorSlice::hSlice_ClustADC.  See Section 4.e.ii.IV for more details.
-
-                gEta_ClustADC_Fit_Failures   //As SectorEta::gEta_ClustADC_Fit_PkPos but for when the minimizer did not succeed in finding a minima
-
-                gEta_ClustADC_Spec_NumPks    //Number of peaks found in the SectorSlice::hSlice_ClustADC histogram; based on TSpectrum::Search() and TSpectrum::GetNPeaks()
-                gEta_ClustADC_Spec_PkPos     //As SectorEta::gEta_ClustADC_Fit_PkPos but from TSpectrum::Search() and TSpectrum::GetPositionX() instead of fitting
-
-            The copy constructor and one overloaded assignment operator perform a deep copy of the
-            std::shared_ptr objects above.
-
-            # 4.b.vii.III ReadoutSectorPhi
-            # --------------------------------------------------------
-
-            Defined in include/ReadoutSectorPhi.h
-            Inherits from ReadoutSector.
-            Non-inherited member attributes shown below.
-
-            Public Member Functions
-                ReadoutSectorPhi();
-                ReadoutSectorPhi(const ReadoutSectorPhi & other);
-
-            Public Attributs
-                float fNFitSuccess;
-                float fPos_Xlow;
-                float fPos_Xhigh;
-
-                int iStripNum_Min;
-                int iStripNum_Max;
-
-                std::map<int, Uniformity::SectorSlice> map_slices;
-
-                std::multimap<int, Uniformity::Cluster> map_clusters;
-                std::multimap<int, Uniformity::Hit> map_hits;
-
-            Operators
-                ReadoutSectorPhi & operator=(const ReadoutSectorPhi & other);
-
-            Each of these items are described below:
-
-                fNFitSuccess             //Tracks the number of slices that were successfully fit
-                fPos_Xlow                //X lower boundary of iPhi sector, in mm, at ReadoutSectorEta::fPos_Y
-                fPos_Xhigh               //X upper boundary of iPhi sector, in mm, at ReadoutSectorEta::fPos_Y
-                iStripNum_Min            //lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
-                iStripNum_Max            //upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
-
-                map_slices               //Stores Uniformity::AnalysisSetupUniformity::iUniformityGranularity number of Uniformity::SectorSlice objects
-                map_clusters             //Stores clusters located in this iPhi sector.  Here the key value is the event number the Cluster is associated with
-                map_hits                 //As map_clusters but for Hits
-
-            The copy constructor and overloaded assignment operator perform a deep copy of
-            the std::shared_ptr objects above.
-
-        # 4.b.viii. DetectorMPGD
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-    # 4.c. Utilities
-    # --------------------------------------------------------
-
-    For utility functions defined in the Timing namespace see
-    $GEM_BASE/include/TimingUtilityFunctions.h and it's implementation in
-    $GEM_BASE/src/TimingUtilityFunctions.cpp.
-
-    For utility functions defined in the Uniformity namespace see
-    $GEM_BASE/include/UniformityUtilityFunctions.h and it's implementation in
-    $GEM_BASE/src/UniformityUtilityFunctions.cpp.
-
-        # 4.c.i. Timing
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-
-        # 4.c.ii. Uniformity
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-        # 4.c.iii. Plotter
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-    # 4.d Types
-    # --------------------------------------------------------
-
-    For types defined in the Timing namespace see
-    $GEM_BASE/include/TimingUtilityTypes.h and it's implementation in
-    $GEM_BASE/src/TimingUtilityTypes.cpp.
-
-    For utility functions defined in the Uniformity namespace see
-    $GEM_BASE/include/UniformityUtilityTypes.h and it's implementation in
-    $GEM_BASE/src/UniformityUtilityTypes.cpp.
-
-        # 4.d.i. Timing
-        # --------------------------------------------------------
-
-        More Coming "soon"
-
-        The Timing::HistoSetup struct is used for storing user input defined in the Analysis Config file.
-        Objects of this struct store values to be set to data members of TH1 and TF1 objects.
-
-        An instance of the Timing::HistoSetup struct is used by private methods of the
-        Uniformity::AnalyzeResponseUniformity class for producing & manipulating TH1 & TF1 objects.
-
-        Data members of Timing::HistoSetup struct relevant to the ROOT::TH1 class are:
-
-            HistoSetup::fHisto_xLower       //lower x range of a TH1 object
-            HistoSetup::fHisto_xUpper       //upper x range of a TH1 object
-
-            HistoSetup::iHisto_nBins        //number of bins a TH1 object will have
-
-            HistoSetup::strHisto_Name       //TName of a TH1 object
-            HistoSetup::strHisto_Title_X    //X-axis title of a TH1 object
-            HistoSetup::strHisto_Title_Y    //Y-axis title of a TH1 object
-
-        Data members of Timing::HistoSetup struct relevant to the ROOT::TF1 class are:
-
-            HistoSetup::strFit_Formula              //TFormula of a TF1 object
-            HistoSetup::strFit_Name                 //TName of a TF1 object
-            HistoSetup::strFit_Option               //Option to be used when fitting some TObject with a TF1
-            HistoSetup::vec_strFit_ParamMeaning     //Vector storing meaning of each fit parameter
-            HistoSetup::vec_strFit_ParamIGuess      //Vector storing initial guess of each parameter (stof conversion occurs)
-            HistoSetup::vec_strFit_ParamLimit_Min   //Vector storing lower bound of each parameter (stof conversion occurs)
-            HistoSetup::vec_strFit_ParamLimit_Max   //Vector storing upper bound of each parameter (stof conversion occurs)
-            HistoSetup::vec_strFit_Range            //Vector storing range of TF1 object
-
-        In the case of the vector members above, stof conversion occurs via the utility
-        function Timing::stofSafe.  Unfortunately scientific notation is not presently supported.
-        However this allows the user to enter complex expressions beyond simple numeric input.
-
-        The following members of Timing::HistoSetup are not used presently (legacy from CMS_GEM_TB_Timing,
-        kept in case the two repositories are ever merged):
-
-            HistoSetup::bFit
-            HistoSetup::bFit_AutoRanging
-            HistoSetup::bIsTrig
-            HistoSetup::iTDC_Chan;
-
-        # 4.d.ii. Uniformity
-        # --------------------------------------------------------
-
-        The list of structs defined in namespace Uniformity is as follows:
-
-            AnalysisSetupUniformity
-            Cluster
-            HistoPhysObj
-            Hit
-            RunSetup
-            SectorEta
-            SectorPhi
-            SectorSlice
-            SelParam
-            SummaryStatistics
-
-        Each of these items are described in detail below.
-
-        Several of the above structs have both copy constructors and overloaded assignment operators which perform
-        a deep copy of all the objects stored in the struct.  For those unfamiliar with the term "deep copy" please
-        consult:
-
-            http://stackoverflow.com/questions/184710/what-is-the-difference-between-a-deep-copy-and-a-shallow-copy
-
-        or perform a google search of "deep copy C++" for further explanation.
-
-            # 4.d.ii.I AnalysisSetupUniformity
-            # --------------------------------------------------------
-
+This section describes the contents of the repository, the expected inputs, and the produced outputs. Developers should have a firm grasp of this entire section; users need only be concerned with sections 4.e and 4.f.  However users may be interested in understanding what `TObjects` are created/stored in the output `ROOT` file and may wish to browse the sections below.
+
+## 4.a. Namespaces
+## --------------------------------------------------------
+This repository has declared the following namespaces: `Luminosity`, `Plotter`, `Timing`, `Uniformity`. The last three of these namespaces reside within the `QualityControl` namespace. The `Luminosity` and `Plotter` namespaces include tools necessary for creating plots conforming to the offical CMS Style Guide.
+
+The `Timing` namespace includes several operators, types, and utility functions that were developed in `CMS_GEM_TB_Timing`; the contents of the `Timing` namespace offer substantial utility and "quality of life features."
+
+The `Uniformity` namespace contains the majority of source code for analyzing response uniformity measurements performed for GE1/1 detectors; and hopefully GE2/1 & ME0 detectors in the future.
+
+## 4.b. Class Map
+## --------------------------------------------------------
+Following is for C++ classes only.
+
+Inheritance relations:
+
+    FrameworkBase
+        |
+        |--->AnalyzeResponseUniformity
+        |       |
+        |       |--->AnalyzeResponseUniformityClusters
+        |       |--->AnalyzerResponseUniformityHits
+        |       |--->Visualizer
+        |               |
+        |               |--->VisualizeComparison
+        |               |--->VisualizeUniformity
+        |
+        |--->Interface
+        |       |
+        |       |--->InterfaceAnalysis
+        |       |--->InterfaceReco  (Skeleton, not implemented yet)
+        |       |--->InterfaceRun   (Depreciated)
+        |
+        |--->Selector
+                |
+                |--->SelectorCluster
+                |--->SelectorHit
+
+    ParameterLoader
+        |
+        |--->ParameterLoaderAnalysis
+        |--->ParameterLoaderDetector
+        |--->ParameterLoaderFit
+        |--->ParameterLoaderPlotter
+        |--->ParameterLoaderRun
+
+    PlotterGeneric
+        |
+        |--->PlotterGraph
+        |--->PlotterGraph2D
+        |--->PlotterGraphErrors
+        |--->PlotterHisto
+        |--->PlotterHisto2D
+
+    ReadoutSector
+        |
+        |--->ReadoutSectorEta
+        |--->ReadoutSectorPhi
+
+The following classes have no children presently:
+
+- DetectorMPGD
+- SRSAPVEvent
+- SRSCluster
+- SRSConfiguration
+- SRSEventBuilder
+- SRSFECDecoder
+- SRSHit
+- SRSMain
+- SRSMapping
+- SRSOutputROOT
+
+Friendship relations:
+
+- AnalyzeResponseUniformity, AnalyzeResponseUniformityClusters, AnalyzeResponseUniformityHits,
+- InterfaceAnalysis, and ParameterLoaderDetector are all friend classes to DetectorMPGD.
+
+Interactions:
+
+- Classes ParameterLoaderDetector, those inheriting from Selector, and those inheriting from
+- AnalyzeResponseUniformity all act on an object of DetectorMPGD.
+ 
+- The ParameterLoaderAnalysis class interacts with objects who inherit from Selector and
+- AnalyzResponseUniformity classes.
+
+The table below gives a brief description of some of the major classes used in the Framework:
+
+Class | Description
+----- | -----------
+InterfaceAnalysis |  interface between `main()` and the analysis portion of the framework; runs the analysis for loaded case.
+ParameterLoaderAnalysis | sets up the user specified analysis; this info is passed separately to `Selector` & `AnalyzeResponseUniformity` classes (and their inherited classes).
+ParameterLoaderDetector | creates a `DetectorMPGD` object
+ParameterLoaderFit | loads necessary information for fits
+ParameterLoaderPlotter | loads necessary information for making a plot conforming to the CMS Style Guide
+ParameterLoaderRun | sets up the run configuration, the files to be analyzed, and what analysis stages (e.g. hits, clusters, fitting, etc...) to be exectued.
+PlotterGeneric | And it's inherited classes create a `TCanvas` with one or more `TObjects` drawn on it such that it conforms to the CMS Style Guide
+ReadoutSector | A single readout sector, used by `DetectorMPGD` to track distributions in a certain portion of the detector
+ReadoutSectorEta | As `ReadoutSector`, but for an iEta row inside the detector, stores the detector's `ReadoutSectorPhi` objects
+ReadoutSectorPhi | As `ReadoutSectorEta`, but for an iPhi sector within an iEta row, stores the detector's hits, clusters, and slices
+SelectorCluster | Assigned an input `DetectorMPGD` object the opens an input root file and performs the cluster selection; selected clusters are stored based on their location in the `DetectorMPGD` object.
+SelectorHit | As `SelectorCluster` but for hits (e.g. single strips).
+AnalyzeResponseUniformityCluster | Acts on a `DetectorMPGD` object that has stored clusters and performs the user requested analysis
+AnalyzeResponseUniformityHit | As `AnalyzeResponseUniformityCluster` but for hits.
+VisualizeUniformity | Takes the raw plots produced by `AnalyzeResponseUniformity` and presents them in a user friendly manner.
+VisualizeComparison | Compares `TH1F` objects from different Framework output files and makes simple comparison plots
+
+An example process-flow of what `frameworkMain` does in a given execution is shown as:
+
+    frameworkMain
+        |
+        |->ParameterLoaderRun loads run parameters from run config file
+        |
+        |->Run Option Analysis
+        |       |
+        |       |->ParameterLoaderDetector creates a DetectorMPGD Object
+        |       |
+        |       |->ParameterLoaderAnalysis & ParameterLoaderFit load analysis parameters from analysis config file
+        |       |
+        |       |->InterfaceAnalysis is given run & analyiss setup structs, and DetectorMPGD object
+        |               |
+        |               |->Reconstructed Tree File Input?
+        |               |       |
+        |               |       |->SelectorHit performs hit selection and stores selected hits in DetectorMPGD object
+        |               |       |
+        |               |       |->AnalyzeResponseUniformityHits makes distributions from selected hits
+        |               |       |
+        |               |       |->SelectorCluster does the same for clusters
+        |               |       |
+        |               |       |->AnalyzeResponseUniformityClusters makes distributions from selected clusters
+        |               |       |
+        |               |       |->After all input files are processed AnalyzeResponseUniformityClusters makes & fits slice distributions
+        |               |       |
+        |               |       |->VisualizeUniformity creates summary plots
+        |               |
+        |               |->Framework output file as input?
+        |                       |
+        |                       |->AnalyzeResponseUniformityClusters loads all previously created TObjects from file
+        |                       |
+        |                       |->AnalyzeResponseUniformityClusters then makes then fits slice distributions
+        |                       |
+        |                       |->VisualizeUniformity creates summary plots
+        |
+        |->Run Option Comparison
+        |       |
+        |       |->VisualizeComparison collects all TH1F objects for comparison from all input files
+        |       |
+        |       |->VisualizeComparison collected TH1F objects and sets up a legend for identification
+        |
+        |->Run Option Reconstruction
+        |       |
+        |       |->SRSMain produces a Tree file from a RD51 SRS raw file (BLACK BOX!!!)
+        |
+        |->Run Option Combined
+                |
+                |->Run Option Reconstruction is executed
+                |
+                |->Run Option Analysis is executed
+
+The following sections give further documentation about the `C++` classes in the Framework.
+
+### 4.b.i. FrameworkBase
+### --------------------------------------------------------
+Defined in `include/FrameworkBase.h` Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    FrameworkBase();
+
+Public Member Functions
+    virtual Uniformity::DetectorMPGD getDetector();
+    virtual int getRunNum();
+
+    virtual void setAnalysisParameters(Uniformity::AnalysisSetupUniformity inputSetup);
+    virtual void setDetector(Uniformity::DetectorMPGD & inputDet);
+    virtual void setRunNum(int iInput);
+    virtual void setRunParameters(Uniformity::RunSetup inputSetup);
+    virtual void setVerboseMode(bool bInput);
+
+Protected Attributes
+    bool bVerboseMode;
+    int iNum_Run;
+
+    QualityControl::Uniformity::RunSetup rSetup;
+    QualityControl::Uniformity::AnalysisSetupUniformity aSetup;
+    QualityControl::Uniformity::DetectorMPGD detMPGD;
+```
+
+### 4.b.ii. Analyzers & Visualization
+### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.ii.I AnalyzeResponseUniformity
+#### --------------------------------------------------------
+Defined in `include/AnalyzeResponseUniformity.h` Inherits from `FrameworkBase`. Non-inherited member attributes shown below.
+
+```
+Public Types
+    typedef exprtk::symbol_table<float> symbol_table_t;
+    typedef exprtk::expression<float> expression_t;
+    typedef exprtk::parser<float> parser_t;
+
+Public Constructors
+    AnalyzeResponseUniformity()
+    AnalyzeResponseUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
+
+Protected Member Functions
+    void calcStatistics(Uniformity::SummaryStatistics &inputStatObs, multiset<float> &mset_fInputObs, std::string strObsName);
+    bool isQualityFit(std::shared_ptr<TF1> fitInput);
+    bool isQualityFit(std::shared_ptr<TF1> fitInput, int iPar);
+    TF1 getFit(int iEta, int iPhi, int iSlice, Timing::HistoSetup & setupHisto, shared_ptr<TH1F> hInput, TSpectrum &specInput );
+    float getParsedInput(string &strInputExp, shared_ptr<TH1F> hInput, TSpectrum &specInput);
+    TGraphErrors getGraph(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+    TH1F getHistogram(int iEta, int iPhi, Timing::HistoSetup &setupHisto);
+    TH2F getHistogram2D(int iEta, int iPhi, Timing::HistoSetup &setupHisto_X, Timing::HistoSetup &setupHisto_Y);
+    string getNameByIndex(int iEta, int iPhi, int iSlice, string & strInputPrefix, string & strInputName);
+    string getNameByIndex(int iEta, int iPhi, int iSlice, const string & strInputPrefix, const string & strInputName);
+    float getParam( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
+    float getParamError( shared_ptr<TF1> fitInput, Timing::HistoSetup & setupHisto, string strParam );
+    float getValByKeyword(string strInputKeyword, shared_ptr<TH1F> hInput, TSpectrum &specInput);
+
+Protected Attributes
+    string strAnalysisName;
+    vector<string> vec_strSupportedKeywords;
+```
+
+#### 4.b.ii.II AnalyzeResponseUniformityClusters
+#### --------------------------------------------------------
+Defined in `include/AnalyzeResponseUniformityClusters.h`. Inherits from `AnalyzeResponseUniformity`. Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    AnalyzeResponseUniformityClusters()
+    AnalyzeResponseUniformityClusters(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD & inputDet);
+
+Public Member Functions
+    virtual void fillHistos(DetectorMPGD & inputDet)
+    virtual void fitHistos(DetectorMPGD & inputDet)
+
+    virtual void initGraphsClusters(DetectorMPGD & inputDet);
+    virtual void initHistosClusters(DetectorMPGD & inputDet);
+    virtual void initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet);
+
+    virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+    virtual void loadHistosFromFile(std::string & strInputMappingFileName, TFile * file_InputRootFile);
+
+    void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+    void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
+
+    void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+    void storeFits(TFile * file_InputRootFile, DetectorMPGD & inputDet);
+```
+
+#### 4.b.ii.III AnalyzeResponseUniformityHits
+#### --------------------------------------------------------
+Defined in `include/AnalyzeResponseUniformityHits.h`. Inherits from `AnalyzeResponseUniformity`. Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    AnalyzeResponseUniformityHits();
+    AnalyzeResponseUniformityHits(Uniformity::AnalysisSetupUniformity inputSetup);
+
+Public Member Functions
+    virtual void fillHistos(DetectorMPGD & inputDet);
+    virtual void findDeadStrips(DetectorMPGD & inputDet, std::string & strOutputTextFileName);
+    virtual void fitHistos(DetectorMPGD & inputDet);
+
+    virtual void initHistosHits(DetectorMPGD & inputDet);
+
+    virtual void loadHistosFromFile(std::string & strInputMappingFileName, std::string & strInputROOTFileName);
+
+    void storeHistos(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+    void storeHistos(TFile * file_InputRootFile, DetectorMPGD & inputDet);
+
+    void storeFits(std::string & strOutputROOTFileName, std::string strOption, DetectorMPGD & inputDet);
+```
+
+#### 4.b.ii.IV Visualizer
+#### --------------------------------------------------------
+Defined in `include/Visualizer.h`. Inherits from `AnalyzeResponseUniformity`. Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    Visualizer()
+
+Public Member Functions
+    virtual void setAutoSaveCanvas(bool bInput){ m_bSaveCanvases = bInput; return; };
+
+Protected Member Functions
+    virtual void save2png(TCanvas & inputCanvas);
+    virtual TPad *getPadEta(int iEta, int iNumEta);
+    virtual TPad *getPadPhi(int iEta, int iNumEta, int iPhi, int iNumPhi);
+
+Protected Attributes
+    bool m_bSaveCanvases;
+```
+
+#### 4.b.ii.V VisualizeComparison
+#### --------------------------------------------------------
+Defined in `include/VisualizeComparison.h`. Inherits from `Visualizer`. Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    VisualizeComparison();
+
+Public Member Functions
+    virtual void storeCanvasComparisonHisto()
+    virtual void storeCanvasComparisonHisto(std::string strOutputROOTFileName, std::string strOption, std::string strObsName)
+    virtual void storeCanvasComparisonHisto(TFile * file_InputRootFile, std::string strObsName)
+
+    virtual void setDrawOption(std::string strInput)
+
+    virtual void setIdentifier(std::string strInput)
+
+    virtual void setInputFiles(std::vector<std::string> vec_strInput)
+
+    virtual void setNormalize(bool bInput)
+
+    virtual void setPosEta(int iInput);
+    virtual void setPosEtaPhi(int iInputEta, int iInputPhi)
+    virtual void setPosFull(int iInputEta, int iInputPhi, int iInputSlice)
+    virtual void setPosPhi(int iInput)
+    virtual void setPosSlice(int iInput)
+
+    virtual void setRunParameters(Uniformity::RunSetup inputSetup)  //Intentially overrides FrameworkBase::setRunParameters(Uniformity::RunSetup inputSetup)
+
+Private Methods
+    virtual std::shared_ptr<TH1F> getObsHisto(TFile * file_InputRootFile, std::string strObsName)
+    virtual std::map<std::string, std::shared_ptr<TH1F> > getObsHistoMap(std::string strObsName)
+
+Private Attributes
+    bool m_bNormalize
+
+    int m_iEta
+    int m_iPhi
+    int m_iSlice
+
+    std::string m_strIdent
+    std::string m_strDrawOption
+
+    std::vector<std::string> m_vec_strFileList;
+```
+
+#### 4.b.ii.VI VisualizeUniformity
+#### --------------------------------------------------------
+Defined in `include/VisualizeUniformity.h`. Inherits from `Visualizer`. Non-inherited member attributes shown below.
+
+```
+Public Constructors
+    VisualizeUniformity();
+    VisualizeUniformity(Uniformity::AnalysisSetupUniformity inputSetup, Uniformity::DetectorMPGD inputDet);
+
+Public Member Functions
+    virtual void makeAndStoreCanvasHisto2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+    virtual void makeAndStoreCanvasHisto2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+
+    virtual void storeCanvasData(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption);
+    virtual void storeCanvasData(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption);
+
+    virtual void storeCanvasFits(std::string & strOutputROOTFileName, std::string strOption, std::string strDrawOption);
+    virtual void storeCanvasFits(TFile * file_InputRootFile, std::string strDrawOption);
+
+    virtual void storeCanvasGraph(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+    virtual void storeCanvasGraph(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+    virtual void storeCanvasGraph2D(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bNormalize);
+    virtual void storeCanvasGraph2D(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bNormalize);
+
+    virtual void storeCanvasHisto(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+    virtual void storeCanvasHisto(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+    virtual void storeCanvasHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+    virtual void storeCanvasHistoSegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bShowPhiSegmentation);
+
+    virtual void storeCanvasHisto2DHistorySegmented(std::string & strOutputROOTFileName, std::string strOption, std::string strObsName, std::string strDrawOption, bool bIsEta);
+    virtual void storeCanvasHisto2DHistorySegmented(TFile * file_InputRootFile, std::string strObsName, std::string strDrawOption, bool bIsEta);
+
+    virtual void storeListOfCanvasesGraph(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+    virtual void storeListOfCanvasesGraph(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+    virtual void storeListOfCanvasesHisto(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+    virtual void storeListOfCanvasesHisto(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+    virtual void storeListOfCanvasesHistoSegmented(std::string & strOutputROOTFileName, std::string strOption, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+    virtual void storeListOfCanvasesHistoSegmented(TFile * file_InputRootFile, std::map<std::string, std::string> & map_strObsNameAndDrawOpt, bool bShowPhiSegmentation);
+
+Private Methods
+    virtual TCanvas *getCanvasSliceFit(Uniformity::SectorSlice & inputSlice, int iEta, int iPhi, int iSlice, bool bDataOverFit);
+
+    virtual Uniformity::SummaryStatistics getObsData(std::string strObsName);
+    virtual std::shared_ptr<TGraphErrors> getObsGraph(std::string strObsName, Uniformity::ReadoutSectorEta &inputEta);
+    virtual std::shared_ptr<TH1F> getObsHisto(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+
+    virtual std::map<int, std::shared_ptr<TH2F> > getMapObsHisto2D(std::string strObsName, Uniformity::ReadoutSector &inputSector);
+
+    virtual std::shared_ptr<TH2F> getSummarizedRunHistoryHisto2D(std::map<int, std::shared_ptr<TH2F> > inputMapHisto2D, int iEta, int iPhi );
+```
+
+### 4.b.iii. Interfaces
+### --------------------------------------------------------
+
+#### 4.b.iii.I Interface
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.iii.II InterfaceAnalysis
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.iii.III InterfaceReco
+#### --------------------------------------------------------
+Skeleton class, not yet implemented
+
+#### 4.b.iii.IV InterfaceRun
+#### --------------------------------------------------------
+Depreciated class, no longer used but kept in Framework.
+
+### 4.b.iv. Selectors
+### --------------------------------------------------------
+These classes are for performing the cluster/event/hit selection specified by the user.
+
+#### 4.b.iv.I Selector
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.iv.II SelectorCluster
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.iv.III SelectorHit
+#### --------------------------------------------------------
+Coming "soon"
+
+### 4.b.v. Loaders
+### --------------------------------------------------------
+These classes are loading user specified parameters at runtime.
+
+#### 4.b.v.I ParameterLoaderAnalysis
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.v.II ParameterLoaderDetector
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.v.III ParameterLoaderFit
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.v.IV ParameterLoaderPlotter
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.v.V ParameterLoaderRun
+#### --------------------------------------------------------
+Coming "soon"
+
+### 4.b.vi. Plotters
+### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.I PlotterGeneric
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.II PlotterGraph
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.III PlotterGraph2D
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.IV PlotterGraphErrors
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.V PlotterHisto
+#### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vi.VI PlotterHisto2D
+#### --------------------------------------------------------
+Coming "soon"
+
+### 4.b.vii. Readouts
+### --------------------------------------------------------
+Coming "soon"
+
+#### 4.b.vii.I ReadoutSector
+#### --------------------------------------------------------
+More coming "soon". Defined `in include/ReadoutSector.h`. Non-inherited member attributes shown below.
+
+```
+Public Member Functions
+    ReadoutSector();
+    ReadoutSector(const ReadoutSector & other);
+
+Public Attributs
+    float fWidth;
+
+    Uniformity::HistosPhysObj clustHistos;
+    Uniformity::HistosPhysObj hitHistos;
+```
+
+These data members are described in the table below:
+
+Data Member | Description
+----------- | -----------
+`fWidth` | Width of sector in mm along the x-dir at the sector's y-location
+`clustHistos` | Tracks observables for clusters
+`hitHistos` | Tracls observables for hits
+
+#### 4.b.vii.II ReadoutSectorEta
+#### --------------------------------------------------------
+The `Uniformity::ReadoutSectorEta` represents one iEta row of a detector. Each instance of a `Uniformity::ReadoutSectorEta` will store `nbConnect` objects of a `Uniformity::ReadoutSectorPhi` class where `nbConnect` is a field found in the *mapping file* defining the number of readout conncetors per iEta row. Each object of a `Uniformity::ReadoutSectorPhi` will store `Uniformity::AnalysisSetupUniformity::iUniformityGranularity` number of `Uniformity::SectorSlice` struct objects.  An object of a `Uniformity::DetectorMPGD` class will store a number of objects of `Uniformity::ReadoutSectorEta` as defined in the *mapping file* (e.g. number of **DET** rows).
+
+Defined in `include/ReadoutSectorEta.h`. Inherits from `ReadoutSector`. Non-inherited member attributes shown below.
+
+```
+Public Member Functions
+    ReadoutSectorEta();
+    ReadoutSectorEta(const ReadoutSectorEta & other);
+
+Public Attributs
+    float fPos_Y;
+
+    std::map<int, Uniformity::ReadoutSectorPhi> map_sectorsPhi;
+
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_NormChi2;
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkPos;
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_PkRes;
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Fit_Failures;
+
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_NumPks;
+    std::shared_ptr<TGraphErrors> gEta_ClustADC_Spec_PkPos;
+
+Operators
+    ReadoutSectorEta & operator=(const ReadoutSectorEta & other);
+```
+
+Each of these items are described in the table below:
+
+Data Member | Description
+----------- | -----------
+`fPos_Y` | Vertical Midpoint, in mm, of iEta row from wide base of trapezoid
+`map_sectorsPhi` | Container storing nbConnect instances of `ReadoutSectorPhi` objects
+`gEta_ClustADC_Fit_NormChi2` | NormChi2 of fits from all `SectorSlice::hSlice_ClustADC`
+`gEta_ClustADC_Fit_PkPos` | ADC spec peak position from fits of all `SectorSlice::hSlice_ClustADC`
+`gEta_ClustADC_Fit_PkRes` | ADC spec peak resolution.  Resolution is taken as (FWHM / Mean).  The FWHM and mean are taken from the fit results from fits of all `SectorSlice::hSlice_ClustADC`.  See Section 4.e.ii.IV for more details.
+`gEta_ClustADC_Fit_Failures` | As `SectorEta::gEta_ClustADC_Fit_PkPos` but for when the minimizer did not succeed in finding a minima
+`gEta_ClustADC_Spec_NumPks` | Number of peaks found in the `SectorSlice::hSlice_ClustADC` histogram; based on `TSpectrum::Search()` and `TSpectrum::GetNPeaks()`
+`gEta_ClustADC_Spec_PkPos` | As `SectorEta::gEta_ClustADC_Fit_PkPos` but from `TSpectrum::Search()` and `TSpectrum::GetPositionX()` instead of fitting
+
+The copy constructor and one overloaded assignment operator perform a deep copy of the `std::shared_ptr` objects above.
+
+#### 4.b.vii.III ReadoutSectorPhi
+#### --------------------------------------------------------
+Defined in `include/ReadoutSectorPhi.h`. Inherits from `ReadoutSector`. Non-inherited member attributes shown below.
+
+```
+Public Member Functions
+    ReadoutSectorPhi();
+    ReadoutSectorPhi(const ReadoutSectorPhi & other);
+
+Public Attributs
+    float fNFitSuccess;
+    float fPos_Xlow;
+    float fPos_Xhigh;
+
+    int iStripNum_Min;
+    int iStripNum_Max;
+
+    std::map<int, Uniformity::SectorSlice> map_slices;
+
+    std::multimap<int, Uniformity::Cluster> map_clusters;
+    std::multimap<int, Uniformity::Hit> map_hits;
+
+Operators
+    ReadoutSectorPhi & operator=(const ReadoutSectorPhi & other);
+```
+
+Each of these items are described in the table below:
+
+Data Member | Description
+----------- | -----------
+`fNFitSuccess` | Tracks the number of slices that were successfully fit
+`fPos_Xlow` | X lower boundary of iPhi sector, in mm, at `ReadoutSectorEta::fPos_Y`
+`fPos_Xhigh` | X upper boundary of iPhi sector, in mm, at `ReadoutSectorEta::fPos_Y`
+`iStripNum_Min` | lower bound of strip number for this iPhi sector, e.g. 0, 128, 256
+`iStripNum_Max` | upper bound of strip number for this iPhi sector, e.g. 127, 255, 383
+`map_slices` | Stores `Uniformity::AnalysisSetupUniformity::iUniformityGranularity` number of `Uniformity::SectorSlice` objects
+`map_clusters` | Stores clusters located in this iPhi sector.  Here the key value is the event number the Cluster is associated with
+`map_hits` | As `map_clusters` but for Hits
+
+The copy constructor and overloaded assignment operator perform a deep copy of the `std::shared_ptr` objects above.
+
+#### 4.b.viii. DetectorMPGD
+#### --------------------------------------------------------
+Coming "soon"
+
+## 4.c. Utilities
+## --------------------------------------------------------
+For utility functions defined in the `Timing` namespace see `include/TimingUtilityFunctions.h` and it's implementation in `src/TimingUtilityFunctions.cpp`. For utility functions defined in the `Uniformity` namespace see `include/UniformityUtilityFunctions.h` and it's implementation in `src/UniformityUtilityFunctions.cpp`.
+
+### 4.c.i. Timing
+### --------------------------------------------------------
+Coming "soon"
+
+### 4.c.ii. Uniformity
+### --------------------------------------------------------
+Coming "soon"
+
+### 4.c.iii. Plotter
+### --------------------------------------------------------
+Coming "soon"
+
+## 4.d Types
+## --------------------------------------------------------
+For types defined in the `Timing` namespace see `include/TimingUtilityTypes.h` and it's implementation in `src/TimingUtilityTypes.cpp`. For utility functions defined in the `Uniformity` namespace see `include/UniformityUtilityTypes.h` and it's implementation in `src/UniformityUtilityTypes.cpp`.
+
+### 4.d.i. Timing
+### --------------------------------------------------------
+More Coming "soon"
+
+The `Timing::HistoSetup` struct is used for storing user input defined in the *Analysis Config* file. Objects of this struct store values to be set to data members of `TH1` and `TF1` objects. An instance of the `Timing::HistoSetup` struct is used by private methods of the `Uniformity::AnalyzeResponseUniformity` class for producing & manipulating `TH1` & `TF1` objects.
+
+Data members of `Timing::HistoSetup` struct relevant to the `ROOT::TH1` class are shown in the table below:
+
+Data Member | Description
+----------- | -----------
+`HistoSetup::fHisto_xLower` | lower x range of a `TH1` object
+`HistoSetup::fHisto_xUpper` | upper x range of a `TH1` object
+`HistoSetup::iHisto_nBins` | number of bins a `TH1` object will have
+`HistoSetup::strHisto_Name` | `TName` of a `TH1` object
+`HistoSetup::strHisto_Title_X` | X-axis title of a `TH1` object
+`HistoSetup::strHisto_Title_Y` | Y-axis title of a `TH1` object
+
+Data members of `Timing::HistoSetup` struct relevant to the `ROOT::TF1` class are shwon in the table below:
+
+Data Member | Description
+----------- | -----------
+`HistoSetup::strFit_Formula` | `TFormula` of a `TF1` object
+`HistoSetup::strFit_Name` | `TName` of a `TF1` object
+`HistoSetup::strFit_Option` | Option to be used when fitting some `TObject` with a `TF1`
+`HistoSetup::vec_strFit_ParamMeaning` | Vector storing meaning of each fit parameter
+`HistoSetup::vec_strFit_ParamIGuess` | Vector storing initial guess of each parameter (`stof` conversion occurs)
+`HistoSetup::vec_strFit_ParamLimit_Min` | Vector storing lower bound of each parameter (`stof` conversion occurs)
+`HistoSetup::vec_strFit_ParamLimit_Max` | Vector storing upper bound of each parameter (`stof` conversion occurs)
+`HistoSetup::vec_strFit_Range` | Vector storing range of `TF1` object
+
+In the case of the vector members above, `stof` conversion occurs via the utility function `Timing::stofSafe`. 
+
+The following members of `Timing::HistoSetup` are not used presently (legacy from `CMS_GEM_TB_Timing`):
+
+- `HistoSetup::bFit`
+- `HistoSetup::bFit_AutoRanging`
+- `HistoSetup::bIsTrig`
+- `HistoSetup::iTDC_Chan`
+
+### 4.d.ii. Uniformity
+### --------------------------------------------------------
+The list of structs defined in namespace Uniformity is as follows:
+
+- `AnalysisSetupUniformity`
+- `Cluster`
+- `HistoPhysObj`
+- `Hit`
+- `RunSetup`
+- `SectorEta`
+- `SectorPhi`
+- `SectorSlice`
+- `SelParam`
+- `SummaryStatistics`
+
+Each of these items are described in detail below.
+
+Several of the above structs have both copy constructors and overloaded assignment operators which perform a [deep copy](http://stackoverflow.com/questions/184710/what-is-the-difference-between-a-deep-copy-and-a-shallow-copy) of all the objects stored in the struct.  
+
+#### 4.d.ii.I AnalysisSetupUniformity
+#### --------------------------------------------------------
             The AnalysisSetupUniformity struct stores user input defined in the Analysis Config file.  This
             struct has one instance of a HistoSetup struct for each cluster physical obserable (e.g. ADC,
             position, etc...).  Additionally this struct has one instance of a SelParam struct; which
@@ -3347,458 +3022,235 @@
                                                     parameterizes MIP cluster size parameterized in terms of
                                                     triple-GEM detector gain.
 
-        # 4.e.v.V   PARAMETERS - Efficiency Info
-        # --------------------------------------------------------
+#### 4.e.v.V   PARAMETERS - Efficiency Info
+#### --------------------------------------------------------
+The table below describes the allowed input fields and their data types.
 
-        The table below describes the allowed input fields and their data types.
+The following parameters are supported:
+FIELD | DATA TYPE | DESCRIPTION
+----- | --------- | -----------
+Eff_HVPt_List | comma separated list of ints | list of HV Pt's the efficiency should be predicted at.
 
-        The following parameters are supported:
-        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+## 4.f. Output File - Analysis Mode
+## --------------------------------------------------------
+The framework will produce a number of output `ROOT` files and text files depending on the configuration used.  When `Output_Individual = true` one `ROOT` file and text file will be produced per input file.  Otherwise a single `ROOT` and text file will be produced which represents the aggregate of the input file(s) analyzed
 
-                Eff_HVPt_List                       comma separated list of ints, list of HV Pt's the efficiency
-                                                    should be predicted at.
+The output (text) `ROOT` file is described in Section (4.f.ii) 4.f.i.
 
-    # 4.f. Output File - Analysis Mode
-    # --------------------------------------------------------
+### 4.f.i Output ROOT File - Analysis Mode
+### --------------------------------------------------------
+The output `ROOT` file produced by classes inheriting from `AnalyzeResponseUniformity` will contain the `TObjects` described in Sections 4.b.i, 4.b.iii, and 4.d.ii.  The output file will have a repeating file structure.  For each `SectorEta` defined (i.e. "**DET**" line in the *mapping config file*) there will be one `TDirectory` named `SectorEtaX` where `X` is an integer.  Those `TObject`'s stored in the `Uniformity::SectorEta` struct will be stored directly in this `SectorEtaX` TDirectory; and obviously they will represent only distributions from that iEta value.  The `TName`'s for each `TObject` here will include the string `_iEtaX_` to ensure they are unique.
 
-    The framework will produce a number of output ROOT files and text files depending
-    on the configuration used.  When Output_Individual = true one ROOT file and text
-    file will be produced per input file.  Otherwise a single ROOT and text file will
-    be produced which represents the aggregate of the input file(s) analyzed
+Within each `SectorEtaX` folder will be `nbConnect` number of `TDirectory`'s labeled `SectorPhiY` for `Y = {1, ... , nbConnect}`.  Similarly to the above, the `TObject`'s stored in the `Uniformity::SectorPhi` struct will be stored directly in this `SectorPhiY` TDirectory; they will represent only distributions from this (iEta, iPhi) value.  Again, the `TName`'s for each `TObject` here will include the string `_iEtaXiPhiY_` to ensure they are unique.
 
-    The output (text) ROOT file is described in Section (4.f.ii) 4.f.i.
+Within each `SectorPhiY` folder there will exist `AnalysisSetupUniformity::iUniformityGranularity` number of `TDirectory`'s labeled `SliceZ` where `Z` is an integer from 1 to `AnalysisSetupUniformity::iUniformityGranularity`.  Similarly, the `TObject`'s stored in `Uniformity::SectorSlice` struct will be stored directly in this `SliceZ` TDirectory; they will only represent distributions from this (iEta, iPhi, Slice) value.  Again, the `TName`'s for each `TObject` here will include the string `_iEtaXiPhiYSliceZ_` to ensure tehy are unique.
 
-        # 4.f.i Output ROOT File - Analysis Mode
-        # --------------------------------------------------------
+In general all `TObjcets` stored in the output `ROOT` file will follow a convention for their `TNames`. For one dimensional `TObjects` we use the following convention/regular expression:
 
-        The output ROOT file produced by classes inheriting from AnalyzeResponseUniformity will contain the
-        TObjects described in Sections 4.b.i, 4.b.iii, and 4.d.ii.  The output file will have a repeating file
-        structure.  For each SectorEta defined (i.e. "DET" line in the amoreSRS mapping config file) there
-        will be one TDirectory named "SectorEtaX" where X is an integer.  Those TObject's stored in the
-        Uniformity::SectorEta struct will be stored directly in this "SectorEtaX" TDirectory; and obviously
-        they will represent only distributions from that iEta value.  The TName's for each TObject here
-        will include the string "_iEtaX_" to ensure they are unique.
+```   
+ <TypePrefix>_<Coordinate>_<ObservableNameX>
+```
 
-        Within each "SectorEtaX" folder will be nbConnect number of TDirectory's labeled "SectorPhiY" for
-        Y = {1, ... , nbConnect}.  Similarly to the above, the TObject's stored in the Uniformity::SectorPhi struct
-        will be stored directly in this "SectorPhiY" TDirectory; they will represent only distributions
-        from this (iEta, iPhi) value.  Again, the TName's for each TObject here will include the string
-        "_iEtaXiPhiY_" to ensure they are unique.
+For two dimensional `TObjects` we use the following convention:
 
-        Within each "SectorPhiY" folder there will exist AnalysisSetupUniformity::iUniformityGranularity
-        number of TDirectory's labeled "SliceZ" where Z is an integer from 1 to
-        AnalysisSetupUniformity::iUniformityGranularity.  Similarly, the TObject's stored in
-        Uniformity::SectorSlice will be stored directly in this "SliceZ" TDirectory; they will only
-        represent distributions from this (iEta, iPhi, Slice) value.  Again, the TName's for each TObject
-        here will include the string "_iEtaXiPhiYSliceZ_" to ensure tehy are unique.
+```    
+<TypePrefix>_<Coordinate>_<ObservableNameY>_v_<ObservableNameX>
+```
 
-        In general all TObjcets stored in the output ROOT file will follow a convention for their TNames.
-        For one dimensional TObjects we use the following convention/regular expression:
+Where: the **TypePrefix** is described in Section 4.g.i (e.g. for `TH1F` objcets it is `h`); the **Coordinate** is the `(iEta,iPhi,iSlice)` point of the histogram as described above; the **ObservableNameX**, and **ObservableNameY** fields are respectively what is plotted on the X & Y access of the `TObject`.
 
-            <TypePrefix>_<Coordinate>_<ObservableNameX>
+One top level `TDirectory` named **Summary** will also exist.  This folder will store a set of histograms for each cluster/hit observable.  The contents of these histograms is simply the sum of the corresponding `SectorEtaX` histograms (e.g. `TH1::Add()` method).
 
-        For two dimensional TObjects we use the following convention:
+Additionally the `VisualizeUniformity` class places additional `TObjects` (e.g. `TCanvas`, `TMultiGraph`, etc...) to assist the analyst in making the "pass/fail" statement.  These are desribed below.
 
-            <TypePrefix>_<Coordinate>_<ObservableNameY>_v_<ObservableNameX>
+#### 4.f.i.I "Segmented" Plots Stored in "Summary" folder
+#### --------------------------------------------------------
 
-        Where: the "TypePrefix" is described in Section 4.g.i (e.g. for TH1F objcets it is "h"); the
-        "Coordinate" is the (iEta,iPhi,iSlice) point of the histogram as described above; the
-        "ObservableNameX," and "ObservableNameY" fields are respectively what is plotted on the X & Y access
-        of the TObject.
+Several `TCanvas` objects with `TNames` of the form:
 
-        One top level TDirectory named "Summary" will also exist.  This folder will store a set of histograms
-        for each cluster/hit observable.  The contents of these histograms is simply the sum of the
-        corresponding SectorEtaX histograms (e.g. TH1::Add() method).
+```    
+canv_<Detector_Name>_<Observable>_<ReadoutLevel>_Segmented
+```
 
-        Additionally the VisualizeUniformity class places additional TObjects (e.g. TCanvas, TMultiGraph, etc...)
-        to assist the analyst in making the "pass/fail" statement.  These are desribed below.
+will be stored in the folder.  Here the **Detector_Name** is the parameter defined in the given `configRun.cfg` file; **Observable** comes from the set {`ClustADC`, `ClustMulti`, `ClustPos`, `ClustSize`, `ClustTime`, `HitADC`, `HitMulti`, `HitPos`, `HitTime`}; and **ReadoutLevel** comes from the set {`AllEta`, `AllPhi`}.
 
-            # 4.f.i.I "Segmented" Plots Stored in "Summary" folder
-            # --------------------------------------------------------
+These will show a `TCanvas` with an array of `TPads` placed in a columns-by-row grid of (3-by-8) 2-by-4 grid for (AllPhi) AllEta case.  Each `TPad` will have iEta index written in the upper left corner of the pad and have the corresponding `TObject` from this **ReadoutLevel** (e.g. iEta or iPhi) drawn on the pad.
 
-            Several TCanvas objects with TNames of the form:
+#### 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
+#### --------------------------------------------------------
 
-                canv_<Detector_Name>_<Observable>_<ReadoutLevel>_Segmented
+Several `TCanvas` objects with `TNames` of the form:
 
-            will be stored in the folder.  Here the "Detector_Name" is the parameter defined in the given
-            configRun.cfg file; "Observable" comes from the set {ClustADC, ClustMulti, ClustPos, ClustSize,
-            ClustTime, HitADC, HitMulti, HitPos, HitTime}; and "ReadoutLevel" comes from the set {AllEta, AllPhi}.
+```    
+canv_<Detector_Name>_<Observable>Dataset_AllEta
+```
 
-            These will show a TCanvas with an array of TPads placed in a columns-by-row grid of (3x8) 2x4 grid
-            for (AllPhi) AllEta case.  Each TPad will have iEta index written in the upper left corner of the pad
-            and have the corresponding TObject from this ReadoutLevel (e.g. iEta or iPhi) drawn on the pad.
+will be stored in the folder along with matching `TH1F` objects for each `TCanvas` with the `TName` of the form:
 
-            # 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
-            # --------------------------------------------------------
+```    
+h_Summary_<Observable>Dataset
+```
 
-            Several TCanvas objects with TNames of the form:
+Here the **Detector_Name** is the parameter defined in the given `configRun.cfg` file and **Observable** comes from the set {`ResponseFitPkPos`, `ResponseFitPkRes`}, with expansions possible if requested.
 
-                canv_<Detector_Name>_<Observable>Dataset_AllEta
+The x-axis will be the **Observable** in question (e.g. for `ResponseFitPkPos` this will be the cluster ADC of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution of the observable in question over the entire detector.  The `TH1F` in question will always have the bin range `[Avg - 5 * StdDev, Avg + 5 * StdDev)` with a bin width of `0.25 * StdDev`.  Here `Avg` is the average of the dataset and `StdDev` is the dataset's standard deviation.  This `TH1F` will also be automatically fit with both a Gaussian and a Landau distribution.  The Fit with the lowest Normalized Chi2 value will be kept.  The whose mean (MPV) and sigma (scale) parameter of the stored Gaussian (Landau) will be written on the `TPad`.  The percent error of the dataset, defined as sigma / mean (scale / MPV) from the Gaussian (Landua), will also be displayed on the `TPad`.  This offers an "at a glance" look at the total distribution for a given observable and may help understand an immediate pass/fail condition.
 
-            will be stored in the folder along with matching TH1F objects for each TCanvas with the
-            TName of the form:
+Additionally there will be one `TCanvas` and `TGraphErrors` object with "**Shifted**" in it's name. This is identical to the objects without the "Shifted" string in their names but here the mean position of the plot has been shifted to 0.  This allows you to better compare across detectors when you are interested in the spread of the distribution rather than the mean.  Here two points at (+/-2000,0) have been added to allow a greater range of drawing the x-axis with `genericPlotter` or some custom code of your choice.
 
-                h_Summary_<Observable>Dataset
+#### 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
+#### --------------------------------------------------------
+Several `TCanvas` objects with `TNames` of the form:
 
-            Here the "Detector_Name" is the parameter defined in the given
-            configRun.cfg file and "Observable" comes from the set {ResponseFitPkPos, ResponseFitPkRes},
-            with expansions possible if requested.
+```
+canv_<Detector_Name>_<FitObservable>_AllEta
+```
 
-            The x-axis will be the <Observable> in question (e.g. for ResponseFitPkPos this will be the cluster ADC
-            of the peak determined from the fit).  The Y-axis will be counts.  These canvases show the distribution
-            of the observable in question over the entire detector.  The TH1F in question will always have the bin
-            range [Avg - 5 * StdDev, Avg + 5 * StdDev) with a bin width of 0.25 * StdDev.  Here "Avg" is the average
-            of the dataset and "StdDev" is the dataset's standard deviation.  This TH1F will also be automatically
-            fit with both a Gaussian and a Landau distribution.  The Fit with the lowest Normalized Chi2 value will
-            be kept.  The whose mean (MPV) and sigma (scale) parameter of the stored Gaussian (Landau) will be written
-            on the TPad.  The percent error of the dataset, defined as sigma / mean (scale / MPV) from the Gaussian
-            (Landua), will also be displayed on the TPad.  This offers an "at a glance" look at the total distribution
-            for a given observable and may help understand an immediate pass/fail condition.
+will be stored in the folder along with matching `TMultiGraph` objects for each `TCanvas` with the `TName` of the form:
 
-            Additionally there will be one TCanvas & TGraphErrors object with "Shifted" in it's name. This is identical
-            to the objects without the "Shifted" string in their names but here the mean position of the plot has been
-            shifted to 0.  This allows you to better compare across detectors when you are interested in the spread of
-            the distribution rather than the mean.  Here two points at (+/-2000,0) have been added to allow a greater
-            range of drawing the x-axis with genericPlotter or some custom code of your choice.
+```   
+mgraph_<Detector_Name>_<FitObservable>_AllEta
+```
 
-            # 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
-            # --------------------------------------------------------
+Here the **Detector_Name** is the parameter defined in the given `configRun.cfg` file. The **FitObservable** is from the set {`ResponseFitChi2`, `ResponseFitPkPos`, `ResponseFitPkRes`} for the normalized Chi2 value of the fit, determined peak position, and determined peak resolution (see Section 4.e.ii.IV for details), respectively.
 
-            Several TCanvas objects with TNames of the form:
+#### 4.f.i.IV 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
+#### --------------------------------------------------------
+Several `TCanvas` objects with `TNames` of the form:
 
-                canv_<Detector_Name>_<FitObservable>_AllEta
+```
+canv_<Detector_Name>_<FitObservable>2D_AllEta
+```
 
-            will be stored in the folder along with matching TMultiGraph objects for each TCanvas with the
-            TName of the form:
+will be stored in the folder along with matching `TGraph2D` objects for each `TCanvas` with the
+`TName` of the form:
 
-                mgraph_<Detector_Name>_<FitObservable>_AllEta
+```    
+g2D_<Detector_Name>_<FitObservable>_AllEta
+```
 
-            Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
-            is from the set {ResponseFitChi2, ResponseFitPkPos, ResponseFitPkRes} for the normalized Chi2 value
-            of the fit, determined peak position, and determined peak resolution (see Section 4.e.ii.IV for details),
-            respectively.
+Note in the case of the `TCanvas` a *"2D"* string is placed in the `TName` to distinguish it from the *1D* case.
+Here the **Detector_Name** is the parameter defined in the given `configRun.cfg` file. The **FitObservable**
+is from the set {`ResponseFitPkPos`, `ResponseFitPkPosNormalized`, `ResponseFitPkRes`,
+`ResponseFitPkResNormalized`}.  For the *"Normalized"* cases the z-axis at every point will be the point
+divided by the mean of the dataset formed by all points of the **FitObservable** (e.g. `z / z_avg`);
 
-            # 4.f.i.IV 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-            # --------------------------------------------------------
+These plots may take some time to load.  This is due to the rendering that is done by `ROOT`; be patient.  Consider transfering the file to your local machine if it is not already.  Once they load the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area of the detector and the Z-axis will be the **FitObservable**.
 
-            Several TCanvas objects with TNames of the form:
+### 4.f.ii Output ROOT File - Comparison Mode
+### --------------------------------------------------------
+Here the output `ROOT` file is produced by classes inheriting from `VisualizeComparison`.  The `ROOT` file will contain a `TDirectory` whose `TName` is equal to the value of the **Input_Identifier** field at the time of execution.  Inside this folder there will be a `TDirectory` whose `TName` is equal to the value of the "**Obs_Name** field at the time of execution.
 
-                canv_<Detector_Name>_<FitObservable>2D_AllEta
+If you have the **Output_File_Option** field equal to `UPDATE` then rather than over-writing the **Output_File_Name** `TFile` everytime it will simply add TDirectories (or sub-TDirectories) to the file.  This is perfect if you want to compare multiple **Obs_Name** distributions for the same **Input_Identifier** value.  Additionally you could have one `TFile` store several different **Input_Identifier** top-level TDirectories each with multipler **Obs_Name** sub-directories.
 
-            will be stored in the folder along with matching TGraph2D objects for each TCanvas with the
-            TName of the form:
+In each **Obs_Name** sub directory you will find a `TH1F` object from each of the input files you considered on execution.  The `TNames` of these `TH1F` objects will be equivalent to what they are in their original `TFile` but they will be appended with the **Input_Identifier** field specific to that `TFile`.  These `TH1F` objects will automatically be drawn on a `TCanvas`, colored, and placed in a `TLegend` (also drawn on the `TCanvas`).  The `TName` of this `TCanvas` will follow the convention:
 
-                g2D_<Detector_Name>_<FitObservable>_AllEta
+```
+canv_<Input_Identifier>_<Obs_Name>
+```
 
-            Note in the case of the TCanvas a "2D" is placed in the TName to distinguish it from the 1D case.
-            Here the "Detector_Name" is the parameter defined in the given configRun.cfg file. The "FitObservable"
-            is from the set {ResponseFitPkPos, ResponseFitPkPosNormalized, ResponseFitPkRes,
-            ResponseFitPkResNormalized}.  For the "Normalized" cases the z-axis at every point will be the point
-            divided by the mean of the dataset formed by all points of the FitObservable (e.g. z / z_avg);
+Example if you have **Input_Identifier** equal `ClustTime` and you are running over the following list of input files:
 
-            These plots may take some time to load.  This is due to the rendering that is done by ROOT; be
-            patient.  Consider transfering the file to your local machine if it is not already.  Once they load
-            the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area
-            of the detector and the Z-axis will be the FitObservable.
+```
+/some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
+/some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+```
+The **Obs_Name** sub directory will contain two `TH1F` objects with their regular `TNames` appended with `_ClustTime1to30`
+and `ClustTime6to27`.  The `TCanvas` they are drawn on will be named `canv_ClustSize_<Obs_Name>`.
 
-        # 4.f.ii Output ROOT File - Comparison Mode
-        # --------------------------------------------------------
+### 4.f.iii Output ROOT File - genericPlotter
+### --------------------------------------------------------
+Here an output `ROOT` file is produced by classes inheriting from `PlotterGeneric` with the filename `plotterOutput.root`.  The `ROOT` file will contain the produced `TCanvas` and all `TObjects` that were declared in `[BEGIN_PLOT]` headers and drawn on the canvas. The `TName` of the produce `TCanvas` will follow the convention:
 
-        Here the output ROOT file is produced by classes inheriting from VisualizeComparison.  The ROOT file will
-        contain a TDirectory whose TName is equal to the value of the "Input_Identifier" field at the time of
-        execution.  Inside this folder there will be a TDirectory whose TName is equal to the value of the "Obs_Name"
-        field at the time of execution.
+```
+<Canv_Name>_<Canv_Dim X component>_<Canv_Dim Y component>_<Canv_Logo_Pos Idx>_<Canv_Logo_Prelim>_<Canv_Logo_Pos>
+```
 
-        If you have the "Output_File_Option" field equal to "UPDATE" then rather than over-writing the "Output_File_Name"
-        TFile everytime it will simply add TDirectories (or sub-TDirectories) to the file.  This is perfect if you
-        want to compare multiple "Obs_Name" distributions for the same "Input_Identifier" value.  Additionally you
-        could have one TFile store several different "Input_Identifier" top-level TDirectories each with multipler
-        "Obs_Name" sub-directories.
+Here **Canv_Name** is the value of the `Canv_Name` field; **Canv_Dim X & Y component** are the x and y-values given in the `Canv_Dim` field; **Canv_Logo_Pos Idx** is the value of the `Canv_Logo_Pos` field; **Canv_Logo_Prelim** will read `prelim` if **Canv_Logo_Prelim** is set to `true` or be omitted (along with the next underscore) if **Canv_Logo_Prelim** is set to `false`; **Canv_Logo_Pos** will be from the set {`out`, `right`, `center`, `left`} to indicate the position of the CMS logo.  All fields here are found in the *plot config file*.
 
-        In each "Obs_Name" sub directory you will find a TH1F object from each of the input files you considered on
-        execution.  The TNames of these TH1F objects will be equivalent to what they are in their original TFile but
-        they will be appended with the "Input_Identifier" field specific to that TFile.  These TH1F objects will
-        automatically be drawn on a TCanvas, colored, and placed in a TLegend (also drawn on the TCanvas).  The TName
-        of this TCanvas will follow the convention:
+For example if:
+- `Canv_Name = GE11-VII-L-CERN-0002_ResponseMap_Normalized`, 
+- `Canv_Dim = 1000,1000`,
+- `Canv_Logo_Pos = 0`, and 
+- `Canv_Logo_Prelim = true` 
 
-            canv_<Input_Identifier>_<Obs_Name>
+then the produced `TCanvas` would have a `TName` of:
 
-        Example if you have "Input_Identifier" = ClustTime and you are running over the following list of input files:
+```
+GE11-VII-L-CERN-0002_ResponseMap_Normalized_1000_1000_0_prelim_out
+```
 
-            /some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
-            /some/file/path/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+The `TObjects` drawn on the `TCanvas` declared in `[BEGIN_PLOT]` headers will have the value of the `Plot_Name` field set to their `TName`.
 
-        The "Obs_Name" sub directory will contain two TH1F objects with their regular TNames appended with "_ClustTime1to30"
-        and "ClustTime6to27."  The TCanvas they are drawn on will be named "canv_ClustSize_<Obs_Name>"
+Since the style defined by `genericPlotter` may not persist in the created `TObjects` once they have been saved to the output `TFile` and loaded again in `ROOT` two image files will also be produced.  In the working directory you will also find `Canvas_TName.C`, `*.eps`, `*.pdf`, and `*.png` files.  These files should be used for plot approval in publication since they are gauranteed to have the style settings created by `genericPlotter`.
 
-        # 4.f.iii Output ROOT File - genericPlotter
-        # --------------------------------------------------------
+### 4.f.iv Output Text File
+### --------------------------------------------------------
+An output text file will be created that will show in tabular form a table which looks like:
 
-        Here an output ROOT file is produced by classes inheriting from PlotterGeneric with the filename
-        "plotterOutput.root".  The ROOT file will contain the produced TCanvas and all TObjects that were declared
-        in [BEGIN_PLOT] headers and drawn on the canvas. The TName of the produce TCanvas will follow th econvention:
+```
+Cut_HitAdc_Min = 60
+iEta	iPhi	iStrip
+1       1       64
+1       1       65
+1       2       64
+1       3       64
+...     ...     ...
+...     ...     ...
+7       1       128
+7       2       1
+8       3       64
+8       2       1
+```
 
-            <Canv_Name>_<Canv_Dim X component>_<Canv_Dim Y component>_<Canv_Logo_Pos Idx>_<Canv_Logo_Prelim>_<Canv_Logo_Pos>
+The first row will show `Cut_HitAdc_Min`, the minimum ADC cut on hits, applied during the analysis.
 
-        Here "Canv_Name" is the value of the Canv_Name field; "Canv_Dim X & Y component" are the x and y-values
-        given in the Canv_Dim field; "Canv_Logo_Pos Idx" is the value of the Canv_Logo_Pos field; "Canv_Logo_Prelim"
-        will read "prelim" if Canv_Logo_Prelim is set to true or be omitted (along with the next underscore) if
-        Canv_Logo_Prelim is set to false; "Canv_Logo_Pos" will be from the set {out, right, center, left} to indicate
-        the position of the CMS logo.
+A strip is considered dead if there are no entries in the corresponding bin of hit position histogram at the iEta level.  The algorithm will transpose this strip number from iEta numbering, e.g. [1,384], to iPhi numbering [1,128]. This should allow the user to easily identify which strip on a connector is reported as dead.
 
-        For example if Canv_Name = 'GE11-VII-L-CERN-0002_ResponseMap_Normalized', Canv_Dim = '1000,1000',
-        Canv_Logo_Pos = '0', and Canv_Logo_Prelim = 'true' the produced TCanvas would have a TName of:
+Note that having the `Cut_HitAdc_Min` *too high* may cause strips to be reported as dead.  Also when identifying dead strips it is important to understand if the problem is a dead strip on the detector or a dead channel on the front end used to readout the sector.
 
-            GE11-VII-L-CERN-0002_ResponseMap_Normalized_1000_1000_0_prelim_out
+### 4.f.v Output ROOT File - Gain Map
+### --------------------------------------------------------
+This file will have a series of TDirectories of the form:
 
-        The TObjects drawn on the TCanvas declared in [BEGIN_PLOT] headers will have the value of the Plot_Name field
-        set to their TName.
+```
+GainMap_HVPt<X>
+```
 
-        Since the style defined by genericPlotter may not persist in the created TObjects once they have been saved
-        to the output TFile and loaded again in ROOT two image files will also be produced.  In the working directory
-        you will also find Canvas_TName.C, *.eps, *.pdf, and *.png file.  These two files should be used for
-        plot approval in publication since they are gauranteed to have the style settings created by genericPlotter.
+Where **X** corresponds to the HV values given to parameters {`hvPoint`,`hvlist`} either as command line arguments or entries in the provided *Summary File*.  Additionally there will be one `TDirectory` named `Summary`.
 
-        # 4.f.iv Output Text File
-        # --------------------------------------------------------
+Inside each of the `GainMap_HVPt<X>` TDirectories you will find `TCanvas` objects whose `TNames` follow the form:
 
-        An output text file will be created that will show in tabular form a table which
-        looks like:
+```
+canv_<name>_<Observable>_AllEta_<hvPoint>
+```
 
-                            Cut_HitAdc_Min = 60
-                            iEta	iPhi	iStrip
-                            1       1       64
-                            1       1       65
-                            1       2       64
-                            1       3       64
-                            ...     ...     ...
-                            ...     ...     ...
-                            7       1       128
-                            7       2       1
-                            8       3       64
-                            8       2       1
+Where: **name** is the string given to the `--name` argument at command line or provided in the *Summary File*, **Observable** is from the set {`EffGain`, `PD`}, and **hvPoint** is either the value given to the `hvPoint` argument or one of the values given to the `hvlist` argument, or their respective entries in the *Summary File*.  Note that `PD` corresponds to _discharge probability induced by alpha-particles_; and is only calculated for HV values found in the `hvlist` argument.
 
-        The first row will show Cut_HitAdc_Min, the minimum ADC cut on hits, applied
-        during the analysis.
+Additionally, inside each of the `GainMap_HVPt<X>` TDirectories you will find `TGraph2D` objects whose `TNames` follow the form:
 
-        A strip is considered dead if there are no entries in the corresponding bin of
-        hit position histogram at the ieta level.  The algorithm will transpose this
-        strip number from iEta numbering, e.g. [1,384], to iPhi numbering [1,128].
-        This should allow the user to easily identify which strip on a connector is
-        reported as dead.
+```
+g2D_<name>_<Observable>_AllEta_<hvPoint>
+```
 
-        Note that having the Cut_HitAdc_Min "too high" may cause strips to be reported
-        as dead.  Also when identifying dead strips it is important to understand if
-        the problem is a dead strip on the detector or a dead channel on the front end
-        used to readout the sector.
+Where the **name**, **Observable**, and **hvPoint** are as above.
 
-        # 4.f.v Output ROOT File - Gain Map
-        # --------------------------------------------------------
+Inside the `Summary` TDirectory you will find `TCanvas` objects whose `TNames` follow the form:
 
-        This file will have a series of TDirectories of the form:
+```
+canv_<name>_<Observable>
+```
 
-            GainMap_HVPt<X>
+Where: **name** is as given above and **Observable** is from the set {`EffGainAvg`, `PDAvg`}.  Additionally you will find a set of `TGraphError` objects whose `TNames` follow the form:
 
-        Where X corresponds to the HV values given to parameters {hvPoint,hvlist} either
-        as command line arguments or entries in the provided Summary File.  Additionally
-        there will be one TDirectory named "Summary."
+```
+g_<name>_<Observable>
+```
 
-        Inside each of the GainMap_HVPt<X> TDirectories you will find TCanvas objects
-        whose TNames follow the form:
+Where: **name** is as given above and **Observable** is from the set {`EffGainAvg`, `EffGainMax`, `EffGainMin`, `PDAvg`, `PDMax`, and `PDMin`}.  
 
-            canv_<name>_<Observable>_AllEta_<hvPoint>
+### 4.f.vi Output ROOT File - Efficiency Map
+### --------------------------------------------------------
 
-        Where: "name" is the string given to the "--name" argument at command line or
-        provided in the Summary File, "Observable" is from the set {EffGain, PD}, and
-        "hvPoint" is either the value given to the command line argument "hvPoint" or
-        one of the values given to the command line argument hvlist, or their respective
-        entries in the Summary File.  Note that PD corresponds to "discharge probability"
-        induced by alpha-particles observable is only calculated for HV values found in
-        the hvlist parameter.
-
-        Additionally, inside each of the GainMap_HVPt<X> TDirectories you will find
-        TGraph2D objects whose TNames follow the form:
-
-            g2D_<name>_<Observable>_AllEta_<hvPoint>
-
-        Where the "name," "Observable," and "hvPoint" are as above.
-
-        Inside the "Summary" TDirectory you will find TCanvas objects whose TNames follow
-        the form:
-
-            canv_<name>_<Observable>
-
-        Where: "name" is as given above and "Observable" is from the set {EffGainAvg, PDAvg}.  Additionally you will find a set of TGraphError objects whose TNames follow the form:
-
-            g_<name>_<Observable>
-
-Where: "name" is as given above and "Observable" is from the set {EffGainAvg, EffGainMax, EffGainMin, PDAvg, PDMax, and PDMin}.  The error bars depicted on EffGainAvg and PDAvg
-
-        # 4.f.vi Output ROOT File - Efficiency Map
-        # --------------------------------------------------------
-
-    # 4.g. Source Code Name Conventions
-    # --------------------------------------------------------
-
-    Developers are asked to adhere to the naming conventions below when working on the code base.  This
-    improves readability and lowers the chance that ambiguity enters into the development.
-
-        # 4.g.i. STL Objects
-        # --------------------------------------------------------
-
-        For those classes/data types/containers present in the STL the following naming conventions
-        should be used:
-
-            #		<TYPE>             <CONVENTION>
-                    char                The character 'c' should start the object name, e.g. "cName".
-
-                    int                 The character 'i' should start the object name, e.g. "iNumBins"
-
-                    double              The character 'd' should start the object name, e.g. "dPeakPos"
-
-                    float               The character 'f' should start the object name, e.g. "fPeakPos"
-
-                    map                 For a std::map<T1 key, T2 val> the sequence 'map_' should start the
-                                        object name followed by the character/sequence for type T2 if a
-                                        convention already exists for it.  Right now T1 is mostly int type
-                                        and is not specified.  If no convention for T2 exists use a starting
-                                        sequence that is easily identifiable. e.g. "map_strName"
-                                        or "map_hClustHisto"
-
-                    multiset            For a std::multiset<T> the sequence 'mset_' should start the object
-                                        name followed by the character/sequence for type T if a convention
-                                        already exists for it. if no convention for T exists use a starting
-                                        sequnce that is easily identified as described in the std::map
-                                        description above.
-
-                    shared_ptr          For std::shared_ptr<T> follow the convention for type T.
-
-                    short               The sequence 's' should start the object name, e.g. sADC
-
-                    string              The sequence 'str' should start the object name, e.g. "strName"
-
-                    vector              Follow the convention for std::map but the starting sequence 'vec_'
-                                        should be used instead. e.g. "vec_strName" or "vec_hClustHistos"
-
-        # 4.g.i. ROOT Objects
-        # --------------------------------------------------------
-
-        For those classes in ROOT that are the following listed classes, or inherit from the following
-        listed classes, use the naming conventions outlined below:
-
-            #		<TYPE>             <CONVENTION>
-                    TH1                 The character 'h' should start the object name, e.g. hClustADC
-
-                    TH2                 As TH1 but the physical observables of the y & x axes should be
-                                        included in the object name in "y vs. x" format,
-                                        e.g. hEta_ClustADC_v_ClustPos
-
-                    TF1                 The sequence 'fit' should start the object name, e.g. fitSlice_ClustADC
-
-                    TGraph              The character 'g' should start the object name, e.g. gClustADC
-
-                    TGraph2D            The character 'g2D' should start the object name, e.g. g2D_RespFitPkPos
-
-# 5. Known & Outstanding Issues
+# 5. Troubleshooting
 # ========================================================
-
-    Please consult the list of known/outstanding issues from the list below. If you do not find your
-    issue please navigate to:
-
-        https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues
-
-    And submit a new issue which outlines the problem, the commands exectued, the output error messages
-    and a minimal piece of code to repeat the problem.  We will then try to get back to you with a solution.
-
-    ********ISSUE********
-    Compiling on MAC OS v10.9.X with g++ (GCC) version 4.9.2 20141029 fails.  This is due to the
-    default C++ library in apple software.  Before 10.9.X the default was "libstdc++" but after 10.9.X
-    it has been renamed to "libc++".  We have provided a make file for the clang compiler ("Makefile.clang)
-    but do not support this computing environemnt since lxplus is so readily accessible and configurable.
-
-    ********ISSUE********
-    Running the frameworkMain executable in a MAC OS environment hangs indefinitely or seg faults
-    when trying to parse the input analysis config file.  This appears to be due to the implementation of
-    the standard library in MAC OS.  Specifically in the Timing::getlineNoSpaces() function declared in
-    $GEM_BASE/include/TimingUtilityFunctions.h and implemented in $GEM_BASE/src/TimingUtilityFunctions.cpp.
-    From what we can tell iterator operation e.g. strString.begin() + iNum seems to cause either a crash
-    out right or the stl algorithm std::remove to exit the iterator range given and continue until the
-    computer runs out of memory.  Our recommended solution is to use the linux computing environment
-    specified above.
-
-    ********ISSUE********
-    Running frameworkMain executable on linux crashes when parsing the input analysis config file.
-    This is a very rare occurrence and it seems to be again coming from Timing::getlineNoSpaces();
-    function declared in $GEM_BASE/include/TimingUtilityFunctions.h and implemented in
-    $GEM_BASE/src/TimingUtilityFunctions.cpp.  It is believed that for some reason the function tries to
-    remove space or tab characters that are not there and return a null pointer causing the seg fault.
-    If you identify the line of the input analysis config file the crash occurs at try adding or subtracting
-    a few spaces or tabs and then re-running.  This has been seen to solve the issue in the past.  If a
-    developer can come up with a better implementation of Timing::getlineNoSpaces() this might solve
-    both this issue and the above issue.
-
-    ********ISSUE********
-    Runing frameworkMain gives error messages when parsing the input analysis config file stating
-    it does not recognize a given (field, value) pair even though the field is listed in this README 
-    file and have double checked that it is spelled correctly:
-
-        strLine: = Cut_ClusterSize_Min='2';
-        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - Error!!! Parameter Not Recognizd:
-        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Field = CUT_CLUSTERSIZE_MIN
-        ParameterLoaderAnaysis::loadAnalysisParametersUniformity() - 	Value = 2
-
-    We are puzzled by this also. Upon inspecting the output histograms it does appear that the specified
-    selection cut is correctly applied.  Need to spend sometime with just ParameterLoaderAnalysis to
-    understand what is going on.  Open issue.
-
-    ********ISSUE********
-    When attempting to run the executable frameworkMain I get the following error:
-
-        ./frameworkMain: error while loading shared libraries:
-        libSpectrum.so: cannot open shared object file: No such file or directory
-
-    You did not run the setup script to initialize the computing environment.  Execute from the base 
-    directory of the repository the following command:
-
-        source scripts/setup_CMS_GEM.sh
-
-    Now attempt to re-run the executable.
-
-    ********ISSUE********
-    When attempting to compile I get the following error (or similar):
-
-        g++ -g3 -O0 `/bin/root-config --cflags --glibs --libs` -std=c++11 -I include/ -I/include/ -c src/DetectorMPGD.cpp -o src/DetectorMPGD.o  -L /lib/ -lSpectrum
-        /bin/sh: /bin/root-config: No such file or directory
-        cc1plus: error: unrecognized command line option "-std=c++11"
-        make: *** [src/DetectorMPGD.o] Error 1
-
-    You most likely did not run the setup script to initialize the computing environement.  Execute from
-    the base directory of the repository the following command:
-
-        source scripts/setup_CMS_GEM.sh
-
-    Now attempt to recompile.
-
-    ********ISSUE********
-    When attempting to execute:
-
-        source scripts/setup_CMS_GEM.sh
-
-    The following error message is returned:
-
-        gcc_config_version=4.8.4: Command not found.
-        LCGPLAT=x86_64-slc6-gcc48-opt: Command not found.
-        LCG_lib_name=lib64: Command not found.
-        LCG_arch=x86_64: Command not found.
-        BASH: Undefined variable.
-
-    This has been traced to your $SHELL environment.  It seems the setup_CMS_GEM.sh script does not
-    execute properly if you are not using zsh.  While we explore solutions to this problem we recommend
-    running the framework using zsh.  We apologize for this inconvenience.
-
-    ********ISSUE********
-    When attempting to run with the comparison configuration you get a segmentation violation.
-
-    Please double check that your "Obs_Name", "Obs_Eta", "Obs_Phi", and "Obs_Slice" result in a
-    valid location within your input TFiles.  Note the value set to "Obs_Name" is case-sensitive.
-    Then please try to re-run.
+    If you run into trouble please double check this file to ensure you are using the repository correctly.  If you still are running into trouble please navigate too the [issue tab](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) of the repository and post an issue following the instructions included in the template.
