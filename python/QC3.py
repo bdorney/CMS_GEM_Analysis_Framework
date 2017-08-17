@@ -3,24 +3,26 @@ from wrappers import runCommand,envCheck
 from options import parser
 import os
 
-args = parser.parse_args()
+(args,opts)=parser.parse_args()
 
 envCheck('GEM_BASE')
 dataPath  = os.getenv('GEM_BASE')
 cmd = ["python","%s/python/Produce_Config_File.py"%(dataPath)]
 
 for filelist in args.file:
-	cmd.append(filelist)
+	cmd.append("--file=%s"%(filelist))
 	pass
 
 cmd.append("--CanvTitleX=Time #left(s#right)")
 cmd.append("--CanvTitleY=Pressure #left(mbar#right)")
-cmd.append("--SelectColumnX= 1")
-cmd.append("--SelectColumnY= 2")
-cmd.append("--SelectRowStart= 1")
-cmd.append("--SelectRowEnd= 61")
-cmd.append("--CanvRangeX= 0,3600")
-cmd.append("--CanvRangeY= 0,35")
+cmd.append("--SelectColumnX=1")
+cmd.append("--SelectColumnY=2")
+cmd.append("--SelectRowStart=1")
+cmd.append("--SelectRowEnd=61")
+cmd.append("--CanvRangeX=0,3600")
+cmd.append("--CanvRangeY=0,35")
+cmd.append("--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}")
+cmd.append("--LatexLines=0.62,0.27, Gas~=~CO_{2}")
 
 # Fit the Pressure vs Time curves
 if bool(args.Fit):
@@ -37,7 +39,7 @@ if len(args.file)==1:
 	cmd.append("--OutputName=config_"+filename)
 	pass
 else:
-	cmd.append("--OutputName= config_QC3_LS2_Pres_vs_Time_AllDet")
+	cmd.append("--OutputName=config_QC3_LS2_Pres_vs_Time_AllDet")
 	pass
 
 runCommand(cmd)

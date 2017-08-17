@@ -6,6 +6,19 @@
 *                                                *
 **************************************************
 
+Update: August 17th 2017
+==================================================
+->options.py: Switched from argparse to optparse, add append action to LatexLines option
+->Produce_Config_File.py: add loop to print Latexlines from list
+-> QC3.py,QC4_*.py,QC5_*.py: append LatexLines to cmd
+
+
+->options.py: changed YaxisScale, SetErrX, SetErrY and Fit arguments store type (back to boolean)
+->Produce_Config_File.py: Changed the if statement for the arguments mentioned above (boolean instead of strings)
+->QC3.py: Changed the way the above arguments are appended to cmd 
+->QC4_*.py: Changed the way the above arguments are appended to cmd 
+->QC5_*.py: Changed the way the above arguments are appended to cmd 
+
 Update: August 16th 2017
 ==================================================
 scripts/setup_CMS_GEM.sh: add pip2.7 install --user xlrd (library used by produce_config_file.py)

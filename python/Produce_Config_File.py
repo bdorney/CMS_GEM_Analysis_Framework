@@ -34,7 +34,7 @@ def CyclicColor(DrawArg):
 		pass
 	return ret_int
 
-args = parser.parse_args()
+(args,opts)=parser.parse_args()
 text_file = open(args.OutputName+".cfg", "w")
 
 DrawArg=0
@@ -44,12 +44,9 @@ text_file.write("\tCanv_Axis_NDiv = '%s';#X,Y\n"%(args.AxisNDiv))
 text_file.write("\tCanv_Dim= '%s';#X,Y\n"%(args.CanvDim))
 text_file.write("\tCanv_DrawOpt = '%s';\n"%(args.CanvDrawOpt))
 text_file.write("\tCanv_Grid_XY = '%s';\n"%(args.CanvGridXY))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine1))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine2))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine3))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine4))
-text_file.write("\tCanv_Latex_Line = '%s';\n"%(args.LatexLine5))
+for line in args.LatexLines:
+    text_file.write("\tCanv_Latex_Line = '%s';\n"%(line))
+    pass
 text_file.write("\tCanv_Legend_Dim_X = '%s';\n"%(args.CanvLegDimX))
 text_file.write("\tCanv_Legend_Dim_Y = '%s';\n"%(args.CanvLegDimY))
 text_file.write("\tCanv_Legend_Draw = '%s';\n"%(args.CanvLegDraw))
