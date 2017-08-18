@@ -2,9 +2,13 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 5.0.1                               *
-*	LAST UPDATE: Aug 17 2017                     *
+*	LAST UPDATE: Aug 18 2017                     *
 *                                                *
 **************************************************
+
+Update: August 18th 2017
+==================================================
+->Further of re-writting README.md in Markdown
 
 Update: August 17th 2017
 ==================================================
