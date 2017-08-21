@@ -1180,548 +1180,377 @@ Data Member | Description
 `Hit::vec_sADC` | `std::vector` of ADC values, each element of the vector represents ADC value at that time bin; e.g. `vec_sADC[Hit::iTimeBin]` gives the ADV value at the defined time bin
 
 #### 4.d.ii.VI RunSetup
-The `Uniformity::RunSetup` struct stores user input defined in the `[RUN_INFO]` header of the *Run Config* File.  It does not store the list of input files.  This struct is responsible for setting the analysis configuration and is used by `InterfaceAnalysis` class for identifying what stages of the analysis should be performed.
-
-Data members of `Uniformity::RunSetup` are:
-
-    RunSetup::strRunMode            //string, tracks whether executable is doing analysis or comparison
-
-    RunSetup::bAnaStep_Clusters     //True: perform the cluster analysis; false: do not.
-    RunSetup::bAnaStep_Fitting      //True: fit stored distributions; false: do not.  Note bAnaStep_Clusters (bAnaStep_Hits) must also be true for cluster (hit) distributions to be fitted.
-    RunSetup::bAnaStep_Hits         //True: perform the hit analysis; false: do not.
-    RunSetup::bAnaStep_Reco         //True: reconstruct clusters from hits; false: take clusters from input amoreSRS TTree.  Right now just a placeholder value.  Does nothing presently.
-    RunSetup::bAnaStep_Visualize    //True: make summary TCanvas objects after analyzing all input files; false: do not.
-
-    RunSetup::strIdent              //string, unique identifier in input filenames
-    RunSetup::strObsName            //string, name of observable to be compared across input files in comparsion mode
-
-    RunSetup::iEta                  //int, iEta index to be used in comparsion mode
-    RunSetup::iPhi                  //int, iPhi index to be used in comparsion mode
-    RunSetup::iSlice                //int, iSlice index to be used in comparsion mode
-
-    RunSetup::strDetName            //Stores a string acting as the unique detector serial number.  Resolves ambiguity in TObject TName data members when opening multiple output TFiles.
-
-    RunSetup::bInputFromFrmwrk      //True (false): input files are produced by the CMS_GEM_Analysis_Framework (amoreSRS)
-    RunSetup::bLoadSuccess          //True (false): the input parameters were (not) loaded successfully from the Run Config File. Defaults to false.  If after attempting to load these parameters from the Run Config File this is still false the analysis routine exits.
-    RunSetup::bMultiOutput          //True: one output file is made which represents the sum of all input files; false: one output file is made for each input file.  Note when bInputFromFrmwrk is true bMultiOutput must also be true.
-
-    RunSetup::strFile_Config_Ana    //PFN of input analysis config file
-    RunSetup::strFile_Config_Map    //PFN of input mapping config file
-
-    RunSetup::strFile_Output_Name   //PFN of output TFile to be created when bMultiOutput is false
-    RunSetup::strFile_Output_Option //Option for TFile, e.g. CREATE, RECRATE, UPDATE, etc...
-
-    RunSetup::bDrawNormalized       //True: in comaprison mode TH1F objects are drawn to have area=1; false: no change
-    RunSetup::bVisPlots_PhiLines    //True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
-    RunSetup::bVisPlots_AutoSaving  //True: automatically save TCanvas objects stored in the Summary folder of the output TFile as *.png and *.pdf files; false: do not.
-
-    RunSetup::strDrawOption         //string, draw option to be used in comparison mode
-
-            4.d.ii.VII SectorSlice
-            # --------------------------------------------------------
-
-            The data members of the Uniformity::SectorSlice struct are:
-
-                SectorSlice::bFitAccepted       //True: fit of SectorSlice::hSlice_ClustADC passed quality checks
-                SectorSlice::fPos_Center        //Location of the center of the slice, in mm, within the SectorPhi (iPhi value)
-                SectorSlice::fWidth             //Width of the slice in mm
-                SectorSlice::iMinuitStatus      //Minuit status code after attempting to fit SectorSlice::hSlice_ClustADC
-                SectorSlice::fitSlice_ClustADC  //std::shared_ptr of a TF1; used to fit SectorSlice::hSlice_ClustADC
-                SectorSlice::hSlice_ClustADC    //As SectorEta::hEta_ClustADC but only for this SectorSlice
-
-            There is also one copy constructor and one overloaded assignment operator.  These items perform a
-            deep copy of the std::shared_ptr objects above.
-
-            4.d.ii.VIII SelParam
-            # --------------------------------------------------------
-
-            Data members of Uniformity::SelParam are:
-
-                SelParam::iCut_ADCNoise     //Hit or Cluster rejected if ADC LESS than value
-                SelParam::iCut_ADCSat       //Hit rejected if ADC GREATER than value
-                SelParam::iCut_MultiMin     //EVENT rejected if cluster multiplicity LESS than or equal to value
-                SelParam::iCut_MultiMax     //EVENT rejected if cluster multiplicity GREATER than or equal to value
-                SelParam::iCut_SizeMin      //Cluster rejected if size LESS than value
-                SelParam::iCut_SizeMax      //Cluster rejected if size GREATER than value
-                SelParam::iCut_TimeMin      //Hit or Cluster rejected if time bin LESS than value
-                SelParam::iCut_TimeMax      //Hit or Cluster rejected if time bin GREATER than value
-
-            4.d.ii.IX SummaryStatistics
-            # --------------------------------------------------------
-
-            The Uniformity::SummaryStatistics is a container for storing statistical parameters of a dataset
-            (e.g. fit results from all strips).  Data members of Uniformity::SummaryStatistics are:
-
-                SummaryStatistics::fIQR             //Interquantile range of dataset; IQR = Q3 - Q1; intrinsically positive
-                SummaryStatistics::fMax             //Max value of dataset
-                SummaryStatistics::fMean            //Mean value of dataset
-                SummaryStatistics::fMin             //Min value of dataset
-                SummaryStatistics::fQ1              //First quantile (Q1) of dataset
-                SummaryStatistics::fQ2              //Second quantile (Q2) of dataset
-                SummaryStatistics::fQ3              //Third quantile (Q3) of dataset
-                SummaryStatistics::fStdDev          //Standard deviation of dataset
-                SummaryStatistics::mset_fOutliers   //Container storing outliers of a dataset; outlier definition is defined per Analyzer
-                SummaryStatistics::hDist            //TH1F object of which stores the distribution of the dataset
-                SummaryStatistics::fitDist          //TF1 object which attempts a Gaussian fit to hDist
-
-                SummaryStatistics::clear()          //resets all floats to -1, resets TObjects, and clears all stl containers
-
-            There is also one copy constructor and one overloaded assignment operator.  These items perform a
-            deep copy of the std::shared_ptr objects above.
-
-        # 4.d.iii. Plotter
-        # --------------------------------------------------------
-
-        Coming "soon"
-
-    # 4.e. Configuration Files
-    # --------------------------------------------------------
-
-    Two configuration files are require to run the frameworkMain exectuable.  The first is the amoreSRS
-    mapping file.  The second is the Analysis Config file.  Examples of both files have been included in
-    the $GEM_BASE/config directory
-
-        # 4.e.i. amoreSRS Mapping Config File
-        # --------------------------------------------------------
-
-        The amoreSRS mapping config file is the file used by amoreSRS when analyzing data collected with the SRS
-        system.  Right now only the part of the file specifying the detectors (e.g. lines starting with
-        "DET") are used:
-
-            # CMSGEM
-            #################################################################################################
-            #   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
-            #################################################################################################
-            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR1,    1014.95,         411.402,       3,       1
-            ...     ...         ...      ...        ...         ...          ...        ...     ...
-            ...     ...         ...      ...        ...         ...          ...        ...     ...
-            DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR8,    0,        231.186,       3,       1
-
-        For each "DET" line defined in this file an entry in the DetectorMPGD::map_sectorsEta map will be
-        stored.  In this way the amoreSRS mapping config file specifies the geometry of the DetectorMPGD object.
-
-        Right now the framework only supports detectors with 1D readouts.  Although the future plan would be
-        to extend the software to 2D readouts.
-
-        # 4.e.ii. Analysis Config File
-        # --------------------------------------------------------
-
-        The analysis config file expects a certain "nested-header" style. The format should look something like:
-
-            [BEGIN_ANALYSIS_INFO]
-                ...
-                ...
-                [BEGIN_UNIFORMITY_INFO]
-                    ...
-                    ...
-                    [BEGIN_ADC_FIT_INFO]
-                        ...
-                        ...
-                    [END_ADC_FIT_INFO]
-                    [BEGIN_HISTO_INFO]
-                        ...
-                        ...
-                    [END_HISTO_INFO]
-                    ...
-                    ...
-                    ...
-                    ...
-                    [BEGIN_HISTO_INFO]
-                        ...
-                        ...
-                    [END_HISTO_INFO]
-                [END_UNIFORMITY_INFO]
-            [END_ANALYSIS_INFO]
-
-        For each of the higher level header sections (i.e. "[BEGIN_ANALYSIS_INFO]" and "[BEGIN_UNIFORMITY_INFO]")
-        the header parameters should *always* be placed before the declaration of lower headers.  Placing top
-        level header parameters after the declaration of lower level headers could lead to undefined behavior
-        or at worst crashes.
-
-        Parameters are expected to be entered in the following format:
-
-            field_name = 'value';
-
-        The field_name should be on the left followed by an equals sign "=" then the value should be enclosed
-        in single quote marks "'".  A semicolon ";" ends the statement.  Tabs "\t" and spaces outside of the
-        single quotes will be ignored, but will be preserved inside the single quotes.  Text after the ";" will
-        also be ignored.  The template at the end of this subsection showns an example.
-
-        The Uniformity::ParameterLoaderAnalysis class understands the "#" character to indicate a comment; so
-        it is possible to comment out lines in the Analysis Config file you create for ease of use.
-
-        Please note that for all field_names that scientific notation is, unfortunately, not yet supported and
-        WILL lead to crashes (i.e. enter 1000 instead of 1e3).
-
-        # 4.e.ii.I HEADER PARAMETERS - ANALYSIS_INFO
-        # --------------------------------------------------------
-
-            The following parameters are supported:
-            #		<FIELD>			<DATA TYPE, DESCRIPTION>
-
-        None for now, placeholder
-
-        # 4.e.ii.II HEADER PARAMETERS - TIMING_INFO
-        # --------------------------------------------------------
-
-            The following parameters are supported:
-            #		<FIELD>			<DATA TYPE, DESCRIPTION>
-
-        None for now, placeholder
-
-        # 4.e.ii.III HEADER PARAMETERS - UNIFORMITY_INFO
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Cut_ClusterADC_Min      integer, clusters with ADC values less than this value are rejected.
-
-                Cut_ClusterMulti_Min    integer, events with clusters multiplicity less than or equal to this
-                                        value are rejected.
-
-                Cut_ClusterMulti_Max    integer, events with clusters multiplicity greater than or equal to this
-                                        value are rejected.
-
-                Cut_ClusterSize_Min     integer, clusters with sizes less than this value are rejected.
-
-                Cut_ClusterSize_Max     integer, clusters with sizes greater than this value are rejected.
-
-                Cut_ClusterTime_Min     integer, clusters with time bins less than this value are rejected.
-
-                Cut_ClusterTime_Max     integer, clusters with time bins greater than this value are rejected.
-
-                Cut_HitAdc_Min          integer, hits with ADC value less than this value are rejected.
-
-                Cut_HitAdc_Max          integer, hits with ADV value greater than this value are rejected.
-
-                Cut_HitMulti_Min        integer, events with hit multiplicity less than or equal to this
-                                        value are rejected.
-
-                Cut_HitMulti_Max        integer, events with hit multiplicity greater than or equal to this
-                                        value are rejected.
-
-                Cut_HitTime_Min         integer, hits with time bins less than this value are rejected.
-
-                Cut_HitTime_Max         integer, hits with time bins greater than this value are rejected.
-
-                Event_First             integer, the first event, of the TTree found in the input root file
-                                        (created by amoreSRS with ROOTDATATYPE = CLUSTERS_ONLY), to start
-                                        processing the cluster selection at.
-
-                Event_Total             integer, total number of events to process from the Event_First of the
-                                        TTree found in the input root file (created by amoreSRS with
-                                        ROOTDATATYPE = CLUSTERS_ONLY) A value of -1 sets indicates all events
-                                        from the first event will be processed.
-
-                Uniformity_Granularity  integer, numer of slices, or partitions, to split one iPhi sector into
-                                        for the response uniformity measurement.
-
-        # 4.e.ii.IV HEADER PARAMETERS - ADC_FIT_INFO
-        # --------------------------------------------------------
-
-        A set of keywords = {"AMPLITUDE","FWHM","HWHM","MEAN","PEAK","SIGMA"} is presently supported
-        which allows the user to configure complex expressions for the initial guess of fit parameters,
-        their limits, and the fit range.  In the future additional keywords may be added as requested.
-        The table below describes the keywords:
-
-            The following keywords are supported and describe how they define the initial guess for a
-            given fit:
-            #       <KEYWORD>       <DESCRIPTION>
-
-                AMPLITUDE           The fit parameter is set to the value of the TH1 bin with the largest
-                                    content (e.g. TH1::GetBinContent(TH1::GetMaximumBin() ) ).
-
-                FWHM                The fit parameter is set to the RMS of the distribution stored in
-                                    the TH1 object (e.g. TH1::GetRMS() ).
-
-                HWHM                The fit parameter is set to half the RMS of the distribution stored in
-                                    the TH1 object (e.g. TH1::GetRMS() ).
-
-                MEAN                The fit parameter is set to the mean of the distribution stored in
-                                    the TH1 object (e.g. TH1::GetMean() ).
-
-                PEAK                An instance of the ROOT::TSpectrum class is created and searches the TH1
-                                    object that will be fitted for all peaks.  The TSpectrum parameters are
-                                    hard coded and "should" ensure only one peak is found (open issue).  The
-                                    x-position of the first peak found in the TH1 distribution is set to the
-                                    fit parameter (e.g. TSpectrum::Search() and TSpectrum::GetPositionX()
-                                    are used).
-
-                SIGMA               As "FWHM"
-
-        The framework will calculate the energy resolution of a given slice of the detector.  The energy
-        resolution is always taken as:
-
-            E_Res = PEAK_FWHM / PEAK_Pos
-
-        In your fit formula you must label one parameter in the "Fit_Param_Map" (see table below) from
-        the peak width set {"FWHM","HWHM","SIGMA"}.  Failure to do so will cause the energy resolution
-        to be zero for all slices (i.e. all points in gEta_ClustADC_Fit_PkRes will be 0 for all SectorEta
-        objects defined).  The table below shows how the PEAK_FWHM is determined for each of the entires
-        in the peak width set:
-
-            Energy resolution determination for each of the three input parameter values:
-            #       <KEYWORD>       <DESCRIPTION>
-
-                FWHM                E_Res = FWHM / PEAK_Pos; where FWHM is the value of the fit
-                                    parameter, post fit, given the meaning "FWHM" in the Fit_Param_Map
-                                    field.
-
-                HWHM                E_Res = (2.*HWHM) / PEAK_Pos; where HWHM is the value of the
-                                    fit parameter, post fit, given the meaning "HWHM" in the Fit_Param_Map
-                                    field.
-
-                SIGMA               E_Res = (2. * sqrt( 2. * ln(2.) ) * SIGMA ) / PEAK_Pos; where SIGMA
-                                    is the value of the fit parameter, post fit, given the meaning "SIGMA"
-                                    in the Fit_Param_Map field.
-
-        The table below describes the allowed input fields and their data types:
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Fit_Formula             string, TFormula to be given to a ROOT::TF1 object.  Note the syntax
-                                        and full complexity of inputs expected/available in ROOT works!
-                                        e.g. "[0]*x^2+[1]" or "gaus(0)+pol2(3)" or "[1]*TMath::Erf(x) + [2]"
-                                        are all supported.
-
-                Fit_Formula_Sig         string, as Fit_Formula but this is understood to be the portion of the
-                                        formula which describes the signal peak.  Note the parameters here must
-                                        be indexed from 0 and follow the same order as they due in Fit_Formula.
-                                        E.g. if your Fit_Formula is "pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])"
-                                        with the CauchyDist describing your signal peak then Fit_Formula_Sig
-                                        would be written as "[0]*TMath::CauchyDist(x,[1],[2])".  Here the index
-                                        of the parameters has been restarted at [0] but the order is preserved.
-                                        This, in conjunction with Fit_Formula_Sig_Param_Idx_Range, will ensure
-                                        the parameter determined for [3] in Fit_Formula is assigned to [0] in
-                                        Fit_Formula_Sig.
-
-                Fit_Formula_BKG         string, as Fit_Formula_Sig but for the background.
-
-                Fit_Formula_Sig_Param_Idx_Range     integers, two comma separated integers.  This gives the range
-                                                    of the parameters that correspond to the signal peak in Fit_Formula.
-                                                    E.g. if your Fit_Formula is "pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])"
-                                                    with the CauchyDist describing your signal peak then
-                                                    Fit_Formula_Sig_Param_Idx_Range is "3,5" which, in conjunction
-                                                    with Fit_Formula_Sig, will ensure the parameter determined for
-                                                    [3] in Fit_Formula is assigned to [0] in Fit_Formula_Sig.
-
-
-                Fit_Formula_Sig_Param_Idx_Range     integers, as Fit_Formula_Sig_Param_Idx_Range but for the
-                                                    background.
-
-                Fit_Name                string, starting point of TName of the TF1 object; note the (ieta,iphi,islice)
-                                        coordinate of the fit will be used to augment the TName to ensure a unique
-                                        TName for each TF1 object created.
-
-                Fit_Option              string, the fit option to be used for fitting the ADC spectrums made
-                                        from each slice.
-
-                Fit_Param_IGuess        string, comma separated list of the initial values for the parameters
-                                        defined in the Fit_Formula field.  Note the order in which the parameters
-                                        are given in the Fit_Formula field should match the order listed here.
-                                        Explicitly for the Fit_Formula '[0]*x^2+[1]*x+[2]' the initial guess
-                                        of '4,5,6' would mean [0] = 4, [1] = 5, and [2] = 6.  Additionally,
-                                        both numeric values and expressions formed from the above supported
-                                        keywords can be used.  E.g. for a Fit_Formula = 'gaus(0)' the initial
-                                        guess of '12.3, MEAN, 2.*SIGMA+23.5' can be assigned.
-
-                Fit_Param_Limit_Max     string, as Fit_Param_IGuess but for the upper limit on fit parameters.
-
-                Fit_Param_Limit_Min     string, as Fit_Param_IGuess but for the lower limit on fit parameters.
-
-                Fit_Param_Map           string, words to help the user track the meaning of the fit parameter.
-                                        The order follows the ordering schema described in Fit_Param_IGuess.
-                                        NOTE: at least one parameter must be given the value "PEAK" and one
-                                        parameter must be given a value from the set {"FWHM","HWHM","SIGMA"}.
-                                        The vertical error-bar on these two parameters comes from the error
-                                        on the corresponding fit parameter determined in ROOT (e.g. TF1::GetParError() )
-
-                Fit_Range               string, as Fit_Param_IGuess but for the fit range.  NOTE: must supply
-                                        exactly two parameters.  If more than two parameters are supplied
-                                        only those that evaluate to the maximum and minimum are used.
-
-        # 4.e.ii.V HEADER PARAMETERS - HISTO_INFO
-        # --------------------------------------------------------
-
-        The user at runtime is able to specify the data members of the TH1 objects that will be created
-        (e.g. number of bins, TName, etc...).  However, unlike amoreSRS these histograms are hard coded and
-        the user cannot choose at runtime to make new distributions.  If a distribution you would like to
-        see does not already exist please navigate to:
-
-            https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues
-
-        and submit a request; or if you are a developer implement the distribution yourself and then submit
-        a pull request to the repository (https://github.com/bdorney/CMS_GEM_Analysis_Framework/pulls).
-
-        The table below describes the allowed input fields and their data types.
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Histo_Name              string, type of histogram you are specifying information for.  NOTE:
-                                        this entry should appear as the first line below the section
-                                        header ("BEGIN_HISTO_INFO") and only entries from the following
-                                        set are allowed: {"clustADC", "clustMulti", "clustPos", "clustSize",
-                                        "clustTime", "hitADC", "hitMulti", "hitPos", "hitTime"}.
-
-                Histo_XTitle            string, title of the x-axis, full TLatex style entires are supported.
-                                        Explicitly "cluster position #left(#mum#right)" will result in a
-                                        well formatted x-axis with parenthesis that are sized accordingly
-                                        and proper Greek lettering.
-
-                Histo_YTitle            string, as Histo_XTitle but for the y-axis.
-
-                Histo_BinRange          float, two floats separated by a comma specifying the lowest and
-                                        highest values of the x-axis.  In the case of Histo_Name = {clustPos, hitPos}
-                                        this field is automatically set based on input from amoreSRS mapping file.
-
-                Histo_NumBins           integer, number of bins in the histogram.  In the case of
-                                        Histo_Name = {clustPos, hitPos} this field is automatically set
-                                        based on input from amoreSRS mapping file.
-
-        # 4.e.ii.VI Example Config File
-        # --------------------------------------------------------
-
-        An example config file is shown below (feel free to remove the leading tabs, they are shown here
-        just for readablility):
-
-            [BEGIN_ANALYSIS_INFO]
-                [BEGIN_UNIFORMITY_INFO]
-                    #Selection Cuts
-                    ####################################
-                    Cut_ClusterADC_Min = '300';
-                    Cut_ClusterMulti_Min = '0';
-                    Cut_ClusterMulti_Max = '20';
-                    Cut_ClusterSize_Min = '2';
-                    Cut_ClusterSize_Max = '10';
-                    Cut_ClusterTime_Min = '6';
-                    Cut_ClusterTime_Max = '27';
-                    #Selection Cuts - Hit
-                    ####################################
-                    Cut_HitAdc_Min = '60';
-                    Cut_HitAdc_Max = '3000';
-                    Cut_HitMulti_Min = '1';
-                    Cut_HitTime_Min = '2';
-                    Cut_HitTime_Max = '29';
-                    #Event Range
-                    ####################################
-                    Event_First = '0';
-                    Event_Total = '-1';
-                    #Requested Granularity
-                    ####################################
-                    Uniformity_Granularity = '64';
-                    #Requested Tolerance on Uniformity
-                    ####################################
-                    [BEGIN_ADC_FIT_INFO]
-                        Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol5(3)';
-                        Fit_Formula_Sig = '[0]*TMath::CauchyDist(x, [1], [2])';
-                        Fit_Formula_Sig_Param_Idx_Range = '0,2';
-                        Fit_Formula_Bkg = 'pol5';
-                        Fit_Formula_Bkg_Param_Idx_Range = '3,8';
-                        Fit_Param_Map = 'AMPLITUDE, PEAK, HWHM';
-                        Fit_Param_IGuess = '1000000,PEAK,PEAK*0.3';
-                        Fit_Param_Limit_Min = '10, PEAK-0.2*PEAK, 0.1*PEAK';
-                        Fit_Param_Limit_Max = '10000000, PEAK+0.2*PEAK, 0.70*PEAK';
-                        Fit_Range = 'PEAK-0.57*PEAK, 3*PEAK';
-                    [END_ADC_FIT_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'clustADC';
-                        Histo_XTitle = 'Cluster ADC';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,10000';
-                        #Histo_NumBins = '150';
-                        Histo_NumBins = '100';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'clustMulti';'
-                        Histo_XTitle = 'Cluster Multiplicity';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,20';
-                        Histo_NumBins = '20';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'clustPos';
-                        Histo_XTitle = 'Cluster Position #left(mm#right)';
-                        Histo_YTitle = 'N';
-                        #Here Histo_BinRange is set automatically based on input amoreSRS mapping file
-                        #Here Histo_NumBins is set automatically based off Bin_Range
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'clustSize';
-                        Histo_XTitle = 'Size #left(N_{strips}#right)';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,20';
-                        Histo_NumBins = '20';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'clustTime';
-                        Histo_XTitle = 'Time Bin';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,30';
-                        Histo_NumBins = '30';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'hitADC';
-                        Histo_XTitle = 'Hit ADC';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,2000';
-                        Histo_NumBins = '200';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'hitMulti';'
-                        Histo_XTitle = 'Hit Multiplicity';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,50';
-                        Histo_NumBins = '50';
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'hitPos';
-                        Histo_XTitle = 'Hit Position #left(mm#right)';
-                        Histo_YTitle = 'N';
-                        #Here Histo_BinRange is set automatically based on input amore mapping file
-                        #Here Histo_NumBins is set automatically based off Bin_Range
-                    [END_HISTO_INFO]
-                    [BEGIN_HISTO_INFO]
-                        Histo_Name = 'hitTime';
-                        Histo_XTitle = 'Time Bin';
-                        Histo_YTitle = 'N';
-                        Histo_BinRange = '0,30';
-                        Histo_NumBins = '30';
-                    [END_HISTO_INFO]
-                [END_UNIFORMITY_INFO]
-            [END_ANALYSIS_INFO]
-
-        # 4.e.iii. Run Config File
-        # --------------------------------------------------------
-
-        The run config file expects a certain "nested-header" style. The format should look something like:
-
-            [BEGIN_RUN_INFO]
-                ...
-                ...
-                ...
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                ...
-                ...
-                ...
-            [END_RUN_LIST]
-
-        Parameters found inside the "[BEGIN_RUN_INFO]" header are expected to be entered in the manner described
-        in Section 4.e.ii.
-
-        Contrary to the "[BEGIN_RUN_INFO]" header the "[BEGIN_RUN_LIST]" header is simply a list of PFN of the
-        input files to be analyzed by the call of the executable.  Again tabs "\t" and spaces will be ignored.
-
-        The Uniformity::ParameterLoaderRun class understands the "#" character to indicate a comment; so
-        it is possible to comment out lines in the Run Config file you create for ease of use.  The value of
-        true is understood as being from the case-insensitive set {t, true, 1} while the value of false is
-        understood as being from the case-insensitive set {f, false, 0}. Example config files are shown at the
-        end of this subsection.
+The `Uniformity::RunSetup` struct stores user input defined in the `[RUN_INFO]` header of the *Run Config* File.  It does not store the list of input files.  This struct is responsible for setting the analysis configuration and is used by `InterfaceAnalysis` class for identifying what stages of the analysis should be performed. Data members of `Uniformity::RunSetup` are:
+
+Data Member | Description
+----------- | -----------
+`RunSetup::strRunMode` | string, tracks whether executable is doing analysis or comparison
+`RunSetup::bAnaStep_Clusters` | True: perform the cluster analysis; false: do not.
+`RunSetup::bAnaStep_Fitting` | True: fit stored distributions; false: do not.  Note `bAnaStep_Clusters` (`bAnaStep_Hits`) must also be true for cluster (hit) distributions to be fitted.
+`RunSetup::bAnaStep_Hits` | True: perform the hit analysis; false: do not.
+`RunSetup::bAnaStep_Reco` | True: reconstruct clusters from hits; false: take clusters from input `TClusters` tree.
+`RunSetup::bAnaStep_Visualize` | True: make summary `TCanvas` objects after analyzing all input files; false: do not.
+`RunSetup::strIdent` | string, unique identifier in input filenames
+`RunSetup::strObsName` | string, name of observable to be compared across input files in comparsion mode
+`RunSetup::iEta` | int, iEta index to be used in comparsion mode
+`RunSetup::iPhi` | int, iPhi index to be used in comparsion mode
+`RunSetup::iSlice` | int, iSlice index to be used in comparsion mode
+`RunSetup::strDetName` | Stores a string acting as the unique detector serial number.  Resolves ambiguity in TObject `TName` data members when opening multiple output TFiles.
+`RunSetup::bInputFromFrmwrk` | False (true): input files do (not) contain the `TCluster` or `THit` trees
+`RunSetup::bLoadSuccess` | True (false): the input parameters were (not) loaded successfully from the *Run Config* File. Defaults to false.  If after attempting to load these parameters from the *Run Config* File this is still false the analysis routine exits.
+`RunSetup::bMultiOutput` | True: one output file is made which represents the sum of all input files; false: one output file is made for each input file.  Note when `bInputFromFrmwrk` is true `bMultiOutput` must also be true.
+`RunSetup::strFile_Config_Ana` | PFN of input *analysis config* file
+`RunSetup::strFile_Config_Map` | PFN of input *mapping config* file
+`RunSetup::strFile_Output_Name` | PFN of output `TFile` to be created when `bMultiOutput` is false
+`RunSetup::strFile_Output_Option` | Option for `TFile`, e.g. `CREATE`, `RECRATE`, `UPDATE`, etc...
+`RunSetup::bDrawNormalized` | True: in comaprison mode `TH1F` objects are drawn to have area=1; false: no change
+`RunSetup::bVisPlots_PhiLines` | True: draw lines denoting iPhi sectors in plots spanning iEta sectors; false: do not.
+`RunSetup::bVisPlots_AutoSaving` | True: automatically save `TCanvas` objects stored in the Summary folder of the output `TFile` as `*.png` and `*.pdf` files; false: do not.
+`RunSetup::strDrawOption` | string, draw option to be used in comparison mode
+
+#### 4.d.ii.VII SectorSlice
+The data members of the `Uniformity::SectorSlice` struct are:
+
+Data Member | Description
+----------- | -----------
+`SectorSlice::bFitAccepted` | True: fit of `SectorSlice::hSlice_ClustADC` passed quality checks
+`SectorSlice::fPos_Center` | Location of the center of the slice, in mm, within the `SectorPhi` (iPhi value)
+`SectorSlice::fWidth` | Width of the slice in mm
+`SectorSlice::iMinuitStatus` | Minuit status code after attempting to fit `SectorSlice::hSlice_ClustADC`
+`SectorSlice::fitSlice_ClustADC` | `std::shared_ptr` of a `TF1`; used to fit `SectorSlice::hSlice_ClustADC`
+`SectorSlice::hSlice_ClustADC` | As `SectorEta::hEta_ClustADC` but only for this `SectorSlice`
+
+There is also one copy constructor and one overloaded assignment operator.  These items perform a deep copy of the `std::shared_ptr` objects above.
+
+#### 4.d.ii.VIII SelParam
+Data members of `Uniformity::SelParam` are:
+
+Data Member | Description
+----------- | -----------
+`SelParam::iCut_ADCNoise` | Hit or Cluster rejected if ADC *less than* value
+`SelParam::iCut_ADCSat` | Hit rejected if ADC *greater than* value
+`SelParam::iCut_MultiMin` | Event rejected if cluster multiplicity *less than or equal to* value
+`SelParam::iCut_MultiMax` | Event rejected if cluster multiplicity *greater than or equal to* value
+`SelParam::iCut_SizeMin` | Cluster rejected if size *less than* value
+`SelParam::iCut_SizeMax` | Cluster rejected if size *greater than* value
+`SelParam::iCut_TimeMin` | Hit or Cluster rejected if time bin *less than* value
+`SelParam::iCut_TimeMax` | Hit or Cluster rejected if time bin *greater than* value
+
+#### 4.d.ii.IX SummaryStatistics
+The `Uniformity::SummaryStatistics` is a container for storing statistical parameters of a dataset (e.g. fit results from all strips).  Data members of `Uniformity::SummaryStatistics` are:
+
+Data Member | Description
+----------- | -----------
+`SummaryStatistics::fIQR | Interquantile range of dataset; `IQR = Q3 - Q1`
+`SummaryStatistics::fMax | Max value of dataset
+`SummaryStatistics::fMean | Mean value of dataset
+`SummaryStatistics::fMin | Min value of dataset
+`SummaryStatistics::fQ1 | First quantile (Q1) of dataset
+`SummaryStatistics::fQ2 | Second quantile (Q2) of dataset
+`SummaryStatistics::fQ3 | Third quantile (Q3) of dataset
+`SummaryStatistics::fStdDev | Standard deviation of dataset
+`SummaryStatistics::mset_fOutliers | Container storing outliers of a dataset; outlier definition is defined per Analyzer
+`SummaryStatistics::hDist | `TH1F` object of which stores the distribution of the dataset
+`SummaryStatistics::fitDist | `TF1` object which attempts a Gaussian fit to `SummaryStatistics::hDist`
+`SummaryStatistics::clear() | resets all floats to -1, resets TObjects, and clears all stl containers
+
+There is also one copy constructor and one overloaded assignment operator.  These items perform a deep copy of the `std::shared_ptr` objects above.
+
+### 4.d.iii. Plotter
+Coming "soon"
+
+## 4.e. Configuration Files
+Three configuration files are require to run the frameworkMain exectuable:
+
+1. the *mapping config* file,  
+2. the *analysis config* file, and
+3. the *reco config* file.
+
+Examples of each files have been included in the `$GEM_BASE/config` directory
+
+### 4.e.i. Mapping Config File
+The *mapping config* file is the file used when analyzing data collected with the SRS system. An example of the mapping config file is shown as:
+
+```
+    # CMSGEM
+    #################################################################################################
+    #   ReadoutType  DetType    DetName    Sector     SectPos   SectSize   nbConnect  orient
+    #################################################################################################
+    DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR1,    507.475,         411.402,       3,       1
+    ...     ...         ...      ...        ...         ...          ...        ...     ...
+    ...     ...         ...      ...        ...         ...          ...        ...     ...
+    DET,   CMSGEM,    CMSGEM,    CMS,    CMSSECTOR8,    -507.475,        231.186,       3,       1
+
+    ############################################################################################
+    #APV     fecId    adcCh     detPlane  apvOrient  apvIndex    apvHdr   apvCustMap
+    ############################################################################################ 
+    APV,        2,        0,       CMSSECTOR8,     0,      2,        1300,  1
+    APV,        2,        1,       CMSSECTOR8,     0,       0,        1300, 1
+    
+    APV,        2,        2,       CMSSECTOR8,     0,       1,        1300, 0
+    APV,        2,        3,       CMSSECTOR7,     0,       1,        1300, 0
+    ...     ...         ...      ...        ...         ...          ...        ...     ...
+    ...     ...         ...      ...        ...         ...          ...        ...     ...
+```
+
+For each "DET" line defined in this file an entry in the `DetectorMPGD::map_sectorsEta` map will be stored.  In this way the mapping config file specifies the geometry of the `DetectorMPGD` object.  For each "APV" line data from that APV25 Hybrid will be linked to the corresponding position in the listed (iEta,iPhi) sector.
+
+Right now the framework only supports detectors with 1D readouts.  
+
+### 4.e.ii. Analysis Config File
+The analysis config file expects a certain "nested-header" style. The format should look something like:
+
+```
+[BEGIN_ANALYSIS_INFO]
+    ...
+    ...
+    [BEGIN_UNIFORMITY_INFO]
+        ...
+        ...
+        [BEGIN_ADC_FIT_INFO]
+            ...
+            ...
+        [END_ADC_FIT_INFO]
+        [BEGIN_HISTO_INFO]
+            ...
+            ...
+        [END_HISTO_INFO]
+        ...
+        ...
+        ...
+        ...
+        [BEGIN_HISTO_INFO]
+            ...
+            ...
+        [END_HISTO_INFO]
+    [END_UNIFORMITY_INFO]
+[END_ANALYSIS_INFO]
+```
+
+For each of the higher level header sections (i.e. `[BEGIN_ANALYSIS_INFO]` and `[BEGIN_UNIFORMITY_INFO]`) the header parameters should *always* be placed before the declaration of lower headers.  Placing top level header parameters after the declaration of lower level headers could lead to undefined behavior or at worst crashes.
+
+Parameters are expected to be entered in the following format:
+
+```    
+field_name = 'value';
+```
+The `field_name` should be on the left followed by an equals sign "=" then the value should be enclosed in single quote marks "'".  A semicolon ";" ends the statement.  Tabs "\t" and spaces outside of the single quotes will be ignored, but will be preserved inside the single quotes.  Text after the ";" will also be ignored.  The template at the end of this subsection showns an example.
+
+The `Uniformity::ParameterLoaderAnalysis` class understands the `#` character to indicate a comment; so it is possible to comment out lines in the *Analysis Config* file you create for ease of use.
+
+#### 4.e.ii.I HEADER PARAMETERS - ANALYSIS_INFO
+None for now, placeholder
+
+#### 4.e.ii.II HEADER PARAMETERS - TIMING_INFO
+None for now, placeholder
+
+#### 4.e.ii.III HEADER PARAMETERS - UNIFORMITY_INFO
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Cut_ClusterADC_Min` | int | clusters with ADC values less than this value are rejected.
+`Cut_ClusterMulti_Min` | int | events with clusters multiplicity less than or equal to this value are rejected.
+`Cut_ClusterMulti_Max` | int | events with clusters multiplicity greater than or equal to this value are rejected.
+`Cut_ClusterSize_Min` | int | clusters with sizes less than this value are rejected.
+`Cut_ClusterSize_Max` | int | clusters with sizes greater than this value are rejected.
+`Cut_ClusterTime_Min` | int | clusters with time bins less than this value are rejected.
+`Cut_ClusterTime_Max` | int | clusters with time bins greater than this value are rejected.
+`Cut_HitAdc_Min` | int | hits with ADC value less than this value are rejected.
+`Cut_HitAdc_Max` | int | hits with ADV value greater than this value are rejected.
+`Cut_HitMulti_Min` | int | events with hit multiplicity less than or equal to this value are rejected.
+`Cut_HitMulti_Max` | int | events with hit multiplicity greater than or equal to this value are rejected.
+`Cut_HitTime_Min` | int | hits with time bins less than this value are rejected.
+`Cut_HitTime_Max` | int | hits with time bins greater than this value are rejected.
+`Event_First` | int | the first event in each tree (`TCluster` and/or `THit`) to start from when running the analysis.
+`Event_Total` | int | total number of events to process after `Event_First` in each tree. A value of `-1` sets indicates all events from the first event will be processed.
+`Uniformity_Granularity` | int | numer of slices, or partitions, to split one iPhi sector into for the response uniformity measurement.
+
+#### 4.e.ii.IV HEADER PARAMETERS - ADC_FIT_INFO
+A set of keywords = {`AMPLITUDE`,`FWHM`,`HWHM`,`MEAN`,`PEAK`,`SIGMA`} is presently supported which allows the user to configure complex expressions for the initial guess of fit parameters, their limits, and the fit range.  In the future additional keywords may be added as requested. The table below describes the supported supported and how they define the initial guess for a given fit:
+
+Keyword | Description
+------- | -----------
+`AMPLITUDE` | The fit parameter is set to the value of the `TH1` bin with the largest content (e.g. `TH1::GetBinContent(TH1::GetMaximumBin() )` ).
+`FWHM` | The fit parameter is set to the RMS of the distribution stored in the `TH1` object (e.g. `TH1::GetRMS()` ).
+`HWHM` | The fit parameter is set to half the RMS of the distribution stored in the `TH1` object (e.g. `TH1::GetRMS()` ).
+`MEAN` | The fit parameter is set to the mean of the distribution stored in the `TH1` object (e.g. `TH1::GetMean()` ).
+`PEAK` | An instance of the `ROOT::TSpectrum` class is created and searches the `TH1` object that will be fitted for all peaks.  The `TSpectrum` parameters are hard coded and "should" ensure only one peak is found (open issue).  The x-position of the first peak found in the `TH1` distribution is set to the fit parameter (e.g. `TSpectrum::Search()` and `TSpectrum::GetPositionX()` are used).
+`SIGMA` | As `FWHM`
+
+The framework will calculate the energy resolution of a given slice of the detector.  The energy resolution is always taken as:
+
+```
+E_Res = PEAK_FWHM / PEAK_Pos
+```
+
+In your fit formula you must label one parameter in the `Fit_Param_Map` (see table below) from the *peak width* set {`FWHM`,`HWHM`,`SIGMA`}.  Failure to do so will cause the energy resolution to be zero for all slices (i.e. all points in `gEta_ClustADC_Fit_PkRes` will be 0 for all `SectorEta` objects defined).  The table below shows how the `PEAK_FWHM` is determined for each of the entires in the peak width set:
+
+Keyword | Expression | Description
+------- | ---------- | -----------
+`FWHM` | `E_Res = FWHM / PEAK_Pos` | Here `FWHM` is the value of the fit parameter, post fit, given the meaning `FWHM` in the `Fit_Param_Map` field.
+`HWHM` | `E_Res = (2.*HWHM) / PEAK_Pos` | Here `HWHM` is the value of the fit parameter, post fit, given the meaning `HWHM` in the `Fit_Param_Map` field.
+`SIGMA` | `E_Res = (2. * sqrt( 2. * ln(2.) ) * SIGMA ) / PEAK_Pos` | Here `SIGMA` is the value of the fit parameter, post fit, given the meaning `SIGMA` in the `Fit_Param_Map` field. 
+
+The table below describes the allowed input fields and their data types:
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Fit_Formula` | string | `TFormula` to be given to a `ROOT::TF1` object.  Note the syntax and full complexity of inputs expected/available in `ROOT` works! e.g. `[0]*x^2+[1]` or `gaus(0)+pol2(3)" or "[1]*TMath::Erf(x) + [2]` are all supported.
+`Fit_Formula_Sig` | string | As `Fit_Formula` but this is understood to be the portion of the formula which describes the signal peak.  Note the parameters here must be indexed from 0 and follow the same order as they due in `Fit_Formula`. E.g. if your `Fit_Formula` is `pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])` with the `CauchyDist` describing your signal peak then `Fit_Formula_Sig` would be written as `[0]*TMath::CauchyDist(x,[1],[2])`.  Here the index of the parameters has been restarted at [0] but the order is preserved. This, in conjunction with `Fit_Formula_Sig_Param_Idx_Range`, will ensure the parameter determined for [3] in `Fit_Formula` is assigned to [0] in `Fit_Formula_Sig`.
+`Fit_Formula_BKG` | string | As `Fit_Formula_Sig` but for the background. 
+`Fit_Formula_Sig_Param_Idx_Range` | Two comma separated int's | Gives the range of the parameters that correspond to the signal peak in `Fit_Formula`. E.g. if your `Fit_Formula` is `pol2(0) + [3]*TMath::CauchyDist(x,[4],[5])` with the `CauchyDist` describing your signal peak then `Fit_Formula_Sig_Param_Idx_Range` is **"3,5"** which, in conjunction with `Fit_Formula_Sig`, will ensure the parameter determined for `[3]` in `Fit_Formula` is assigned to `[0]` in `Fit_Formula_Sig`.
+`Fit_Formula_Sig_Param_Idx_Range` | Two comma separated int's | As `Fit_Formula_Sig_Param_Idx_Range` but for the background.
+`Fit_Name` | string | Starting point of `TName` of the `TF1` object; note the `(ieta,iphi,islice)` coordinate of the fit will be used to augment the `TName` to ensure a unique `TName` for each `TF1` object created.
+`Fit_Option` | string | The fit option to be used for fitting the ADC spectrums made from each slice.
+`Fit_Param_IGuess` | Comma separated list of strings | Initial values for the parameters defined in the `Fit_Formula` field.  Note the order in which the parameters are given in the `Fit_Formula` field should match the order listed here. Explicitly for the `Fit_Formula = '[0]*x^2+[1]*x+[2]'` the initial guess of `4,5,6` would mean `[0] = 4`, `[1] = 5`, and `[2] = 6`.  Additionally, both numeric values and expressions formed from the above supported keywords can be used.  E.g. for a `Fit_Formula = 'gaus(0)'` the initial guess of `12.3, MEAN, 2.*SIGMA+23.5` can be assigned.
+`Fit_Param_Limit_Max` | string | As `Fit_Param_IGuess` but for the upper limit on fit parameters.
+`Fit_Param_Limit_Min` | string | As `Fit_Param_IGuess` but for the lower limit on fit parameters.
+`Fit_Param_Map` | string | Words to help the user track the meaning of the fit parameter. The order follows the ordering schema described in `Fit_Param_IGuess`. NOTE: at least one parameter *must* be given the value `PEAK` and one parameter *must* be given a value from the set {`FWHM`,`HWHM`,`SIGMA`}. The vertical error-bar on these two parameters comes from the error on the corresponding fit parameter determined in `ROOT` (e.g. `TF1::GetParError()` )
+`Fit_Range` | string | As `Fit_Param_IGuess` but for the fit range.  NOTE: must supply exactly two parameters.  If more than two parameters are supplied only those that evaluate to the maximum and minimum are used.
+        
+#### 4.e.ii.V HEADER PARAMETERS - HISTO_INFO
+The user at runtime is able to specify the data members of the `TH1` objects that will be created (e.g. number of bins, `TName`, etc...).  However, these histograms are hard coded and the user cannot choose at runtime to make new distributions.  If a distribution you would like to see does not already exist please navigate to the [issue tab](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) and submit a new feature request describing your requested distribution. The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Histo_Name` | string | Type of histogram you are specifying information for.  NOTE: this entry should appear as the *first* line below the section header (`[BEGIN_HISTO_INFO]`) and only entries from the following set are allowed: {`clustADC`, `clustMulti`, `clustPos`, `clustSize`, `clustTime`, `hitADC`, `hitMulti`, `hitPos`, `hitTime`}.
+`Histo_XTitle` | string | Title of the x-axis, full `TLatex` style entires are supported. Explicitly `cluster position #left(#mum#right)` will result in a well formatted x-axis with parenthesis that are sized accordingly and proper Greek lettering.
+`Histo_YTitle` | string | As `Histo_XTitle` but for the y-axis.
+`Histo_BinRange` | Two comma separated floats | Specifies the lowest and highest values of the x-axis.  In the case of `Histo_Name = {clustPos, hitPos}` this field is automatically set based on input from *mapping config* file.
+`Histo_NumBins` | int | number of bins in the histogram.  In the case of `Histo_Name = {clustPos, hitPos}` then this field is automatically set based on input from the *mapping config* file.
+
+#### 4.e.ii.VI Example Config File
+An example config file is shown below:
+
+```
+[BEGIN_ANALYSIS_INFO]
+    [BEGIN_UNIFORMITY_INFO]
+        #Selection Cuts
+        ####################################
+        Cut_ClusterADC_Min = '300';
+        Cut_ClusterMulti_Min = '0';
+        Cut_ClusterMulti_Max = '20';
+        Cut_ClusterSize_Min = '2';
+        Cut_ClusterSize_Max = '10';
+        Cut_ClusterTime_Min = '6';
+        Cut_ClusterTime_Max = '27';
+        #Selection Cuts - Hit
+        ####################################
+        Cut_HitAdc_Min = '60';
+        Cut_HitAdc_Max = '3000';
+        Cut_HitMulti_Min = '1';
+        Cut_HitTime_Min = '2';
+        Cut_HitTime_Max = '29';
+        #Event Range
+        ####################################
+        Event_First = '0';
+        Event_Total = '-1';
+        #Requested Granularity
+        ####################################
+        Uniformity_Granularity = '64';
+        #Requested Tolerance on Uniformity
+        ####################################
+        [BEGIN_ADC_FIT_INFO]
+            Fit_Formula = '[0]*TMath::CauchyDist(x, [1], [2])+pol5(3)';
+            Fit_Formula_Sig = '[0]*TMath::CauchyDist(x, [1], [2])';
+            Fit_Formula_Sig_Param_Idx_Range = '0,2';
+            Fit_Formula_Bkg = 'pol5';
+            Fit_Formula_Bkg_Param_Idx_Range = '3,8';
+            Fit_Param_Map = 'AMPLITUDE, PEAK, HWHM';
+            Fit_Param_IGuess = '1000000,PEAK,PEAK*0.3';
+            Fit_Param_Limit_Min = '10, PEAK-0.2*PEAK, 0.1*PEAK';
+            Fit_Param_Limit_Max = '10000000, PEAK+0.2*PEAK, 0.70*PEAK';
+            Fit_Range = 'PEAK-0.57*PEAK, 3*PEAK';
+        [END_ADC_FIT_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'clustADC';
+            Histo_XTitle = 'Cluster ADC';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,10000';
+            #Histo_NumBins = '150';
+            Histo_NumBins = '100';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'clustMulti';'
+            Histo_XTitle = 'Cluster Multiplicity';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,20';
+            Histo_NumBins = '20';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'clustPos';
+            Histo_XTitle = 'Cluster Position #left(mm#right)';
+            Histo_YTitle = 'N';
+            #Here Histo_BinRange is set automatically based on input amoreSRS mapping file
+            #Here Histo_NumBins is set automatically based off Bin_Range
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'clustSize';
+            Histo_XTitle = 'Size #left(N_{strips}#right)';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,20';
+            Histo_NumBins = '20';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'clustTime';
+            Histo_XTitle = 'Time Bin';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,30';
+            Histo_NumBins = '30';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'hitADC';
+            Histo_XTitle = 'Hit ADC';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,2000';
+            Histo_NumBins = '200';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'hitMulti';'
+            Histo_XTitle = 'Hit Multiplicity';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,50';
+            Histo_NumBins = '50';
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'hitPos';
+            Histo_XTitle = 'Hit Position #left(mm#right)';
+            Histo_YTitle = 'N';
+            #Here Histo_BinRange is set automatically based on input amore mapping file
+            #Here Histo_NumBins is set automatically based off Bin_Range
+        [END_HISTO_INFO]
+        [BEGIN_HISTO_INFO]
+            Histo_Name = 'hitTime';
+            Histo_XTitle = 'Time Bin';
+            Histo_YTitle = 'N';
+            Histo_BinRange = '0,30';
+            Histo_NumBins = '30';
+        [END_HISTO_INFO]
+    [END_UNIFORMITY_INFO]
+[END_ANALYSIS_INFO]
+```
+### 4.e.iii. Run Config File
+The run config file expects a certain "header" style. The format should look something like:
+
+```
+[BEGIN_RUN_INFO]
+    ...
+    ...
+    ...
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    ...
+    ...
+    ...
+[END_RUN_LIST]
+```
+
+Parameters found inside the `[BEGIN_RUN_INFO]` header are expected to be entered in the manner described in Section 4.e.ii.
+
+Contrary to the `[BEGIN_RUN_INFO]` header the `[BEGIN_RUN_LIST]` header is simply a list of PFN of the input files to be analyzed by the call of the executable.  Again tabs `\t` and spaces will be ignored.
+
+The `Uniformity::ParameterLoaderRun` class understands the `#` character to indicate a comment; so it is possible to comment out lines in the *Run Config* file you create for ease of use.  The value of `true` is understood as being from the case-insensitive set `{t, true, 1}` while the value of `false` is understood as being from the case-insensitive set `{f, false, 0}`. Example config files are shown at the end of this subsection.
 
         # 4.e.iii.I HEADER PARAMETERS - RUN_INFO
         # --------------------------------------------------------
