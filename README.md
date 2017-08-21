@@ -7,6 +7,8 @@ Instructions below assume the user is using a `sh/bash/zsh` shell.  Scripts for 
 
 If you are having problems please consult the [closed issue page](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues?utf8=✓&q=is%3Aissue%20is%3Aclosed) to see if your issue has been solved before. If not please open a new issue [here](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) and submit an issue that describes your problem following the examples in the issue template.  You may need to provide any input files or a link to the fork of the repository for us to troubleshoot.
 
+This README.md file was written in [MarkDown](https://guides.github.com/features/mastering-markdown/).  The table of contents was generated using [gh-md-toc](https://github.com/ekalinin/github-markdown-toc).
+
 # 1. Contributors & License
 This repository is the work of:
 
@@ -2238,238 +2240,155 @@ The following example shows the case where two `TGraphError` objects are plotted
 
 Note the `Plot_Root_File` should be the PFN of the `TFile` and `Plot_Root_Path` should be the physical path to the `TGraphErrors` object `g_GE11-VII-L-CERN-0003_EffGain`.
 
-        # 4.e.iv.IX Example Config File - TH1F
-        # --------------------------------------------------------
+#### 4.e.iv.IX Example Config File - TH1F
+The following example shows the case where a `TH1F` object is plotted.  Note the `Canv_Plot_Type` in the `[BEGIN_CANVAS]` header is set to `TH1F`. Here the `TH1F` is loaded from an input `TFile`.
 
-        The following example shows the case where a TH1F object is plotted.  Note the Canv_Plot_Type
-        in the [BEGIN_CANVAS] header is set to TH1F. Here the TH1F is loaded from an input TFile.
+```
+[BEGIN_CANVAS]
+    Canv_Axis_NDiv = '510,510'; #X, Y
+    Canv_Dim = '1000,1000'; #X, Y
+    Canv_DrawOpt = 'E1';
+    Canv_Grid_XY = 'false,false'; #X, Y
+    Canv_Latex_Line = '0.19,0.75, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
+    Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+    Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+    Canv_Legend_Draw = 'false';
+    Canv_Log_XY = 'false,false'; #X, Y
+    Canv_Logo_Pos = '11';
+    Canv_Logo_Prelim = 'true';
+    Canv_Margin_Top = '0.08';
+    Canv_Margin_Bot = '0.12';
+    Canv_Margin_Lf = '0.12';
+    Canv_Margin_Rt = '0.04';
+    Canv_Name = 'GE11-VII-L-CERN-0002_RespFitPkPosDataset';
+    Canv_Plot_Type = 'TH1F';
+    Canv_Range_X = '0,2500'; #X1, X2
+    Canv_Range_Y = '0,150'; #Y1, Y2
+    Canv_Title_Offset_X = '1.2';
+    Canv_Title_Offset_Y = '1.65';
+    Canv_Title_X = 'Fitted Cu Fluorescence Peak Position #left(ADC#right)';
+    Canv_Title_Y = 'Entries';
+    [BEGIN_PLOT]
+        Plot_Color = 'kBlack';
+        Plot_LegEntry = 'Data';
+        Plot_Name = 'h_Summary_ResponseFitPkPosDataset';
+        Plot_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+        Plot_Root_Path = 'Summary/';
+        [BEGIN_FIT]
+            Fit_Color = 'kRed';
+            Fit_LegEntry = 'Fit';
+            Fit_Line_Size = '1';
+            Fit_Line_Style = '1';
+            Fit_Name = 'fit_Summary_ResponseFitPkPosDataset';
+            Fit_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+            Fit_Root_Path = 'Summary/';
+        [END_FIT]
+    [END_PLOT]
+[END_CANVAS]
+```
 
-            [BEGIN_CANVAS]
-                Canv_Axis_NDiv = '510,510'; #X, Y
-                Canv_Dim = '1000,1000'; #X, Y
-                Canv_DrawOpt = 'E1';
-                Canv_Grid_XY = 'false,false'; #X, Y
-                Canv_Latex_Line = '0.19,0.75, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
-                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
-                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
-                Canv_Legend_Draw = 'false';
-                Canv_Log_XY = 'false,false'; #X, Y
-                Canv_Logo_Pos = '11';
-                Canv_Logo_Prelim = 'true';
-                Canv_Margin_Top = '0.08';
-                Canv_Margin_Bot = '0.12';
-                Canv_Margin_Lf = '0.12';
-                Canv_Margin_Rt = '0.04';
-                Canv_Name = 'GE11-VII-L-CERN-0002_RespFitPkPosDataset';
-                Canv_Plot_Type = 'TH1F';
-                Canv_Range_X = '0,2500'; #X1, X2
-                Canv_Range_Y = '0,150'; #Y1, Y2
-                Canv_Title_Offset_X = '1.2';
-                Canv_Title_Offset_Y = '1.65';
-                Canv_Title_X = 'Fitted Cu Fluorescence Peak Position #left(ADC#right)';
-                Canv_Title_Y = 'Entries';
-                [BEGIN_PLOT]
-                    Plot_Color = 'kBlack';
-                    Plot_LegEntry = 'Data';
-                    Plot_Name = 'h_Summary_ResponseFitPkPosDataset';
-                    Plot_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
-                    Plot_Root_Path = 'Summary/';
-                    [BEGIN_FIT]
-                        Fit_Color = 'kRed';
-                        Fit_LegEntry = 'Fit';
-                        Fit_Line_Size = '1';
-                        Fit_Line_Style = '1';
-                        Fit_Name = 'fit_Summary_ResponseFitPkPosDataset';
-                        Fit_Root_File = 'GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
-                        Fit_Root_Path = 'Summary/';
-                    [END_FIT]
-                [END_PLOT]
-            [END_CANVAS]
+Note the `Plot_Root_File` should be the PFN of the `TFile` and `Plot_Root_Path` should be the physical path to the `TH1F` object `h_Summary_ResponseFitPkPosDataset`.
 
-        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
-        the physical path to the TH1F object "h_Summary_ResponseFitPkPosDataset".
+#### 4.e.iv.X  Example Config File - TH2F
+The following example shows the case where a `TH2F` object is plotted.  Note the `Canv_Plot_Type` in the `[BEGIN_CANVAS]` header is set to `TH2F`. Here the `TH2F` is loaded from an input `TFile`.
 
-        # 4.e.iv.X  Example Config File - TH2F
-        # --------------------------------------------------------
+```
+[BEGIN_CANVAS]
+    Canv_Axis_NDiv = '507,510'; #X, Y
+    Canv_Dim = '1000,1000'; #X, Y
+    Canv_DrawOpt = 'COLZTEXT';
+    Canv_Grid_XY = 'false,false'; #X, Y
+    Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+    Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+    Canv_Legend_Draw = 'false';
+    Canv_Log_XY = 'false,false'; #X, Y
+    Canv_Logo_Pos = '0';
+    Canv_Logo_Prelim = 'true';
+    Canv_Margin_Top = '0.08';
+    Canv_Margin_Bot = '0.14';
+    Canv_Margin_Lf = '0.13';
+    Canv_Margin_Rt = '0.19';
+    Canv_Mono_Color = 'false';
+    Canv_Name = 'GE11-VII-L-CERN-0001_FitSuccess_RGB';
+    Canv_Plot_Type = 'TH2F';
+    Canv_Range_Y = '1,9'; #Y1, Y2
+    Canv_Range_Z = '0,1'; #Y1, Y2
+    Canv_Title_Offset_X = '1.2';
+    Canv_Title_Offset_Y = '1.2';
+    Canv_Title_Offset_Z = '1.65';
+    Canv_Title_X = 'Detector #it{i#phi} index';
+    Canv_Title_Y = 'Detector #it{i#eta} index';
+    Canv_Title_Z = 'GE1/1-VII-L-CERN-0001 Fit Success';
+    [BEGIN_PLOT]
+        Plot_Name = 'h_Summary_FitSuccess';
+        Plot_Root_File = '/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/QC5_Resp_Uni/GE11-VII-L-CERN-0001_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_588uA_TimeCorr_DPGGeo_AnaWithFits.root';
+        Plot_Root_Path = 'Summary';
+    [END_PLOT]
+[END_CANVAS]
+```
 
-        The following example shows the case where a TH2F object is plotted.  Note the Canv_Plot_Type
-        in the [BEGIN_CANVAS] header is set to TH2F. Here the TH2F is loaded from an input TFile.
+Note the `Plot_Root_File` should be the `PFN` of the `TFile` and `Plot_Root_Path` should be the physical path to the `TH2F` object `h_Summary_FitSuccess`.
 
-        [BEGIN_CANVAS]
-            Canv_Axis_NDiv = '507,510'; #X, Y
-            Canv_Dim = '1000,1000'; #X, Y
-            Canv_DrawOpt = 'COLZTEXT';
-            Canv_Grid_XY = 'false,false'; #X, Y
-            Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
-            Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
-            Canv_Legend_Draw = 'false';
-            Canv_Log_XY = 'false,false'; #X, Y
-            Canv_Logo_Pos = '0';
-            Canv_Logo_Prelim = 'true';
-            Canv_Margin_Top = '0.08';
-            Canv_Margin_Bot = '0.14';
-            Canv_Margin_Lf = '0.13';
-            Canv_Margin_Rt = '0.19';
-            Canv_Mono_Color = 'false';
-            Canv_Name = 'GE11-VII-L-CERN-0001_FitSuccess_RGB';
-            Canv_Plot_Type = 'TH2F';
-            Canv_Range_Y = '1,9'; #Y1, Y2
-            Canv_Range_Z = '0,1'; #Y1, Y2
-            Canv_Title_Offset_X = '1.2';
-            Canv_Title_Offset_Y = '1.2';
-            Canv_Title_Offset_Z = '1.65';
-            Canv_Title_X = 'Detector #it{i#phi} index';
-            Canv_Title_Y = 'Detector #it{i#eta} index';
-            Canv_Title_Z = 'GE1/1-VII-L-CERN-0001 Fit Success';
-            [BEGIN_PLOT]
-                Plot_Name = 'h_Summary_FitSuccess';
-                Plot_Root_File = '/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/data/sliceTestAna/QC5_Resp_Uni/GE11-VII-L-CERN-0001_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_588uA_TimeCorr_DPGGeo_AnaWithFits.root';
-                Plot_Root_Path = 'Summary';
-            [END_PLOT]
-        [END_CANVAS]
+### 4.e.v Efficiency Predictor Config File
+Unlike most other config files used in the framewok the *Efficiency Predictor Config* File does not use a nested header style to load in information.  Instead each line consists of tab delimited data, the field name appears first, followed by a tab, and then the value to be assigned to the field.  For example:
 
-        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
-        the physical path to the TH2F object "h_Summary_FitSuccess".
+```
+field_name\tValue
+```
 
-        # 4.e.v Efficiency Predictor Config File
-        # --------------------------------------------------------
+Where the tab `\t` character has been shown explicitly.  The possible field names are shown in the following subsections
 
-        Unlike most other config files used in the framewok the Efficiency Predictor Config File does
-        not use a nested header style to load in information.  Instead each line consists of tab
-        delimited data, the field name appears first, followed by a tab, and then the value to be assigned
-        to the field.  For example:
+#### 4.e.v.I   PARAMETERS - Input Files
+The table below describes the allowed input fields and their data types:
 
-            field_name\tValue
+Field Name | Type | Description
+---------- | ---- | -----------
+`File_Framework_Output` | string | PFN of the input framework out file produced in the `QC5_Resp_Uni` measurement
+`File_ClustQ_Mean` | string | PFN of a tab deliminted file storing cluster charge landau data collected with triple-GEM detectors. The data is ordered as `V_Drift`, Cluster Size, and the Landau mean parameter.  Note the first two lines of this file are assumed to consist of column headers and units and are thus skipped.
+`File_ClustQ_MPV` | string | As `File_ClustQ_Mean` but for Landau MPV parameter
+`File_ClustQ_Sigma` | string | As `File_ClustQ_Mean` but for Landau Sigma (e.g. scale) parameter
+`File_ClustSize` | string | PFN of a `TFile` storing a `TF1` object which gives MIP cluster size parameterized in terms of triple-GEM detector gain.
+`File_DUT_Mapping_Geo` | string | PFN of the mapping config file used to create the given `File_Framework_Output`
+`File_DUT_Mapping_VFATPos2iEtaiPhi` | string | PFN of a tab deliminted mapping file which gives the correspondance between detector (ieta,iphi) coordinate to VFAT position.  Note the first line of this file is assume to consist of column headers and is thus skipped
+`File_DUT_SCurveData` | string | PFN of a `TFile` storing the **scurveFitTree** `TTree` object which contains the analyzed S-Curve data recorded with a detector instrumented with the v2b GEM Electronics.
+`File_Output` | string | PFN of the output file to be produced by calling `python/computeEffCurves.py`
 
-        Where the tab '\t' character has been shown explicitly.  The possible field names are shown in the
-        following subsections
+#### 4.e.v.II  PARAMETERS - Device Under Test (DUT)
+The table below describes the allowed input fields and their data types.
 
-        # 4.e.v.I   PARAMETERS - Input Files
-        # --------------------------------------------------------
+Field Name | Type | Description
+---------- | ---- | -----------
+`DUT_GAIN_P0` | float | For the detector corresponding to the QC5 data stored in `File_Framework_Output`, this is value of `p0` in `G(x) = exp(p0*x+p1)`; here `x` is either divider current or `V_Drift`.
+`DUT_GAIN_P0_Err` | float | Error on `DUT_GAIN_P0`.
+`DUT_GAIN_P1` | float | As `DUT_GAIN_P0` but for `p1` in `G(x) = exp(p0*x+p1)`.
+`DUT_GAIN_P1_Err` | float | Error on `DUT_GAIN_P1`.
+`DUT_iEta_Clust_Size_Norm` | int | iEta index corresponding to (ieta,iphi) sector that data in `File_CluseSize` was obtained from.
+`DUT_iEta_QC5_Gain_Cal` | int | iEta index corresponding to (ieta,iphi) sector that `QC5_Eff_Gain` was performed in.
+`DUT_iPhi_Clust_Size_Norm` | int | As `DUT_iEta_Clust_Size_Norm` but for iPhi index.
+`DUT_iPhi_QC5_Gain_Cal` | int | As `DUT_iEta_QC5_Gain_Cal` but for iPhi index.
+`DUT_Num_Sim_Pts_Per_RO` | int | Number of Toy MC events to simulate for each slice of the detector found in `File_Framework_Output`.
+`DUT_QC5_Resp_Uni_HVPt` | float | HV value at which the `QC5_Resp_Uni` measurement was performed at (e.g. HV value used to obtain `File_Framework_Output`). Note the HV observable here, either divider current or `V_Drift`, should match the observable that was used to parameterize the Gain curve.
+`DUT_Serial_Number` | string | Value assigned to the `Detector_Name` field in the input *run config* file used to create the given `File_Framework_Output`.  Note: **Detector** should be used if the user did not supply a value to this field in the *run config* file when generating the `File_Framework_Output`.
+`DUT_Slice_Granularity` | int | Value assigned to the `Uniformity_Granularity` field in the input *analysis config* file used to create the given `File_Framework_Output`.
 
-        The table below describes the allowed input fields and their data types.
+#### 4.e.v.III PARAMETERS - Cluster Charge
+The table below describes the allowed input fields and their data types.
 
-        The following parameters are supported:
-        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
+Field Name | Type | Description
+---------- | ---- | -----------
+`Det_ClustQ_Serial_Number` | string | Serial number of the detector used to obtain the data found in the `File_ClustQ_Mean`, `File_ClustQ_MPV`, and `File_ClustQ_Sigma` files.
+`Det_ClustQ_GAIN_P0` | float | For `Det_ClustQ_Serial_Number` this is value of `p0` in `G(V_Drift) = exp(p0*V_Drift+p1)`.
+`Det_ClustQ_GAIN_P0_Err` | float | Error on `Det_ClustQ_GAIN_P0`.
+`Det_ClustQ_GAIN_P1` | float | As `Det_ClustQ_GAIN_P0` but for `p1` in `G(V_Drift) = exp(p0*V_Drift+p1)`.
+`Det_ClustQ_GAIN_P1_Err` | float | Error on `Det_ClustQ_GAIN_P1`.
 
-                File_Framework_Output               string, PFN of the input framework out file produced in
-                                                    the QC5_Resp_Uni measurement
+#### 4.e.v.IV  PARAMETERS - Cluster Size
+The table below describes the allowed input fields and their data types.
 
-                File_ClustQ_Mean                    string, PFN of a tab deliminted file storing cluster
-                                                    charge landau data collected with triple-GEM detectors.
-                                                    The data is ordered as V_Drift, Cluster Size, and the
-                                                    Landau mean parameter.  Note the first two lines of this
-                                                    file are assumed to consist of column headers and units
-                                                    and are thus skipped.
-
-                File_ClustQ_MPV                     string, as File_ClustQ_Mean but for Landau MPV parameter
-
-                File_ClustQ_Sigma                   string, as File_ClustQ_Mean but for Landau Sigma (e.g.
-                                                    scale) parameter
-
-                File_ClustSize                      string, PFN of a TFile storing a TF1 object which gives
-                                                    MIP cluster size parameterized in terms of triple-GEM
-                                                    detector gain.
-
-                File_DUT_Mapping_Geo                string, PFN of the mapping config file used to create
-                                                    the given File_Framework_Output
-
-                File_DUT_Mapping_VFATPos2iEtaiPhi   string, PFN of a tab deliminted mapping file which gives
-                                                    the correspondance between detector (ieta,iphi) coordinate
-                                                    to VFAT position.  Note the first line of this file is
-                                                    assume to consist of column headers and is thus skipped
-
-                File_DUT_SCurveData                 string, PFN of a TFile storing the scurveFitTree TTree
-                                                    object which contains the analyzed S-Curve data recorded
-                                                    with a detector instrumented with the v2b GEM Electronics.
-
-                File_Output                         string, PFN of the output file to be produced by
-                                                    calling computeEffCurves.py
-
-        # 4.e.v.II  PARAMETERS - Device Under Test (DUT)
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-        The following parameters are supported:
-        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
-
-                DUT_GAIN_P0                         float, for the detector corresponding to the QC5 data
-                                                    stored in File_Framework_Output, this is value of p0 in
-                                                    G(x) = exp(p0*x+p1); here x is either divider current
-                                                    or V_Drift
-
-                DUT_GAIN_P0_Err                     float, error on DUT_GAIN_P0
-
-                DUT_GAIN_P1                         float, as DUT_GAIN_P0 but for p1 in G(x) = exp(p0*x+p1)
-
-                DUT_GAIN_P1_Err                     float, error on DUT_GAIN_P1
-
-                DUT_iEta_Clust_Size_Norm            int, iEta index corresponding to (ieta,iphi) sector that
-                                                    data in File_CluseSize was obtained from
-
-                DUT_iEta_QC5_Gain_Cal               int, iEta index corresponding to (ieta,iphi) sector that
-                                                    QC5_Gain_Cal was performed in
-
-                DUT_iPhi_Clust_Size_Norm            int, as DUT_iEta_Clust_Size_Norm but for iPhi index
-
-                DUT_iPhi_QC5_Gain_Cal               int, as DUT_iEta_QC5_Gain_Cal but for iPhi index
-
-                DUT_Num_Sim_Pts_Per_RO              int, number of Toy MC events to simulate for each slice
-                                                    of the detector found in File_Framework_Output
-
-                DUT_QC5_Resp_Uni_HVPt               float, HV value at which the QC5_Resp_Uni measurement was
-                                                    performed at (e.g. HV value used to obtain File_Framework_Output).
-                                                    Note the HV observable here, either divider current or
-                                                    V_Drift, should match the observable that was used to
-                                                    parameterize the Gain curve.
-
-                DUT_Serial_Number                   string, value assigned to the Detector_Name field in the
-                                                    input run config file used to create the given
-                                                    File_Framework_Output.  Note: "Detector" should be used
-                                                    if the user did not supply a value to this field in the
-                                                    run config file when generating the File_Framework_Output
-
-                DUT_Slice_Granularity               int, value assigned to the Uniformity_Granularity field
-                                                    in the input analysis config file used to create the
-                                                    given File_Framework_Output
-
-        # 4.e.v.III PARAMETERS - Cluster Charge
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-        The following parameters are supported:
-        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
-
-                Det_ClustQ_Serial_Number            string, serial number of the detector used to obtain
-                                                    the data found in File_ClustQ_Mean, File_ClustQ_MPV,
-                                                    and File_ClustQ_Sigma files
-
-                Det_ClustQ_GAIN_P0                  float, for Det_ClustQ_Serial_Number this is value of p0 in
-                                                    G(V_Drift) = exp(p0*V_Drift+p1)
-
-                Det_ClustQ_GAIN_P0_Err              float, error on Det_ClustQ_GAIN_P0
-
-                Det_ClustQ_GAIN_P1                  float, as Det_ClustQ_GAIN_P0 but for p1 in
-                                                    G(V_Drift) = exp(p0*V_Drift+p1)
-
-                Det_ClustQ_GAIN_P1_Err              float, error on Det_ClustQ_GAIN_P1
-
-        # 4.e.v.IV  PARAMETERS - Cluster Size
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-        The following parameters are supported:
-        #		<FIELD>                             <DATA TYPE, DESCRIPTION>
-
-                Det_ClustSize_Serial_Number         string, serial number of the detecotr used to obtain the
-                                                    data found in File_ClustSize
-
-                Det_ClustSize_TF1_TName             string, name of the TF1 object in File_ClustSize which
-                                                    parameterizes MIP cluster size parameterized in terms of
-                                                    triple-GEM detector gain.
+Field Name | Type | Description
+---------- | ---- | -----------
+`Det_ClustSize_Serial_Number` | string | Serial number of the detecotr used to obtain the data found in `File_ClustSize`.
+`Det_ClustSize_TF1_TName` | string | `TName` of the `TF1` object in `File_ClustSize` which parameterizes MIP cluster size parameterized in terms of triple-GEM detector gain.
 
 #### 4.e.v.V   PARAMETERS - Efficiency Info
 #### --------------------------------------------------------
