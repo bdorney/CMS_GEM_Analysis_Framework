@@ -2391,7 +2391,6 @@ Field Name | Type | Description
 `Det_ClustSize_TF1_TName` | string | `TName` of the `TF1` object in `File_ClustSize` which parameterizes MIP cluster size parameterized in terms of triple-GEM detector gain.
 
 #### 4.e.v.V   PARAMETERS - Efficiency Info
-#### --------------------------------------------------------
 The table below describes the allowed input fields and their data types.
 
 The following parameters are supported:
@@ -2400,13 +2399,11 @@ FIELD | DATA TYPE | DESCRIPTION
 Eff_HVPt_List | comma separated list of ints | list of HV Pt's the efficiency should be predicted at.
 
 ## 4.f. Output File - Analysis Mode
-## --------------------------------------------------------
 The framework will produce a number of output `ROOT` files and text files depending on the configuration used.  When `Output_Individual = true` one `ROOT` file and text file will be produced per input file.  Otherwise a single `ROOT` and text file will be produced which represents the aggregate of the input file(s) analyzed
 
 The output (text) `ROOT` file is described in Section (4.f.ii) 4.f.i.
 
 ### 4.f.i Output ROOT File - Analysis Mode
-### --------------------------------------------------------
 The output `ROOT` file produced by classes inheriting from `AnalyzeResponseUniformity` will contain the `TObjects` described in Sections 4.b.i, 4.b.iii, and 4.d.ii.  The output file will have a repeating file structure.  For each `SectorEta` defined (i.e. "**DET**" line in the *mapping config file*) there will be one `TDirectory` named `SectorEtaX` where `X` is an integer.  Those `TObject`'s stored in the `Uniformity::SectorEta` struct will be stored directly in this `SectorEtaX` TDirectory; and obviously they will represent only distributions from that iEta value.  The `TName`'s for each `TObject` here will include the string `_iEtaX_` to ensure they are unique.
 
 Within each `SectorEtaX` folder will be `nbConnect` number of `TDirectory`'s labeled `SectorPhiY` for `Y = {1, ... , nbConnect}`.  Similarly to the above, the `TObject`'s stored in the `Uniformity::SectorPhi` struct will be stored directly in this `SectorPhiY` TDirectory; they will represent only distributions from this (iEta, iPhi) value.  Again, the `TName`'s for each `TObject` here will include the string `_iEtaXiPhiY_` to ensure they are unique.
@@ -2432,8 +2429,6 @@ One top level `TDirectory` named **Summary** will also exist.  This folder will 
 Additionally the `VisualizeUniformity` class places additional `TObjects` (e.g. `TCanvas`, `TMultiGraph`, etc...) to assist the analyst in making the "pass/fail" statement.  These are desribed below.
 
 #### 4.f.i.I "Segmented" Plots Stored in "Summary" folder
-#### --------------------------------------------------------
-
 Several `TCanvas` objects with `TNames` of the form:
 
 ```    
@@ -2445,8 +2440,6 @@ will be stored in the folder.  Here the **Detector_Name** is the parameter defin
 These will show a `TCanvas` with an array of `TPads` placed in a columns-by-row grid of (3-by-8) 2-by-4 grid for (AllPhi) AllEta case.  Each `TPad` will have iEta index written in the upper left corner of the pad and have the corresponding `TObject` from this **ReadoutLevel** (e.g. iEta or iPhi) drawn on the pad.
 
 #### 4.f.ii.II "Dataset" Plots Stored in "Summary" folder
-#### --------------------------------------------------------
-
 Several `TCanvas` objects with `TNames` of the form:
 
 ```    
@@ -2466,7 +2459,6 @@ The x-axis will be the **Observable** in question (e.g. for `ResponseFitPkPos` t
 Additionally there will be one `TCanvas` and `TGraphErrors` object with "**Shifted**" in it's name. This is identical to the objects without the "Shifted" string in their names but here the mean position of the plot has been shifted to 0.  This allows you to better compare across detectors when you are interested in the spread of the distribution rather than the mean.  Here two points at (+/-2000,0) have been added to allow a greater range of drawing the x-axis with `genericPlotter` or some custom code of your choice.
 
 #### 4.f.i.III 1D Fit Summary Plots Stored in "Summary" folder
-#### --------------------------------------------------------
 Several `TCanvas` objects with `TNames` of the form:
 
 ```
@@ -2482,7 +2474,6 @@ mgraph_<Detector_Name>_<FitObservable>_AllEta
 Here the **Detector_Name** is the parameter defined in the given `configRun.cfg` file. The **FitObservable** is from the set {`ResponseFitChi2`, `ResponseFitPkPos`, `ResponseFitPkRes`} for the normalized Chi2 value of the fit, determined peak position, and determined peak resolution (see Section 4.e.ii.IV for details), respectively.
 
 #### 4.f.i.IV 2D Fit Trapezoidal Map Plots Stored in "Summary" folder
-#### --------------------------------------------------------
 Several `TCanvas` objects with `TNames` of the form:
 
 ```
@@ -2505,7 +2496,6 @@ divided by the mean of the dataset formed by all points of the **FitObservable**
 These plots may take some time to load.  This is due to the rendering that is done by `ROOT`; be patient.  Consider transfering the file to your local machine if it is not already.  Once they load the plots will show a 3D plot of the detector.  The xy-plane will be the trapezoidal active area of the detector and the Z-axis will be the **FitObservable**.
 
 ### 4.f.ii Output ROOT File - Comparison Mode
-### --------------------------------------------------------
 Here the output `ROOT` file is produced by classes inheriting from `VisualizeComparison`.  The `ROOT` file will contain a `TDirectory` whose `TName` is equal to the value of the **Input_Identifier** field at the time of execution.  Inside this folder there will be a `TDirectory` whose `TName` is equal to the value of the "**Obs_Name** field at the time of execution.
 
 If you have the **Output_File_Option** field equal to `UPDATE` then rather than over-writing the **Output_File_Name** `TFile` everytime it will simply add TDirectories (or sub-TDirectories) to the file.  This is perfect if you want to compare multiple **Obs_Name** distributions for the same **Input_Identifier** value.  Additionally you could have one `TFile` store several different **Input_Identifier** top-level TDirectories each with multipler **Obs_Name** sub-directories.
@@ -2526,7 +2516,6 @@ The **Obs_Name** sub directory will contain two `TH1F` objects with their regula
 and `ClustTime6to27`.  The `TCanvas` they are drawn on will be named `canv_ClustSize_<Obs_Name>`.
 
 ### 4.f.iii Output ROOT File - genericPlotter
-### --------------------------------------------------------
 Here an output `ROOT` file is produced by classes inheriting from `PlotterGeneric` with the filename `plotterOutput.root`.  The `ROOT` file will contain the produced `TCanvas` and all `TObjects` that were declared in `[BEGIN_PLOT]` headers and drawn on the canvas. The `TName` of the produce `TCanvas` will follow the convention:
 
 ```
@@ -2552,7 +2541,6 @@ The `TObjects` drawn on the `TCanvas` declared in `[BEGIN_PLOT]` headers will ha
 Since the style defined by `genericPlotter` may not persist in the created `TObjects` once they have been saved to the output `TFile` and loaded again in `ROOT` two image files will also be produced.  In the working directory you will also find `Canvas_TName.C`, `*.eps`, `*.pdf`, and `*.png` files.  These files should be used for plot approval in publication since they are gauranteed to have the style settings created by `genericPlotter`.
 
 ### 4.f.iv Output Text File
-### --------------------------------------------------------
 An output text file will be created that will show in tabular form a table which looks like:
 
 ```
@@ -2577,7 +2565,6 @@ A strip is considered dead if there are no entries in the corresponding bin of h
 Note that having the `Cut_HitAdc_Min` *too high* may cause strips to be reported as dead.  Also when identifying dead strips it is important to understand if the problem is a dead strip on the detector or a dead channel on the front end used to readout the sector.
 
 ### 4.f.v Output ROOT File - Gain Map
-### --------------------------------------------------------
 This file will have a series of TDirectories of the form:
 
 ```
@@ -2617,8 +2604,6 @@ g_<name>_<Observable>
 Where: **name** is as given above and **Observable** is from the set {`EffGainAvg`, `EffGainMax`, `EffGainMin`, `PDAvg`, `PDMax`, and `PDMin`}.  
 
 ### 4.f.vi Output ROOT File - Efficiency Map
-### --------------------------------------------------------
 
 # 5. Troubleshooting
-# ========================================================
-    If you run into trouble please double check this file to ensure you are using the repository correctly.  If you still are running into trouble please navigate too the [issue tab](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) of the repository and post an issue following the instructions included in the template.
+If you run into trouble please double check this file to ensure you are using the repository correctly.  If you still are running into trouble please navigate too the [issue tab](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) of the repository and post an issue following the instructions included in the template.
