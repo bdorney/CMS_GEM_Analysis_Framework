@@ -271,12 +271,6 @@ void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
                 fEtaLim_High = (*iterEta).second.fPos_Y - (0.1 * (*iterEta).second.fPos_Y);
             } //End Case: Case: iEta Y-Pos <= 0
            
-		//Debugging
-		//cout<<"===============================================\n";
-		//cout<<"fEtaLim_Low = " << fEtaLim_Low << endl;
-		//cout<<"fEtaLim_High = " << fEtaLim_High << endl;
-		//cout<<"inputCluster.fPos_Y = " << inputCluster.fPos_Y << endl;
- 
             //Find matching eta sector
             if ( fEtaLim_Low < inputCluster.fPos_Y && inputCluster.fPos_Y < fEtaLim_High ) { //Case: Matching Eta Sector Found!
                 
@@ -285,9 +279,6 @@ void DetectorMPGD::setCluster(int iNum_Evt, Cluster &inputCluster){
                     
                     if ( (*iterPhi).second.fPos_Xlow <= inputCluster.fPos_X && inputCluster.fPos_X < (*iterPhi).second.fPos_Xhigh ) { //Case: Matching Phi Sector Found!
                         (*iterPhi).second.map_clusters.insert( std::pair<int, Cluster>(iNum_Evt, inputCluster) );
-
-			//Debugging
-			//cout<<"Phi Selected\n";
 
                         break;
                     } //End Case: Matching Phi Sector Found!
@@ -366,15 +357,12 @@ void DetectorMPGD::setEtaSector(int iEta, float fInputPos_Y, float fInputWidth, 
         etaSector.fPos_Y = fInputPos_Y;
         etaSector.fWidth = fInputWidth;
         
-        //Is this sector the widest sector?
-        //if (fMaxSectorWidth < fInputWidth) fMaxSectorWidth = fInputWidth;
-        
         //Make three Phi Sectors for this Eta Sector
         for (int i=1; i <= iNumPhiSector; ++i) {
             ReadoutSectorPhi phiSector;
             
-            phiSector.fPos_Xlow = -0.5 * fInputWidth + (i-1) * fInputWidth / 3.;
-            phiSector.fPos_Xhigh= -0.5 * fInputWidth + (i) * fInputWidth / 3.;
+            phiSector.fPos_Xlow = -0.5 * fInputWidth + (i-1) * fInputWidth / float(iNumPhiSector);
+            phiSector.fPos_Xhigh= -0.5 * fInputWidth + (i) * fInputWidth / float(iNumPhiSector);
             
             phiSector.fWidth = fabs( phiSector.fPos_Xhigh - phiSector.fPos_Xlow );
             
@@ -432,5 +420,3 @@ void DetectorMPGD::setEventOnlyHits(Event &inputEvt){
     
     return;
 } //End DetectorMPGD::setEventOnlyHits()
-
-

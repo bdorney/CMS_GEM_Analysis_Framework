@@ -379,8 +379,6 @@ void AnalyzeResponseUniformityClusters::initHistosClusters(DetectorMPGD & inputD
 
 //Loops through the detector and initalizes all cluster histograms
 void AnalyzeResponseUniformityClusters::initHistosClustersByRun(int iInputRunNo, DetectorMPGD & inputDet){
-	//cout<<"AnalyzeResponseUniformityClusters::initHistosClustersByRun() - iInputRunNo = " << iInputRunNo << endl;
-
     //Loop Over Stored iEta Sectors
     for (auto iterEta = inputDet.map_sectorsEta.begin(); iterEta != inputDet.map_sectorsEta.end(); ++iterEta) { //Loop Over iEta Sectors
         //Initialize iEta Histograms - 1D
@@ -781,7 +779,6 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
     
     //Call the store fits sequence
     storeFits(ptr_fileOutput, inputDet);
-    //storeFits(ptr_fileOutput);
     
     //Close the ROOT file
     ptr_fileOutput->Close();
@@ -792,9 +789,6 @@ void AnalyzeResponseUniformityClusters::storeFits( string & strOutputROOTFileNam
 //Stores booked cluster fits (for those fits that are non-null)
 //Takes a TFile * which the histograms are written to as input
 void AnalyzeResponseUniformityClusters::storeFits( TFile * file_InputRootFile, DetectorMPGD & inputDet){
-    //TFile does not manage objects
-    //TH1::AddDirectory(kFALSE);
-
     //Variable Declaration
     
     //Check if File Failed to Open Correctly

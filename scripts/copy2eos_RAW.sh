@@ -1,8 +1,8 @@
 #!/bin/zsh
 # usage:
-# ./copy2eos_ROOT.sh <Detector Serial Number> <Target Directory>
+# ./copy2eos_RAW.sh <Detector Serial Number> <Target Directory>
 # example:
-# source ../copy2eos_ROOT.sh GE11-III-CERN-0002 .
+# source ../copy2eos_RAW.sh GE11-III-CERN-0002 .
 
 eos=/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select
 
@@ -17,7 +17,7 @@ else
 fi
 
 #Get the files to send
-FILES=$(ls $2/*dataTree.root)
+FILES=$(ls $2/*.raw)
 
 #Tell the user which group of files will be copied
 echo "The list of files to be copied is:"

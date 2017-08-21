@@ -19,7 +19,6 @@ using std::string;
 using std::vector;
 
 using namespace QualityControl::Uniformity;
-//using namespace QualityControl::Timing;
 
 //Default Constructor
 SelectorHit::SelectorHit(){
@@ -80,11 +79,7 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     //Variable Declaration
     Float_t fHitPos_Y[3072];
     
-    //int iFirstEvt = aSetup.iEvt_First;
-    //int iNEvt = aSetup.iEvt_Total;
-
     Int_t iHitMulti;  //I cry a little inside because of this
-    //Int_t iHitPos_Y[3072];
     Int_t iHitStrip[3072];
     Int_t iHitTimeBin[3072];
     
@@ -148,7 +143,6 @@ void SelectorHit::setHits(TFile * file_InputRootFile, Uniformity::DetectorMPGD &
     tree_Hits->SetBranchAddress("hitTimebin",&iHitTimeBin);
     tree_Hits->SetBranchAddress("nch", &iHitMulti);
     tree_Hits->SetBranchAddress("planeID",&fHitPos_Y);
-    //tree_Hits->SetBranchAddress("planeID",&iHitPos_Y);
     tree_Hits->SetBranchAddress("strip",&iHitStrip);
     
 	//ADC

@@ -1,82 +1,33 @@
-# Back-Up Files #
-#################
-*~
-*.swp
+# Ignore everything
+*
 
-# Binary Files #
-################
-.DS_Store
+# Don't ignore git settings
+!*.gitignore
+!*.gitattributes
 
-# Cluster Computing #
-#####################
-config/configRun_RunNo*.cfg
-stderr/
-stderr/*
-stdlog/
-stdlog/*
-stdout/
-stdout/*
-scripts/submitFrameworkJob_RunNo*.sh
-#scripts/deleteSelectedRawFiles.sh
+# Don't ignore special files
+!*.md
+!*.rst
+!CHANGELOG.txt
 
-# Compiled source #
-###################
-*.o
-*analyzeUniformity
-*analyzeSpec
-*frameworkMain
-*genericPlotter
-*shiftPkPosDist
-*cosmicTest
+# Don't ignore subdirectories
+!*/
 
-# Figures #
-###########
-figures/
-figures/*
-*.png
-*.pdf
-
-# Misc #
-########
-core.*
-AnalysisCode.cpp
-AnalysisCode_GE4_V1.cpp
-AnalysisCode_GE6_V1.cpp
-loopdir.C
-*.tar
-*.xls
-*.xlsx
-*.xlsm
-tmp/
-tmp/*
-config/configRun_RecoLong3.cfg
-*.swo
-
-# Python #
-##########
-*.pyc
-numpy/
-numpy/*
-python/pip/
-python/pip/*
-scripts/installPythonPkgs.sh
-python/interpolationTest.py
-python/test.py
-
-# ROOT Files #
-##############
-*.root
-#TestBeamDataset_*.root
+# But definitely ignore these subdirectories
 data/
-data/*
+figures/
+python/pip/
+testing/
 
-# Text Files #
-##############
-#*PFP.txt
-#setup_files/Production_ConfigFile.txt
-*DeadStripList.txt
-config/*.cfg_*
-config/configAnalysis_Slices*.cfg
-config/mapping_imaging_4APV.cfg
-config/GE7MappingCMScernData2016.cfg
-config/GE7MappingCMScernData2016_v2.cfg
+# Don't ignore python
+!*.py
+
+# Don't ignore C++
+!*.cpp
+!*.h
+
+# Don't ignore scripts
+!*.sh
+
+# Don't ignore config files
+!*.cfg

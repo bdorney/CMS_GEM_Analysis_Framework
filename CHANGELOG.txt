@@ -1,10 +1,44 @@
 **************************************************
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
-*	VERSION: 4.0                                 *
-*	LAST UPDATE: June 13 2017                    *
+*	VERSION: 5.0.1                               *
+*	LAST UPDATE: Aug 21 2017                     *
 *                                                *
 **************************************************
+
+Update: August 21st 2017
+==================================================
+->Finished re-writting README.md in Markdown
+->Added Table of Contents to README.md
+
+Update: August 18th 2017
+==================================================
+->Further of re-writting README.md in Markdown
+
+Update: August 17th 2017
+==================================================
+->Added repo structure files showing guidelines for contributing, issue templates, and pull request templates
+->Updated .gitignore to be cleaner
+->README.txt renamed to README.md
+->Started process of re-writting README.md in Markdown
+
+Update: August 8th 2017
+==================================================
+->Merged changes from mmaggi so now unpacker is no longer hard coded to work with only 2 FECs, now FEC numbers 1, 2, or 3 are supported
+->Issuing new release (v5.0).
+->Updating master branch to release v4.0
+
+Update: July 4th 2017
+==================================================
+->Scripts runMode_Grid.sh and runMode_Grid_Reco.sh will now stage data in from EOS to the node /tmp directory when analyzing a *dataTree.root file or when reco'ing a *.raw file
+->Scripts copy2eos_ROOT.sh and copy2eos_RAW.sh now updated and included in the framework rather than data directory of DAQ machines
+
+Update: July 3rd 2017
+==================================================
+->Fit Success distribution made by VisualizeUniformity will now have bins centered on integer values
+->DetectorMPGD::setEtaSector() no longer incorretly assume there are exactly 3 phi sectors
+->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution for phi distribution did not have correct y axis range
+->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution's TName did not reflect the observables plotted
 
 Update: June 13th 2017
 ==================================================
