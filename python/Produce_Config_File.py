@@ -2,7 +2,7 @@ import xlrd
 from array import array
 import numpy as np
 import ROOT as r
-from options import parser
+from PlotOptions import parser
 import sys
 
 if len(sys.argv)==1:

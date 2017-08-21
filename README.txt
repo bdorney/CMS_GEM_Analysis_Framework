@@ -615,7 +615,7 @@
         This will then execute genericPlotter taking each *.cfg file in the figures/ResponseUniformityMaps
         directory.
 
-    # 3.b. Python Scripts
+    # 3.c. Python Scripts
     # --------------------------------------------------------
 
     A set of python analysis tools has been added to assist the user in further analysis of data created
@@ -705,6 +705,260 @@
         An example call is given as:
 
             python2.7 python/computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
+
+
+	# 3.c.iii Analysis of QC data stored in an excel file
+        # --------------------------------------------------------
+	main script: Produce_Config_File.py
+	additional scripts: QC3.py, QC4_HV.py, QC4_SS.py, QC5_Gain.py, QC5_Rate.py
+ 
+	main script: This tool is designed to read selected columns from an excel file and produce a config file 
+       in the genericPlotter input style described in session: “4.e.iv. Plot Config File”. Following, the produced
+	config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
+
+	The following options are defined:
+
+	Options:
+  	-h, --help            show this help message and exit
+  	-f FILE, --file=FILE  Choose the input excel file
+  	--OutputName=OUTPUTNAME
+                        Set Output file name, default is: Myconfig
+ 	 --SelectSheetNum=SELECTSHEETNUM
+                        Select the Excel sheet for reading, default is: 0
+  	--SelectColumnX=SELECTCOLUMNX
+                        Select Column number for X data, default value is 0
+  	--SelectColumnY=SELECTCOLUMNY
+                        Select Column number for Y data, default value is 0
+  	--SelectRowStart=SELECTROWSTART
+                        Select the first Row for reading, default is 1
+  	--SelectRowEnd=SELECTROWEND
+                        Select the last Row for reading, default is 61
+  	--AxisNDiv=AXISNDIV   Set Axis Ndivisions X,Y (default is: 508,510)
+  	--CanvDim=CANVDIM     Set Canvas Dimensions X,Y (default is: 1000,1000)
+  	--CanvDrawOpt=CANVDRAWOPT
+                        Set Draw Option (default is: APE1)
+  	--CanvGridXY=CANVGRIDXY
+                        Set GridXY option (default: false,false)
+  	--LatexLines=latexLines
+                        Add an entry to the LatexLines list following syntax:
+                        'Coord_PadX,Coord_PadY, text'
+  	--CanvLegDimX=CANVLEGDIMX
+                        Set X Legend Dimensions
+  	--CanvLegDimY=CANVLEGDIMY
+                        Set Y Legend Dimensions
+  	--CanvLegDraw=CANVLEGDRAW
+                        Set Legend Draw Option (dedault: true)
+  	--CanvLogXY=CANVLOGXY
+                        Set Canvas LogXY options (default: false,false)
+  	--CanvLogoPos=CANVLOGOPOS
+                        Set Logo Position (Default: 0 , Other Options: 11, 22,
+                        33
+  	--CanvLogoPrelim=CANVLOGOPRELIM
+                        Set Logo Preliminary true or false (default is true)
+  	--CanvMarginTop=CANVMARGINTOP
+                        Set Canvas Margin Top (default is 0.08)
+  	--CanvMarginBot=CANVMARGINBOT
+                        Set Canvas Margin Bottom (default is 0.14)
+  	--CanvMarginLf=CANVMARGINLF
+                        Set Canvas Margin Left (default is 0.16)
+  	--CanvMarginRt=CANVMARGINRT
+                        Set Canvas Margin Right (default is 0.06)
+  	--CanvPlotType=CANVPLOTTYPE
+                        Set the Canvas Plot type (default is TGraphErrors)
+  	--CanvTitleX=CANVTITLEX
+                        Set Xaxis title, example: Divider Current
+                        #left(#muA#right)
+  	--CanvTitleY=CANVTITLEY
+                        Set Yaxis title, example: Applied Voltage
+                        #left(kV#right)
+  	--CanvRangeX=CANVRANGEX
+                        Set the X-Range of the Canvas (default is 0,1000)
+  	--CanvRangeY=CANVRANGEY
+                        Set the Y-Range of the Canvas (default is 0,7)
+  	--CanvTitleOffsetX=CANVTITLEOFFSETX
+                        Set the X-Offset of the Canvas Title (default is 1.0)
+  	--CanvTitleOffsetY=CANVTITLEOFFSETY
+                        Set the Y-offset of the Canvas Title (default is 0.8)
+  	--CanvName=CANVNAME   Set Canvas Name, Default is: LS2_Detectors
+  	--YaxisScale          If YaxisScale option is used the Y axis is plotted in
+                        kUnit. Default is: False
+  	--SetErrX             Set Error option true (for X axis)
+  	--SetErrY             Set Error option true (for Y axis)
+  	--SelectColumnErrX=SELECTCOLUMNERRX
+                        If SetErrX=True choose the Column for XError, Default
+                        is: 0
+  	--SelectColumnErrY=SELECTCOLUMNERRY
+                        If SetErrY=True choose the Column for YError, Default
+                        is: 0
+  	--PlotLineSize=PLOTLINESIZE
+                        Set Plot Line Size (default is: 1)
+  	--PlotLineStyle=PLOTLINESTYLE
+                        Set Plot Line Style (default is: 1)
+  	--PlotMarkerSize=PLOTMARKERSIZE
+                        Set Plot Marker Size (default is: 0.8)
+  	--Fit                 if it is used the header parameters for the fit are
+                        created
+  	--FitFormula=FITFORMULA
+                        Set the fit formula e.g. [0]*x^2+[1]
+  	--FitLineSize=FITLINESIZE
+                        Set Fit Line Size, default is: 1
+  	--FitLineStyle=FITLINESTYLE
+                        Set Fit Line Style, default is: 1
+  	--FitOption=FITOPTION
+                        Set Fit Option, default is: R
+  	--FitParamIGuess=FITPARAMIGUESS
+                        Set Fit Parameters initial values
+  	--FitPerform=FITPERFORM
+                        if true (default) perform a fit to the TObject defined
+                        in the [BEGIN_PLOT]header this [BEGIN_FIT] header is
+                        found in
+  	--FitRange=FITRANGE   Set the Fit range, default is 0,1
+
+	
+	Example of use: 1) As with frameworkMain for each new shell navigate to the base directory of the repository 
+       and setup the environment via: source scripts/setup_CMS_GEM.sh
+
+	2) Let’s assume that you want to plot the first 60 lines of second and third columns of the first sheet of the file 
+	QC3_GE11-X-L-CERN-0001_20170601.xlsm which is stored in the base directory of 
+	the repository (../CMS_GEM_Analysis_Framework/)
+
+	What you have to do is:   
+
+	python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61   
+
+	
+	The options you have set are:
+						—-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm	
+
+	(the desired file stored in the base dir of the repository. If you want to plot the comparison of multiple files 
+	you can write:  —-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm —-file=NameofSecondFile.xlsm —-file=NameofThirdFile.xlsm),
+
+	
+						—-SelectSheetNum=0
+
+	(the excel sheet number starting counting from zero),
+
+						—-SelectColumnX=1 —-SelectColumnY=2
+	
+	(The desired columns for read),
+
+						--SelectRowStart=1 --SelectRowEnd=61
+
+	(The desired rows for read starting counting from zero).
+	
+	
+	—————————————————————————————————————————————											
+	
+	Additional scripts: The additional scripts are designed to give specific instructions to the main script
+	about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is 
+	selected the columnY=2 (corresponds to the pressure(mbar) column) vs columnX=1 (corresponds to the time(s) column)
+ 	will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 
+	will be plotted on the graph. The user is able to open and modify the produced config file in case some of the 
+	options that are set are not the desirable ones.  
+
+	Options set for QC3.py, QC4_HV.py, QC4_SS.py, QC5_Gain.py, QC5_Rate.py scripts:
+
+	
+	-> QC3.py :   
+
+	--CanvTitleX=Time #left(s#right)
+	--CanvTitleY=Pressure #left(mbar#right)
+	--SelectColumnX=1
+	--SelectColumnY=2
+	--SelectRowStart=1
+	--SelectRowEnd=61
+	--CanvRangeX=0,3600
+	--CanvRangeY=0,35
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+
+	Moreover if the Fit option is used (example: python python/QC3.py —-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm —-Fit)
+	the following options are set for the fit:
+
+	--Fit
+	--FitFormula=[0]*TMath::Exp([1]*x)
+	--FitParamIGuess=AMPLITUDE,6.2e-05
+	--FitRange=0,3600
+
+	-> QC4_HV.py :
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Applied Voltage #left(kV#right)
+	--SelectColumnX=3
+	--SelectColumnY=1
+	--SelectRowStart=3
+	--SelectRowEnd=37
+	--CanvRangeX=0,1000
+	--CanvRangeY=0,7
+	--YaxisScale
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+
+	Moreover if the Fit option is used (example: python python/QC4_HV.py —-file=QC4_GE11-X-L-CERN-0001_20170601.xlsm —-Fit)
+	the following options are set for the fit:
+
+	--Fit")
+	--FitFormula=[0]*x+[1]
+	--FitParamIGuess=Req,5   (where Req is the measured resistance from the excel file) 
+	--FitRange=0,1000
+
+	-> QC4_SS.py :
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Spurious Signal R_{SS} #left(Hz#right)
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+	--LatexLines=0.58,0.73, Readout~=~GEM3B
+	--SelectColumnX=3
+	--SelectColumnY=7
+	--SelectRowStart=3
+	--SelectRowEnd=37
+	--CanvRangeX=0,1000
+	--CanvRangeY=0,50
+	--SetErrY
+	--SelectColumnErrY=8
+
+	-> QC5_Gain.py :
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Effective Gain
+	--LatexLines=0.19,0.88, LS2~Detector~Production
+	--LatexLines=0.19,0.83, Gas~=~Ar/CO_{2}~#left(70/30#right)
+	--LatexLines=0.19,0.78, X-Ray~Target:~Ag
+	--LatexLines=0.19,0.73, X-Ray~V_{mon}~=~40~kV
+	--LatexLines=0.19,0.68, X-Ray~I_{mon}~~~=~5~#muA
+	--LatexLines=0.19,0.63, i#eta~=~4;~i#phi~=~2
+	--SelectColumnX=4
+	--SelectColumnY=11
+	--SelectRowStart=29
+	--SelectRowEnd=45
+	--CanvRangeX=0,750
+	--CanvLogXY=false,true
+	--CanvRangeY=10,1000000
+	--SetErrY
+	--SelectColumnErrY=12
+
+	-> QC5_Rate.py :
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Rate #left(Hz#right)
+	--LatexLines=0.19,0.88, LS2~Detector~Production
+	--LatexLines=0.19,0.83, Gas~=~Ar/CO_{2}~#left(70/30#right)
+	--LatexLines=0.19,0.78, X-Ray~Target:~Ag
+	--LatexLines=0.19,0.73, X-Ray~V_{mon}~=~40~kV
+	--LatexLines=0.19,0.68, X-Ray~I_{mon}~~~=~5~#muA
+	--LatexLines=0.19,0.63, i#eta~=~4;~i#phi~=~2
+	--SelectColumnX=4
+	--SelectColumnY=7
+	--SelectRowStart=29
+	--SelectRowEnd=45
+	--CanvRangeX=0,750
+	--CanvRangeY=0,1800
+	--SetErrY
+	--SelectColumnErrY=8
+
+
+
 
 # 4. Documentation
 # ========================================================

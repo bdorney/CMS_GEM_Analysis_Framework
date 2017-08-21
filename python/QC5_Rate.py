@@ -1,6 +1,6 @@
 from subprocess import CalledProcessError
 from wrappers import runCommand,envCheck
-from options import parser
+from PlotOptions import parser
 import os
 
 (args,opts)=parser.parse_args()
