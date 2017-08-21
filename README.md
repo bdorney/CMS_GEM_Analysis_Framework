@@ -1404,10 +1404,10 @@ Field Name | Type | Description
 `Fit_Name` | string | Starting point of `TName` of the `TF1` object; note the `(ieta,iphi,islice)` coordinate of the fit will be used to augment the `TName` to ensure a unique `TName` for each `TF1` object created.
 `Fit_Option` | string | The fit option to be used for fitting the ADC spectrums made from each slice.
 `Fit_Param_IGuess` | Comma separated list of strings | Initial values for the parameters defined in the `Fit_Formula` field.  Note the order in which the parameters are given in the `Fit_Formula` field should match the order listed here. Explicitly for the `Fit_Formula = '[0]*x^2+[1]*x+[2]'` the initial guess of `4,5,6` would mean `[0] = 4`, `[1] = 5`, and `[2] = 6`.  Additionally, both numeric values and expressions formed from the above supported keywords can be used.  E.g. for a `Fit_Formula = 'gaus(0)'` the initial guess of `12.3, MEAN, 2.*SIGMA+23.5` can be assigned.
-`Fit_Param_Limit_Max` | string | As `Fit_Param_IGuess` but for the upper limit on fit parameters.
-`Fit_Param_Limit_Min` | string | As `Fit_Param_IGuess` but for the lower limit on fit parameters.
-`Fit_Param_Map` | string | Words to help the user track the meaning of the fit parameter. The order follows the ordering schema described in `Fit_Param_IGuess`. NOTE: at least one parameter *must* be given the value `PEAK` and one parameter *must* be given a value from the set {`FWHM`,`HWHM`,`SIGMA`}. The vertical error-bar on these two parameters comes from the error on the corresponding fit parameter determined in `ROOT` (e.g. `TF1::GetParError()` )
-`Fit_Range` | string | As `Fit_Param_IGuess` but for the fit range.  NOTE: must supply exactly two parameters.  If more than two parameters are supplied only those that evaluate to the maximum and minimum are used.
+`Fit_Param_Limit_Max` | Comma separated list of strings | As `Fit_Param_IGuess` but for the upper limit on fit parameters.
+`Fit_Param_Limit_Min` | Comma separated list of strings | As `Fit_Param_IGuess` but for the lower limit on fit parameters.
+`Fit_Param_Map` | Comma separated list of strings | Words to help the user track the meaning of the fit parameter. The order follows the ordering schema described in `Fit_Param_IGuess`. NOTE: at least one parameter *must* be given the value `PEAK` and one parameter *must* be given a value from the set {`FWHM`,`HWHM`,`SIGMA`}. The vertical error-bar on these two parameters comes from the error on the corresponding fit parameter determined in `ROOT` (e.g. `TF1::GetParError()` )
+`Fit_Range` | Comma separated list of strings | As `Fit_Param_IGuess` but for the fit range.  NOTE: must supply exactly two parameters.  If more than two parameters are supplied only those that evaluate to the maximum and minimum are used.
         
 #### 4.e.ii.V HEADER PARAMETERS - HISTO_INFO
 The user at runtime is able to specify the data members of the `TH1` objects that will be created (e.g. number of bins, `TName`, etc...).  However, these histograms are hard coded and the user cannot choose at runtime to make new distributions.  If a distribution you would like to see does not already exist please navigate to the [issue tab](https://github.com/bdorney/CMS_GEM_Analysis_Framework/issues) and submit a new feature request describing your requested distribution. The table below describes the allowed input fields and their data types.
@@ -1552,998 +1552,691 @@ Contrary to the `[BEGIN_RUN_INFO]` header the `[BEGIN_RUN_LIST]` header is simpl
 
 The `Uniformity::ParameterLoaderRun` class understands the `#` character to indicate a comment; so it is possible to comment out lines in the *Run Config* file you create for ease of use.  The value of `true` is understood as being from the case-insensitive set `{t, true, 1}` while the value of `false` is understood as being from the case-insensitive set `{f, false, 0}`. Example config files are shown at the end of this subsection.
 
-        # 4.e.iii.I HEADER PARAMETERS - RUN_INFO
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Config_Analysis             string, PFN of the input analysis configuration file.
-
-                Config_Mapping              string, PFN of the input mapping configuration file.
-
-                Config_Reco                 string, PFN of the input reconstruction configuration file.
-                                            e.g. your "amore.cfg" file
-
-                Detector_Name               string, the serial number of the detector (do not include special
-                                            characters such as '/' but dashes '-' are allowed)
-
-                Input_Identifier            string, a regular expression found in each input filename, separated
-                                            by underscores '_', that is understood to have the run number after
-                                            the expression. e.g. if the filename contains "_RunX_" for some set
-                                            of integers X then this field should be set to "Run." This field must
-                                            always be set.
-
-                Input_Is_Frmwrk_Output      boolean, set to true (false) if the input file/files is/are created
-                                            by the CMS_GEM_Analysis_Framework (amoreSRS).  Note that if this
-                                            option is set to true then Output_Individual must also be set to true.
-
-                Output_File_Name            string, PFN of the output TFile.  Note that if Output_Individual is
-                                            set to true and Input_Is_Frmwrk_Output is set to false then the PFN
-                                            defined here is not used.  Instead the PFN of the input TFile, created
-                                            by amoreSRS, is used but the "dataTree.root" ending of the file name is
-                                            removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
-                                            to true then the PFN defined here is again not used.  Instead the PFN of
-                                            the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
-                                            filename is appended with "NewAna.root".  This could be potentially
-                                            improved in the future.
-
-                Output_File_Option          string, the option for the output TFile taken from the standard set
-                                            defined in the TFile documentation, e.g. "CREATE, NEW, READ,
-                                            RECREATE, UPDATE"
-
-                Output_Individual           boolean, setting to true produces one output file for each input file.
-                                            Setting to false produces one output file that represents the entirity
-                                            of the analysis of all input files.  Note that this should only be set
-                                            to false if Input_Is_Frmwrk_Output is also set to false.
-
-                Reco_All                    boolean, set to true if input files are RD51 SRS raw data files.
-
-                Ana_Hits                    boolean, setting to true will tell the framework to perform the analysis
-                                            of the input hits.
-
-                Ana_Clusters                boolean, setting to true will tell the framework to perform the analysis
-                                            of the input clusters.
-
-                Ana_Fitting                 boolean, setting to true will tell the framework to fit the obtained
-                                            distributions.  Note that Ana_Clusters must also be true for those
-                                            distributions to be fitted.
-
-                Visualize_Plots             boolean, setting to true will tell the framework to prepare several
-                                            TCanvases after analyzing all input files (Output_Individual = false)
-                                            or each input file (Output_Individual = true).
-
-                Visualize_AutoSaveImages    boolean, setting to true will tell the framework to automatically create
-                                            *.png and *.pdf files of all TCanvases stored in the "Summary" folder.
-                                            The name of these files will match the TName of the corresponding TCanvas.
-                                            They will be found in the working directory (the directory you execute
-                                            the framework executable from).  If these files already exist they will
-                                            be over-written.
-
-                Visualize_DrawPhiLines      boolean, setting to true will tell the framework to draw lines on the
-                                            summary TCanvases that show the iPhi segmentation.
-
-
-        # 4.e.iii.II  HEADER PARAMETERS - RUN_LIST
-        # --------------------------------------------------------
-
-        This header contains a list of PFN of the input files.  It is expected that there is one line for per
-        file.  White space, such as tabs '\t' and spaces ' ', is ignored when reading in these input files.
-        For example:
-
-            [BEGIN_RUN_LIST]
-                ...
-                ...
-                /filepath/filename3.root
-                /filepath/filename4.root
-                ...
-                ...
-            [END_RUN_LIST]
-
-        # 4.e.iii.III  HEADER PARAMETERS - COMP_INFO
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-        The following parameters are supported:
-        #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Obs_Name                    string, the "ObservableNameX" (See Section 4.f.i) found in the TName of the
-                                            TH1F object that you wish to compare across all input files.
-
-                Obs_Eta                     int, the iEta index you wish to comapre TH1F objects from.  This must be from
-                                            [1, iNumEta] or -1.  If set to -1 summary level TH1F objects are compared.
-
-                Obs_Phi                     int, as Obs_Eta but for phi index.
-
-                Obs_Slice                   int, as Obs_Eta but for slice index.
-
-                Input_Identifier            string, a regular expression found in each input filename, separated
-                                            by underscores '_'.  From each filename this expression will be drawn on a
-                                            TLegend to identify the TH1F object from the corresponding filename.
-
-                Output_File_Name            string, PFN of the output TFile.  Note that if Output_Individual is
-                                            set to true and Input_Is_Frmwrk_Output is set to false then the PFN
-                                            defined here is not used.  Instead the PFN of the input TFile, created
-                                            by amoreSRS, is used but the "dataTree.root" ending of the file name is
-                                            removed and replaced with "Ana.root".  If Input_Is_Frmwrk_Output is set
-                                            to true then the PFN defined here is again not used.  Instead the PFN of
-                                            the input TFile, created by CMS_GEM_Analysis_Framework, is used but the
-                                            filename is appended with "NewAna.root".  This could be potentially
-                                            improved in the future.
-
-                Output_File_Option          string, the option for the output TFile taken from the standard set
-                                            defined in the TFile documentation, e.g. "CREATE, NEW, READ,
-                                            RECREATE, UPDATE"
-
-                Visualize_AutoSaveImages    boolean, setting to true will tell the framework to automatically create
-                                            *.png and *.pdf files of all TCanvases stored in the "Summary" folder.
-                                            The name of these files will match the TName of the corresponding TCanvas.
-                                            They will be found in the working directory (the directory you execute
-                                            the framework executable from).  If these files already exist they will
-                                            be over-written.
-
-                Visualize_DrawNormalized    boolean, setting to true will tell the framework all distributions plotted
-                                            should be re-scaled to have an integral = 1.
-
-                Visualize_DrawOption        string, the draw option to use for the selected distributions.
-
-
-        # 4.e.iii.IV  Configuration Options
-        # --------------------------------------------------------
-
-        The framework can run with: 1) an analysis option, which has three configurations;
-        2) a comparison option, which has one configuration; 3) a reconstruction option, which has
-        one configuration; and 4) a combined reconstruction and analysis option which has one
-        configuration. The three configurations of the analysis mode have the frameworkMain executable
-        analyze data taken with RD51 Scaleable Readout System and reconstructed either with amoreSRS
-        or the framework. In the comparison mode the frameworkMain executable is used to compare
-        plots across multiple Framework output files.  In the reconstruction option the framework
-        main executable takes reconstructs a raw data file produced by the RD51 SRS system to create
-        an output tree file for later analysis.  This option must only be given one input file.  In
-        the combined option the frameworkMain executable is used to perform the reconstruction and
-        then analysis of an input RD51 SRS raw data file.  Again in this option only a single input
-        file must be given; however here two output root files will be produced, one a tree file, the
-        other the framework output file.
-
-        The 1st analysis configuration is the "series" mode which will analyze all of the input files
-        defined in the "[BEGIN_RUN_LIST]" header, one after another, created by either amoreSRS or the
-        CMS_GEM_Analysis_Framework (but not a mix of both!).  The time of execution can vary depending on
-        the number of input files and the number of events/slice granularity present in each of those files.
-        However, care has been taken to maximimize performance while still maintaining modularity/flexibility
-        in the design.  Here the "[BEGIN_RUN_INFO]" header can be configured to execute whatever level of
-        the framework analysis is desired; but this will be applied to EACH of the input files defined in
-        the "[BEGIN_RUN_LIST]" header.  If the need arises we can implement a way to assign a different
-        analysis and mapping config file to each of the input files defined in the "[BEGIN_RUN_LIST]" header
-        but right now this functionality is not foreseen.  It is recommended to just do two runs of the
-        executable after changing the configuration.
-
-        The 2nd analysis config is the computing cluster mode; to avoid confusion w/charge clusters this is
-        referred to as "grid" mode. Here the input run config file contains only a single input file in the
-        "[BEGIN_RUN_LIST]" header and the "[BEGIN_RUN_INFO]" header is configured such that Ana_Fitting and
-        Visualize_Plots are set to false.  The user uses a script/scheduler of their choice to launch their
-        jobs to a computing cluster to analyze a set of input files in parallel (scripts to do this with the
-        batch submission system on CERN's lxplus are included in the repository).  Then after all jobs are
-        finished and the outputs retrieved the user can merge the output files together (if running on
-        amoreSRS input files) using the "hadd" command in ROOT.  Then this merged file can be reprocessed
-        in series mode with Input_Is_Frmwrk_Output, Ana_Fitting, and Visualize_Plots set to true.
-
-        The third analysis config is the "re-run" mode.  Here a TFile that has been previously produced by
-        the CMS_GEM_Analysis_Framework is reanalyzed after changing the fit parameters defined in the
-        analysis configuration file.  Each run will result in a new TFile (independent from the input) that
-        has the updated results.  This allows the user to more rapidly study variations in parameters without
-        having to waste time performing the base selection (which may not need to change).  Right now in
-        "re-run" mode only cluster level plots are propogated to the new TFile.  Additionally none of the
-        TH2F objects found in the RunHistory folder will be propogated to the new TFile.
-
-        In the "comparison" configuration one can take a set of TFiles that have been previously
-        produced by the CMS_GEM_Analysis_Framework and compare TH1F objects from the files against each other.
-        Here the input Run Config file should be configured to have a "[BEGIN_COMP_INFO]" header instead of the
-        "[BEGIN_RUN_INFO]" header that is used by the other modes.  The "[BEGIN_RUN_LIST]" header is still used
-        normally; however now the input files listed here must be Framework output files produced in one of the
-        three modes described above.
-
-        In the "reconstruction" configuration one can take a raw data file recorded with the RD51 SRS system and
-        perform the unpacking, decoding, and event reconstruction to produce an output TFile which contains a TTree
-        which can be analyzed by the framework.  Here the input Run Config file should be configured to have a
-        "[BEGIN_RUN]" header as in the case of the analysis configurations.  The "[BEGIN_RUN_LIST]" header is
-        still used however there should only be a single file listed.
-
-        In the "combined" configuration the framework first executes the workflow performed by the reconstruction
-        and then executes the analysis.  Here the input Run Config file should be configured to have a
-        "[BEGIN_RUN]" header as in the case of the analysis configurations. The framework will produce two TFiles
-        one will have the output TTree produced by the reconstruction configuration and the other will be the
-        standard framework output file produced by the analysis.  The "[BEGIN_RUN_LIST]" header is still used
-        however again there should only be a single file listed.  The framework will automatically determine the
-        name of the TTree file it should run over in the analysis portion.
-
-        Example configuration files illustrating these options are provided in the sections below.  Furthermore
-        template config files and helper scripts are provided in the framework to run in each mode.  For details
-        on this functionality see Sections 3.a.i through 3.a.iii.
-
-        # 4.e.iii.V  Example Config File - Mode: Series
-        # --------------------------------------------------------
-
-        Four example files here are presented.
-
-        The first example illustrates a series run in which the entire analysis is requested on a list of
-        input TFile's containing the THit and TCluster trees.  Here the Output_Individual is set to false
-        to create one output file representing the results of the analysis on all input files. Changing
-        Output_Individual to true will produce one output file per input file.  The example is as follows:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
-                #Detector
-                ####################################
-                Detector_Name = 'GE11-VII-L-CERN-0002';
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
-                Input_Identifier = 'Run';
-                #Output Config
-                ####################################
-                Output_File_Name = 'GE11-VII-L-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_Ana.root';
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'false';        #indicates we are making one output file that represents results obtained from all inputs
-                #Analysis Steps
-                ####################################
-                Ana_Reco_Clusters = 'false';
-                Ana_Hits = 'true';
-                Ana_Clusters = 'true';
-                Ana_Fitting = 'true';
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'true';
-                Visualize_AutoSaveImages = 'true';
-                Visualize_DrawPhiLines = 'true';
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run100_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run101_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run102_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
-            [END_RUN_LIST]
-
-        Here leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-
-        The second example illustrates a series run in which only the final portion of the analysis (fitting
-        and visualizing) is performed on an input TFile created by the CMS_GEM_Analysis_Framework.  Here
-        Output_Individual is set to true, as it must be, and one output file for each input file will be
-        produced.  The example is as follows:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-S.cfg';
-                #Detector
-                ####################################
-                Detector_Name = 'GE1/1-VII-S-CERN-0001';
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'true';    #indicates we are running on input created by the CMS_GEM_Analysis_Framework
-                #Output Config
-                ####################################
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'true';         #indicates we are making one output file for each input file
-                #Analysis Steps
-                ####################################
-                Ana_Reco_Clusters = 'false';
-                Ana_Hits = 'false';
-                Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
-                Ana_Fitting = 'true';
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'true';
-                Visualize_DrawPhiLines = 'true';
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_Ana.root
-                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_Ana.root
-                /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_Ana.root
-            [END_RUN_LIST]
-
-        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-        In this case the framework should create the following list of output files:
-
-            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_NewAna.root
-            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_NewAna.root
-            /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_NewAna.root
-
-        If you're filename ends with "*_Ana.root" the input file will not be overwritten and instead a new file
-        will be produced with the same PFN as the input but ending with *_NewAna.root instead.
-
-        Pay special attention to the fact that these files will not necessarily be found in the directory you
-        are calling the executable from but in the directory the input file is found in.
-
-        The third example illustrates a series run in which the reconstruction is requested on a list of
-        raw data files taken with the RD51 SRS.  This time the analysis config file is not supplied but
-        instead a reco config file is given. Here the Output_Individual is set to true to create one output
-        file for the input file. Only one input file is given.  The example is as follows:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Reco = 'config/configReco.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
-                Input_Identifier = 'Run';
-                #Output Config
-                ####################################
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
-                #Reco Steps
-                ####################################
-                Reco_All = 'true';
-                #Analysis Steps
-                ####################################
-                Ana_Hits = 'false';
-                Ana_Clusters = 'false';
-                Ana_Fitting = 'false';
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'false';
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                #Place only one file here, use grid submission mode for multiple files
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
-            [END_RUN_LIST]
-
-        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-        Notice that the three analysis flags (Ana_Hits, Ana_Clusters, and Ana_Fitting) are set to false and the
-        reconstruction flag (Reco_All) is set to true.  The visualizer has also been turned off (Visualize_Plots
-        set to false). No output file name is given here since the framework will automatically create the
-        following output file:
-
-            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
-
-        The final example illustrates a series run in which the combined option (reconstruction plus analysis)
-        is used.  Again the input file is a raw data file taken with the RD51 SRS.  Notice that all three
-        config files are given: 1) the reco, 2) analysis, and 3) mapping config file. Here the Output_Individual
-        is set to true to create one output file for the input file. Only one input file is given.  The example
-        is as follows:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Reco = 'config/configReco.cfg';
-                Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
-                Input_Identifier = 'Run';
-                #Output Config
-                ####################################
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
-                #Reco Steps
-                ####################################
-                Reco_All = 'true';
-                #Analysis Steps
-                ####################################
-                Ana_Hits = 'true';
-                Ana_Clusters = 'true';
-                Ana_Fitting = 'false';
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'false';
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                #Place only one file here, use grid submission mode for multiple files
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
-            [END_RUN_LIST]
-
-        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-        Notice that Reco_All has been set to true along with Ana_Hits and Ana_Clusters.  The visualizer has
-        also been turned off (Visualize_Plots set to false). No output file name is given here since the
-        framework will automatically create the following output files:
-
-            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
-            /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_Ana.root
-
-        The fitting (Ana_Fitting) and the visualizer (Visualize_Plots) may be turned on by setting the
-        relevant flags to true.  However in this example the input file contains only 500k events which is
-        not enough for a high granularity analysis which usually requires at least 10 million clusters
-        distributed over the detector.
-
-        # 4.e.iii.VI  Example Config File - Mode: Grid
-        # --------------------------------------------------------
-
-        Grid mode is really designed for running the framewok on multiple input files (either TTree files or
-        RD51 SRS raw data files) in parallel.  One could also use this option when running on multiple input
-        TFiles created by the framework but the increase in analysis speed would be small in comparison since
-        usually you are only interested in checking a new set of fit parameters on the previously obtained data.
-
-        It is strongly recommended that you perform this script using the provided runMode_Grid.sh or
-        runMode_Grid_Reco.sh scripts (See Sections 3.a.i and 3.a.ii) located in the script/ directory, included
-        in the repository, to a fast queue such as the 8 natural minute (8nm) or 1 natural hour (1nh) queue.
-        The 8nm queue has been found to be ideal for running the analysis on an input TTree file with
-        N_Evt <= 500k.  Reconstructing an RD51 SRS raw dat of similiar event size has been shown best suited
-        for the 1nh queue.
-
-        The scripts mentioned above will setup everything automatically for you an example config file is shown as:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
-                Input_Identifier = 'Run';
-                #Output Config
-                ####################################
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
-                #Analysis Steps
-                ####################################
-                Ana_Reco_Clusters = 'false';
-                Ana_Hits = 'true';
-                Ana_Clusters = 'true';
-                Ana_Fitting = 'false';              #Do not perform the fitting; input file is a subset of the total dataset
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'false';          #Do not perform the visualization; input file is a subset of the total dataset
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/myFileForThisJob.root
-            [END_RUN_LIST]
-
-        Again leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-
-        # 4.e.iii.VII  Example Config File - Mode: Re-Run
-        # --------------------------------------------------------
-
-        The re-run mode is designed to allow a user to change the fit parameters defined in their analysis
-        config file and re-run on an input TFile previously produced by the framework.  This saves significant
-        time when tweaking the fit parameters being applied to a given input file since the selection does
-        not have to be repeated.  Obviously this mode should not be applied to input TTree TFiles produced
-        containing the THit and TCluster trees. The example config file is given below:
-
-            [BEGIN_RUN_INFO]
-                #Config Files
-                ####################################
-                Config_Analysis = 'config/configAnalysis.cfg';
-                Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
-                #Detector
-                ####################################
-                Detector_Name = 'DETECTORNAME';
-                #Input Config
-                ####################################
-                Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the framework
-                #Output Config
-                ####################################
-                Output_File_Option = 'RECREATE';
-                Output_Individual = 'true';         #must be set to true since Input_Is_Frmwrk_Output = true
-                #Analysis Steps
-                ####################################
-                Ana_Reco_Clusters = 'false';
-                Ana_Hits = 'false';
-                Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
-                Ana_Fitting = 'true';
-                #Visualizer Config
-                ####################################
-                Visualize_Plots = 'true'; #true -> make summary canvas plots; false -> do not make summary canvas plots
-                Visualize_AutoSaveImages = 'false';
-                Visualize_DrawPhiLines = 'true'; #true -> draw iPhi lines; false -> do not draw iPhi lines
-            [END_RUN_INFO]
-            [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1.root
-            [END_RUN_LIST]
-
-        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-        In this case the framework should create the following list of output files:
-
-            /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1_NewAna.root
-
-        Again pay special attention to the fact that these files will not necessarily be found in the directory you
-        are calling the executable from but in the directory the input file is found in.
-
-        Astute readers will note this is identical to the series mode example 2 with just one input file.
-        This is true; however, I felt the explicit example could prove useful.
-
-        # 4.e.iii.VII  Example Config File - Mode: Comparison
-        # --------------------------------------------------------
-
-        The comparison mode is designed to allow a user to quickly compare TH1F objects stored in different
-        framework output files from different detectors, different acquisition conditions, or produced with
-        different analysis parameters.  This can save signficant time for an analyst interested in performing
-        these comparisons.  The example config file is given below:
-
-            [BEGIN_COMP_INFO]
-                #Observable
-                ####################################
-                Obs_Name = 'clustADC';
-                Obs_Eta = '4';
-                Obs_Phi = '2';
-                Obs_Slice = '-1';
-                #Input Config
-                ####################################
-                Input_Identifier = 'ClustTime';
-                #Output Config
-                ####################################
-                Output_File_Name = 'GE11-VII-L-CERN-0002_ClustTime_Comparison.root';
-                Output_File_Option = 'UPDATE';
-                #Visualizer Config
-                ####################################
-                Visualize_AutoSaveImages = 'true';
-                Visualize_DrawNormalized = 'false';
-                Visualize_DrawOption = "E1"
-                Visualize_DrawPhiLines = 'false';
-            [END_COMP_INFO]
-            [BEGIN_RUN_LIST]
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
-                /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
-            [END_RUN_LIST]
-
-        Again the leading tabs are shown just for convenience and can be kept/or omitted without consequence.
-
-        # 4.e.iv. Plot Config File
-        # --------------------------------------------------------
-
-        The plot config file expects a certain "nested-header" style.  The format should look something like:
-
-            [BEGIN_CANVAS]
+#### 4.e.iii.I HEADER PARAMETERS - RUN INFO
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Config_Analysis` | string | PFN of the input *analysis config* file.
+`Config_Mapping` | string | PFN of the input *mapping config* file.
+`Config_Reco` | string | PFN of the input *reco config* file (e.g. old "amore.cfg" file).
+`Detector_Name` | string | the serial number of the detector (do not include special characters such as '/' but dashes '-' are allowed)
+`Input_Identifier` | string | a regular expression found in each input filename, separated by underscores `_`, that is understood to have the run number after the expression. E.g. if the filename contains `_RunX_` for some set of integers X then this field should be set to `Run`. This field must always be set.
+`Input_Is_Frmwrk_Output` | boolean | set to false (true) if the input file/files (do not) contain the `TCluster` and/or `THit` trees. Note that if this option is set to true then `Output_Individual` must *also* be set to true.
+`Output_File_Name` | string | PFN of the output `TFile`.  If `Output_Individual` is set to *true* and `Input_Is_Frmwrk_Output` is set to *false* then the PFN defined here is not used.  Instead the PFN of the input `TFile` is used but the `dataTree.root` ending of the PFN is removed and replaced with `Ana.root`.  If `Input_Is_Frmwrk_Output` is set to true then the PFN defined here is again not used.  Instead the PFN of the input `TFile` is used but the filename is appended with `NewAna.root`.
+`Output_File_Option` | string | Write option for the output TFile from the standard set defined in the `TFile` documentation, e.g. {`CREATE`, `NEW`, `READ`, `RECREATE`, `UPDATE`}
+`Output_Individual` | bool | Setting to **true** produces one output file for *each* input file. Setting to **false** produces one output file that represents the entirity of the analysis of all input files.  Note that this should only be set to false if `Input_Is_Frmwrk_Output` is *also* set to false.
+`Reco_All` | bool | Set to true if input files are raw data files.
+`Ana_Hits` | bool | Setting to true will tell the framework to perform the analysis of the input hits.
+`Ana_Clusters` | bool | Setting to true will tell the framework to perform the analysis of the input clusters.
+`Ana_Fitting` | bool | Setting to true will tell the framework to fit the obtained distributions.  Note that `Ana_Clusters` must also be true for those distributions to be fitted.
+`Visualize_Plots` | bool | Setting to true will tell the framework to prepare several `TCanvas` objects after analyzing all input files (`Output_Individual = false`) or each input file (`Output_Individual = true`).
+`Visualize_AutoSaveImages` | bool | Setting to true will tell the framework to automatically create `*.png` and `*.pdf` files of all `TCanvas` objects stored in the *Summary* folder. The name of these files will match the `TName` of the corresponding `TCanvas`. They will be found in the working directory (the directory you execute the framework executable from).  If these files already exist they will be over-written.
+`Visualize_DrawPhiLines` | bool | Setting to true will tell the framework to draw lines on the summary `TCanvas` objects that show the iPhi segmentation.
+
+#### 4.e.iii.II  HEADER PARAMETERS - RUN LIST
+This header contains a list of PFN of the input files.  It is expected that there is one line for per file.  White space, such as tabs `\t` and spaces ` `, is ignored when reading in these input files. For example:
+
+```
+[BEGIN_RUN_LIST]
+    ...
+    ...
+    /filepath/filename3.root
+    /filepath/filename4.root
+    ...
+    ...
+[END_RUN_LIST]
+```
+
+#### 4.e.iii.III  HEADER PARAMETERS - COMP INFO
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Obs_Name` | string | The **ObservableNameX** (See Section 4.f.i) found in the `TName` of the `TH1F` object that you wish to compare across all input files.
+`Obs_Eta` | int | the iEta index you wish to comapre `TH1F` objects from.  This must be from [1, iNumEta] or -1.  If set to -1 summary level `TH1F` objects are compared.
+`Obs_Phi` | int | As `Obs_Eta` but for phi index.
+`Obs_Slice` | int | As `Obs_Eta` but for slice index.
+`Input_Identifier` | string | Regular expression found in each input filename, separated by underscores `_`.  From each filename this expression will be drawn on a `TLegend` to identify the `TH1F` object from the corresponding filename.
+`Output_File_Name` | string | As Section 4.e.iii.I
+`Output_File_Option` | string | As Section 4.e.iii.I
+`Visualize_AutoSaveImages` | bool | As Section 4.e.iii.I
+`Visualize_DrawNormalized` | bool | Setting to true will tell the framework all distributions plotted should be re-scaled to have an integral = 1.
+`Visualize_DrawOption`     | string | Draw option to use for selected distributions.
+
+#### 4.e.iii.IV  Configuration Options
+The framework can run with: 
+
+1. an analysis option, which has three configurations;
+2. a comparison option, which has one configuration; 
+3. a reconstruction option, which has one configuration; and 
+4. a combined reconstruction and analysis option which has one configuration. 
+
+The three configurations of the *analysis mode* have the `frameworkMain` executable analyze data taken with *RD51 Scaleable Readout System (RD51 SRS)* and reconstructed the framework. In the *comparison mode* the `frameworkMain` executable is used to compare plots across multiple Framework output files.  In the *reconstruction option* the `frameworkMain` executable takes reconstructs **one** raw data file produced by the *RD51 SRS* system to create an output tree file for later analysis.  This option *will crash* if *more than one* input file `*.raw` file is used.  In the *combined option* the `frameworkMain` executable is used to perform the reconstruction and then analysis of an input *RD51 SRS* raw data file.  Again in this option only a single input file must be given; however here two output root files will be produced, one a tree file, the other the framework output file.
+
+The 1st *analysis configuration* is the **series** mode which will analyze all of the input files defined in the `[BEGIN_RUN_LIST]` header one after another; note these input files must either be all tree files or all analyzed files but *not* a mix of both. The time of execution can vary depending on the number of input files and the number of events/slice granularity present in each of those files. However, care has been taken to maximimize performance while still maintaining modularity/flexibility in the design.  Here the `[BEGIN_RUN_INFO]` header can be configured to execute whatever level of the framework analysis is desired; but this will be applied to _each_ of the input files defined in the `[BEGIN_RUN_LIST]` header.  
+
+The 2nd *analysis configuration* is the computing cluster mode; to avoid confusion w/charge clusters this is referred to as **grid** mode. Here the input *run config* file contains a single input file in the `[BEGIN_RUN_LIST]` header and the `[BEGIN_RUN_INFO]` header is configured such that `Ana_Fitting` and `Visualize_Plots` are set to false.  The user uses a script/scheduler of their choice to launch their jobs to a computing cluster to analyze a set of input files in parallel (scripts to do this with the batch submission system on CERN's lxplus are included in the repository).  Then after all jobs are finished and the outputs retrieved the user can merge the output files together (if running over tree files) using the `hadd` command.  Then this merged file can be reprocessed in series mode with `Input_Is_Frmwrk_Output`, `Ana_Fitting`, and `Visualize_Plots` set to true.
+
+The 3rd *analysis configuration* is the **re-run** mode.  Here a `TFile` that has been previously produced by the Framework is re-analyzed after changing the fit parameters defined in the *analysis configuration* file.  Each run will result in a new `TFile` (independent from the input) that has the updated results.  This allows the user to more rapidly study variations in parameters without
+having to waste time performing the base selection (which may not need to change).  Right now in **re-run** mode only cluster level plots are propogated to the new `TFile`.  Additionally none of the `TH2F` objects found in the `RunHistory` folder will be propogated to the new `TFile`.
+
+In the *comparison configuration* one can take a set of TFiles that have been previously produced by the Framework and compare `TH1F` objects from the files against each other. Here the input *Run Config* file should be configured to have a `[BEGIN_COMP_INFO]` header instead of the `[BEGIN_RUN_INFO]` header that is used by the other modes.  The `[BEGIN_RUN_LIST]` header is still used normally; however now the input files listed here must be Framework output files produced in one of the three modes described above.
+
+In the *reconstruction configuration* one can take a raw data file recorded with the *RD51 SRS* system and perform the unpacking, decoding, and event reconstruction to produce an output `TFile` which contains a `TTree` which can be analyzed by the Framework.  Here the input *Run Config* file should be configured to have a `[BEGIN_RUN]` header as in the case of the analysis configurations.  The `[BEGIN_RUN_LIST]` header is still used however there should only be _one_ file listed.
+
+In the *combined configuration* the Framework first executes the workflow performed by the reconstruction and then executes the analysis.  Here the input *Run Config* file should be configured to have a `[BEGIN_RUN]` header as in the case of the analysis configurations. The framework will produce two TFiles one will have the output `TTree` produced by the reconstruction configuration and the other will be the standard framework output file produced by the analysis.  The `[BEGIN_RUN_LIST]` header is still used however again there should only be a single file listed.  The framework will automatically determine the name of the `TTree` file it should run over in the analysis portion.
+
+Example configuration files illustrating these options are provided in the sections below.  Furthermore template config files and helper scripts are provided in the framework to run in each mode.  For details on this functionality see Sections 3.a.i through 3.a.iii.
+
+#### 4.e.iii.V  Example Config File - Mode: Series
+Four example files here are presented. The first example illustrates a series run in which the entire analysis is requested on a list of input TFile's containing the `THit` and `TCluster` trees.  Here the `Output_Individual` is set to false to create one output file representing the results of the analysis on all input files. Changing `Output_Individual` to true will produce one output file per input file.  The example is as follows:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Analysis = 'config/configAnalysis.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+    #Detector
+    ####################################
+    Detector_Name = 'GE11-VII-L-CERN-0002';
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+    Input_Identifier = 'Run';
+    #Output Config
+    ####################################
+    Output_File_Name = 'GE11-VII-L-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_Ana.root';
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'false';        #indicates we are making one output file that represents results obtained from all inputs
+    #Analysis Steps
+    ####################################
+    Ana_Reco_Clusters = 'false';
+    Ana_Hits = 'true';
+    Ana_Clusters = 'true';
+    Ana_Fitting = 'true';
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'true';
+    Visualize_AutoSaveImages = 'true';
+    Visualize_DrawPhiLines = 'true';
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run100_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run101_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Run102_Physics_RandomTrigger_XRay40kV100uA_580uA_500kEvt_dataTree.root
+[END_RUN_LIST]
+```
+
+here leading tabs are shown just for convenience and can be kept/or omitted without consequence.
+
+The second example illustrates a series run in which only the final portion of the analysis (fitting and visualizing) is performed on an input `TFile` created by the Framework.  Here `Output_Individual` is set to true, as it must be, and one output file for each input file will be produced.  The example is as follows:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Analysis = 'config/configAnalysis.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-S.cfg';
+    #Detector
+    ####################################
+    Detector_Name = 'GE1/1-VII-S-CERN-0001';
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'true';    #indicates we are running on input created by the CMS_GEM_Analysis_Framework
+    #Output Config
+    ####################################
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'true';         #indicates we are making one output file for each input file
+    #Analysis Steps
+    ####################################
+    Ana_Reco_Clusters = 'false';
+    Ana_Hits = 'false';
+    Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
+    Ana_Fitting = 'true';
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'true';
+    Visualize_DrawPhiLines = 'true';
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_Ana.root
+    /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_Ana.root
+    /base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_Ana.root
+[END_RUN_LIST]
+```
+
+in this case the framework should create the following list of output files:
+
+```
+/base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize2_NewAna.root
+/base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize3_NewAna.root
+/base_dir/sub_dir/sub_dir/GE11-VII-S-CERN-0002_Summary_RandTrig_AgXRay40kV100uA_1500kEvt_ClustSize4_NewAna.root
+```
+
+If you're filename ends with `*_Ana.root` the input file will not be overwritten and instead a new file will be produced with the same PFN as the input but ending with `*_NewAna.root` instead. Pay special attention to the fact that these files will not necessarily be found in the directory you are calling the executable from but in the directory the input file is found in.
+
+The third example illustrates a series run in which the reconstruction is requested on a list of raw data files taken with the *RD51 SRS*.  This time the *analysis config* file is not supplied but instead a *reco config* file is given. Here the `Output_Individual` is set to true to create one output file for the input file. Only one input file is given.  The example is as follows:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Reco = 'config/configReco.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+    Input_Identifier = 'Run';
+    #Output Config
+    ####################################
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+    #Reco Steps
+    ####################################
+    Reco_All = 'true';
+    #Analysis Steps
+    ####################################
+    Ana_Hits = 'false';
+    Ana_Clusters = 'false';
+    Ana_Fitting = 'false';
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'false';
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    #Place only one file here, use grid submission mode for multiple files
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
+[END_RUN_LIST]
+```
+
+notice that the three analysis flags `Ana_Hits`, `Ana_Clusters`, and `Ana_Fitting` are set to `false` and the reconstruction flag `Reco_All` is set to `true`.  The visualizer has also been turned off by setting `Visualize_Plots` to `false`. No output file name is given here since the framework will automatically create the following output file:
+
+```
+/base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
+```
+
+The final example illustrates a series run in which the combined option (reconstruction plus analysis) is used.  Again the input file is a raw data file taken with the *RD51 SRS*.  Notice that all three config files are given: 
+
+1. reco config, 
+2. analysis config, and 
+3. mapping config file. 
+
+Here the `Output_Individual` is set to true to create one output file for the input file. Only one input file is given.  The example is as follows:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Reco = 'config/configReco.cfg';
+    Config_Analysis = 'config/configAnalysis.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-L.cfg'; #Make sure this file matches what is in the configReco.cfg file!
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+    Input_Identifier = 'Run';
+    #Output Config
+    ####################################
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+    #Reco Steps
+    ####################################
+    Reco_All = 'true';
+    #Analysis Steps
+    ####################################
+    Ana_Hits = 'true';
+    Ana_Clusters = 'true';
+    Ana_Fitting = 'false';
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'false';
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    #Place only one file here, use grid submission mode for multiple files
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt.raw
+[END_RUN_LIST]
+```
+
+notice that `Reco_All` has been set to `true` along with `Ana_Hits` and `Ana_Clusters`.  The visualizer has also been turned off by setting `Visualize_Plots` to `false`. No output file name is given here since the Framework will automatically create the following output files:
+
+```
+/base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_dataTree.root
+/base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0004_Run024_Physics_615uA_XRay40kV25uA_500kEvt_Ana.root
+```
+
+The fitting (`Ana_Fitting`) and the visualizer (`Visualize_Plots`) may be turned on by setting the relevant flags to true.  However in this example the input file contains only 500k events which is not enough for a high granularity analysis which usually requires at least 10 million clusters distributed over the detector.
+
+#### 4.e.iii.VI  Example Config File - Mode: Grid
+Grid mode is really designed for running the framewok on multiple input files (either `TTree` files or *RD51 SRS* raw data files) in parallel.  One could also use this option when running on multiple input TFiles created by the framework but the increase in analysis speed would be small in comparison since usually you are only interested in checking a new set of fit parameters on the previously obtained data.
+
+It is strongly recommended that you perform this script using the provided `scripts/runMode_Grid.sh` or `script/srunMode_Grid_Reco.sh` scripts (See Sections 3.a.i and 3.a.ii) located in the script/ directory, included in the repository, to a fast queue such as the 8 natural minute (8nm) or 1 natural hour (1nh) queue. The `8nm` queue has been found to be ideal for running the analysis on an input `TTree` file with `N_Evt <= 250k`.  Reconstructing an *RD51 SRS* raw dat of similiar event size has been shown best suited for the `1nh` queue. The two scripts mentioned will setup everything automatically for you.  An example config file is shown as:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Analysis = 'config/configAnalysis.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'false';   #indicates we are running on input created by amoreSRS
+    Input_Identifier = 'Run';
+    #Output Config
+    ####################################
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'true';         #Here we are having the output PFN be the input PFN appended with "Ana.root"
+    #Analysis Steps
+    ####################################
+    Ana_Reco_Clusters = 'false';
+    Ana_Hits = 'true';
+    Ana_Clusters = 'true';
+    Ana_Fitting = 'false';              #Do not perform the fitting; input file is a subset of the total dataset
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'false';          #Do not perform the visualization; input file is a subset of the total dataset
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    /base_dir/sub_dir/sub_dir/myFileForThisJob.root
+[END_RUN_LIST]
+```
+
+#### 4.e.iii.VII  Example Config File - Mode: Re-Run
+The re-run mode is designed to allow a user to change the fit parameters defined in their analysis config file and re-run on an input TFile previously produced by the framework.  This saves significant time when tweaking the fit parameters being applied to a given input file since the selection does not have to be repeated.  Obviously this mode should not be applied to input `TTree` TFiles produced containing the `THit` and `TCluster` trees. The example config file is given below:
+
+```
+[BEGIN_RUN_INFO]
+    #Config Files
+    ####################################
+    Config_Analysis = 'config/configAnalysis.cfg';
+    Config_Mapping = 'config/Mapping_GE11-VII-L.cfg';
+    #Detector
+    ####################################
+    Detector_Name = 'DETECTORNAME';
+    #Input Config
+    ####################################
+    Input_Is_Frmwrk_Output = 'true'     #indicates we are running on input created by the framework
+    #Output Config
+    ####################################
+    Output_File_Option = 'RECREATE';
+    Output_Individual = 'true';         #must be set to true since Input_Is_Frmwrk_Output = true
+    #Analysis Steps
+    ####################################
+    Ana_Reco_Clusters = 'false';
+    Ana_Hits = 'false';
+    Ana_Clusters = 'true';              #this is set to true so we fit the cluster distributions
+    Ana_Fitting = 'true';
+    #Visualizer Config
+    ####################################
+    Visualize_Plots = 'true'; #true -> make summary canvas plots; false -> do not make summary canvas plots
+    Visualize_AutoSaveImages = 'false';
+    Visualize_DrawPhiLines = 'true'; #true -> draw iPhi lines; false -> do not draw iPhi lines
+[END_RUN_INFO]
+[BEGIN_RUN_LIST]
+    /base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1.root
+[END_RUN_LIST]
+```
+
+in this case the Framework should create the following output file:
+
+```
+/base_dir/sub_dir/sub_dir/myPreviousFrmwrkOutput_Detector1_NewAna.root
+```
+
+again pay special attention to the fact that these files will not necessarily be found in the directory you are calling the executable from but in the directory the input file is found in. Astute readers will note this is identical to the series mode example 2 with just one input file. This is true; however, I felt the explicit example could prove useful.
+
+#### 4.e.iii.VII  Example Config File - Mode: Comparison
+The comparison mode is designed to allow a user to quickly compare TH1F objects stored in different framework output files from different detectors, different acquisition conditions, or produced with different analysis parameters.  This can save signficant time for an analyst interested in performing these comparisons.  The example config file is given below:
+
+```
+[BEGIN_COMP_INFO]
+    #Observable
+    ####################################
+    Obs_Name = 'clustADC';
+    Obs_Eta = '4';
+    Obs_Phi = '2';
+    Obs_Slice = '-1';
+    #Input Config
+    ####################################
+    Input_Identifier = 'ClustTime';
+    #Output Config
+    ####################################
+    Output_File_Name = 'GE11-VII-L-CERN-0002_ClustTime_Comparison.root';
+    Output_File_Option = 'UPDATE';
+    #Visualizer Config
+    ####################################
+    Visualize_AutoSaveImages = 'true';
+    Visualize_DrawNormalized = 'false';
+    Visualize_DrawOption = "E1"
+    Visualize_DrawPhiLines = 'false';
+[END_COMP_INFO]
+[BEGIN_RUN_LIST]
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime1to30_ClustSize1to20_Ana.root
+    /base_dir/sub_dir/sub_dir/GE11-VII-L-CERN-0002_Summary_Physics_RandTrig_AgXRay40kV100uA_580uA_15004kEvt_ClustTime6to27_ClustSize1to20_Ana.root
+[END_RUN_LIST]
+```
+
+### 4.e.iv. Plot Config File
+The plot config file expects a certain "nested-header" style.  The format should look something like:
+
+```
+    [BEGIN_CANVAS]
+        ...
+        ...
+        ...
+        [BEGIN_PLOT]
+            ...
+            ...
+            ...
+            [BEGIN_FIT]
+            ...
+            ...
+            [END_FIT]
+        [END_PLOT]
+        ...
+        ...
+        ...
+        [BEGIN_PLOT]
+            ...
+            ...
+            ...
+            [BEGIN_DATA]
                 ...
                 ...
                 ...
-                [BEGIN_PLOT]
-                    ...
-                    ...
-                    ...
-                    [BEGIN_FIT]
-                    ...
-                    ...
-                    [END_FIT]
-                [END_PLOT]
-                ...
-                ...
-                ...
-                [BEGIN_PLOT]
-                    ...
-                    ...
-                    ...
-                    [BEGIN_DATA]
-                        ...
-                        ...
-                        ...
-                    [END_DATA]
-                [END_PLOT]
-                ...
-                ...
-            [END_CANVAS]
-
-        Parameters found inside the "[BEGIN_CANVAS]" header are expected to be entered in the following format:
-
-            field_name = 'value';'
-
-        Parameters found inside the "[BEGIN_CANVAS]" header are expected to be entered in the manner described
-        in Section 4.e.ii.
-
-        The config file will define one TCanvas which will be drawn following the official CMS Style Guide.  For
-        this canvas any number of TObjects can be defined and drawn on the canvas.  Right now the TGraphErrors,
-        TGraph2D, and TH1F classes are supported. For each of higher level header sections (i.e. "[BEGIN_CANVAS]"
-        and "[BEGIN_PLOT]") the header parameters should *always* be placed before descending into the next header.
-        Failure to adhere to this convention may lead to undefined behavior or crashes.
-
-        Plots can be declared by entering comma separated data in the [BEGIN_DATA] header, see Section 4.e.iv.III,
-        or loaded from an input TFile, see Section 4.e.iv.II.  Additionally, one or more TF1 objects can be declared
-        for each plot and drawn on the TCanvas.  Right now these TF1 objects can only be loaded from an input TFile.
-
-        The Plotter::ParameterLoaderPlotter class understands the "#" character to indicate a comment; so it is
-        possible to comment out lines in the Plot Config file you create for ease of use. The value of true is
-        understood as being from the case-insensitive set {t, true, 1} while the value of false is understood as
-        being from the case-insensitive set {f, false, 0}. The template run config file at the end of this
-        subsection showns an example.
-
-        # 4.e.iv.I HEADER PARAMETERS - CANVAS
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Canv_Axis_NDiv          int, comma separated list of integers defining the number of divisions
-                                        for a given TAxis.  See https://root.cern.ch/doc/master/classTAttAxis.html
-                                        for more information.  Between one and three integers can be provided.
-                                        They are understand as applying to the {X}, {X,Y}, or {X,Y,Z} axes.
-
-                Canv_Dim                int, pair of integers separated by a comma defining the size of the canvas
-                                        in pixels.  The first (second) number is for the x (y) direction.
-
-                Canv_DrawOpt            string, the draw option that will be applied to all plots on this canvas
-
-                Canv_Grid_XY            boolean, pair of booleans separated by a comma defining if the grid should
-                                        be drawn on the canvas.  The first (second) boolean is for the x (y) grid.
-
-                Canv_Latex_Line         tuple<float,float,string>, comma separated list of data that defines the
-                                        position of a TLatex line and the text in the line.  The first (second)
-                                        float defines the x (y) position of the line.  Unfortunately spaces or tabs
-                                        in the string will be stripped before it is passed to the TLatex class.  Any
-                                        number of Canv_Latex_Line fields may be supplied and they will all be drawn
-                                        on the Canvas.  Note that "CMS" or "CMS Preliminary" will already be drawn by
-                                        default so there is no need to include it as an inpuy Canv_Latex_Line.
-
-                Canv_Legend_Dim_X       float, pair of floats defining the NDC position of a TLegend to be drawn on
-                                        the pad.  The first (second) float is the X1 (X2) coordinate of the TLegend.
-                                        See https://root.cern.ch/doc/master/classTLegend.html for more details.
-
-                Canv_Legend_Dim_Y       As Canv_Legend_Dim_X but for the Y coordinates.
-
-                Canv_Legend_Draw        boolean, setting to true (false) will (not) draw the TLegend on the canvas.
-
-                Canv_Log_XY             As Canv_Grid_XY but for setting the X & Y axis to logarithmic.
-
-                Canv_Logo_Pos           int, Indicates the position the CMS logo should be placed.  Possible values are
-                                        out of frame (0), top-left (11), top-centered (22), or top-right (33).  See
-                                        https://ghm.web.cern.ch/ghm/plots/ for more details and examples.
-
-                Canv_Logo_Prelim        boolean, defines whether or not a canvas is preliminary (e.g. "CMS Preliminary").
-                                        This should be true for all plots unless they are being submitted for CMS CWR
-                                        (e.g. publication in a peer-review journal).
-
-                Canv_Margin_Bot         float, sets the bottom margin of the created canvas.
-
-                Canv_Margin_Lf          float, sets the left margin of the created canvas.
-
-                Canv_Margin_Rt          float, sets the right margin of the created canvas.
-
-                Canv_Margin_Top         float, sets the top margin of the create canvas.
-
-                Canv_Mono_Color         boolean, determines if the color palette is monocolored (true), e.g. a single
-                                        shade, or multi-colored (false).  For paper publications this should be false;
-                                        for presentations/talks this ma be true.
-
-                Canv_N_Axis_X           int, placeholder
-
-                Canv_N_Axis_Y           int, placeholder
-
-                Canv_Name               string, TName of the created TCanvas.
-
-                Canv_Normalize          boolean, Only implemented for TH1F objects, if set to true all TH1F's are 
-					drawn with an integral of unity.
-
-                Canv_Plot_Type          string, determines the type of TObject to be plotted on the Canvas, supported
-                                        types are "TGraph, TGraph2D, TGraphErrors, TH1F".
-
-                Canv_Range_X            int, pair of integers that determine the range [X_min, X_max] of the X-axis.
-
-                Canv_Range_Y            As Canv_Range_X but for the Y-axis.
-
-                Canv_Range_Z            As Canv_Range_X but for the Z-axis.
-
-                Canv_Title_Offset_X     float, determines the offset of the X-axis title
-
-                Canv_Title_Offset_Y     As Canv_Title_Offset_X but for the Y-axis.
-
-                Canv_Title_Offset_Z     As Canv_Title_Offset_X but for the Z-axis.
-
-                Canv_Title_X            string, title (e.g. label) assigned to the X-axis.
-
-                Canv_Title_Y            As Canv_Title_X but for the Y-axis.
-
-                Canv_Title_Z            As Canv_Title_X but for the Z-axis.
-
-        # 4.e.iv.II HEADER PARAMETERS - PLOT
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-            The following parameters are supported:
-            #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Plot_Color              TColor, color assigned to the TObject marker, line, and fill color attributes
-                                        The list of supported colors includes {kWhite, kBlack, kGray, kRed, kGreen,
-                                        kBlue, kYellow, kMagenta, kCyan, kOrange, kSpring, kTeal, kAzure, kViolet,
-                                        kPink}.  Note mathematical expressions on TColors are supported.  For example
-                                        "kRed+2" or "kBlue-3" will be interpreted correctly.
-
-                Plot_LegEntry           string, legend entry for this TObject.
-
-                Plot_Line_Size          float, line size of the TObject
-
-                Plot_Line_Style         int, line style of the TObject
-
-                Plot_Marker_Size        float, marker size of the TObject
-
-                Plot_Marker_Style       int, marker style of the TObject
-
-                Plot_Name               string, TName of the TObject. This will be the TName of the created TObject
-                                        a [BEGIN_DATA] header is supplied.  Otherwise this is the TName of the TObject
-                                        to be loaded from the input TFile defined in Plot_Root_File found with path
-                                        Plot_Root_Path inside the TFile.
-
-                Plot_Root_File          string, if no [BEGIN_DATA] header is supplied for this plot, this is the name
-                                        of the TFile from which the desired TObject to be plotted is found in.
-
-                Plot_Root_Path          string, if no [BEGIN_DATA] header is supplied for this plot, this is the path
-                                        in Plot_Root_File for which Plot_Name is found at. Explicitly inside the TFile
-                                        the desired TObject is Plot_Root_Path/Plot_Name
-
-        # 4.e.iv.III HEADER PARAMETERS - DATA
-        # --------------------------------------------------------
-
-        Each plot is either found in an input TFile using the Plot_Name, Plot_Root_File, and Plot_Root_Path
-        fields or is created from comma separated data found in the [BEGIN_DATA] header.  If comma separated
-        data is supplied the Plot_Root_File and Plot_Root_Path fields are not used.  Presently only
-        Canv_Plot_Type set to TGraphErrors is supported, in this case a TGraphErrors object is made and the
-        value of the Plot_Name field is assigned as its TName.  Right now for Canv_Plot_Type set to either
-        TH1F or TGraph2D the TFile input must be used.
-
-        If comma separated data is supplied it is done so in this header.  Each line must have between 2 and 4
-        values.  Each value represents either the x-value, the error on the x-value, the y-value, or the error
-        on the y-value for a given point.  The first line of the [BEGIN_DATA] header must be a line consisting
-        of between 2 and 4 strings from the set {"VAR_INDEP", "VAR_INDEP_ERR", "VAR_DEP", "VAR_DEP_ERR"} for
-        the x-value, x-value error, y-value, or y-value error, respectively.  The position of these strings
-        defines the meaning of each entry in all subsequent lines.  For example:
-
-            VAR_INDEP, VAR_DEP, VAR_INDEP_ERR
-
-        Indicates that the first value of each line is the y-value, the second is the x-value, and the third value
-        is the error on the x-value for a given point. See Section 4.e.iv.VI for an example.
-
-        # 4.e.iv.III HEADER PARAMETERS - FIT
-        # --------------------------------------------------------
-
-        The table below describes the allowed input fields and their data types.
-
-        The following parameters are supported:
-        #		<FIELD>             <DATA TYPE, DESCRIPTION>
-
-                Fit_Color           As Plot_Color in Section 4.e.iv.II.
-
-                Fit_Formula         As Fit_Formula in Section 4.e.ii.IV.
-
-                Fit_LegEntry        As Plot_LegEntry in Section 4.e.iv.II.
-
-                Fit_Line_Size       As Plot_Line_Size in Section 4.e.iv.II.
-
-                Fit_Line_Style      As Plot_Line_Style in Section 4.e.iv.II.
-
-                Fit_Name            string, TName of the TF1 object.  Either the TF1 will be created with this
-                                    TName or it will be loaded from Fit_Root_File found with path Fit_Root_Path
-                                    inside the TFile.
-
-                Fit_Option          string, if the TF1 is being loaded from a previous TFile with FIT_ROOT_FILE
-                                    option this is the draw option; if the TF1 is being fit to one of the TObjects
-                                    on the TCanvas this is the fit option.
-
-                Fit_Root_File       As Plot_Root_File in Section 4.e.iv.II.
-
-                Fit_Root_Path       As Plot_Root_Path  in Section 4.e.iv.II.
-
-                Fit_Perform         boolean, if true perform a fit to the TObject defined in the [BEGIN_PLOT]
-                                    header this [BEGIN_FIT] header is found in; otherwise the TF1 is just
-                                    drawn on the TCanvas
-
-                Fit_Range           string, comma separated list of numbers.  NOTE: must supply exactly two
-                                    parameters.  If more than two parameters are supplied only those that
-                                    evaluate to the maximum and minimum are used.
-
-        # 4.e.iv.V Configuration Options
-        # --------------------------------------------------------
-
-        The genericPlotter executable will create one TCanvas for every call of the executable.  The created
-        TCanvas, and plots on it, will follow the official CMS Style Guide.  Note the user needs to ensure the
-        additional input configurations provided also conform to the CMS Style Guide (e.g. units on axis labels).
-        However this will provide a "baseline" style to the created canvas to greatly simplify the process for
-        preparing plots for publication.  The [BEGIN_CANVAS] header is required.  One or more TObjects can be
-        drawn on the canvas.  For each TObject you should define a corresponding [BEGIN_PLOT].  Note that all
-        the TObjects drawn on the canvas must be of the same type. For example you cannot draw both a TH1F and
-        a TGraphErrors on the canvas simultaneously (you'll need to convert one into the other).  The supported
-        types of TObjects are {TGraph2D, TGraphErrors, TH1F}.
-
-        For the case of TGraphErrors you can choose to provide a [BEGIN_DATA] header (see Section 4.e.iv.III) and
-        have the genericPlotter executable load comma separated data in and use this data to create the graph or
-        you can have genericPlotter load a previously created TGraphErrors from a TFile by supplying the TName of
-        the TGraphErrors (Plot_Name field), the name of the TFile (Plot_Root_File), and the path inside the TFile
-        the TGraphErrors is located at (Plot_Root_Path).
-
-        For the case of TGraph2D and TH1F objects presently they must be loaded from a previously created TFile in
-        the manner described above.
-
-        Example plot config files showning TGraph2D, TGraphErrors, and TH1F cases are shown below.
-
-        # 4.e.iv.VI Example Config File - TGraph
-        # --------------------------------------------------------
-
-        The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
-        in the [BEGIN_CANVAS] header is set to TGraphErrors. Here one TGraphError is supplied via comma separated
-        data while the other is loaded from an input TFile.
-
-            [BEGIN_CANVAS]
-                Canv_Axis_NDiv = '510,510'; #X, Y
-                Canv_Dim = '1000,1000'; #X, Y
-                Canv_DrawOpt = 'APE1';
-                Canv_Grid_XY = 'false,false'; #X, Y
-                Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
-                Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
-                Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
-                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
-                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
-                Canv_Legend_Draw = 'true';
-                Canv_Log_XY = 'false,true'; #X, Y
-                Canv_Logo_Pos = '11'; #0, 11, 22, 33
-                Canv_Logo_Prelim = 'true';
-                Canv_Margin_Top = '0.08';
-                Canv_Margin_Bot = '0.14';
-                Canv_Margin_Lf = '0.15';
-                Canv_Margin_Rt = '0.04';
-                Canv_Name = 'GainComp';
-                Canv_Plot_Type = 'TGraph';
-                Canv_Range_X = '500,800'; #X1, X2
-                Canv_Range_Y = '10,30000'; #Y1, Y2
-                Canv_Title_Offset_X = '1.0';
-                Canv_Title_Offset_Y = '1.2';
-                Canv_Title_X = 'Divider Current #left(#muA#right)';
-                Canv_Title_Y = 'Effective Gain';
-                [BEGIN_PLOT]
-                    Plot_Color = 'kBlack';
-                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
-                    Plot_Line_Size = '1';
-                    Plot_Line_Style = '1';
-                    Plot_Marker_Size = '1';
-                    Plot_Marker_Style = '22';
-                    Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
-                    [BEGIN_DATA]
-                        #NOTE:  Copying/pasting data from excel may not have the desired effect.
-                        #	Have noticed that a "newline" character (which is invisible) is
-                        #	not present in some copy/past actions, if your data does not load
-                        #	properly consider this as a potential cause.
-                        VAR_INDEP,VAR_DEP
-                        700,24850.98774
-                        690,16972.77181
-                        680,11719.64474
-                        670,8115.337175
-                        660,5608.074856
-                        650,3882.143995
-                        640,2706.058443
-                        630,1909.212518
-                        620,1359.699531
-                        610,964.186757
-                        600,698.2227425
-                        590,516.9014257
-                        580,359.4035559
-                        570,264.6152389
-                        560,192.4948981
-                        550,140.1252986
-                    [END_DATA]
-                [END_PLOT]
-            [END_CANVAS]
-
-        # 4.e.iv.VII Example Config File - TGraph2D
-        # --------------------------------------------------------
-
-        The following example shows the case where a TGraph2D object is plotted.  Note the Canv_Plot_Type
-        in the [BEGIN_CANVAS] header is set to TGraph2D. Here the TGraph2D is loaded from an input TFile.
-
-            [BEGIN_CANVAS]
-                Canv_Axis_NDiv = '507,510'; #X, Y
-                Canv_Dim = '1000,1000'; #X, Y
-                Canv_DrawOpt = 'TRI2Z';
-                Canv_Grid_XY = 'false,false'; #X, Y
-                #Canv_Latex_Line = '0.55,0.97, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
-                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
-                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
-                Canv_Legend_Draw = 'false';
-                Canv_Log_XY = 'false,false'; #X, Y
-                Canv_Logo_Pos = '0';
-                Canv_Logo_Prelim = 'true';
-                Canv_Margin_Top = '0.08';
-                Canv_Margin_Bot = '0.14';
-                Canv_Margin_Lf = '0.19';
-                Canv_Margin_Rt = '0.24';
-                Canv_Mono_Color = 'false';
-                Canv_Name = 'GE11-VII-L-CERN-0002_ResponseMap_Normalized'';
-                Canv_N_Axis_X = '1';
-                Canv_N_Axis_Y = '1';
-                Canv_Plot_Type = 'TGraph2D';
-                Canv_Range_Z = '0.5,1.5'; #Y1, Y2
-                Canv_Title_Offset_X = '1.2';
-                Canv_Title_Offset_Y = '1.65';
-                Canv_Title_Offset_Z = '1.32';
-                Canv_Title_X = 'Width #left(mm#right)';
-                Canv_Title_Y = 'Height #left(mm#right)';
-                Canv_Title_Z = '#splitline{Normalized Response}{#bf{GE1/1-VII-L-CERN-0002}}';
-                [BEGIN_PLOT]
-                    Plot_Name = 'g2D_Detector_ResponseFitPkPosNormalized_AllEta';
-                    Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
-                    Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
-                [END_PLOT]
-            [END_CANVAS]
-
-        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
-        the physical path to the TGraphErrors object "g2D_Detector_ResponseFitPkPosNormalized_AllEta".
-
-        # 4.e.iv.VIII Example Config File - TGraphErrors
-        # --------------------------------------------------------
-
-        The following example shows the case where two TGraphError objects are plotted. Note the Canv_Plot_Type
-        in the [BEGIN_CANVAS] header is set to TGraphErrors. Here one TGraphError is supplied via comma separated
-        data while the other is loaded from an input TFile.
-
-            [BEGIN_CANVAS]
-                Canv_Axis_NDiv = '510,510'; #X, Y
-                Canv_Dim = '1000,1000'; #X, Y
-                Canv_DrawOpt = 'APE1';
-                Canv_Grid_XY = 'false,false'; #X, Y
-                Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
-                Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
-                Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
-                Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
-                Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
-                Canv_Legend_Draw = 'true';
-                Canv_Log_XY = 'false,true'; #X, Y
-                Canv_Logo_Pos = '11'; #0, 11, 22, 33
-                Canv_Logo_Prelim = 'true';
-                Canv_Margin_Top = '0.08';
-                Canv_Margin_Bot = '0.14';
-                Canv_Margin_Lf = '0.15';
-                Canv_Margin_Rt = '0.04';
-                Canv_Name = 'GainComp';
-                Canv_Plot_Type = 'TGraphErrors';
-                Canv_Range_X = '500,800'; #X1, X2
-                Canv_Range_Y = '10,30000'; #Y1, Y2
-                Canv_Title_Offset_X = '1.0';
-                Canv_Title_Offset_Y = '1.2';
-                Canv_Title_X = 'Divider Current #left(#muA#right)';
-                Canv_Title_Y = 'Effective Gain';
-                [BEGIN_PLOT]
-                    Plot_Color = 'kBlack';
-                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
-                    Plot_Line_Size = '1';
-                    Plot_Line_Style = '1';
-                    Plot_Marker_Size = '1';
-                    Plot_Marker_Style = '22';
-                    Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
-                    [BEGIN_DATA]
-                        #NOTE:  Copying/pasting data from excel may not have the desired effect.
-                        #	Have noticed that a "newline" character (which is invisible) is
-                        #	not present in some copy/past actions, if your data does not load
-                        #	properly consider this as a potential cause.
-                        VAR_INDEP,VAR_DEP,VAR_DEP_ERR
-                        700,24850.98774,967.6738646
-                        690,16972.77181,733.8815033
-                        680,11719.64474,482.4250694
-                        670,8115.337175,323.215912
-                        660,5608.074856,223.2476327
-                        650,3882.143995,157.3363848
-                        640,2706.058443,111.6052345
-                        630,1909.212518,87.83123466
-                        620,1359.699531,63.74477198
-                        610,964.186757,47.84551633
-                        600,698.2227425,41.03127041
-                        590,516.9014257,32.91787275
-                        580,359.4035559,26.97947809
-                        570,264.6152389,22.77914941
-                        560,192.4948981,21.47259055
-                        550,140.1252986,20.45959455
-                    [END_DATA]
-                [END_PLOT]
-                [BEGIN_PLOT]
-                    Plot_Color = 'kRed+1';
-                    Plot_LegEntry = 'GE1/1-VII-L-CERN-0003';
-                    Plot_Line_Size = '1';
-                    Plot_Line_Style = '1';
-                    Plot_Marker_Size = '1';
-                    Plot_Marker_Style = '23';
-                    Plot_Name = 'g_GE1/1-VII-L-CERN-0003_EffGain';
-                    Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0003_EffGain.root';
-                    Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
-                [END_PLOT]
-            [END_CANVAS]
-
-        Note the Plot_Root_File should be the PFN of the TFile and Plot_Root_Path should be
-        the physical path to the TGraphErrors object "g_GE1/1-VII-L-CERN-0003_EffGain"
+            [END_DATA]
+        [END_PLOT]
+        ...
+        ...
+    [END_CANVAS]
+```
+
+parameters found inside the `[BEGIN_CANVAS]` header are expected to be entered in the following format:
+
+```
+field_name = 'value';
+```
+
+additionally these parameters are expected to be entered in the manner described in Section 4.e.ii.
+
+The config file will define one `TCanvas` which will be drawn following the official CMS Style Guide.  For this canvas any number of `TObjects` can be defined and drawn on the canvas.  Right now the `TGraph`, `TGraphErrors`, `TGraph2D`, `TH1F`, and `TH2F` classes are supported. For each of higher level header sections (i.e. `[BEGIN_CANVAS]` and `[BEGIN_PLOT]`) the header parameters should *always* be placed before descending into the next header. Failure to adhere to this convention may lead to undefined behavior or crashes.
+
+Plots can be declared by entering comma separated data in the `[BEGIN_DATA]` header, see Section 4.e.iv.III, or loaded from an input `TFile`, see Section 4.e.iv.II.  Additionally, one or more `TF1` objects can be declared for each plot and drawn on the `TCanvas`.  These `TF1` objects can be loaded from an input `TFile` or fit at the time of the execution.
+
+The `Plotter::ParameterLoaderPlotter` class understands the `#` character to indicate a comment; so it is possible to comment out lines in the *Plot Config* file you create for ease of use. The value of `true` is understood as being from the case-insensitive set `{t, true, 1}` while the value of `false` is understood as being from the case-insensitive set `{f, false, 0}`. The template *plot config* file at the end of this subsection showns an example.
+
+#### 4.e.iv.I HEADER PARAMETERS - CANVAS
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Canv_Axis_NDiv` | Two comma separated int's | Defines the number of divisions for a given `TAxis`.  See the `TAxis` [documentation](https://root.cern.ch/doc/master/classTAttAxis.html) for more information.  Between one and three integers can be provided. They are understand as applying to the {X}, {X,Y}, or {X,Y,Z} axes.
+`Canv_Dim` | Two comma separated int's | Defines the size of the canvas in pixels.  The first (second) number is for the x (y) direction.
+`Canv_DrawOpt` | string | Draw option that will be applied to all plots on this canvas
+`Canv_Grid_XY` | Two comma separated bool's | Defines if the grid should be drawn on the canvas.  The first (second) boolean is for the x (y) grid.
+`Canv_Latex_Line` | Comma separated sequence: float,float,string | Defines the position of a `TLatex` line and the text in the line.  The first (second) float defines the x (y) position of the line.  Use the `~` character to insert a space between characters as spaces or `\t` in the string will be stripped before it is passed to the `TLatex` class.  Any number of `Canv_Latex_Line` fields may be supplied and they will all be drawn on the `TCanvas`.  Note that "CMS" or "CMS Preliminary" will already be drawn by default.
+`Canv_Legend_Dim_X` | Two comma separated floats | Defines the [NDC coordinates](https://root.cern.ch/root/html534/guides/users-guide/Graphics.html#the-coordinate-systems-of-a-pad) of a `TLegend` to be drawn on the pad.  The first (second) float is the X1 (X2) coordinate of the `TLegend`. See the `TLegend` [documentation](https://root.cern.ch/doc/master/classTLegend.html) for more details.
+`Canv_Legend_Dim_Y` | Two comma separated floats | As `Canv_Legend_Dim_X` but for the Y coordinates.
+`Canv_Legend_Draw` | bool | Setting to true (false) will (not) draw the `TLegend` on the `TCanvas`.
+`Canv_Log_XY` | Two comma separated bool's | As `Canv_Grid_XY` but for setting the X & Y axis to logarithmic.
+`Canv_Logo_Pos` | int | Indicates the position the CMS logo should be placed.  Possible values are out of frame (0), top-left (11), top-centered (22), or top-right (33).  More details and examples shown [here](https://ghm.web.cern.ch/ghm/plots/).
+`Canv_Logo_Prelim` | bool | Defines whether or not a canvas is preliminary (e.g. "CMS Preliminary"). This should be true for all plots unless they are being submitted for CMS CWR (e.g. publication in a peer-review journal).
+`Canv_Margin_Bot` | float | Sets the bottom margin of the `TCanvas`.
+`Canv_Margin_Lf` | float | Sets the left margin of the `TCanvas`.
+`Canv_Margin_Rt` | float | Sets the right margin of the `TCanvas`.
+`Canv_Margin_Top` | float | Sets the top margin of the `TCanvas`.
+`Canv_Mono_Color` | bool | Determines if the color palette is monocolored (true), e.g. a single shade, or multi-colored (false).  For paper publications this should be false; for presentations/talks this ma be true.
+`Canv_N_Axis_X` | int | Placeholder
+`Canv_N_Axis_Y` | int | Placeholder
+`Canv_Name` | string | `TName` of the created `TCanvas`.
+`Canv_Normalize` | bool | Only implemented for `TH1F` objects, if set to true all `TH1F` objects are drawn with an integral of unity.
+`Canv_Plot_Type` | string | Defines the type of `TObject` to be plotted on the `TCanvas`. Supported types are from the set {`TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, `TH2F`}.
+`Canv_Range_X` | Two comma separated int's | Defines the range `[X_min, X_max]` of the X-axis.
+`Canv_Range_Y` | Two comma separated int's | As `Canv_Range_X` but for the Y-axis.
+`Canv_Range_Z` | Two comma separated int's | As `Canv_Range_X` but for the Z-axis.
+`Canv_Title_Offset_X` | float | Defines the offset of the X-axis title
+`Canv_Title_Offset_Y` | float | As `Canv_Title_Offset_X` but for the Y-axis.
+`Canv_Title_Offset_Z` | float | As `Canv_Title_Offset_X` but for the Z-axis.
+`Canv_Title_X` | string | Title (e.g. label) assigned to the X-axis.
+`Canv_Title_Y` | string | As `Canv_Title_X` but for the Y-axis.
+`Canv_Title_Z` | string | As `Canv_Title_X` but for the Z-axis.
+        
+#### 4.e.iv.II HEADER PARAMETERS - PLOT
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Plot_Color` | TColor | Color assigned to the `TObject` marker, line, and fill color attributes. List of supported colors is defined [here](https://root.cern.ch/doc/master/Rtypes_8h.html#ac31db05c6cb5891c704eae374f6926a8a9e1b2d3dcb56c17a372440853228ad01) and can be view [here](https://root.cern.ch/doc/master/classTColor.html#C02). Note mathematical expressions on `TColor` words is also supported.  For example `kRed+2` or `kBlue-3` will be interpreted correctly.
+`Plot_LegEntry` | string | Legend entry for this `TObject`.
+`Plot_Line_Size` | float | Line size of the `TObject`.
+`Plot_Line_Style` | int | Line [style](https://root.cern.ch/doc/master/classTAttLine.html#L3) of the `TObject`.
+`Plot_Marker_Size` | float | Marker size of the `TObject`.
+`Plot_Marker_Style` | int | Marker [style](https://root.cern.ch/doc/master/classTAttMarker.html#M2) of the `TObject`
+`Plot_Name` | string | `TName` of the `TObject` defined in this `[BEGIN_DATA]` header.  It will either be the `TName` created or loaded from the input `TFile` defined in `Plot_Root_File` found with path `Plot_Root_Path` inside the `TFile`.
+`Plot_Root_File` | string | If no `[BEGIN_DATA]` header is supplied for this plot this is the name of the `TFile` from which the desired `TObject` to be plotted is found in.
+`Plot_Root_Path` | string | If no `[BEGIN_DATA]` header is supplied for this plot this is the path in `Plot_Root_File` for which `Plot_Name` is found at. Explicitly inside the `TFile` the desired `TObject` is `Plot_Root_Path/Plot_Name`.
+
+#### 4.e.iv.III HEADER PARAMETERS - DATA
+Each plot is either found in an input `TFile` using the `Plot_Name`, `Plot_Root_File`, and `Plot_Root_Path` fields or is created from comma separated data found in the `[BEGIN_DATA]` header.  If comma separated data is supplied the `Plot_Root_File` and `Plot_Root_Path` fields are not used. Right now for `Canv_Plot_Type` set to either `TH1F` or `TH2F` the `TFile` input must be used.
+
+If comma separated data is supplied it is done so in this header.  Each line must have between 2 and 4 values.  Each value represents either the x-value, the error on the x-value, the y-value, or the error on the y-value for a given point.  The first line of the `[BEGIN_DATA]` header must be a line consisting of between 2 and 4 strings from the set {`VAR_INDEP`, `VAR_INDEP_ERR`, `VAR_DEP`, `VAR_DEP_ERR`} for the x-value, x-value error, y-value, or y-value error, respectively.  The position of these strings defines the meaning of each entry in all subsequent lines.  For example:
+
+```
+VAR_INDEP, VAR_DEP, VAR_INDEP_ERR
+```
+
+indicates that the first value of each line is the y-value, the second is the x-value, and the third value is the error on the x-value for a given point. See Section 4.e.iv.VI for an example.
+
+#### 4.e.iv.III HEADER PARAMETERS - FIT
+The table below describes the allowed input fields and their data types.
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`Fit_Color` | TColor | As `Plot_Color` in Section 4.e.iv.II.
+`Fit_Formula` | string | As `Fit_Formula` in Section 4.e.ii.IV.
+`Fit_LegEntry` | string | As `Plot_LegEntry` in Section 4.e.iv.II.
+`Fit_Line_Size` | float | As `Plot_Line_Size` in Section 4.e.iv.II.
+`Fit_Line_Style` | int | As `Plot_Line_Style` in Section 4.e.iv.II.
+`Fit_Name` | string | `TName` of the `TF1` object.  Either the `TF1` will be created with this `TName` or it will be loaded from `Fit_Root_File` found with path `Fit_Root_Path` inside the `TFile`.
+`Fit_Option` | string | If the `TF1` is being loaded from a previous `TFile` with `Fit_Root_File` option this is the *draw* option; if the `TF1` is being fit to one of the `TObjects` on the `TCanvas` this is the *fit* option.
+`Fit_Root_File` | string | As `Plot_Root_File` in Section 4.e.iv.II.
+`Fit_Root_Path` | string | As `Plot_Root_Path`  in Section 4.e.iv.II.
+`Fit_Perform` | bool | If true perform a fit to the `TObject` defined in the `[BEGIN_PLOT]` header this `[BEGIN_FIT]` header is found in; otherwise the `TF1` is just drawn on the `TCanvas`.
+`Fit_Range` | Two comma separated strings | As `Fit_Range` in Section 4.e.ii.IV.
+
+#### 4.e.iv.V Configuration Options
+The `genericPlotter` executable will create one `TCanvas` for every call of the executable.  The created `TCanvas`, and all plots on it, will follow the official [CMS Style Guide](https://twiki.cern.ch/twiki/bin/viewauth/CMS/Internal/PubGuidelines#Figures_and_tables).  Note the user needs to ensure the additional input configurations provided also conform to the CMS Style Guide (e.g. units on axis labels). However this will provide a "baseline" style to the created canvas to greatly simplify the process for preparing plots for publication.  The `[BEGIN_CANVAS]` header is required.  One or more `TObjects` can be drawn on the canvas.  For each `TObject` you should define a corresponding `[BEGIN_PLOT]`.  Note that all the `TObjects` drawn on the canvas must be of the same type; however `TF1` objects can be drawn on top of the input TObjects or fitted to them. For example you cannot draw both a `TH1F` and a `TGraphErrors` on the canvas simultaneously (you'll need to convert one into the other) but you could fit a `TF1` to a `TGraphErrors`.  The supported types of TObjects are from the set {`TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, `TH2F`}.
+
+For the case of `TGraph`, `TGraph2D`, and `TGraphErrors` objects you can choose to provide a `[BEGIN_DATA]` header (see Section 4.e.iv.III) and have the `genericPlotter` executable load comma separated data in and use this data to create the graph or you can have `genericPlotter` load a previously created objects from a `TFile` by supplying the `TName` of the object (`Plot_Name` field), the name of the `TFile` (`Plot_Root_File`), and the path inside the `TFile` the object is located at (`Plot_Root_Path`).
+
+For the case of `TH1F` and `TH2F` objects presently they must be loaded from a previously created `TFile` in the manner described above.
+
+Example plot config files showning `TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, and `TH2F` cases are shown below.
+
+#### 4.e.iv.VI Example Config File - TGraph
+The following example shows the case where two `TGraph` objects are plotted. Note the `Canv_Plot_Type` in the `[BEGIN_CANVAS]` header is set to `TGraph`. Here one `TGraph` is supplied via comma separated data while the other is loaded from an input `TFile`.
+
+```
+[BEGIN_CANVAS]
+    Canv_Axis_NDiv = '510,510'; #X, Y
+    Canv_Dim = '1000,1000'; #X, Y
+    Canv_DrawOpt = 'APE1';
+    Canv_Grid_XY = 'false,false'; #X, Y
+    Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
+    Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
+    Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
+    Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+    Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+    Canv_Legend_Draw = 'true';
+    Canv_Log_XY = 'false,true'; #X, Y
+    Canv_Logo_Pos = '11'; #0, 11, 22, 33
+    Canv_Logo_Prelim = 'true';
+    Canv_Margin_Top = '0.08';
+    Canv_Margin_Bot = '0.14';
+    Canv_Margin_Lf = '0.15';
+    Canv_Margin_Rt = '0.04';
+    Canv_Name = 'GainComp';
+    Canv_Plot_Type = 'TGraph';
+    Canv_Range_X = '500,800'; #X1, X2
+    Canv_Range_Y = '10,30000'; #Y1, Y2
+    Canv_Title_Offset_X = '1.0';
+    Canv_Title_Offset_Y = '1.2';
+    Canv_Title_X = 'Divider Current #left(#muA#right)';
+    Canv_Title_Y = 'Effective Gain';
+    [BEGIN_PLOT]
+        Plot_Color = 'kBlack';
+        Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
+        Plot_Line_Size = '1';
+        Plot_Line_Style = '1';
+        Plot_Marker_Size = '1';
+        Plot_Marker_Style = '22';
+        Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
+        [BEGIN_DATA]
+            #NOTE:  Copying/pasting data from excel may not have the desired effect.
+            #	Have noticed that a "newline" character (which is invisible) is
+            #	not present in some copy/past actions, if your data does not load
+            #	properly consider this as a potential cause.
+            VAR_INDEP,VAR_DEP
+            700,24850.98774
+            690,16972.77181
+            680,11719.64474
+            670,8115.337175
+            660,5608.074856
+            650,3882.143995
+            640,2706.058443
+            630,1909.212518
+            620,1359.699531
+            610,964.186757
+            600,698.2227425
+            590,516.9014257
+            580,359.4035559
+            570,264.6152389
+            560,192.4948981
+            550,140.1252986
+        [END_DATA]
+    [END_PLOT]
+[END_CANVAS]
+```
+
+#### 4.e.iv.VII Example Config File - TGraph2D
+The following example shows the case where a `TGraph2D` object is plotted.  Note the `Canv_Plot_Type` in the `[BEGIN_CANVAS]` header is set to `TGraph2D`. Here the `TGraph2D` is loaded from an input `TFile`.
+
+```
+[BEGIN_CANVAS]
+    Canv_Axis_NDiv = '507,510'; #X, Y
+    Canv_Dim = '1000,1000'; #X, Y
+    Canv_DrawOpt = 'TRI2Z';
+    Canv_Grid_XY = 'false,false'; #X, Y
+    #Canv_Latex_Line = '0.55,0.97, GE1/1-VII-L-CERN-0002'; #X_NDC, Y_NDC, String
+    Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+    Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+    Canv_Legend_Draw = 'false';
+    Canv_Log_XY = 'false,false'; #X, Y
+    Canv_Logo_Pos = '0';
+    Canv_Logo_Prelim = 'true';
+    Canv_Margin_Top = '0.08';
+    Canv_Margin_Bot = '0.14';
+    Canv_Margin_Lf = '0.19';
+    Canv_Margin_Rt = '0.24';
+    Canv_Mono_Color = 'false';
+    Canv_Name = 'GE11-VII-L-CERN-0002_ResponseMap_Normalized'';
+    Canv_N_Axis_X = '1';
+    Canv_N_Axis_Y = '1';
+    Canv_Plot_Type = 'TGraph2D';
+    Canv_Range_Z = '0.5,1.5'; #Y1, Y2
+    Canv_Title_Offset_X = '1.2';
+    Canv_Title_Offset_Y = '1.65';
+    Canv_Title_Offset_Z = '1.32';
+    Canv_Title_X = 'Width #left(mm#right)';
+    Canv_Title_Y = 'Height #left(mm#right)';
+    Canv_Title_Z = '#splitline{Normalized Response}{#bf{GE1/1-VII-L-CERN-0002}}';
+    [BEGIN_PLOT]
+        Plot_Name = 'g2D_Detector_ResponseFitPkPosNormalized_AllEta';
+        Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_10826kEvt_AnaWithFits.root';
+        Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
+    [END_PLOT]
+[END_CANVAS]
+```
+
+Note the `Plot_Root_File` should be the PFN of the `TFile` and `Plot_Root_Path` should be the physical path to the `TGraph2D` object, e.g. `g2D_Detector_ResponseFitPkPosNormalized_AllEta` in this example.
+
+#### 4.e.iv.VIII Example Config File - TGraphErrors
+The following example shows the case where two `TGraphError` objects are plotted. Note the `Canv_Plot_Type` in the `[BEGIN_CANVAS]` header is set to `TGraphErrors`. Here one `TGraphError` is supplied via comma separated data while the other is loaded from an input `TFile`.
+
+```
+[BEGIN_CANVAS]
+    Canv_Axis_NDiv = '510,510'; #X, Y
+    Canv_Dim = '1000,1000'; #X, Y
+    Canv_DrawOpt = 'APE1';
+    Canv_Grid_XY = 'false,false'; #X, Y
+    Canv_Latex_Line = '0.19,0.75, Ar/CO_{2}~=~#left(70/30#right)'; #X_NDC, Y_NDC, String
+    Canv_Latex_Line = '0.19,0.70, X-Ray#left(Ag#right);40~kV;5~#muA'; #X_NDC, Y_NDC, String
+    Canv_Latex_Line = '0.19,0.65, i#eta~=~4;i#phi~=~2'; #X_NDC, Y_NDC, String
+    Canv_Legend_Dim_X = '0.5,0.95'; X_NDC_1, X_NDC_2
+    Canv_Legend_Dim_Y = '0.14,0.40'; Y_NDC_1, Y_NDC_2
+    Canv_Legend_Draw = 'true';
+    Canv_Log_XY = 'false,true'; #X, Y
+    Canv_Logo_Pos = '11'; #0, 11, 22, 33
+    Canv_Logo_Prelim = 'true';
+    Canv_Margin_Top = '0.08';
+    Canv_Margin_Bot = '0.14';
+    Canv_Margin_Lf = '0.15';
+    Canv_Margin_Rt = '0.04';
+    Canv_Name = 'GainComp';
+    Canv_Plot_Type = 'TGraphErrors';
+    Canv_Range_X = '500,800'; #X1, X2
+    Canv_Range_Y = '10,30000'; #Y1, Y2
+    Canv_Title_Offset_X = '1.0';
+    Canv_Title_Offset_Y = '1.2';
+    Canv_Title_X = 'Divider Current #left(#muA#right)';
+    Canv_Title_Y = 'Effective Gain';
+    [BEGIN_PLOT]
+        Plot_Color = 'kBlack';
+        Plot_LegEntry = 'GE1/1-VII-L-CERN-0004';
+        Plot_Line_Size = '1';
+        Plot_Line_Style = '1';
+        Plot_Marker_Size = '1';
+        Plot_Marker_Style = '22';
+        Plot_Name = 'g_GE1/1-VII-L-CERN-0004_EffGain';
+        [BEGIN_DATA]
+            #NOTE:  Copying/pasting data from excel may not have the desired effect.
+            #	Have noticed that a "newline" character (which is invisible) is
+            #	not present in some copy/past actions, if your data does not load
+            #	properly consider this as a potential cause.
+            VAR_INDEP,VAR_DEP,VAR_DEP_ERR
+            700,24850.98774,967.6738646
+            690,16972.77181,733.8815033
+            680,11719.64474,482.4250694
+            670,8115.337175,323.215912
+            660,5608.074856,223.2476327
+            650,3882.143995,157.3363848
+            640,2706.058443,111.6052345
+            630,1909.212518,87.83123466
+            620,1359.699531,63.74477198
+            610,964.186757,47.84551633
+            600,698.2227425,41.03127041
+            590,516.9014257,32.91787275
+            580,359.4035559,26.97947809
+            570,264.6152389,22.77914941
+            560,192.4948981,21.47259055
+            550,140.1252986,20.45959455
+        [END_DATA]
+    [END_PLOT]
+    [BEGIN_PLOT]
+        Plot_Color = 'kRed+1';
+        Plot_LegEntry = 'GE1/1-VII-L-CERN-0003';
+        Plot_Line_Size = '1';
+        Plot_Line_Style = '1';
+        Plot_Marker_Size = '1';
+        Plot_Marker_Style = '23';
+        Plot_Name = 'g_GE1/1-VII-L-CERN-0003_EffGain';
+        Plot_Root_File = '/path/to/file/GE11-VII-L-CERN-0003_EffGain.root';
+        Plot_Root_Path = '/path/to/Plot_Name/in/Plot_Root_File/';
+    [END_PLOT]
+[END_CANVAS]
+```
+
+Note the `Plot_Root_File` should be the PFN of the `TFile` and `Plot_Root_Path` should be the physical path to the `TGraphErrors` object `g_GE11-VII-L-CERN-0003_EffGain`.
 
         # 4.e.iv.IX Example Config File - TH1F
         # --------------------------------------------------------
