@@ -44,9 +44,11 @@ text_file.write("\tCanv_Axis_NDiv = '%s';#X,Y\n"%(args.AxisNDiv))
 text_file.write("\tCanv_Dim= '%s';#X,Y\n"%(args.CanvDim))
 text_file.write("\tCanv_DrawOpt = '%s';\n"%(args.CanvDrawOpt))
 text_file.write("\tCanv_Grid_XY = '%s';\n"%(args.CanvGridXY))
-for line in args.LatexLines:
-    text_file.write("\tCanv_Latex_Line = '%s';\n"%(line))
-    pass
+if args.LatexLines!= None:
+	for line in args.LatexLines:
+		text_file.write("\tCanv_Latex_Line = '%s';\n"%(line))
+	pass
+	pass
 text_file.write("\tCanv_Legend_Dim_X = '%s';\n"%(args.CanvLegDimX))
 text_file.write("\tCanv_Legend_Dim_Y = '%s';\n"%(args.CanvLegDimY))
 text_file.write("\tCanv_Legend_Draw = '%s';\n"%(args.CanvLegDraw))
@@ -107,7 +109,7 @@ for filelist in args.file:
 			pass
 
 		X= ws.cell_value(row,args.SelectColumnX) 
-		text_file.write(str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
+		text_file.write("\t\t\t"+str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
 		pass
 
 	text_file.write("\t\t\t[END_DATA]\n" )

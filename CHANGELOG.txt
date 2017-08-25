@@ -6,6 +6,12 @@
 *                                                *
 **************************************************
 
+Update: August 25th 2017
+==================================================
+-> README.md: Rewrite all the instructions section in MarkDown
+->Produce_Config_File.py:  LatexLines option: Added a check that is not none, added tabs in data printing to improve readability.
+-> PlotOptions: Improved the help descriptions 
+
 Update: August 21th 2017
 ==================================================
 -> README.txt: Added instructions for Produce_Config_File.py,QC3.py,QC4_*.py and QC5_*.py scripts ( 3.c.iii Analysis of QC data stored in an excel file )
