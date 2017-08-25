@@ -4,6 +4,12 @@ clear
 
 #Define Base Directory
 export GEM_BASE=$PWD
+export PATH=$PATH:$GEM_BASE
+export PATH=$PATH:$GEM_BASE/scripts
+
+#Setup eos
+alias eos='/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select'
+export CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem/QualityControl
 
 #Setup gcc/g++
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6/setup.sh
@@ -33,7 +39,11 @@ if [[ !  -d $DIR_PIP ]]; then
 	alias pip2.7="$DIR_PIP/bin/pip"
 
 	#Installing packages
+<<<<<<< HEAD
 	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy xlrd
+=======
+	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy
+>>>>>>> e21350254a66edaba88bbc0ebe02a635509e2b34
 else
 	#Update environment	
 	export PYTHONPATH=$DIR_PIP/lib/python2.7/site-packages:$PYTHONPATH
