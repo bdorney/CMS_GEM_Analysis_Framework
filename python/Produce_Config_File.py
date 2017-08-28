@@ -71,8 +71,8 @@ text_file.write("\tCanv_Title_Y = '%s';\n"%(args.CanvTitleY))
 for filelist in args.file:
 	workbook = xlrd.open_workbook(filelist)
 	ws = workbook.sheet_by_index(args.SelectSheetNum)
-	Gcharacter=int(filelist.index('G'))
-	legEntry=filelist[Gcharacter:Gcharacter+18]
+	GEcharacter=int(filelist.index('GE'))
+	legEntry=filelist[GEcharacter:GEcharacter+18]
 	Marker_Style = int(20+DrawArg)
 
 	text_file.write("\t\t[BEGIN_PLOT]\n" )

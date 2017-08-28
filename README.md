@@ -13,8 +13,8 @@ Table of Contents
          * [3.a.v  Helper Script - Run Mode: Comparison](#3av--helper-script---run-mode-comparison)
       * [3.b. genericPlotter](#3b-genericplotter)
          * [3.b.i  Helper Script - Make All Plots](#3bi--helper-script---make-all-plots)
-         * [3.b.ii.I  Helper Script - Parsing Excel Files to genericPlotter](#3biii--helper-script---parsing-excel-files-to-genericplotter)
-         * [3.b.ii.II  Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts](#3biiii--helper-script---parsing-excel-files-to-genericplotter---additional-scripts)
+         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter](#3biii-helper-script---parsing-excel-files-to-genericplotter)
+         * [3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts](#3biiii-helper-script---parsing-excel-files-to-genericplotter---additional-scripts)
       * [3.c. Python Scripts](#3c-python-scripts)
          * [3.c.i  Analysis Suite - Gain Map](#3ci--analysis-suite---gain-map)
          * [3.c.ii Analysis Suite - Efficiency Predictions](#3cii-analysis-suite---efficiency-predictions)
@@ -511,16 +511,13 @@ this will then execute genericPlotter taking each `*.cfg` file in the `figures/R
 
 ### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter 
 
-- Main script: Produce\_Config\_File.py
--  Additional scripts: QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py
+- **Main script:** Produce\_Config\_File.py
+- **Additional scripts:** QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py
 
 
-**Main script:** This tool is designed to read selected columns from an excel file and produce a config file 
-       in the genericPlotter input style described in session: “4.e.iv. Plot Config File”. Following, the produced config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
+**Main script:** This tool is designed to read selected columns from an excel file and produce a config file in the genericPlotter input style described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). Following, the produced config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
 
-The following options are defined:
-
-
+The following **options** are defined:
 
 Field Name | Type | Description
 ---------- | ---- | -----------
@@ -565,10 +562,10 @@ Field Name | Type | Description
 `--PlotMarkerSize` |float| Set Plot Marker Size (default is: 0.8).
 `--Fit ` |bool |If the Fit option is used the header parameters for the fit are created .
 `--FitFormula` | string | `TFormula` to be given to a `ROOT::TF1` object.  Note the syntax and full complexity of inputs expected/available in `ROOT` works! e.g. `[0]*x^2+[1]` or `gaus(0)+pol2(3)" or "[1]*TMath::Erf(x) + [2]` are all supported. Default is [0].
-`--FitOption` | string | The fit option to be used for fitting the ADC spectrums made from each slice.
+`--FitOption` | string | The [Fit Method](https://root.cern.ch/root/htmldoc/guides/users-guide/FittingHistograms.html#the-fit-method) to be used for fitting. Default is: R (Use the range specified in the function range)
 `--FitParamIGuess`  | Comma separated list of strings | Initial values for the parameters defined in the `Fit_Formula` field.  Note the order in which the parameters are given in the `Fit_Formula` field should match the order listed here. Explicitly for the `Fit_Formula = '[0]*x^2+[1]*x+[2]'` the initial guess of `4,5,6` would mean `[0] = 4`, `[1] = 5`, and `[2] = 6`.  Additionally, both numeric values and expressions formed from the above supported keywords can be used.  E.g. for a `Fit_Formula = 'gaus(0)'` the initial guess of `12.3, MEAN, 2.*SIGMA+23.5` can be assigned.
 `--FitRange` | Comma separated list of strings | Set the Fit range, default is 0,1000.
-`--FitPerform` | string| If true (default) perform a fit to the TObject defined in the [BEGIN_PLOT]header this [BEGIN_FIT] header is found in.
+`--FitPerform` | string| If true (default) perform a fit to the TObject defined in the [BEGIN\_PLOT] header this [BEGIN\_FIT] header is found in.
 `--FitLineSize` |float|Set the Fit Line Size, default is: 1 .
 `--FitLineStyle` |float|Set the Fit Line Style, default is: 1 .
 
@@ -586,11 +583,11 @@ source scripts/setup_CMS_GEM.sh
 What you have to do is:   
 
 ```
-python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61   
+python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61   
 ```
 The options you have set are:
 						
-* `—-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm`	
+* `—-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm`	
 
 (the desired file stored in the base dir of the repository.
 If you want to plot the comparison of multiple files you can write:  
@@ -610,13 +607,166 @@ If you want to plot the comparison of multiple files you can write:
 
 	(The desired rows for read starting counting from zero).
 	
+After executing the command above, a **.cfg** file will be created in the base directory of the repository. If the user doesn't select the name of the **.cfg** file by adding the option **--OutputName=SomeName** in the command line above, the default name **Myconfig.cfg** will be set. In addition all the default values described in the options table above will be set.
 
+The produced config file in our example is shown below:
+
+**Myconfig.cfg:**   
+
+	[BEGIN_CANVAS]
+	Canv_Axis_NDiv = '508,510';#X,Y
+	Canv_Dim= '1000,1000';#X,Y
+	Canv_DrawOpt = 'APE1';
+	Canv_Grid_XY = 'false,false';
+	Canv_Legend_Dim_X = '0.20,0.60';
+	Canv_Legend_Dim_Y = '0.56,0.92';
+	Canv_Legend_Draw = 'true';
+	Canv_Log_XY = 'false,false';
+	Canv_Logo_Pos = '0';
+	Canv_Logo_Prelim = 'true';
+	Canv_Margin_Top = '0.08';
+	Canv_Margin_Bot = '0.14';
+	Canv_Margin_Lf = '0.16';
+	Canv_Margin_Rt = '0.06';
+	Canv_Name = 'LS2_Detectors';
+	Canv_Plot_Type = 'TGraphErrors';
+	Canv_Range_X = '0,1000';
+	Canv_Range_Y = '0,7';
+	Canv_Title_Offset_X = '1.0';
+	Canv_Title_Offset_Y = '1.0';
+	Canv_Title_X = '';
+	Canv_Title_Y = '';
+		[BEGIN_PLOT]
+			Plot_Color = 'kRed';
+			Plot_LegEntry = 'GE11-X-L-CERN-0002';
+			Plot_Line_Size = '1';
+			Plot_Line_Style = '1';
+			Plot_Marker_Size = '0.8';
+			Plot_Marker_Style = '20';
+			Plot_Name = 'GE11-X-L-CERN-0002';
+			[BEGIN_DATA]
+			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
+			1.0,20.38,0.0,0.0
+			62.0,20.26,0.0,0.0
+			123.0,20.13,0.0,0.0
+			184.0,20.14,0.0,0.0
+			245.0,20.11,0.0,0.0
+			306.0,20.11,0.0,0.0
+			367.0,20.04,0.0,0.0
+			428.0,20.05,0.0,0.0
+			489.0,20.03,0.0,0.0
+			550.0,20.07,0.0,0.0
+			...................
+			...................
+			...................
+			2990.0,19.39,0.0,0.0
+			3051.0,19.33,0.0,0.0
+			3112.0,19.39,0.0,0.0
+			3173.0,19.32,0.0,0.0
+			3234.0,19.32,0.0,0.0
+			3295.0,19.35,0.0,0.0
+			3356.0,19.23,0.0,0.0
+			3417.0,19.25,0.0,0.0
+			3478.0,19.25,0.0,0.0
+			3539.0,19.29,0.0,0.0
+			3600.0,19.2,0.0,0.0
+			[END_DATA]
+		[END_PLOT]
+	[END_CANVAS]
+
+The `Plot_LegEntry` for every plot is automatically set to be the detector serial number found in the excel filename. 
+
+Moreover if the fit option is added in the command above:
+
+```
+python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61 --Fit   
+```
+
+the header parameters for the fit will be created with the default fit values set:
+
+**Myconfig.cfg:**   
+
+	[BEGIN_CANVAS]
+	Canv_Axis_NDiv = '508,510';#X,Y
+	Canv_Dim= '1000,1000';#X,Y
+	Canv_DrawOpt = 'APE1';
+	Canv_Grid_XY = 'false,false';
+	Canv_Legend_Dim_X = '0.20,0.60';
+	Canv_Legend_Dim_Y = '0.56,0.92';
+	Canv_Legend_Draw = 'true';
+	Canv_Log_XY = 'false,false';
+	Canv_Logo_Pos = '0';
+	Canv_Logo_Prelim = 'true';
+	Canv_Margin_Top = '0.08';
+	Canv_Margin_Bot = '0.14';
+	Canv_Margin_Lf = '0.16';
+	Canv_Margin_Rt = '0.06';
+	Canv_Name = 'LS2_Detectors';
+	Canv_Plot_Type = 'TGraphErrors';
+	Canv_Range_X = '0,1000';
+	Canv_Range_Y = '0,7';
+	Canv_Title_Offset_X = '1.0';
+	Canv_Title_Offset_Y = '1.0';
+	Canv_Title_X = '';
+	Canv_Title_Y = '';
+		[BEGIN_PLOT]
+			Plot_Color = 'kRed';
+			Plot_LegEntry = 'GE11-X-L-CERN-0002';
+			Plot_Line_Size = '1';
+			Plot_Line_Style = '1';
+			Plot_Marker_Size = '0.8';
+			Plot_Marker_Style = '20';
+			Plot_Name = 'GE11-X-L-CERN-0002';
+			[BEGIN_DATA]
+			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
+			1.0,20.38,0.0,0.0
+			62.0,20.26,0.0,0.0
+			123.0,20.13,0.0,0.0
+			184.0,20.14,0.0,0.0
+			245.0,20.11,0.0,0.0
+			306.0,20.11,0.0,0.0
+			367.0,20.04,0.0,0.0
+			428.0,20.05,0.0,0.0
+			489.0,20.03,0.0,0.0
+			550.0,20.07,0.0,0.0
+			...................
+			...................
+			...................
+			2990.0,19.39,0.0,0.0
+			3051.0,19.33,0.0,0.0
+			3112.0,19.39,0.0,0.0
+			3173.0,19.32,0.0,0.0
+			3234.0,19.32,0.0,0.0
+			3295.0,19.35,0.0,0.0
+			3356.0,19.23,0.0,0.0
+			3417.0,19.25,0.0,0.0
+			3478.0,19.25,0.0,0.0
+			3539.0,19.29,0.0,0.0
+			3600.0,19.2,0.0,0.0
+			[END_DATA]
+			[BEGIN_FIT]
+			Fit_Color = 'kRed';
+			Fit_Formula = '[0]';
+			Fit_LegEntry = 'Fit_GE11-X-L-CERN-0002';
+			Fit_Line_Size = '1';
+			Fit_Line_Style = '1';
+			Fit_Name = 'Fit_GE11-X-L-CERN-0002';
+			Fit_Option = 'R';
+			Fit_Param_IGuess = '0';
+			Fit_Perform = 'true';
+			Fit_Range = '0,1000';
+			[END_FIT]
+		[END_PLOT]
+	[END_CANVAS]
+	
+3) To produce the graph execute the command:
+	
+	 ./genericPlotter Myconfig.cfg true 		
 ### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts
 
 **Additional scripts:** The additional scripts are designed to give specific instructions to the main script about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the options that are set are not the desirable ones.  
 
 The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py** scripts:
-
 	
 **QC3.py :**   
 
@@ -631,13 +781,109 @@ The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\
 	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
 	--LatexLines=0.62,0.27, Gas~=~CO_{2}
 
-	Moreover if the Fit option is used (example: python python/QC3.py —-file=QC3_GE11-X-L-CERN-0001_20170601.xlsm —-Fit)
-	the following options are set for the fit:
+	Moreover if the Fit option is used the following options are set for the fit:
 
 	--Fit
 	--FitFormula=[0]*TMath::Exp([1]*x)
 	--FitParamIGuess=AMPLITUDE,6.2e-05
 	--FitRange=0,3600
+	
+Example of use: 
+
+1) As before for each new shell navigate to the base directory of the repository and setup the environment via: 
+
+	source scripts/setup_CMS_GEM.sh
+
+2) Execute the command:
+
+	 python2.7 python/QC3.py --file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm --Fit
+
+3) A **config_InputExcelFileName.cfg** will be created in the base directory. 
+
+In our example:
+
+**config\_QC3\_GE11-X-L-CERN-0002\_2017\_06\_01.cfg:**
+
+	[BEGIN_CANVAS]
+	Canv_Axis_NDiv = '508,510';#X,Y
+	Canv_Dim= '1000,1000';#X,Y
+	Canv_DrawOpt = 'APE1';
+	Canv_Grid_XY = 'false,false';
+	Canv_Latex_Line = '0.62,0.86, #splitline{LS2}{Detector~Production}';
+	Canv_Latex_Line = '0.62,0.27, Gas~=~CO_{2}';
+	Canv_Legend_Dim_X = '0.20,0.60';
+	Canv_Legend_Dim_Y = '0.56,0.92';
+	Canv_Legend_Draw = 'true';
+	Canv_Log_XY = 'false,false';
+	Canv_Logo_Pos = '0';
+	Canv_Logo_Prelim = 'true';
+	Canv_Margin_Top = '0.08';
+	Canv_Margin_Bot = '0.14';
+	Canv_Margin_Lf = '0.16';
+	Canv_Margin_Rt = '0.06';
+	Canv_Name = 'LS2_Detectors';
+	Canv_Plot_Type = 'TGraphErrors';
+	Canv_Range_X = '0,3600';
+	Canv_Range_Y = '0,35';
+	Canv_Title_Offset_X = '1.0';
+	Canv_Title_Offset_Y = '1.0';
+	Canv_Title_X = 'Time #left(s#right)';
+	Canv_Title_Y = 'Pressure #left(mbar#right)';
+		[BEGIN_PLOT]
+			Plot_Color = 'kRed';
+			Plot_LegEntry = 'GE11-X-L-CERN-0002';
+			Plot_Line_Size = '1';
+			Plot_Line_Style = '1';
+			Plot_Marker_Size = '0.8';
+			Plot_Marker_Style = '20';
+			Plot_Name = 'GE11-X-L-CERN-0002';
+			[BEGIN_DATA]
+			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
+			1.0,20.38,0.0,0.0
+			62.0,20.26,0.0,0.0
+			123.0,20.13,0.0,0.0
+			184.0,20.14,0.0,0.0
+			245.0,20.11,0.0,0.0
+			306.0,20.11,0.0,0.0
+			367.0,20.04,0.0,0.0
+			428.0,20.05,0.0,0.0
+			489.0,20.03,0.0,0.0
+			550.0,20.07,0.0,0.0
+			611.0,20.05,0.0,0.0
+			672.0,20.07,0.0,0.0
+			733.0,20.01,0.0,0.0
+			794.0,20.07,0.0,0.0
+			855.0,19.98,0.0,0.0
+			916.0,19.98,0.0,0.0
+			...................
+			...................
+			...................
+			3112.0,19.39,0.0,0.0
+			3173.0,19.32,0.0,0.0
+			3234.0,19.32,0.0,0.0
+			3295.0,19.35,0.0,0.0
+			3356.0,19.23,0.0,0.0
+			3417.0,19.25,0.0,0.0
+			3478.0,19.25,0.0,0.0
+			3539.0,19.29,0.0,0.0
+			3600.0,19.2,0.0,0.0
+			[END_DATA]
+			[BEGIN_FIT]
+			Fit_Color = 'kRed';
+			Fit_Formula = '[0]*TMath::Exp([1]*x)';
+			Fit_LegEntry = 'Fit_GE11-X-L-CERN-0002';
+			Fit_Line_Size = '1';
+			Fit_Line_Style = '1';
+			Fit_Name = 'Fit_GE11-X-L-CERN-0002';
+			Fit_Option = 'R';
+			Fit_Param_IGuess = 'AMPLITUDE,6.2e-05';
+			Fit_Perform = 'true';
+			Fit_Range = '0,3600';
+			[END_FIT]
+		[END_PLOT]
+	[END_CANVAS] 
+	
+In the case that more than one input files are selected the output name is automatically set to be: **config\_QC3\_LS2\_Pres\_vs\_Time\_AllDet.cfg**
 
 **QC4_HV.py :**
 
@@ -660,6 +906,22 @@ The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\
 	--FitFormula=[0]*x+[1]
 	--FitParamIGuess=Req,5   (where Req is the measured resistance from the excel file) 
 	--FitRange=0,1000
+	
+Example of use: As in steps 1 and 2 of QC3.py script execute:
+
+	1. source scripts/setup_CMS_GEM.sh
+	2. python2.7 python/QC4_HV.py --file=Filename.xlsx (--Fit)
+	
+The output filename in case of one input file will be: 
+	
+* config\_V\_vs\_Imon\_Filename.cfg
+
+or 
+
+* config\_QC4\_LS2\_V\_vs\_Imon\_AllDet.cfg
+
+in case of multiple input files (	python2.7 python/QC4\_HV.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+	
 
 **QC4_SS.py :**
 
@@ -676,6 +938,21 @@ The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\
 	--CanvRangeY=0,50
 	--SetErrY
 	--SelectColumnErrY=8
+	
+Example of use: As in steps 1 and 2 of QC3.py script execute:
+
+	1. source scripts/setup_CMS_GEM.sh
+	2. python2.7 python/QC4_SS.py --file=Filename.xlsx (--Fit)
+	
+The output filename in case of one input file will be: 
+	
+* config\_SS\_vs\_Imon\_Filename.cfg
+
+or 
+
+* config\_QC4\_LS2\_SS\_vs\_Imon\_AllDet.cfg
+
+in case of multiple input files (	python2.7 python/QC4\_SS.py --file=Filename.xlsx --file=Filename2.xlsx ..)
 
 **QC5_Gain.py :**
 
@@ -696,6 +973,22 @@ The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\
 	--CanvRangeY=10,1000000
 	--SetErrY
 	--SelectColumnErrY=12
+	
+Example of use: As in steps 1 and 2 of QC3.py script execute:
+
+	1. source scripts/setup_CMS_GEM.sh
+	2. python2.7 python/QC5_Gain.py --file=Filename.xlsx
+	
+The output filename in case of one input file will be: 
+	
+* config\_Gain\_vs\_Imon\_Filename.cfg
+
+or 
+
+* config\_QC5\_LS2\_Gain\_vs\_Imon\_AllDet.cfg
+
+in case of multiple input files (	python2.7 python/QC5\_Gain.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+	
 
 **QC5_Rate.py :**
 
@@ -715,6 +1008,22 @@ The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\
 	--CanvRangeY=0,1800
 	--SetErrY
 	--SelectColumnErrY=8
+
+Example of use: As in steps 1 and 2 of QC3.py script execute:
+
+	1. source scripts/setup_CMS_GEM.sh
+	2. python2.7 python/QC5_Rate.py --file=Filename.xlsx
+	
+The output filename in case of one input file will be: 
+	
+* config\_Rate\_vs\_Imon\_Filename.cfg
+
+or 
+
+* config\_QC5\_LS2\_Rate\_vs\_Imon\_AllDet.cfg
+
+in case of multiple input files (	python2.7 python/QC5\_Rate.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+	
 
 ## 3.c. Python Scripts
 A set of python analysis tools has been added to assist the user in further analysis of data created with the Framework.  The mathematical framework for the following sections is described [here](https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf). This may be helpful in attempting to understand the results produced by the python tools described below.
