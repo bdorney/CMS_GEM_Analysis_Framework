@@ -548,9 +548,9 @@ Field Name | Type | Description
 `--CanvRangeX` | Two comma separated int's | Defines the range `[X_min, X_max]` of the X-axis. Default is: 0,1000
 `--CanvRangeY` | Two comma separated int's | As `Canv_Range_X` but for the Y-axis. Default is: 0,7
 `--CanvTitleOffsetX` | float | Defines the offset of the X-axis title. Default is: 1.0
-`--CanvTitleOffsetY` | float | As `Canv_Title_Offset_X` but for the Y-axis. Default is: 0.8
+`--CanvTitleOffsetY` | float | As `CanvTitleOffsetX` but for the Y-axis. Default is: 0.8
 `--CanvTitleX` | string | Title (e.g. label) assigned to the X-axis.
-`--CanvTitleY` | string | As `Canv_Title_X` but for the Y-axis.
+`--CanvTitleY` | string | As `CanvTitleX` but for the Y-axis.
 `--CanvName` | string| Set Canvas Name, Default is: LS2_Detectors.
 `--YaxisScale` |bool | If YaxisScale option is used the Y axis is plotted in kUnit. Default is: False.
 `--SetErrX  ` | bool| Set Error option true (for X axis).
@@ -578,7 +578,7 @@ Field Name | Type | Description
 source scripts/setup_CMS_GEM.sh
 ```
 
-2) Let’s assume that you want to plot the first 60 lines of the second and third columns of the first sheet of the file QC3\_GE11-X-L-CERN-0001\_20170601.xlsm which is stored in the base directory of the repository (../CMS\_GEM\_Analysis\_Framework/)
+2) Let’s assume that you want to plot the first 60 lines of the second and third columns of the first sheet of the file QC3\_GE11-X-L-CERN-0002\_2017\_06\_01.xlsm which is stored in the base directory of the repository (../CMS\_GEM\_Analysis\_Framework/)
 
 What you have to do is:   
 
@@ -760,13 +760,17 @@ the header parameters for the fit will be created with the default fit values se
 	[END_CANVAS]
 	
 3) To produce the graph execute the command:
-	
-	 ./genericPlotter Myconfig.cfg true 		
+
+
+	 ./genericPlotter Myconfig.cfg true
+
+	 
 ### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts
 
 **Additional scripts:** The additional scripts are designed to give specific instructions to the main script about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the options that are set are not the desirable ones.  
 
 The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py** scripts:
+
 	
 **QC3.py :**   
 
