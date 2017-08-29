@@ -6,7 +6,11 @@
 *                                                *
 **************************************************
 
-<<<<<<< HEAD
+
+Update: August 29th 2017
+==================================================
+-> README.md: Edited instructions for genericPlotter helper scripts.
+
 Update: August 25th 2017
 ==================================================
 -> README.md: Rewrite all the instructions section in MarkDown
@@ -45,7 +49,7 @@ Update: August 15th 2017
 ->QC4_HV.py: Added Arguments to perform the Vmon-Imon fit if the —Fit option is true
 ->wrappers.py: add function envCheck to check that the $GEM_BASE variable has been declared.
 ->gemlogger.py: removed unnecessary functions and commented lines
-=======
+
 Update: August 21st 2017
 ==================================================
 ->Finished re-writting README.md in Markdown
@@ -79,7 +83,7 @@ Update: July 3rd 2017
 ->DetectorMPGD::setEtaSector() no longer incorretly assume there are exactly 3 phi sectors
 ->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution for phi distribution did not have correct y axis range
 ->Fixed a bug in AnalyzeResponseUniformityHits::initHistosHits() where hit ADC vs ADC Integral distribution's TName did not reflect the observables plotted
->>>>>>> e21350254a66edaba88bbc0ebe02a635509e2b34
+
 
 Update: June 13th 2017
 ==================================================
