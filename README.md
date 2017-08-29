@@ -535,9 +535,9 @@ Field Name | Type | Description
 `--CanvGridXY` | Two comma separated bool's | Defines if the grid should be drawn on the canvas.  The first (second) boolean is for the x (y) grid. Default: false,false
 `--LatexLines` | list of strings |Add an entry to the LatexLines list following syntax:'Coord_PadX,Coord_PadY,text'.   
 `--CanvLegDimX` | Two comma separated floats | Defines the [NDC coordinates](https://root.cern.ch/root/html534/guides/users-guide/Graphics.html#the-coordinate-systems-of-a-pad) of a `TLegend` to be drawn on the pad.  The first (second) float is the X1 (X2) coordinate of the `TLegend`. See the `TLegend` [documentation](https://root.cern.ch/doc/master/classTLegend.html) for more details. Default is: 0.20,0.60
-`--CanvLegDimY` | Two comma separated floats | As `Canv_Legend_Dim_X` but for the Y coordinates. Default is: 0.56,0.92
+`--CanvLegDimY` | Two comma separated floats | As `CanvLegDimX` but for the Y coordinates. Default is: 0.56,0.92
 `--CanvLegDraw` | bool | Setting to true (false) will (not) draw the `TLegend` on the `TCanvas`. Default is: true
-`--CanvLogXY` | Two comma separated bool's | As `Canv_Grid_XY` but for setting the X & Y axis to logarithmic. Default is: false,false
+`--CanvLogXY` | Two comma separated bool's | As `CanvGridXY` but for setting the X & Y axis to logarithmic. Default is: false,false
 `--CanvLogoPos` | int | Indicates the position the CMS logo should be placed.  Possible values are out of frame (0), top-left (11), top-centered (22), or top-right (33).  More details and examples shown [here](https://ghm.web.cern.ch/ghm/plots/). Default is: 0
 `--CanvLogoPrelim` | bool | Defines whether or not a canvas is preliminary (e.g. "CMS Preliminary"). This should be true for all plots unless they are being submitted for CMS CWR (e.g. publication in a peer-review journal). Default is: true
 `--CanvMarginBot` | float | Sets the bottom margin of the `TCanvas`. Default is: 0.14
@@ -546,7 +546,7 @@ Field Name | Type | Description
 `--CanvMarginTop` | float | Sets the top margin of the `TCanvas`. Default is: 0.08
 `--CanvPlotType` | string | Defines the type of `TObject` to be plotted on the `TCanvas`. Supported types are from the set {`TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, `TH2F`}. Default is: TGraphErrors
 `--CanvRangeX` | Two comma separated int's | Defines the range `[X_min, X_max]` of the X-axis. Default is: 0,1000
-`--CanvRangeY` | Two comma separated int's | As `Canv_Range_X` but for the Y-axis. Default is: 0,7
+`--CanvRangeY` | Two comma separated int's | As `CanvRangeX` but for the Y-axis. Default is: 0,7
 `--CanvTitleOffsetX` | float | Defines the offset of the X-axis title. Default is: 1.0
 `--CanvTitleOffsetY` | float | As `CanvTitleOffsetX` but for the Y-axis. Default is: 0.8
 `--CanvTitleX` | string | Title (e.g. label) assigned to the X-axis.
