@@ -138,7 +138,7 @@ This README.md file was written in [MarkDown](https://guides.github.com/features
 This repository is the work of:
 
 - Main Developer: Brian Dorney
-- Contributors: Marcello Maggi
+- Contributors: Marcello Maggi, Anastasia Kotsokechagia
 - amoreSRS Team:  Kondo Gnanvo, Mike Staib, Stefano Colafranchescci, Dorothea Pfeiffer
 
 This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi. The event unpacking and reconstruction code was ported from `amoreSRS` by Marcello Maggi. The original selection & analysis algorithms are based off work done by J. Merlin.  This package makes use of several features from the `CMS_GEM_TB_Timing` repository (also by B. Dorney).
@@ -519,51 +519,50 @@ Field Name | Type | Description
 ---------- | ---- | -----------
 `-h, --help` |  | All the options that are available are displayed.
 `-f, --file` |list of strings  | Add an entry to the input excel file list.
-`--OutputName` |string | Set Output file name, default is: PlotConfig.
-`--SelectSheetNum` | int| Select the Excel sheet for reading, default is: 0 (counting starts from 0).
-`--SelectColumnX` |int | Select Column number for X data, default value is 0 (counting starts from 0).
-`--SelectColumnY` | int| Select Column number for Y data, default value is 0 (counting starts from 0).
-`--SelectRowStart` |int |Select the first Row for reading, default is 1 (counting starts from 0).
-`--SelectRowEnd` | int|  Select the last Row for reading, default is 60 (counting starts from 0).
-`--AxisNDiv` | Two comma separated int's | Defines the number of divisions for a given `TAxis`.  See the `TAxis` [documentation](https://root.cern.ch/doc/master/classTAttAxis.html) for more information.  Between one and three integers can be provided. They are understand as applying to the {X}, {X,Y}, or {X,Y,Z} axes. Default is: 508,510 
-`--CanvDim` | Two comma separated int's | Defines the size of the canvas in pixels.  The first (second) number is for the x (y) direction. Default is: 1000,1000
-`--CanvDrawOpt` | string | Draw option that will be applied to all plots on this canvas. Default is: APE1
-`--CanvGridXY` | Two comma separated bool's | Defines if the grid should be drawn on the canvas.  The first (second) boolean is for the x (y) grid. Default: false,false
-`--LatexLines` | list of strings |Add an entry to the LatexLines list following syntax:'Coord_PadX,Coord_PadY,text'.   
-`--CanvLegDimX` | Two comma separated floats | Defines the [NDC coordinates](https://root.cern.ch/root/html534/guides/users-guide/Graphics.html#the-coordinate-systems-of-a-pad) of a `TLegend` to be drawn on the pad.  The first (second) float is the X1 (X2) coordinate of the `TLegend`. See the `TLegend` [documentation](https://root.cern.ch/doc/master/classTLegend.html) for more details. Default is: 0.20,0.60
-`--CanvLegDimY` | Two comma separated floats | As `CanvLegDimX` but for the Y coordinates. Default is: 0.56,0.92
-`--CanvLegDraw` | bool | Setting to true (false) will (not) draw the `TLegend` on the `TCanvas`. Default is: true
-`--CanvLogXY` | Two comma separated bool's | As `CanvGridXY` but for setting the X & Y axis to logarithmic. Default is: false,false
-`--CanvLogoPos` | int | Indicates the position the CMS logo should be placed.  Possible values are out of frame (0), top-left (11), top-centered (22), or top-right (33).  More details and examples shown [here](https://ghm.web.cern.ch/ghm/plots/). Default is: 0
-`--CanvLogoPrelim` | bool | Defines whether or not a canvas is preliminary (e.g. "CMS Preliminary"). This should be true for all plots unless they are being submitted for CMS CWR (e.g. publication in a peer-review journal). Default is: true
-`--CanvMarginBot` | float | Sets the bottom margin of the `TCanvas`. Default is: 0.14
-`--CanvMarginLf` | float | Sets the left margin of the `TCanvas`.Default is: 0.16
-`--CanvMarginRt` | float | Sets the right margin of the `TCanvas`. Default is: 0.06
-`--CanvMarginTop` | float | Sets the top margin of the `TCanvas`. Default is: 0.08
-`--CanvPlotType` | string | Defines the type of `TObject` to be plotted on the `TCanvas`. Supported types are from the set {`TGraph`, `TGraph2D`, `TGraphErrors`, `TH1F`, `TH2F`}. Default is: TGraphErrors
-`--CanvRangeX` | Two comma separated int's | Defines the range `[X_min, X_max]` of the X-axis. Default is: 0,1000
-`--CanvRangeY` | Two comma separated int's | As `CanvRangeX` but for the Y-axis. Default is: 0,7
-`--CanvTitleOffsetX` | float | Defines the offset of the X-axis title. Default is: 1.0
-`--CanvTitleOffsetY` | float | As `CanvTitleOffsetX` but for the Y-axis. Default is: 0.8
-`--CanvTitleX` | string | Title (e.g. label) assigned to the X-axis.
-`--CanvTitleY` | string | As `CanvTitleX` but for the Y-axis.
-`--CanvName` | string| Set Canvas Name, Default is: LS2_Detectors.
-`--YaxisScale` |bool | If YaxisScale option is used the Y axis is plotted in kUnit. Default is: False.
+`--OutputName` |string | Set Output file name, default is: `PlotConfig`.
+`--SelectSheetNum` | int| Select the Excel sheet for reading, default is:`0` (counting starts from 0).
+`--SelectColumnX` |int | Select Column number for X data, default value is `0` (counting starts from 0).
+`--SelectColumnY` | int| Select Column number for Y data, default value is `0` (counting starts from 0).
+`--SelectRowStart` |int |Select the first Row for reading, default is `1` (counting starts from 0).
+`--SelectRowEnd` | int|  Select the last Row for reading, default is `60` (counting starts from 0).
+`--AxisNDiv` | Two comma separated int's |Set Axis Ndivisions X,Y. Corresponds to the `Canv_Axis_NDiv` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `508,510` 
+`--CanvDim` | Two comma separated int's | Set Canvas Dimensions X,Y. Corresponds to the `Canv_Dim` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `1000,1000`
+`--CanvDrawOpt` | string | Choose the Draw option that will be applied to all plots on this canvas.Corresponds to the `Canv_DrawOpt` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `APE1`
+`--CanvGridXY` | Two comma separated bool's | Choose if the grid should be drawn on the canvas.Corresponds to the `Canv_Grid_XY` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `false,false`
+`--LatexLines` | list of strings |Add an entry to the LatexLines list following syntax:`Coord_PadX,Coord_PadY,text`.Corresponds to the `Canv_Latex_Line` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).   
+`--CanvLegDimX` | Two comma separated floats |Set X Legend Dimensions.Corresponds to the `Canv_Legend_Dim_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.20,0.60`
+`--CanvLegDimY` | Two comma separated floats | As `CanvLegDimX` but for the Y coordinates. Default is: `0.56,0.92`
+`--CanvLegDraw` | string | Set the Legend draw option to true or false. Corresponds to the `Canv_Legend_Draw` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `true`
+`--CanvLogXY` | Two comma separated bool's | As `CanvGridXY` but for setting the X & Y axis to logarithmic. Default is: `false,false`
+`--CanvLogoPos` | int | Indicates the position the CMS logo should be placed.Corresponds to the `Canv_Logo_Pos` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas) . Default is: `0`
+`--CanvLogoPrelim` | string | Set Logo Preliminary true or false. Corresponds to the `Canv_Logo_Prelim` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `true`
+`--CanvMarginBot` | float | Sets the bottom margin of the `TCanvas`. Corresponds to the `Canv_Margin_Bot` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.14`
+`--CanvMarginLf` | float | Sets the left margin of the `TCanvas`. Corresponds to the `Canv_Margin_Lf` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.16`
+`--CanvMarginRt` | float | Sets the right margin of the `TCanvas`.Corresponds to the `Canv_Margin_Rt` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.06`
+`--CanvMarginTop` | float | Sets the top margin of the `TCanvas`. Corresponds to the `Canv_Margin_Top` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.08`
+`--CanvPlotType` | string | Set the Canvas Plot type. Corresponds to the `Canv_Plot_Type` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).  Default is: `TGraphErrors`
+`--CanvRangeX` | Two comma separated int's | Set X-Axis range. Corresponds to the `Canv_Range_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0,1000`
+`--CanvRangeY` | Two comma separated int's | As `CanvRangeX` but for the Y-axis. Default is: `0,7`
+`--CanvTitleX` | string | Set X-Axis Title. Corresponds to the `Canv_Title_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).
+`--CanvTitleY` | string | Set Y-Axis Title. Corresponds to the `Canv_Title_Y` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).
+`--CanvTitleOffsetX` | float | Defines the offset of the X-axis title. Corresponds to the `Canv_Title_Offset_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `1.0`
+`--CanvTitleOffsetY` | float | As `CanvTitleOffsetX` but for the Y-axis. Corresponds to the `Canv_Title_Offset_Y` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.8`
+`--CanvName` | string| Set the Canvas Name for `Canv_Name` header parameter described in [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `LS2_Detectors`.
+`--YaxisScale` |bool | If YaxisScale option is used the Y axis is plotted in kUnit. Default is: `False`.
 `--SetErrX  ` | bool| Set Error option true (for X axis).
 `--SetErrY` | bool | Set Error option true (for Y axis).
-`--SelectColumnErrX` |int | If SetErrX=True choose the Column number for XError, Default is: 0.
-`--SelectColumnErrY` |int | If SetErrY=True choose the Column number for YError, Default is: 0.
-`--PlotLineSize` |float| Set Plot Line Size (default is: 1).
-`--PlotLineStyle` |float| Set Plot Line Style (default is: 1).
-`--PlotMarkerSize` |float| Set Plot Marker Size (default is: 0.8).
+`--SelectColumnErrX` |int | If SetErrX=True choose the Column number for XError, Default is: `0`.
+`--SelectColumnErrY` |int | If SetErrY=True choose the Column number for YError, Default is: `0`.
+`--PlotLineSize` |float| Set Plot Line Size for `Plot_Line_Size` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `1`.
+`--PlotLineStyle` |float| Set Plot Line Style for `Plot_Line_Style` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `1`.
+`--PlotMarkerSize` |float| Set Plot Line Style for `Plot_Marker_Size` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `0.8`.
 `--Fit ` |bool |If the Fit option is used the header parameters for the fit are created .
-`--FitFormula` | string | `TFormula` to be given to a `ROOT::TF1` object.  Note the syntax and full complexity of inputs expected/available in `ROOT` works! e.g. `[0]*x^2+[1]` or `gaus(0)+pol2(3)" or "[1]*TMath::Erf(x) + [2]` are all supported. Default is [0].
-`--FitOption` | string | The [Fit Method](https://root.cern.ch/root/htmldoc/guides/users-guide/FittingHistograms.html#the-fit-method) to be used for fitting. Default is: R (Use the range specified in the function range)
-`--FitParamIGuess`  | Comma separated list of strings | Initial values for the parameters defined in the `Fit_Formula` field.  Note the order in which the parameters are given in the `Fit_Formula` field should match the order listed here. Explicitly for the `Fit_Formula = '[0]*x^2+[1]*x+[2]'` the initial guess of `4,5,6` would mean `[0] = 4`, `[1] = 5`, and `[2] = 6`.  Additionally, both numeric values and expressions formed from the above supported keywords can be used.  E.g. for a `Fit_Formula = 'gaus(0)'` the initial guess of `12.3, MEAN, 2.*SIGMA+23.5` can be assigned.
-`--FitRange` | Comma separated list of strings | Set the Fit range, default is 0,1000.
+`--FitFormula` | string | Set the fit formula for `Fit_Formula` header parameter described in Section 4.e.iv.III. Default is `[0]`.  
+`--FitParamIGuess`  | Comma separated list of strings | Set fit parameters initial guess. Corresponds to the `Fit_Param_IGuess` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit). Default is: `0`
+`--FitRange` | Comma separated list of strings | Set the Fit range for `Fit_Range` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is `0,1000`.
 `--FitPerform` | string| If true (default) perform a fit to the TObject defined in the [BEGIN\_PLOT] header this [BEGIN\_FIT] header is found in.
-`--FitLineSize` |float|Set the Fit Line Size, default is: 1 .
-`--FitLineStyle` |float|Set the Fit Line Style, default is: 1 .
+`--FitLineSize` |float| Set the Fit Line Size for `Fit_Line_Size` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is: `1` .
+`--FitLineStyle` |float| Set the Fit Line Style for `Fit_Line_Style` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is: `1` .
 
 For full example:
 
@@ -577,7 +576,7 @@ python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-Plot
 Where:
 
 * **PlotOption1** and **PlotOption2** are the desired `PlotOptions` described in the table above.
-* **Desired value** is the value that the user wants to give to this particular PlotOption. For the `PlotOptions` that no values were provided by the user the default values are set.
+* **Desired value** is the value that the user wants to give to this particular PlotOption. For the `PlotOptions` that no values are provided by the user the default values are set.
 	
 2) After executing the command above, a `.cfg` file will be created in the base directory of the repository. If the user doesn't select the name of the `.cfg` file by adding the option `--OutputName=SomeName` in the command line above, the default name `PlotConfig.cfg` will be set. 
 
@@ -632,6 +631,11 @@ If the Fit option is used the following options are set automatically for the fi
 	--FitFormula=[0]*TMath::Exp([1]*x)
 	--FitParamIGuess=AMPLITUDE,6.2e-05
 	--FitRange=0,3600
+	
+Where:
+
+* **FitFormula**, **FitParamIGuess** and **FitRange** are the PlotOptions described in Section 	[3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file).
+* **AMPLITUDE** is the Keyword described in Section [4.e.ii.IV HEADER PARAMETERS - ADC_FIT_INFO](#4eiiiv-header-parameters---adc_fit_info).
 		
 2) After executing the command, a `.cfg` file will be created as before in the base directory of the repository. In the case that more than one input files are selected (like in our example) the output name is automatically set to be: 
 
