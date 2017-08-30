@@ -597,11 +597,11 @@ the header parameters for the fit will be created as shown here: [4.e.iv.IX Exam
 
 **Scripts Available:** `QC3.py, QC4_HV.py, QC4_SS.py, QC5_Gain.py, QC5_Rate.py` 
 
-These additional scripts are designed to give specific instructions to the `Produce_Config_File.py` script about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the options that are set are not the desirable ones.  
+These scripts are designed to give specific instructions to the `Produce_Config_File.py` script about the style and the columns plotted depending on the kind of test. For example if the `QC3.py` script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the `PlotOptions` that are set are not the desirable ones.  
 
-The following options are already set:
+The following `PlotOptions` are already set:
 
-**QC3.py :**   
+`QC3.py ` :  
 
 	--CanvTitleX=Time #left(s#right)
 	--CanvTitleY=Pressure #left(mbar#right)
@@ -613,112 +613,35 @@ The following options are already set:
 	--CanvRangeY=0,35
 	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
 	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+	
+For full example:
 
-	Moreover if the Fit option is used the following options are set for the fit:
+1) As before for each new shell navigate to the base directory of the repository and execute: 
 
-	--Fit
+	source scripts/setup_CMS_GEM.sh
+	python2.7 python/QC3.py --file=Filename1.xlsm --file=Filename2.xlsm --Fit
+	
+Where:
+
+* **file** is the PlotOption described in session: [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
+* **Filename1** and **Filename2** are the names of the desired excel files stored in the base directory of the repository.
+* **Fit (Optional)** is the PlotOption described in session: [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file). 
+
+If the Fit option is used the following options are set automatically for the fit:
+
 	--FitFormula=[0]*TMath::Exp([1]*x)
 	--FitParamIGuess=AMPLITUDE,6.2e-05
 	--FitRange=0,3600
-	
-Example of use: 
+		
+2) After executing the command, a `.cfg` file will be created as before in the base directory of the repository. In the case that more than one input files are selected (like in our example) the output name is automatically set to be: 
 
-1) As before for each new shell navigate to the base directory of the repository and setup the environment via: 
+ `config_QC3_LS2_Pres_vs_Time_AllDet.cfg`
 
-	source scripts/setup_CMS_GEM.sh
+If only one input file is selected the default name is:
 
-2) Execute the command:
-
-	 python2.7 python/QC3.py --file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm --Fit
-
-3) A **config_InputExcelFileName.cfg** will be created in the base directory. 
-
-In our example:
-
-**config\_QC3\_GE11-X-L-CERN-0002\_2017\_06\_01.cfg:**
-
-	[BEGIN_CANVAS]
-	Canv_Axis_NDiv = '508,510';#X,Y
-	Canv_Dim= '1000,1000';#X,Y
-	Canv_DrawOpt = 'APE1';
-	Canv_Grid_XY = 'false,false';
-	Canv_Latex_Line = '0.62,0.86, #splitline{LS2}{Detector~Production}';
-	Canv_Latex_Line = '0.62,0.27, Gas~=~CO_{2}';
-	Canv_Legend_Dim_X = '0.20,0.60';
-	Canv_Legend_Dim_Y = '0.56,0.92';
-	Canv_Legend_Draw = 'true';
-	Canv_Log_XY = 'false,false';
-	Canv_Logo_Pos = '0';
-	Canv_Logo_Prelim = 'true';
-	Canv_Margin_Top = '0.08';
-	Canv_Margin_Bot = '0.14';
-	Canv_Margin_Lf = '0.16';
-	Canv_Margin_Rt = '0.06';
-	Canv_Name = 'LS2_Detectors';
-	Canv_Plot_Type = 'TGraphErrors';
-	Canv_Range_X = '0,3600';
-	Canv_Range_Y = '0,35';
-	Canv_Title_Offset_X = '1.0';
-	Canv_Title_Offset_Y = '1.0';
-	Canv_Title_X = 'Time #left(s#right)';
-	Canv_Title_Y = 'Pressure #left(mbar#right)';
-		[BEGIN_PLOT]
-			Plot_Color = 'kRed';
-			Plot_LegEntry = 'GE11-X-L-CERN-0002';
-			Plot_Line_Size = '1';
-			Plot_Line_Style = '1';
-			Plot_Marker_Size = '0.8';
-			Plot_Marker_Style = '20';
-			Plot_Name = 'GE11-X-L-CERN-0002';
-			[BEGIN_DATA]
-			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
-			1.0,20.38,0.0,0.0
-			62.0,20.26,0.0,0.0
-			123.0,20.13,0.0,0.0
-			184.0,20.14,0.0,0.0
-			245.0,20.11,0.0,0.0
-			306.0,20.11,0.0,0.0
-			367.0,20.04,0.0,0.0
-			428.0,20.05,0.0,0.0
-			489.0,20.03,0.0,0.0
-			550.0,20.07,0.0,0.0
-			611.0,20.05,0.0,0.0
-			672.0,20.07,0.0,0.0
-			733.0,20.01,0.0,0.0
-			794.0,20.07,0.0,0.0
-			855.0,19.98,0.0,0.0
-			916.0,19.98,0.0,0.0
-			...................
-			...................
-			...................
-			3112.0,19.39,0.0,0.0
-			3173.0,19.32,0.0,0.0
-			3234.0,19.32,0.0,0.0
-			3295.0,19.35,0.0,0.0
-			3356.0,19.23,0.0,0.0
-			3417.0,19.25,0.0,0.0
-			3478.0,19.25,0.0,0.0
-			3539.0,19.29,0.0,0.0
-			3600.0,19.2,0.0,0.0
-			[END_DATA]
-			[BEGIN_FIT]
-			Fit_Color = 'kRed';
-			Fit_Formula = '[0]*TMath::Exp([1]*x)';
-			Fit_LegEntry = 'Fit_GE11-X-L-CERN-0002';
-			Fit_Line_Size = '1';
-			Fit_Line_Style = '1';
-			Fit_Name = 'Fit_GE11-X-L-CERN-0002';
-			Fit_Option = 'R';
-			Fit_Param_IGuess = 'AMPLITUDE,6.2e-05';
-			Fit_Perform = 'true';
-			Fit_Range = '0,3600';
-			[END_FIT]
-		[END_PLOT]
-	[END_CANVAS] 
-	
-In the case that more than one input files are selected the output name is automatically set to be: **config\_QC3\_LS2\_Pres\_vs\_Time\_AllDet.cfg**
-
-**QC4_HV.py :**
+ `config_FileName.cfg`
+ 
+`QC4_HV.py` :
 
 	--CanvTitleX=Divider Current #left(#muA#right)
 	--CanvTitleY=Applied Voltage #left(kV#right)
@@ -732,30 +655,28 @@ In the case that more than one input files are selected the output name is autom
 	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
 	--LatexLines=0.62,0.27, Gas~=~CO_{2}
 
-	Moreover if the Fit option is used (example: python python/QC4_HV.py —-file=QC4_GE11-X-L-CERN-0001_20170601.xlsm —-Fit)
-	the following options are set for the fit:
+	Moreover if the Fit PlotOption is used the following options are set for the fit:
 
 	--Fit
 	--FitFormula=[0]*x+[1]
 	--FitParamIGuess=Req,5   (where Req is the measured resistance from the excel file) 
 	--FitRange=0,1000
 	
-Example of use: As in steps 1 and 2 of QC3.py script execute:
+For full example: 
 
-	1. source scripts/setup_CMS_GEM.sh
-	2. python2.7 python/QC4_HV.py --file=Filename.xlsx (--Fit)
-	
+Follow steps 1-2 described in `QC3.py` example.
+
 The output filename in case of one input file will be: 
 	
-* config\_V\_vs\_Imon\_Filename.cfg
+`config_V_vs_Imon_Filename.cfg`
 
 or 
 
-* config\_QC4\_LS2\_V\_vs\_Imon\_AllDet.cfg
+`config_QC4_LS2_V_vs_Imon_AllDet.cfg`
 
-in case of multiple input files (	python2.7 python/QC4\_HV.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+in case of multiple input files.
 	
-**QC4_SS.py :**
+`QC4_SS.py`:
 
 	--CanvTitleX=Divider Current #left(#muA#right)
 	--CanvTitleY=Spurious Signal R_{SS} #left(Hz#right)
@@ -771,22 +692,21 @@ in case of multiple input files (	python2.7 python/QC4\_HV.py --file=Filename.xl
 	--SetErrY
 	--SelectColumnErrY=8
 	
-Example of use: As in steps 1 and 2 of QC3.py script execute:
+For full example: 
 
-	1. source scripts/setup_CMS_GEM.sh
-	2. python2.7 python/QC4_SS.py --file=Filename.xlsx (--Fit)
-	
+Follow steps 1-2 described in `QC3.py` example.
+
 The output filename in case of one input file will be: 
 	
-* config\_SS\_vs\_Imon\_Filename.cfg
+`config_SS_vs_Imon_Filename.cfg`
 
 or 
 
-* config\_QC4\_LS2\_SS\_vs\_Imon\_AllDet.cfg
+`config_QC4_LS2_SS_vs_Imon_AllDet.cfg`
 
-in case of multiple input files (	python2.7 python/QC4\_SS.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+in case of multiple input files.
 
-**QC5_Gain.py :**
+`QC5_Gain.py`:
 
 	--CanvTitleX=Divider Current #left(#muA#right)
 	--CanvTitleY=Effective Gain
@@ -806,22 +726,21 @@ in case of multiple input files (	python2.7 python/QC4\_SS.py --file=Filename.xl
 	--SetErrY
 	--SelectColumnErrY=12
 	
-Example of use: As in steps 1 and 2 of QC3.py script execute:
+For full example: 
 
-	1. source scripts/setup_CMS_GEM.sh
-	2. python2.7 python/QC5_Gain.py --file=Filename.xlsx
-	
+Follow steps 1-2 described in `QC3.py` example.
+
 The output filename in case of one input file will be: 
 	
-* config\_Gain\_vs\_Imon\_Filename.cfg
+`config_Gain_vs_Imon_Filename.cfg`
 
 or 
 
-* config\_QC5\_LS2\_Gain\_vs\_Imon\_AllDet.cfg
+`config_QC5_LS2_Gain_vs_Imon_AllDet.cfg`
 
-in case of multiple input files (	python2.7 python/QC5\_Gain.py --file=Filename.xlsx --file=Filename2.xlsx ..)
+in case of multiple input files.
 	
-**QC5_Rate.py :**
+`QC5_Rate.py`:
 
 	--CanvTitleX=Divider Current #left(#muA#right)
 	--CanvTitleY=Rate #left(Hz#right)
@@ -840,21 +759,20 @@ in case of multiple input files (	python2.7 python/QC5\_Gain.py --file=Filename.
 	--SetErrY
 	--SelectColumnErrY=8
 
-Example of use: As in steps 1 and 2 of QC3.py script execute:
+For full example: 
 
-	1. source scripts/setup_CMS_GEM.sh
-	2. python2.7 python/QC5_Rate.py --file=Filename.xlsx
-	
+Follow steps 1-2 described in `QC3.py` example.
+
 The output filename in case of one input file will be: 
 	
-* config\_Rate\_vs\_Imon\_Filename.cfg
+`config_Rate_vs_Imon_Filename.cfg`
 
 or 
 
-* config\_QC5\_LS2\_Rate\_vs\_Imon\_AllDet.cfg
+`config_QC5_LS2_Rate_vs_Imon_AllDet.cfg`
 
-in case of multiple input files (	python2.7 python/QC5\_Rate.py --file=Filename.xlsx --file=Filename2.xlsx ..)
-	
+in case of multiple input files.
+		
 ## 3.c. Python Scripts
 A set of python analysis tools has been added to assist the user in further analysis of data created with the Framework.  The mathematical framework for the following sections is described [here](https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf). This may be helpful in attempting to understand the results produced by the python tools described below.
 
