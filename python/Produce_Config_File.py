@@ -86,7 +86,7 @@ for filelist in args.file:
 	text_file.write("\t\t\t[BEGIN_DATA]\n" )
 	text_file.write("\t\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
 
-	for row in range(args.SelectRowStart,args.SelectRowEnd):
+	for row in range(args.SelectRowStart,args.SelectRowEnd+1):
 		if bool(args.YaxisScale):
 			Y= float(ws.cell_value(row,args.SelectColumnY)/1000)
 			pass
