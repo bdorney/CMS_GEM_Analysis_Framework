@@ -13,7 +13,7 @@ Table of Contents
          * [3.a.v  Helper Script - Run Mode: Comparison](#3av--helper-script---run-mode-comparison)
       * [3.b. genericPlotter](#3b-genericplotter)
          * [3.b.i  Helper Script - Make All Plots](#3bi--helper-script---make-all-plots)
-         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitrary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
+         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
          * [3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File](#3biiii-helper-script---parsing-excel-files-to-genericplotter---qc-excel-file)
       * [3.c. Python Scripts](#3c-python-scripts)
          * [3.c.i  Analysis Suite - Gain Map](#3ci--analysis-suite---gain-map)
@@ -509,11 +509,11 @@ source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
 
 this will then execute genericPlotter taking each `*.cfg` file in the `figures/ResponseUniformityMaps` directory.
 
-### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitrary Excel File
+### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File
 
 `Produce_Config_File.py:`This tool is designed to read selected columns from an excel file and produce a config file for genericPlotter as described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). 
 
-The following **options** are defined:
+The following `PlotOptions` are defined:
 
 Field Name | Type | Description
 ---------- | ---- | -----------
@@ -565,196 +565,33 @@ Field Name | Type | Description
 `--FitLineSize` |float|Set the Fit Line Size, default is: 1 .
 `--FitLineStyle` |float|Set the Fit Line Style, default is: 1 .
 
-**Example of use:** 
+For full example:
 
-1) As with frameworkMain for each new shell navigate to the base directory of the repository and setup the environment via: 
+1) As with frameworkMain for each new shell navigate to the base directory of the repository and execute: 
 
 ```
 source scripts/setup_CMS_GEM.sh
-```
-
-2) Let’s assume that you want to plot the first 60 lines of the second and third columns of the first sheet of the file QC3\_GE11-X-L-CERN-0002\_2017\_06\_01.xlsm which is stored in the base directory of the repository (../CMS\_GEM\_Analysis\_Framework/)
-
-What you have to do is:   
+python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> ...
 
 ```
-python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61   
-```
-The options you have set are:
-						
-* `—-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm`	
-(the desired file stored in the base dir of the repository.
-If you want to plot the comparison of multiple files you can write:  
+Where:
 
-`—-file=NameofFirstFile.xlsm —-file=NameofSecondFile.xlsm --file=NameofThirdFile.xlsm`),
-		
-* `—-SelectSheetNum=0`
-
-	(the excel sheet number starting counting from zero),
-
-* `—-SelectColumnX=1 —-SelectColumnY=2`
+* **PlotOption1** and **PlotOption2** are the desired `PlotOptions` described in the table above.
+* **Desired value** is the value that the user wants to give to this particular PlotOption. For the `PlotOptions` that no values were provided by the user the default values are set.
 	
-	(The desired columns for read starting counting from zero),
+2) After executing the command above, a `.cfg` file will be created in the base directory of the repository. If the user doesn't select the name of the `.cfg` file by adding the option `--OutputName=SomeName` in the command line above, the default name `PlotConfig.cfg` will be set. 
 
-* `--SelectRowStart=1 --SelectRowEnd=61`
-
-	(The desired rows for read starting counting from zero).
-	
-After executing the command above, a **.cfg** file will be created in the base directory of the repository. If the user doesn't select the name of the **.cfg** file by adding the option **--OutputName=SomeName** in the command line above, the default name **Myconfig.cfg** will be set. In addition all the default values described in the options table above will be set.
-
-The produced config file in our example is shown below:
-
-**Myconfig.cfg:**   
-
-	[BEGIN_CANVAS]
-	Canv_Axis_NDiv = '508,510';#X,Y
-	Canv_Dim= '1000,1000';#X,Y
-	Canv_DrawOpt = 'APE1';
-	Canv_Grid_XY = 'false,false';
-	Canv_Legend_Dim_X = '0.20,0.60';
-	Canv_Legend_Dim_Y = '0.56,0.92';
-	Canv_Legend_Draw = 'true';
-	Canv_Log_XY = 'false,false';
-	Canv_Logo_Pos = '0';
-	Canv_Logo_Prelim = 'true';
-	Canv_Margin_Top = '0.08';
-	Canv_Margin_Bot = '0.14';
-	Canv_Margin_Lf = '0.16';
-	Canv_Margin_Rt = '0.06';
-	Canv_Name = 'LS2_Detectors';
-	Canv_Plot_Type = 'TGraphErrors';
-	Canv_Range_X = '0,1000';
-	Canv_Range_Y = '0,7';
-	Canv_Title_Offset_X = '1.0';
-	Canv_Title_Offset_Y = '1.0';
-	Canv_Title_X = '';
-	Canv_Title_Y = '';
-		[BEGIN_PLOT]
-			Plot_Color = 'kRed';
-			Plot_LegEntry = 'GE11-X-L-CERN-0002';
-			Plot_Line_Size = '1';
-			Plot_Line_Style = '1';
-			Plot_Marker_Size = '0.8';
-			Plot_Marker_Style = '20';
-			Plot_Name = 'GE11-X-L-CERN-0002';
-			[BEGIN_DATA]
-			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
-			1.0,20.38,0.0,0.0
-			62.0,20.26,0.0,0.0
-			123.0,20.13,0.0,0.0
-			184.0,20.14,0.0,0.0
-			245.0,20.11,0.0,0.0
-			306.0,20.11,0.0,0.0
-			367.0,20.04,0.0,0.0
-			428.0,20.05,0.0,0.0
-			489.0,20.03,0.0,0.0
-			550.0,20.07,0.0,0.0
-			...................
-			...................
-			...................
-			2990.0,19.39,0.0,0.0
-			3051.0,19.33,0.0,0.0
-			3112.0,19.39,0.0,0.0
-			3173.0,19.32,0.0,0.0
-			3234.0,19.32,0.0,0.0
-			3295.0,19.35,0.0,0.0
-			3356.0,19.23,0.0,0.0
-			3417.0,19.25,0.0,0.0
-			3478.0,19.25,0.0,0.0
-			3539.0,19.29,0.0,0.0
-			3600.0,19.2,0.0,0.0
-			[END_DATA]
-		[END_PLOT]
-	[END_CANVAS]
-
-The `Plot_LegEntry` for every plot is automatically set to be the detector serial number found in the excel filename. 
+An example of the produced config file is shown in session: [4.e.iv.VI Example Config File - TGraph](#4eivvi-example-config-file---tgraph). The `Plot_LegEntry` for every plot is automatically set to be the detector serial number found in the excel filename. 
 
 Moreover if the fit option is added in the command above:
 
 ```
-python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm —-SelectSheetNum=0 —-SelectColumnX=1 —-SelectColumnY=2 --SelectRowStart=1 --SelectRowEnd=61 --Fit   
+python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> --Fit
 ```
 
-the header parameters for the fit will be created with the default fit values set:
-
-**Myconfig.cfg:**   
-
-	[BEGIN_CANVAS]
-	Canv_Axis_NDiv = '508,510';#X,Y
-	Canv_Dim= '1000,1000';#X,Y
-	Canv_DrawOpt = 'APE1';
-	Canv_Grid_XY = 'false,false';
-	Canv_Legend_Dim_X = '0.20,0.60';
-	Canv_Legend_Dim_Y = '0.56,0.92';
-	Canv_Legend_Draw = 'true';
-	Canv_Log_XY = 'false,false';
-	Canv_Logo_Pos = '0';
-	Canv_Logo_Prelim = 'true';
-	Canv_Margin_Top = '0.08';
-	Canv_Margin_Bot = '0.14';
-	Canv_Margin_Lf = '0.16';
-	Canv_Margin_Rt = '0.06';
-	Canv_Name = 'LS2_Detectors';
-	Canv_Plot_Type = 'TGraphErrors';
-	Canv_Range_X = '0,1000';
-	Canv_Range_Y = '0,7';
-	Canv_Title_Offset_X = '1.0';
-	Canv_Title_Offset_Y = '1.0';
-	Canv_Title_X = '';
-	Canv_Title_Y = '';
-		[BEGIN_PLOT]
-			Plot_Color = 'kRed';
-			Plot_LegEntry = 'GE11-X-L-CERN-0002';
-			Plot_Line_Size = '1';
-			Plot_Line_Style = '1';
-			Plot_Marker_Size = '0.8';
-			Plot_Marker_Style = '20';
-			Plot_Name = 'GE11-X-L-CERN-0002';
-			[BEGIN_DATA]
-			VAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR
-			1.0,20.38,0.0,0.0
-			62.0,20.26,0.0,0.0
-			123.0,20.13,0.0,0.0
-			184.0,20.14,0.0,0.0
-			245.0,20.11,0.0,0.0
-			306.0,20.11,0.0,0.0
-			367.0,20.04,0.0,0.0
-			428.0,20.05,0.0,0.0
-			489.0,20.03,0.0,0.0
-			550.0,20.07,0.0,0.0
-			...................
-			...................
-			...................
-			2990.0,19.39,0.0,0.0
-			3051.0,19.33,0.0,0.0
-			3112.0,19.39,0.0,0.0
-			3173.0,19.32,0.0,0.0
-			3234.0,19.32,0.0,0.0
-			3295.0,19.35,0.0,0.0
-			3356.0,19.23,0.0,0.0
-			3417.0,19.25,0.0,0.0
-			3478.0,19.25,0.0,0.0
-			3539.0,19.29,0.0,0.0
-			3600.0,19.2,0.0,0.0
-			[END_DATA]
-			[BEGIN_FIT]
-			Fit_Color = 'kRed';
-			Fit_Formula = '[0]';
-			Fit_LegEntry = 'Fit_GE11-X-L-CERN-0002';
-			Fit_Line_Size = '1';
-			Fit_Line_Style = '1';
-			Fit_Name = 'Fit_GE11-X-L-CERN-0002';
-			Fit_Option = 'R';
-			Fit_Param_IGuess = '0';
-			Fit_Perform = 'true';
-			Fit_Range = '0,1000';
-			[END_FIT]
-		[END_PLOT]
-	[END_CANVAS]
+the header parameters for the fit will be created as shown here: [4.e.iv.IX Example Config File - TH1F](#4eivix-example-config-file---th1f). If the user doesn't provide values for the rest fit PlotOptions the default values will be given to all the fit parameters.
 	
-3) To produce the graph execute the command:
-
-	 ./genericPlotter Myconfig.cfg true
+3) To produce the graph follow the instructions described in session: [3.b. genericPlotter](#3b-genericplotter)
 	 
 ### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File
 
