@@ -13,8 +13,8 @@ Table of Contents
          * [3.a.v  Helper Script - Run Mode: Comparison](#3av--helper-script---run-mode-comparison)
       * [3.b. genericPlotter](#3b-genericplotter)
          * [3.b.i  Helper Script - Make All Plots](#3bi--helper-script---make-all-plots)
-         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter](#3biii-helper-script---parsing-excel-files-to-genericplotter)
-         * [3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts](#3biiii-helper-script---parsing-excel-files-to-genericplotter---additional-scripts)
+         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitrary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
+         * [3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File](#3biiii-helper-script---parsing-excel-files-to-genericplotter---qc-excel-file)
       * [3.c. Python Scripts](#3c-python-scripts)
          * [3.c.i  Analysis Suite - Gain Map](#3ci--analysis-suite---gain-map)
          * [3.c.ii Analysis Suite - Efficiency Predictions](#3cii-analysis-suite---efficiency-predictions)
@@ -509,13 +509,12 @@ source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
 
 this will then execute genericPlotter taking each `*.cfg` file in the `figures/ResponseUniformityMaps` directory.
 
-### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter 
+### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitrary Excel File
 
-- **Main script:** Produce\_Config\_File.py
 - **Additional scripts:** QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py
 
 
-**Main script:** This tool is designed to read selected columns from an excel file and produce a config file in the genericPlotter input style described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). Following, the produced config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
+**Produce\_Config\_File.py:** This tool is designed to read selected columns from an excel file and produce a config file in the genericPlotter input style described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). Following, the produced config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
 
 The following **options** are defined:
 
@@ -765,11 +764,13 @@ the header parameters for the fit will be created with the default fit values se
 	 ./genericPlotter Myconfig.cfg true
 
 	 
-### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - Additional Scripts
+### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File
 
-**Additional scripts:** The additional scripts are designed to give specific instructions to the main script about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the options that are set are not the desirable ones.  
+**Scripts: QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py** 
 
-The following options are already set for **QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py** scripts:
+These additional scripts are designed to give specific instructions to the **Produce\_Config\_File.py** script about the style and the columns plotted depending on the kind of test. For example if the QC3.py script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the options that are set are not the desirable ones.  
+
+The following options are already set:
 
 	
 **QC3.py :**   
