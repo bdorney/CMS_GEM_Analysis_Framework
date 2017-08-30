@@ -3,7 +3,7 @@ from optparse import OptionParser
 parser=OptionParser()
 
 parser.add_option('-f','--file',action="append",dest='file',type=str)
-parser.add_option('--OutputName',action="store",dest="OutputName",type=str,default="Myconfig",help="Set Output file name, default is: Myconfig")
+parser.add_option('--OutputName',action="store",dest="OutputName",type=str,default="Plotconfig",help="Set Output file name, default is: Myconfig")
 parser.add_option('--SelectSheetNum',action="store",dest="SelectSheetNum",type=int,default=0,help="Select the Excel sheet for reading, default is: 0 ")
 parser.add_option('--SelectColumnX',action="store",dest="SelectColumnX",type=int,default=0,help= "Select Column number for X data, default value is 0 (counting starts from 0)")
 parser.add_option('--SelectColumnY',action="store",dest="SelectColumnY",type=int,default=0,help= "Select Column number for Y data, default value is 0 (counting starts from 0)")
