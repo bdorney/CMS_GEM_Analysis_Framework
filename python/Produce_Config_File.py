@@ -47,7 +47,7 @@ text_file.write("\tCanv_Grid_XY = '%s';\n"%(args.CanvGridXY))
 if args.LatexLines!= None:
 	for line in args.LatexLines:
 		text_file.write("\tCanv_Latex_Line = '%s';\n"%(line))
-	pass
+		pass
 	pass
 text_file.write("\tCanv_Legend_Dim_X = '%s';\n"%(args.CanvLegDimX))
 text_file.write("\tCanv_Legend_Dim_Y = '%s';\n"%(args.CanvLegDimY))
@@ -84,7 +84,7 @@ for filelist in args.file:
 	text_file.write("\t\t\tPlot_Marker_Style = '%s';\n"%(Marker_Style))
 	text_file.write("\t\t\tPlot_Name = '%s';\n"%(str(legEntry)))
 	text_file.write("\t\t\t[BEGIN_DATA]\n" )
-	text_file.write("\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
+	text_file.write("\t\t\t\tVAR_INDEP,VAR_DEP,VAR_INDEP_ERR,VAR_DEP_ERR\n" )
 
 	for row in range(args.SelectRowStart,args.SelectRowEnd):
 		if bool(args.YaxisScale):
@@ -109,23 +109,23 @@ for filelist in args.file:
 			pass
 
 		X= ws.cell_value(row,args.SelectColumnX) 
-		text_file.write("\t\t\t"+str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
+		text_file.write("\t\t\t\t"+str(X)+","+str(Y)+","+str(ErrX)+","+str(ErrY)+"\n")
 		pass
 
 	text_file.write("\t\t\t[END_DATA]\n" )
 
 	if bool(args.Fit):
 		text_file.write("\t\t\t[BEGIN_FIT]\n" )
-		text_file.write("\t\t\tFit_Color = '%s';\n"%(CyclicColor(DrawArg)))
-		text_file.write("\t\t\tFit_Formula = '%s';\n"%(args.FitFormula))
-		text_file.write("\t\t\tFit_LegEntry = 'Fit_%s';\n"%(legEntry))
-		text_file.write("\t\t\tFit_Line_Size = '%s';\n"%(args.FitLineSize))
-		text_file.write("\t\t\tFit_Line_Style = '%s';\n"%(args.FitLineStyle))
-		text_file.write("\t\t\tFit_Name = 'Fit_%s';\n"%(legEntry))
-		text_file.write("\t\t\tFit_Option = '%s';\n"%(args.FitOption))
-		text_file.write("\t\t\tFit_Param_IGuess = '%s';\n"%(args.FitParamIGuess))
-		text_file.write("\t\t\tFit_Perform = '%s';\n"%(args.FitPerform))
-		text_file.write("\t\t\tFit_Range = '%s';\n"%(args.FitRange))
+		text_file.write("\t\t\t\tFit_Color = '%s';\n"%(CyclicColor(DrawArg)))
+		text_file.write("\t\t\t\tFit_Formula = '%s';\n"%(args.FitFormula))
+		text_file.write("\t\t\t\tFit_LegEntry = 'Fit_%s';\n"%(legEntry))
+		text_file.write("\t\t\t\tFit_Line_Size = '%s';\n"%(args.FitLineSize))
+		text_file.write("\t\t\t\tFit_Line_Style = '%s';\n"%(args.FitLineStyle))
+		text_file.write("\t\t\t\tFit_Name = 'Fit_%s';\n"%(legEntry))
+		text_file.write("\t\t\t\tFit_Option = '%s';\n"%(args.FitOption))
+		text_file.write("\t\t\t\tFit_Param_IGuess = '%s';\n"%(args.FitParamIGuess))
+		text_file.write("\t\t\t\tFit_Perform = '%s';\n"%(args.FitPerform))
+		text_file.write("\t\t\t\tFit_Range = '%s';\n"%(args.FitRange))
 		text_file.write("\t\t\t[END_FIT]\n" )
 		pass
 
