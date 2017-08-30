@@ -8,7 +8,7 @@ parser.add_option('--SelectSheetNum',action="store",dest="SelectSheetNum",type=i
 parser.add_option('--SelectColumnX',action="store",dest="SelectColumnX",type=int,default=0,help= "Select Column number for X data, default value is 0 (counting starts from 0)")
 parser.add_option('--SelectColumnY',action="store",dest="SelectColumnY",type=int,default=0,help= "Select Column number for Y data, default value is 0 (counting starts from 0)")
 parser.add_option('--SelectRowStart',action="store",dest="SelectRowStart",type=int,default=1,help= "Select the first Row for reading, default is 1 (counting starts from 0)")
-parser.add_option('--SelectRowEnd',action="store",dest="SelectRowEnd",type=int,default=61,help= "Select the last Row for reading, default is 61 (counting starts from 0)")
+parser.add_option('--SelectRowEnd',action="store",dest="SelectRowEnd",type=int,default=60,help= "Select the last Row for reading, default is 61 (counting starts from 0)")
 parser.add_option('--AxisNDiv',action="store",dest="AxisNDiv",type=str,default="508,510",help="Set Axis Ndivisions X,Y (default is: 508,510)")
 parser.add_option('--CanvDim',action="store",dest="CanvDim",type=str,default="1000,1000",help="Set Canvas Dimensions X,Y (default is: 1000,1000)")
 parser.add_option('--CanvDrawOpt',action="store",dest="CanvDrawOpt",type=str,default="APE1",help="Set Draw Option (default is: APE1)")
