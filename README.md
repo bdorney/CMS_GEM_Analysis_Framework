@@ -511,9 +511,6 @@ this will then execute genericPlotter taking each `*.cfg` file in the `figures/R
 
 ### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitrary Excel File
 
-- **Additional scripts:** QC3.py, QC4\_HV.py, QC4\_SS.py, QC5\_Gain.py, QC5\_Rate.py
-
-
 **Produce\_Config\_File.py:** This tool is designed to read selected columns from an excel file and produce a config file in the genericPlotter input style described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). Following, the produced config file can be used as an input file by genericPlotter to create a graph in the official CMS style.
 
 The following **options** are defined:
@@ -568,7 +565,6 @@ Field Name | Type | Description
 `--FitLineSize` |float|Set the Fit Line Size, default is: 1 .
 `--FitLineStyle` |float|Set the Fit Line Style, default is: 1 .
 
-
 **Example of use:** 
 
 1) As with frameworkMain for each new shell navigate to the base directory of the repository and setup the environment via: 
@@ -587,13 +583,11 @@ python2.7 python/Produce_Config_File.py —-file=QC3_GE11-X-L-CERN-0002_2017_06_
 The options you have set are:
 						
 * `—-file=QC3_GE11-X-L-CERN-0002_2017_06_01.xlsm`	
-
 (the desired file stored in the base dir of the repository.
 If you want to plot the comparison of multiple files you can write:  
 
 `—-file=NameofFirstFile.xlsm —-file=NameofSecondFile.xlsm --file=NameofThirdFile.xlsm`),
-	
-	
+		
 * `—-SelectSheetNum=0`
 
 	(the excel sheet number starting counting from zero),
@@ -760,9 +754,7 @@ the header parameters for the fit will be created with the default fit values se
 	
 3) To produce the graph execute the command:
 
-
 	 ./genericPlotter Myconfig.cfg true
-
 	 
 ### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File
 
@@ -772,7 +764,6 @@ These additional scripts are designed to give specific instructions to the **Pro
 
 The following options are already set:
 
-	
 **QC3.py :**   
 
 	--CanvTitleX=Time #left(s#right)
@@ -927,7 +918,6 @@ or
 
 in case of multiple input files (	python2.7 python/QC4\_HV.py --file=Filename.xlsx --file=Filename2.xlsx ..)
 	
-
 **QC4_SS.py :**
 
 	--CanvTitleX=Divider Current #left(#muA#right)
@@ -994,7 +984,6 @@ or
 
 in case of multiple input files (	python2.7 python/QC5\_Gain.py --file=Filename.xlsx --file=Filename2.xlsx ..)
 	
-
 **QC5_Rate.py :**
 
 	--CanvTitleX=Divider Current #left(#muA#right)
@@ -1029,7 +1018,6 @@ or
 
 in case of multiple input files (	python2.7 python/QC5\_Rate.py --file=Filename.xlsx --file=Filename2.xlsx ..)
 	
-
 ## 3.c. Python Scripts
 A set of python analysis tools has been added to assist the user in further analysis of data created with the Framework.  The mathematical framework for the following sections is described [here](https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf). This may be helpful in attempting to understand the results produced by the python tools described below.
 
