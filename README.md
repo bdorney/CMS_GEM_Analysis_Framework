@@ -13,6 +13,8 @@ Table of Contents
          * [3.a.v  Helper Script - Run Mode: Comparison](#3av--helper-script---run-mode-comparison)
       * [3.b. genericPlotter](#3b-genericplotter)
          * [3.b.i  Helper Script - Make All Plots](#3bi--helper-script---make-all-plots)
+         * [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
+         * [3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File](#3biiii-helper-script---parsing-excel-files-to-genericplotter---qc-excel-file)
       * [3.c. Python Scripts](#3c-python-scripts)
          * [3.c.i  Analysis Suite - Gain Map](#3ci--analysis-suite---gain-map)
          * [3.c.ii Analysis Suite - Efficiency Predictions](#3cii-analysis-suite---efficiency-predictions)
@@ -136,7 +138,7 @@ This README.md file was written in [MarkDown](https://guides.github.com/features
 This repository is the work of:
 
 - Main Developer: Brian Dorney
-- Contributors: Marcello Maggi
+- Contributors: Marcello Maggi, Anastasia Kotsokechagia
 - amoreSRS Team:  Kondo Gnanvo, Mike Staib, Stefano Colafranchescci, Dorothea Pfeiffer
 
 This package has been designed by B. Dorney with input from J. Merlin & S. Colafranceschi. The event unpacking and reconstruction code was ported from `amoreSRS` by Marcello Maggi. The original selection & analysis algorithms are based off work done by J. Merlin.  This package makes use of several features from the `CMS_GEM_TB_Timing` repository (also by B. Dorney).
@@ -507,6 +509,274 @@ source scripts/makeAllPlots.sh figures/ResponseUniformityMaps
 
 this will then execute genericPlotter taking each `*.cfg` file in the `figures/ResponseUniformityMaps` directory.
 
+### 3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File
+
+`Produce_Config_File.py:`This tool is designed to read selected columns from an excel file and produce a config file for genericPlotter as described in session: [4.e.iv. Plot Config File](#4eiv-plot-config-file). 
+
+The following `PlotOptions` are defined:
+
+Field Name | Type | Description
+---------- | ---- | -----------
+`-h, --help` |  | All the options that are available are displayed.
+`-f, --file` |list of strings  | Add an entry to the input excel file list.
+`--OutputName` |string | Set Output file name, default is: `PlotConfig`.
+`--SelectSheetNum` | int| Select the Excel sheet for reading, default is:`0` (counting starts from 0).
+`--SelectColumnX` |int | Select Column number for X data, default value is `0` (counting starts from 0).
+`--SelectColumnY` | int| Select Column number for Y data, default value is `0` (counting starts from 0).
+`--SelectRowStart` |int |Select the first Row for reading, default is `1` (counting starts from 0).
+`--SelectRowEnd` | int|  Select the last Row for reading, default is `60` (counting starts from 0).
+`--AxisNDiv` | Two comma separated int's |Set Axis Ndivisions X,Y. Corresponds to the `Canv_Axis_NDiv` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `508,510` 
+`--CanvDim` | Two comma separated int's | Set Canvas Dimensions X,Y. Corresponds to the `Canv_Dim` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `1000,1000`
+`--CanvDrawOpt` | string | Choose the Draw option that will be applied to all plots on this canvas.Corresponds to the `Canv_DrawOpt` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `APE1`
+`--CanvGridXY` | Two comma separated bool's | Choose if the grid should be drawn on the canvas.Corresponds to the `Canv_Grid_XY` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `false,false`
+`--LatexLines` | list of strings |Add an entry to the LatexLines list following syntax:`Coord_PadX,Coord_PadY,text`.Corresponds to the `Canv_Latex_Line` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).   
+`--CanvLegDimX` | Two comma separated floats |Set X Legend Dimensions.Corresponds to the `Canv_Legend_Dim_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.20,0.60`
+`--CanvLegDimY` | Two comma separated floats | As `CanvLegDimX` but for the Y coordinates. Default is: `0.56,0.92`
+`--CanvLegDraw` | string | Set the Legend draw option to true or false. Corresponds to the `Canv_Legend_Draw` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `true`
+`--CanvLogXY` | Two comma separated bool's | As `CanvGridXY` but for setting the X & Y axis to logarithmic. Default is: `false,false`
+`--CanvLogoPos` | int | Indicates the position the CMS logo should be placed.Corresponds to the `Canv_Logo_Pos` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas) . Default is: `0`
+`--CanvLogoPrelim` | string | Set Logo Preliminary true or false. Corresponds to the `Canv_Logo_Prelim` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `true`
+`--CanvMarginBot` | float | Sets the bottom margin of the `TCanvas`. Corresponds to the `Canv_Margin_Bot` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.14`
+`--CanvMarginLf` | float | Sets the left margin of the `TCanvas`. Corresponds to the `Canv_Margin_Lf` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.16`
+`--CanvMarginRt` | float | Sets the right margin of the `TCanvas`.Corresponds to the `Canv_Margin_Rt` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.06`
+`--CanvMarginTop` | float | Sets the top margin of the `TCanvas`. Corresponds to the `Canv_Margin_Top` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.08`
+`--CanvPlotType` | string | Set the Canvas Plot type. Corresponds to the `Canv_Plot_Type` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).  Default is: `TGraphErrors`
+`--CanvRangeX` | Two comma separated int's | Set X-Axis range. Corresponds to the `Canv_Range_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0,1000`
+`--CanvRangeY` | Two comma separated int's | As `CanvRangeX` but for the Y-axis. Default is: `0,7`
+`--CanvTitleX` | string | Set X-Axis Title. Corresponds to the `Canv_Title_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).
+`--CanvTitleY` | string | Set Y-Axis Title. Corresponds to the `Canv_Title_Y` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas).
+`--CanvTitleOffsetX` | float | Defines the offset of the X-axis title. Corresponds to the `Canv_Title_Offset_X` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `1.0`
+`--CanvTitleOffsetY` | float | As `CanvTitleOffsetX` but for the Y-axis. Corresponds to the `Canv_Title_Offset_Y` header parameter described in Section [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `0.8`
+`--CanvName` | string| Set the Canvas Name for `Canv_Name` header parameter described in [4.e.iv.I HEADER PARAMETERS - CANVAS](#4eivi-header-parameters---canvas). Default is: `LS2_Detectors`.
+`--YaxisScale` |bool | If YaxisScale option is used the Y axis is plotted in kUnit. Default is: `False`.
+`--SetErrX  ` | bool| Set Error option true (for X axis).
+`--SetErrY` | bool | Set Error option true (for Y axis).
+`--SelectColumnErrX` |int | If SetErrX=True choose the Column number for XError, Default is: `0`.
+`--SelectColumnErrY` |int | If SetErrY=True choose the Column number for YError, Default is: `0`.
+`--PlotLineSize` |float| Set Plot Line Size for `Plot_Line_Size` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `1`.
+`--PlotLineStyle` |float| Set Plot Line Style for `Plot_Line_Style` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `1`.
+`--PlotMarkerSize` |float| Set Plot Line Style for `Plot_Marker_Size` header parameter described in [4.e.iv.II HEADER PARAMETERS - PLOT](#4eivii-header-parameters---plot). Default is: `0.8`.
+`--Fit ` |bool |If the Fit option is used the header parameters for the fit are created .
+`--FitFormula` | string | Set the fit formula for `Fit_Formula` header parameter described in Section 4.e.iv.III. Default is `[0]`.  
+`--FitParamIGuess`  | Comma separated list of strings | Set fit parameters initial guess. Corresponds to the `Fit_Param_IGuess` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit). Default is: `0`
+`--FitRange` | Comma separated list of strings | Set the Fit range for `Fit_Range` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is `0,1000`.
+`--FitPerform` | string| If true (default) perform a fit to the TObject defined in the [BEGIN\_PLOT] header this [BEGIN\_FIT] header is found in.
+`--FitLineSize` |float| Set the Fit Line Size for `Fit_Line_Size` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is: `1` .
+`--FitLineStyle` |float| Set the Fit Line Style for `Fit_Line_Style` header parameter described in Section [4.e.iv.III HEADER PARAMETERS - FIT](#4eiviii-header-parameters---fit), default is: `1` .
+
+For full example:
+
+1) As with frameworkMain for each new shell navigate to the base directory of the repository and execute: 
+
+```
+source scripts/setup_CMS_GEM.sh
+python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> ...
+
+```
+Where:
+
+* **PlotOption1** and **PlotOption2** are the desired `PlotOptions` described in the table above.
+* **Desired value** is the value that the user wants to give to this particular PlotOption. For the `PlotOptions` that no values are provided by the user the default values are set.
+	
+2) After executing the command above, a `.cfg` file will be created in the base directory of the repository. If the user doesn't select the name of the `.cfg` file by adding the option `--OutputName=SomeName` in the command line above, the default name `PlotConfig.cfg` will be set. 
+
+An example of the produced config file is shown in session: [4.e.iv.VI Example Config File - TGraph](#4eivvi-example-config-file---tgraph). The `Plot_LegEntry` for every plot is automatically set to be the detector serial number found in the excel filename. 
+
+Moreover if the fit option is added in the command above:
+
+```
+python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> --Fit
+```
+
+the header parameters for the fit will be created as shown here: [4.e.iv.IX Example Config File - TH1F](#4eivix-example-config-file---th1f). If the user doesn't provide values for the rest fit PlotOptions the default values will be given to all the fit parameters.
+	
+3) To produce the graph follow the instructions described in session: [3.b. genericPlotter](#3b-genericplotter)
+	 
+### 3.b.ii.II Helper Script - Parsing Excel Files to genericPlotter - QC Excel File
+
+**Scripts Available:** `QC3.py, QC4_HV.py, QC4_SS.py, QC5_Gain.py, QC5_Rate.py` 
+
+These scripts are designed to give specific instructions to the `Produce_Config_File.py` script about the style and the columns plotted depending on the kind of test. For example if the `QC3.py` script is selected the columnY= 2 (corresponds to the pressure(mbar) column) vs columnX= 1 (corresponds to the time(s) column) will be plotted. Moreover the title axis names are set and the latex lines: LS2 Detector Production and Gas=CO2 will be plotted on the graph. The user is able to open and modify the produced config file in case some of the `PlotOptions` that are set are not the desirable ones.  
+
+The following `PlotOptions` are already set:
+
+`QC3.py ` :  
+
+	--CanvTitleX=Time #left(s#right)
+	--CanvTitleY=Pressure #left(mbar#right)
+	--SelectColumnX=1
+	--SelectColumnY=2
+	--SelectRowStart=1
+	--SelectRowEnd=61
+	--CanvRangeX=0,3600
+	--CanvRangeY=0,35
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+	
+For full example:
+
+1) As before for each new shell navigate to the base directory of the repository and execute: 
+
+	source scripts/setup_CMS_GEM.sh
+	python2.7 python/QC3.py --file=Filename1.xlsm --file=Filename2.xlsm --Fit
+	
+Where:
+
+* **file** is the PlotOption described in session: [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file)
+* **Filename1** and **Filename2** are the names of the desired excel files stored in the base directory of the repository.
+* **Fit (Optional)** is the PlotOption described in session: [3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file). 
+
+If the Fit option is used the following options are set automatically for the fit:
+
+	--FitFormula=[0]*TMath::Exp([1]*x)
+	--FitParamIGuess=AMPLITUDE,6.2e-05
+	--FitRange=0,3600
+	
+Where:
+
+* **FitFormula**, **FitParamIGuess** and **FitRange** are the PlotOptions described in Section 	[3.b.ii.I Helper Script - Parsing Excel Files to genericPlotter - Arbitary Excel File](#3biii-helper-script---parsing-excel-files-to-genericplotter---arbitary-excel-file).
+* **AMPLITUDE** is the Keyword described in Section [4.e.ii.IV HEADER PARAMETERS - ADC_FIT_INFO](#4eiiiv-header-parameters---adc_fit_info).
+		
+2) After executing the command, a `.cfg` file will be created as before in the base directory of the repository. In the case that more than one input files are selected (like in our example) the output name is automatically set to be: 
+
+ `config_QC3_LS2_Pres_vs_Time_AllDet.cfg`
+
+If only one input file is selected the default name is:
+
+ `config_FileName.cfg`
+ 
+`QC4_HV.py` :
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Applied Voltage #left(kV#right)
+	--SelectColumnX=3
+	--SelectColumnY=1
+	--SelectRowStart=3
+	--SelectRowEnd=37
+	--CanvRangeX=0,1000
+	--CanvRangeY=0,7
+	--YaxisScale
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+
+	Moreover if the Fit PlotOption is used the following options are set for the fit:
+
+	--Fit
+	--FitFormula=[0]*x+[1]
+	--FitParamIGuess=Req,5   (where Req is the measured resistance from the excel file) 
+	--FitRange=0,1000
+	
+For full example: 
+
+Follow steps 1-2 described in `QC3.py` example.
+
+The output filename in case of one input file will be: 
+	
+`config_V_vs_Imon_Filename.cfg`
+
+or 
+
+`config_QC4_LS2_V_vs_Imon_AllDet.cfg`
+
+in case of multiple input files.
+	
+`QC4_SS.py`:
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Spurious Signal R_{SS} #left(Hz#right)
+	--LatexLines=0.62,0.86, #splitline{LS2}{Detector~Production}
+	--LatexLines=0.62,0.27, Gas~=~CO_{2}
+	--LatexLines=0.58,0.73, Readout~=~GEM3B
+	--SelectColumnX=3
+	--SelectColumnY=7
+	--SelectRowStart=3
+	--SelectRowEnd=37
+	--CanvRangeX=0,1000
+	--CanvRangeY=0,50
+	--SetErrY
+	--SelectColumnErrY=8
+	
+For full example: 
+
+Follow steps 1-2 described in `QC3.py` example.
+
+The output filename in case of one input file will be: 
+	
+`config_SS_vs_Imon_Filename.cfg`
+
+or 
+
+`config_QC4_LS2_SS_vs_Imon_AllDet.cfg`
+
+in case of multiple input files.
+
+`QC5_Gain.py`:
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Effective Gain
+	--LatexLines=0.19,0.88, LS2~Detector~Production
+	--LatexLines=0.19,0.83, Gas~=~Ar/CO_{2}~#left(70/30#right)
+	--LatexLines=0.19,0.78, X-Ray~Target:~Ag
+	--LatexLines=0.19,0.73, X-Ray~V_{mon}~=~40~kV
+	--LatexLines=0.19,0.68, X-Ray~I_{mon}~~~=~5~#muA
+	--LatexLines=0.19,0.63, i#eta~=~4;~i#phi~=~2
+	--SelectColumnX=4
+	--SelectColumnY=11
+	--SelectRowStart=29
+	--SelectRowEnd=45
+	--CanvRangeX=0,750
+	--CanvLogXY=false,true
+	--CanvRangeY=10,1000000
+	--SetErrY
+	--SelectColumnErrY=12
+	
+For full example: 
+
+Follow steps 1-2 described in `QC3.py` example.
+
+The output filename in case of one input file will be: 
+	
+`config_Gain_vs_Imon_Filename.cfg`
+
+or 
+
+`config_QC5_LS2_Gain_vs_Imon_AllDet.cfg`
+
+in case of multiple input files.
+	
+`QC5_Rate.py`:
+
+	--CanvTitleX=Divider Current #left(#muA#right)
+	--CanvTitleY=Rate #left(Hz#right)
+	--LatexLines=0.19,0.88, LS2~Detector~Production
+	--LatexLines=0.19,0.83, Gas~=~Ar/CO_{2}~#left(70/30#right)
+	--LatexLines=0.19,0.78, X-Ray~Target:~Ag
+	--LatexLines=0.19,0.73, X-Ray~V_{mon}~=~40~kV
+	--LatexLines=0.19,0.68, X-Ray~I_{mon}~~~=~5~#muA
+	--LatexLines=0.19,0.63, i#eta~=~4;~i#phi~=~2
+	--SelectColumnX=4
+	--SelectColumnY=7
+	--SelectRowStart=29
+	--SelectRowEnd=45
+	--CanvRangeX=0,750
+	--CanvRangeY=0,1800
+	--SetErrY
+	--SelectColumnErrY=8
+
+For full example: 
+
+Follow steps 1-2 described in `QC3.py` example.
+
+The output filename in case of one input file will be: 
+	
+`config_Rate_vs_Imon_Filename.cfg`
+
+or 
+
+`config_QC5_LS2_Rate_vs_Imon_AllDet.cfg`
+
+in case of multiple input files.
+		
 ## 3.c. Python Scripts
 A set of python analysis tools has been added to assist the user in further analysis of data created with the Framework.  The mathematical framework for the following sections is described [here](https://indico.cern.ch/event/631320/contributions/2552041/attachments/1444163/2224433/BDorney_SliceTest_HV_Settings.pdf). This may be helpful in attempting to understand the results produced by the python tools described below.
 
