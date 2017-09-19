@@ -16,7 +16,7 @@ for f in *.cfg
 do
 	echo "=============================================="
 	echo "Making plot from file:" $f
-	$GEM_BASE/genericPlotter $f false
+	$FRAMEWORK_BASE/genericPlotter $f false
 done
 
 echo "=============================================="
