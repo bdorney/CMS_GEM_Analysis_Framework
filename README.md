@@ -162,7 +162,14 @@ cd CMS_GEM_Analysis_Framework
 git pull origin master
 ```
 
-You will now have the latest version of the `master` branch.  To compile the repository:
+Then you'll need to setup the `$FRAMEWORK_BASE` shell variable:
+
+```
+cd <path>/CMS_GEM_Analysis_Framework
+export FRAMEWORK_BASE=$PWD
+```
+
+You may want to add the definition of `$FRAMEWORK_BASE` to your `~/.bashrc` file. To compile the repository:
 
 ```
 source scripts/setup_CMS_GEM.sh
@@ -171,26 +178,7 @@ make -f Makefile.gpp
 make -f MakefilePlotter.gpp
 ```
 
-The repository is now compiled.  Please note the first execution of `scripts/setup_CMS_GEM.sh` might make a local installation of `pip` and several other `python` packages that are required for the python analysis tools described in Section 3.c.  Additionally the base directory of the repository has been exported to the shell variable `$GEM_BASE`.
-
-Please check [here](https://github.com/bdorney/CMS_GEM_Analysis_Framework) for the most-up-to-date release.  You migrate your `master` branch to the most-up-to-date branch via:
-
-```
-git checkout -b <local_branch_name>
-git pull origin <remote_branch_name>
-make -f Makefile.gpp clean
-make -f Makefile.gpp
-make -f MakefilePlotter.gpp
-```
-
-The `local_branch_name` is the name of the branch on your local machine. The `remote_branch_name` is the name of the branch you are checking out from the remote repository. It is a good practice to make `local_branch_name = remote_branch_name`.  You can see the list of available branches from command line via:
-
-```
-git fetch
-git branch -a
-```
-
-The branch you are currently on will have the `*` character next to it.
+The repository is now compiled.  Please note the first execution of `scripts/setup_CMS_GEM.sh` might make a local installation of `pip` and several other `python` packages that are required for the python analysis tools described in Section 3.c.  Additionally the base directory of the repository has been exported to the shell variable `$FRAMEWORK_BASE`.
 
 NOTE: a make file for clang has been included "Makefile.clang" for MAC OS users.  However presently there is no support for any installation/runtime errors on a MAC OS environemnt. It is strongly urged that you use the Linux computing environment mentioned above (since it is so readily available to us).
 
@@ -261,7 +249,7 @@ Where:
 - **Queue Name** is from the set {`8nm`, `1nh`, `8nh`, `1nd`} and is the submission queue on the [lxplus batch submmission system](https://cern.service-now.com/service-portal/article.do?n=KB0000470), and
 - **Output Dir** is the physical file path (PFP) of the desired output data directory where output files will be moved once the job completes.
 
-Additionally for each job a run config file (described in Section 4.e.iii.V), named `config/configRun_JobNoX.cfg` where `X` is the job number, will be created.  One script per job, named `scripts/submitFrameworkJob_JobNoX.sh`, will created; this script will be what the job executes when it runs.  Three directories will also be created, if they do not already exist, called `$GEM_BASE/stderr`, `$GEM_BASE/stdlog`, and `$GEM_BASE/stdout`.  Each of these directories will respectively store the stderr (`stderr/frameworkErr_JobNoX.txt`), stdlog (`stdlog/frameworkLog_JobNoX.txt`), and stdout (`stdout/frameworkOut_JobNoX.txt`) files produced for each job.  The stderr file for a job should be checked if a job fails to produce an output `TFile`.  The stdlog file for a job shows any output to terminal that would be created if the executable was run locally.  The stdout file shows a summary of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
+Additionally for each job a run config file (described in Section 4.e.iii.V), named `config/configRun_JobNoX.cfg` where `X` is the job number, will be created.  One script per job, named `scripts/submitFrameworkJob_JobNoX.sh`, will created; this script will be what the job executes when it runs.  Three directories will also be created, if they do not already exist, called `$FRAMEWORK_BASE/stderr`, `$FRAMEWORK_BASE/stdlog`, and `$FRAMEWORK_BASE/stdout`.  Each of these directories will respectively store the stderr (`stderr/frameworkErr_JobNoX.txt`), stdlog (`stdlog/frameworkLog_JobNoX.txt`), and stdout (`stdout/frameworkOut_JobNoX.txt`) files produced for each job.  The stderr file for a job should be checked if a job fails to produce an output `TFile`.  The stdlog file for a job shows any output to terminal that would be created if the executable was run locally.  The stdout file shows a summary of the job prepared by the scheduler showing time taken, memory usage, and stderr file for the job.
 
 After `scripts/runMode_Grid.sh` has submitted all your jobs it will dump some useful information for how to check running jobs and kill running jobs if necessary.  The `scripts/runMode_Grid.sh` will also show how to add all output `TFiles` together from command line using `hadd`.  After you have added all `TFiles` together you should run the framework over this summary `TFile` in re-run mode to perform the fitting and uniformity analysis.
 
@@ -277,7 +265,7 @@ For full example:
 runMode_Grid.sh GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
 cd $DATA_DIR/GE11-VII-L-CERN-0001
 hadd summaryFile_Ana.root *Ana.root
-cd $GEM_BASE
+cd $FRAMEWORK_BASE
 source scripts/cleanGridFiles.sh
 source scripts/runMode_Rerun.sh GE11-VII-L-CERN-0001 $DATA_DIR/GE11-VII-L-CERN-0001 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
 ```
@@ -320,7 +308,7 @@ Full example:
 runMode_Grid_Reco.sh GE11-VII-L-CERN-0004 config/configReco.cfg config/Mapping_GE11-VII-L.cfg 1nh $DATA_DIR
 cd $DATA_DIR/GE11-VII-L-CERN-0004
 ls
-cd $GEM_BASE
+cd $FRAMEWORK_BASE
 source scripts/cleanGridFiles.sh
 source scripts/runMode_Series.sh GE11-VII-L-CERN-0004 $DATA_DIR/GE11-VII-L-CERN-0004 config/configAnalysis.cfg config/Mapping_GE11-VII-L.cfg
 ```
@@ -1660,7 +1648,7 @@ Three configuration files are require to run the frameworkMain exectuable:
 2. the *analysis config* file, and
 3. the *reco config* file.
 
-Examples of each files have been included in the `$GEM_BASE/config` directory
+Examples of each files have been included in the `$FRAMEWORK_BASE/config` directory
 
 ### 4.e.i. Mapping Config File
 The *mapping config* file is the file used when analyzing data collected with the SRS system. An example of the mapping config file is shown as:
