@@ -13,11 +13,9 @@ export CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem/QualityControl
 
 #Setup gcc/g++
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6/setup.sh
-#source /afs/cern.ch/sw/lcg/contrib/gcc/4.9.2/x86_64-slc6/setup.sh
 
 #Setup ROOT
 cd /afs/cern.ch/sw/lcg/app/releases/ROOT/6.06.06/x86_64-slc6-gcc48-opt/root
-#cd /afs/cern.ch/sw/lcg/app/releases/ROOT/6.06.08/x86_64-slc6-gcc49-opt/root
 source bin/thisroot.sh
 
 cd $GEM_BASE
@@ -41,7 +39,7 @@ if [[ !  -d $DIR_PIP ]]; then
 	alias pip2.7="$DIR_PIP/bin/pip"
 
 	#Installing packages
-	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy
+	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy xlrd
 else
 	#Update environment	
 	export PYTHONPATH=$DIR_PIP/lib/python2.7/site-packages:$PYTHONPATH
