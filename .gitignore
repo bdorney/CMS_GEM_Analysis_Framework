@@ -1,7 +1,7 @@
 # Ignore everything
 *
 
-# Don't ignore git settings
+## Don't ignore git settings
 !*.gitignore
 !*.gitattributes
 !*.github/
