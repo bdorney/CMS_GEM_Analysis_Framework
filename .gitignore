@@ -4,6 +4,7 @@
 # Don't ignore git settings
 !*.gitignore
 !*.gitattributes
+!*.github/
 
 # Don't ignore special files
 !*.md
