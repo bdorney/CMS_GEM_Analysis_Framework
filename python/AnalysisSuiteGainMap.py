@@ -64,7 +64,7 @@ class AnalysisSuiteGainMap:
         if len(inputfilename) > 0:
             self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
 
-	    self.FILE_OUT = file_out        
+        self.FILE_OUT = file_out        
 
         self.GAIN_CALCULATOR    = params_gain
         self.GAIN_LAMBDA        = 1.
@@ -506,7 +506,7 @@ class AnalysisSuiteGainMap:
         gDet_MaxEffGain.Write()
         gDet_MinEffGain.Write()
         
-    	return
+        return
 
     #Plot Average Gain Over Entire Detector Area
     def plotPDSummary(self, strDetName):
@@ -556,7 +556,7 @@ class AnalysisSuiteGainMap:
         gDet_MaxPD.Write()
         gDet_MinPD.Write()
         
-    	return
+        return
 
     #Open Input File
     def openInputFile(self, inputfilename):
