@@ -70,7 +70,10 @@ if __name__ == "__main__":
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
     #Initialize analysis suite
-    anaSuite = AnalysisSuiteGainMap(inputfilename=options.filename, 
+    import ROOT as r
+    outF = r.TFile("GainMap_%s.root"%(options.det_name),"RECREATE","",1)
+    anaSuite = AnalysisSuiteGainMap(file_out=outF,
+                    inputfilename=options.filename, 
 				    params_gain=params_gain, 
 				    params_det=params_det, 
 				    debug=options.debug)
