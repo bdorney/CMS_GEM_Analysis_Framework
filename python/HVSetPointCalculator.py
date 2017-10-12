@@ -147,18 +147,17 @@ class HVSetPoint:
         return
 
 if __name__ == "__main__":
-
     from optparse import OptionParser
     
     parser = OptionParser()
     
     #Options - debugging
-    parser.add_option("-d","--deubg", type="int", dest="debug",
+    parser.add_option("-d","--debug", type="int", dest="debug",
                       help="Print debugging information", metavar="debug")
-
     parser.add_option("-g","--gain", type="float", dest="gainval",
                       help="Gain value to determine HV Settings at", metavar="gainval")
-
+    parser.add_option("--fileGainMapList", type="string", dest="fileGainMapList",
+                      help="Tab delimited file of root file, detector serial number, and Detector_Name from run config file", metavar="fileGainMapList") 
     #Get input options
     (options, args) = parser.parse_args()
     
@@ -166,17 +165,34 @@ if __name__ == "__main__":
     hvSettings = HVSetPoint(options.gainval, options.debug)
 
     #Add list of files
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long1/GE11-VII-L-CERN-0001_GainCurves.root","GE1/1-VII-L-CERN-0001","GE11-VII-L-CERN-0001")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long2/GE11-VII-L-CERN-0002_GainCurves.root","GE1/1-VII-L-CERN-0002","GE11-VII-L-CERN-0002")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long3/GE11-VII-L-CERN-0003_GainCurves.root","GE1/1-VII-L-CERN-0003","Detector")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Long4/GE11-VII-L-CERN-0004_GainCurves.root","GE1/1-VII-L-CERN-0004","Detector")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short1/GE11-VII-S-CERN-0001_GainCurves.root","GE1/1-VII-S-CERN-0001","GE11-VII-S-CERN-0001")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short2/GE11-VII-S-CERN-0002_GainCurves.root","GE1/1-VII-S-CERN-0002","GE11-VII-S-CERN-0002")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short3/GE11-VII-S-CERN-0003_GainCurves.root","GE1/1-VII-S-CERN-0003","GE11-VII-S-CERN-0003")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short4/GE11-VII-S-CERN-0004_GainCurves.root","GE1/1-VII-S-CERN-0004","Detector")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short5/GE11-VII-S-CERN-0005_GainCurves.root","GE1/1-VII-S-CERN-0005","GE11-VII-S-CERN-0005")
-    hvSettings.addInputFile("/afs/cern.ch/user/d/dorney/scratch0/CMS_GEM/CMS_GEM_Analysis_Framework/figures/AvgGain/Short6/GE11-VII-S-CERN-0006_GainCurves.root","GE1/1-VII-S-CERN-0006","GE11-VII-S-CERN-0006")
+    import os
+    try:
+        fileGainMapList = open(options.fileGainMapList, 'r') #tab '\t' delimited file, first line column headings, subsequent lines data: PFN of ROOT File\tDet SN\tDetector_Name
+    except Exception as e:
+        print '%s does not seem to exist'%(options.fileGainMapList)
+        print e
+        exit(os.EX_NOINPUT)
+        pass
     
+    # Loop Over inputs
+    for i,line in enumerate(fileGainMapList):
+        if line[0] == "#" or not i > 0:
+            continue
+
+        # Split the line
+        line = line.strip('\n')
+        detGainList = line.rsplit('\t') #Physical Filename of ROOT File, Det S/N, Detector_Name
+
+        if len(detGainList) != 3:
+            print "Input format incorrect"
+            print "I was expecting a tab-delimited file with each line having 3 entries"
+            print "But I received:"
+            print "\t%s"%(line)
+            print "Exiting"
+            exit(os.EX_USAGE)
+
+        hvSettings.addInputFile(detGainList[0],detGainList[1],detGainList[2])
+
     #Print the file list if requested
     if options.debug:
 	#Printing input files

@@ -44,7 +44,6 @@ class AnalysisSuiteGainMap:
                  'PD_MIN_POINTS'
                  ]
     
-    #def __init__(self, inputfilename="", outputfilename="AnaSuiteGainMapOutput.root", outputfileoption="RECREATE", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):
     def __init__(self, file_out, inputfilename="", params_gain=PARAMS_GAIN(), params_det=PARAMS_DET(), params_discharge=PARAMS_PD(), debug=False):        
         self.ADCPKPOS_SECTOR_AVG    = 0. #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         self.ADCPKPOS_SECTOR_STDDEV = 0. #Std. Dev. of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
@@ -65,12 +64,7 @@ class AnalysisSuiteGainMap:
         if len(inputfilename) > 0:
             self.FILE_IN	= TFile(str(inputfilename),"READ","",1)
 
-        #if len(outputfilename) == 0:
-            #outputfilename	= inputfilename.split('/')
-            #outputfilename	= "AnaSuiteGainMapOutput_" + outputfilename[len(outputFileName)-1]
-
-        #self.FILE_OUT	= TFile(str(outputfilename),outputfileoption,"",1)
-	self.FILE_OUT = file_out        
+        self.FILE_OUT = file_out        
 
         self.GAIN_CALCULATOR    = params_gain
         self.GAIN_LAMBDA        = 1.
@@ -117,8 +111,6 @@ class AnalysisSuiteGainMap:
         
         #Reset classes
         self.DETECTOR.reset()
-        #self.GAIN_CALCULATOR
-        #self.PD_CALCULATOR
         
         #Clear Lists
         del self.DET_IMON_POINTS[:]
@@ -144,9 +136,7 @@ class AnalysisSuiteGainMap:
     #Determines the Average & Std. Dev. ADC PkPos in the (DETPOS_IETA, DETPOS_IPHI) sector
     def avgROSectorADCPkPos(self):
         #Load the plot
-        #strPlotName = "g_iEta" + str(self.DETECTOR.DETPOS_IETA) + "_clustADC_Fit_PkPos"
         strPlotName = "SectorEta{0}/g_iEta{0}_clustADC_Fit_PkPos".format(self.DETECTOR.DETPOS_IETA)
-        #gSector_clustADC_Fit_PkPos = self.FILE_IN.Get( "SectorEta" + str(self.DETECTOR.DETPOS_IETA) + "/" + strPlotName )
         gSector_clustADC_Fit_PkPos = self.FILE_IN.Get(strPlotName)
         
         #Calculate the iphi sector boundaries
@@ -179,16 +169,13 @@ class AnalysisSuiteGainMap:
         array_clustADC_Fit_PkPos = rejectOutliers(array_clustADC_Fit_PkPos)
 
         if self.DEBUG:
-            #print "np.mean(list_clustADC_Fit_PkPos) = " + str(np.mean(list_clustADC_Fit_PkPos))
             print "np.mean(list_clustADC_Fit_PkPos) = {0}".format(np.mean(list_clustADC_Fit_PkPos))
-            #print "np.mean(array_clustADC_Fit_PkPos) = " + str(np.mean(array_clustADC_Fit_PkPos)) + "\t No Outliers"
             print "np.mean(array_clustADC_Fit_PkPos) = {0}\t No Outliers".format(str(np.mean(array_clustADC_Fit_PkPos)))
 
         #Calculate Average
         self.ADCPKPOS_SECTOR_AVG    = np.mean(array_clustADC_Fit_PkPos) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         self.ADCPKPOS_SECTOR_STDDEV = np.std(array_clustADC_Fit_PkPos) #Std Dev of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         
-        #print "Avg PkPos = " + str(self.ADCPKPOS_SECTOR_AVG) + "+/-" + str(self.ADCPKPOS_SECTOR_STDDEV)
         print "Avg PkPos = {0}+/-{1}".format(self.ADCPKPOS_SECTOR_AVG, self.ADCPKPOS_SECTOR_STDDEV)
         
         return
@@ -196,13 +183,10 @@ class AnalysisSuiteGainMap:
     #Determine the average of the average cluster sizes within a single readout sector
     def avgROSectorAvgClustSize(self):
         #Load the plot
-        #strPlotName = "h_iEta" + str(self.DETECTOR.DETPOS_IETA) + "_clustSize_v_clustPos"
         strPlotName = "SectorEta{0}/h_iEta{0}_clustSize_v_clustPos".format(self.DETECTOR.DETPOS_IETA)
-        #hSector_clustSize_v_clustPos = self.FILE_IN.Get( "SectorEta" + str(self.DETECTOR.DETPOS_IETA) + "/" + strPlotName )
         hSector_clustSize_v_clustPos = self.FILE_IN.Get( strPlotName )
         
         #Calculate the iphi sector boundaries
-        #list_sectBoundary = self.calcROSectorBoundaries(self.LIST_DET_GEO_PARAMS[self.DETECTOR.DETPOS_IETA-1])
         list_sectBoundary = self.DETECTOR.calcROSectorBoundariesByEta(self.DETECTOR.DETPOS_IETA)
         
         #Print to user - Section Boundaries
@@ -219,7 +203,6 @@ class AnalysisSuiteGainMap:
             if list_sectBoundary[self.DETECTOR.DETPOS_IPHI-1] <= fBinCenter and fBinCenter <= list_sectBoundary[self.DETECTOR.DETPOS_IPHI]:
                 
                 #Project out cluster size distribution for *this* slice
-                #strPlotName = "h_iEta" + str(self.DETECTOR.DETPOS_IETA) + "Slice" + str(i) + "_clustSize"
                 strPlotName = "h_iEta{0}Slice{1}_clustSize".format(self.DETECTOR.DETPOS_IETA,i)
                 h_clustSize = hSector_clustSize_v_clustPos.ProjectionY(strPlotName, i, i, "")
                 
@@ -230,7 +213,6 @@ class AnalysisSuiteGainMap:
                 
                 #Print to user - selected data points
                 if self.DEBUG == True:
-                    #print (str(i) + "\t" + str(fBinCenter) + "\t" + str(fAvgClustSize) )
                     print "{0}\t{1}\t{2}".format(i,fBinCenter,fAvgClustSize)
 
         #Store this list as a numpy array and then remove all outliers
@@ -238,16 +220,13 @@ class AnalysisSuiteGainMap:
         array_avgClustSize = rejectOutliers(array_avgClustSize)
 
         if self.DEBUG:
-            #print "np.mean(list_avgClustSize) = " + str(np.mean(list_avgClustSize))
             print "np.mean(list_avgClustSize) = {0}".format(np.mean(list_avgClustSize))
-            #print "np.mean(array_avgClustSize) = " + str(np.mean(array_avgClustSize)) + "\t No Outliers"
             print "np.mean(array_avgClustSize) = {0}\t No Outliers".format(np.mean(array_avgClustSize))
 
         #Calculate Average
         self.AVGCLUSTSIZE_SECTOR_AVG    = np.mean(array_avgClustSize) #Average of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         self.AVGCLUSTSIZE_SECTOR_STDDEV = np.std(array_avgClustSize) #Std. Dev. of the fitted cluster ADC PkPos in defined (ieta,iphi) sector
         
-        #print "Avg of Avg Clust Size = " + str(self.AVGCLUSTSIZE_SECTOR_AVG) + "+/-" + str(self.AVGCLUSTSIZE_SECTOR_STDDEV)
         print "Avg of Avg Clust Size = {0}+/-{1}".format(self.AVGCLUSTSIZE_SECTOR_AVG,self.AVGCLUSTSIZE_SECTOR_STDDEV)
         
         return
@@ -264,7 +243,6 @@ class AnalysisSuiteGainMap:
         self.GAIN_LAMBDA = gain / self.ADCPKPOS_SECTOR_AVG
         self.GAIN_LAMBDA_ERR = ( 1. / self.ADCPKPOS_SECTOR_AVG ) * np.sqrt( np.square(gain_err) + np.square(self.ADCPKPOS_SECTOR_STDDEV * gain / self.ADCPKPOS_SECTOR_AVG) - 2. * gain_err * self.ADCPKPOS_SECTOR_STDDEV * gain / self.ADCPKPOS_SECTOR_AVG)
         
-        #print "lambda = " + str(self.GAIN_LAMBDA) + "+/-" + str(self.GAIN_LAMBDA_ERR)
         print "lambda = {0}+/-{1}".format(self.GAIN_LAMBDA,self.GAIN_LAMBDA_ERR)
         
         return
@@ -272,19 +250,16 @@ class AnalysisSuiteGainMap:
     #Determines the gain map from the absolute response uniformity map
     def calcGainMap(self, strDetName):        
         #Load the absolute response uniformity map
-        #strPlotName = "g2D_" + strDetName + "_ResponseFitPkPos_AllEta"
         strPlotName = "Summary/g2D_{0}_ResponseFitPkPos_AllEta".format(strDetName)
 
         if self.DEBUG:
             print "Attempted to Load:"
-            #print "Summary/" + strPlotName
             print strPlotName
 
         self.G2D_MAP_ABS_RESP_UNI = self.FILE_IN.Get( strPlotName )
         
         #Setup the gain map
         self.G2D_MAP_GAIN_ORIG.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )
-        #self.G2D_MAP_GAIN_ORIG.SetName( "g2D_" + strDetName + "_EffGain_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)) )
         self.G2D_MAP_GAIN_ORIG.SetName( "g2D_{0}_EffGain_AllEta_{1}".format(strDetName, int(self.DET_IMON_QC5_RESP_UNI) ) )
         
         #Get the arrays that make the response uniformity map
@@ -317,14 +292,12 @@ class AnalysisSuiteGainMap:
         self.PD_MIN_POINTS.append(np.min(array_PD_Vals) )
 
         #Draw the effective gain map
-        #canv_Gain_Map_Orig = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)),"Gain Map - Original " + str(self.DET_IMON_QC5_RESP_UNI),600,600)
         canv_Gain_Map_Orig = TCanvas("canv_{0}_EffGain_AllEta_{1}".format(strDetName, int(self.DET_IMON_QC5_RESP_UNI)),"Gain Map - Original {0}".format(self.DET_IMON_QC5_RESP_UNI),600,600)
         canv_Gain_Map_Orig.cd()
         canv_Gain_Map_Orig.cd().SetLogz(1)
         self.G2D_MAP_GAIN_ORIG.Draw("TRI2Z")
         
         #Write the effective gain map to the output file
-        #dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(self.DET_IMON_QC5_RESP_UNI)) )
         dir_hvOrig = self.FILE_OUT.mkdir( "GainMap_HVPt{0}".format(int(self.DET_IMON_QC5_RESP_UNI)) )
         dir_hvOrig.cd()
         canv_Gain_Map_Orig.Write()
@@ -336,12 +309,10 @@ class AnalysisSuiteGainMap:
     def calcGainMapHV(self, strDetName, hvPt):
         #Create the new TGraph2D - Gain
         g2D_Map_Gain_hvPt = TGraph2D( self.G2D_MAP_GAIN_ORIG.GetN() )
-        #g2D_Map_Gain_hvPt.SetName( "g2D_" + strDetName + "_EffGain_AllEta_" + str(int(hvPt)) )
         g2D_Map_Gain_hvPt.SetName( "g2D_{0}_EffGain_AllEta_{1}".format(strDetName, int(hvPt)) )
 
         #Create the new TGraph2D - Discharge Probability
         g2D_Map_PD_hvPt = TGraph2D( self.G2D_MAP_GAIN_ORIG.GetN() )
-        #g2D_Map_PD_hvPt.SetName( "g2D_" + strDetName + "_PD_AllEta_" + str(int(hvPt)) )
         g2D_Map_PD_hvPt.SetName( "g2D_{0}_PD_AllEta_{1}".format(strDetName, int(hvPt)) )
 
         #Get the arrays that make the response uniformity map
@@ -378,21 +349,18 @@ class AnalysisSuiteGainMap:
         self.PD_MIN_POINTS.append(np.min(array_PD_Vals) )
 
         #Draw the effective gain map
-        #canv_Gain_Map_hvPt = TCanvas("canv_" + strDetName + "_EffGain_AllEta_" + str(int(hvPt)),"Gain Map - hvPt = " + str(hvPt),600,600)
         canv_Gain_Map_hvPt = TCanvas("canv_{0}_EffGain_AllEta_{1}".format(strDetName, int(hvPt)),"Gain Map - hvPt = {0}".format(hvPt),600,600)
         canv_Gain_Map_hvPt.cd()
         canv_Gain_Map_hvPt.cd().SetLogz(1)
         g2D_Map_Gain_hvPt.Draw("TRI2Z")
 
         #Draw the discharge probability map
-        #canv_PD_Map_hvPt = TCanvas("canv_" + strDetName + "_PD_AllEta_" + str(int(hvPt)),"Discharge Probability Map - hvPt = " + str(hvPt),600,600)
         canv_PD_Map_hvPt = TCanvas("canv_{0}_PD_AllEta_{1}".format(strDetName,int(hvPt)),"Discharge Probability Map - hvPt = {0}".format(hvPt),600,600)
         canv_PD_Map_hvPt.cd()
         canv_PD_Map_hvPt.cd().SetLogz(1)
         g2D_Map_PD_hvPt.Draw("TRI2Z")
         
         #Write the effective gain map to the output file
-        #dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt" + str(int(hvPt)) )
         dir_hvPt = self.FILE_OUT.mkdir( "GainMap_HVPt{0}".format(int(hvPt)) )
         dir_hvPt.cd()
         canv_Gain_Map_hvPt.Write()
@@ -405,24 +373,19 @@ class AnalysisSuiteGainMap:
     #Determines the average cluster size map for the entire detector
     def calcClusterSizeMap(self, strDetName):
         #Create the container which will store the clusterSize
-        #array_shape = ( self.G2D_MAP_ABS_RESP_UNI.GetN(), 3)   #Not gauranteed to work since some points are thrown out during the fitting process in the C++ class AnalyzeResponseUniformityClusters
         iNEtaSectors = len(self.DETECTOR.LIST_DET_GEO_PARAMS)
         iNBinNum = self.ANA_UNI_GRANULARITY * iNEtaSectors * self.DETECTOR.LIST_DET_GEO_PARAMS[0].NBCONNECT
         array_shape = (iNBinNum, 3)
         array_clustSize = np.zeros(array_shape)
         
         #Create the average cluster size map
-        #strPlotName = "g2D_" + strDetName + "_AvgClustSize_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI))
         strPlotName = "g2D_{0}_AvgClustSize_AllEta_{1}".format(strDetName,int(self.DET_IMON_QC5_RESP_UNI))
-        #self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )    #Set number of pts
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Set( iNBinNum ) #Set number of pts, see comments above
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetName( strPlotName )
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.SetTitle("")
 
         #Create the average cluster size map
-        #strPlotName = "g2D_" + strDetName + "_AvgClustSizeNormalized_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI))
         strPlotName = "g2D_{0}_AvgClustSizeNormalized_AllEta_{1}".format(strDetName, int(self.DET_IMON_QC5_RESP_UNI))
-        #self.G2D_MAP_AVG_CLUST_SIZE_NORM.Set( self.G2D_MAP_ABS_RESP_UNI.GetN() )    #Set number of pts
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.Set( iNBinNum ) #Set number of pts, see comments above
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetName( strPlotName )
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.SetTitle("")
@@ -432,7 +395,6 @@ class AnalysisSuiteGainMap:
             etaSector = self.DETECTOR.LIST_DET_GEO_PARAMS[iEta-1]
 
             #Load the cluster size vs cluster position plot for this iEta value
-            #strPlotName = "SectorEta" + str(iEta) + "/h_iEta" + str(iEta) + "_clustSize_v_clustPos"
             strPlotName = "SectorEta{0}/h_iEta{0}_clustSize_v_clustPos".format(iEta)
             
             if self.DEBUG:
@@ -444,7 +406,6 @@ class AnalysisSuiteGainMap:
             #Loop over the x-bins of this plot
             for iSlice in range(1, h_clustSize_v_clustPos.GetNbinsX() + 1):
                 #Project out cluster size distribution for *this* slice
-                #strPlotName = "h_iEta" + str(iEta) + "Slice" + str(iSlice) + "_clustSize"
                 strPlotName = "h_iEta{0}Slice{1}_clustSize".format(iEta,iSlice)
                 h_clustSize = h_clustSize_v_clustPos.ProjectionY(strPlotName, iSlice, iSlice, "")
     
@@ -463,19 +424,16 @@ class AnalysisSuiteGainMap:
             print array_clustSize
 
         #Draw the average cluster size map - Absolute
-        #canv_AvgClustSize_Map_Orig = TCanvas("canv_" + strDetName + "_AvgClustSize_AllEta_" + str(int(self.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Original " + str(self.DET_IMON_QC5_RESP_UNI),600,600)
         canv_AvgClustSize_Map_Orig = TCanvas("canv_{0}_AvgClustSize_AllEta_{1}".format(strDetName,int(self.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Original {0}".format(self.DET_IMON_QC5_RESP_UNI),600,600)
         canv_AvgClustSize_Map_Orig.cd()
         self.G2D_MAP_AVG_CLUST_SIZE_ORIG.Draw("TRI2Z")
         
         #Draw the average cluster size map - Normalized
-        #canv_AvgClustSize_Map_Norm = TCanvas("canv_" + strDetName + "_AvgClustSizeNormalized_AllEta_" + str(int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Normalized " + str(self.DETECTOR.DET_IMON_QC5_RESP_UNI),600,600)
         canv_AvgClustSize_Map_Norm = TCanvas("canv_{0}_AvgClustSizeNormalized_AllEta_{1}".format(strDetName, int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)),"Average Cluster Size Map - Normalized {0}".format(self.DETECTOR.DET_IMON_QC5_RESP_UNI),600,600)
         canv_AvgClustSize_Map_Norm.cd()
         self.G2D_MAP_AVG_CLUST_SIZE_NORM.Draw("TRI2Z")
         
         #Write the average cluster size map to the output file
-        #dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt" + str(int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)), False, "GetDirectory" )
         dir_hvOrig = self.FILE_OUT.GetDirectory( "GainMap_HVPt{0}".format(int(self.DETECTOR.DET_IMON_QC5_RESP_UNI)), False, "GetDirectory" )
         dir_hvOrig.cd()
         canv_AvgClustSize_Map_Orig.Write()
@@ -499,33 +457,36 @@ class AnalysisSuiteGainMap:
     def plotGainSummary(self, strDetName):
         #Create the Plot - Average
         gDet_AvgEffGain = TGraphErrors( len(self.GAIN_AVG_POINTS) )
-        #gDet_AvgEffGain.SetName("g_" + strDetName + "_EffGainAvg")
         gDet_AvgEffGain.SetName("g_{0}_EffGainAvg".format(strDetName))
         
         #Create the Plot - Max Gain
         gDet_MaxEffGain = TGraphErrors( len(self.GAIN_MAX_POINTS) )
-        #gDet_MaxEffGain.SetName("g_" + strDetName + "_EffGainMax")
         gDet_MaxEffGain.SetName("g_{0}_EffGainMax".format(strDetName))
 
         #Create the Plot - Min Gain
         gDet_MinEffGain = TGraphErrors( len(self.GAIN_MIN_POINTS) )
-        #gDet_MinEffGain.SetName("g_" + strDetName + "_EffGainMin")
         gDet_MinEffGain.SetName("g_{0}_EffGainMin".format(strDetName))
 
-        #Set the points
+        #Set and print the points
+        #print "===============Printing Gain Data==============="
+        #print "[BEGIN_DATA]"
+        #print "\tVAR_INDEP,VAR_DEP,VAR_DEP_ERR"
         for i in range(0, len(self.GAIN_AVG_POINTS) ):
             #Average
             gDet_AvgEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_AVG_POINTS[i])
             gDet_AvgEffGain.SetPointError(i,0,self.GAIN_STDDEV_POINTS[i])
+            #print "\t%f,%f,%f"%(self.DET_IMON_POINTS[i],self.GAIN_AVG_POINTS[i],self.GAIN_STDDEV_POINTS[i])
 
             #Max
             gDet_MaxEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_MAX_POINTS[i])
 
             #Min
             gDet_MinEffGain.SetPoint(i,self.DET_IMON_POINTS[i],self.GAIN_MIN_POINTS[i])
+            pass
+        #print "[END_DATA]"
+        #print ""
         
         #Draw
-        #canv_AvgEffGain = TCanvas("canv_" + strDetName + "_EffGainAvg",strDetName + " Average Effective Gain",600,600)
         canv_AvgEffGain = TCanvas("canv_{0}_EffGainAvg".format(strDetName),"{0} Average Effective Gain".format(strDetName),600,600)
         canv_AvgEffGain.cd()
         canv_AvgEffGain.cd().SetLogy()
@@ -545,18 +506,16 @@ class AnalysisSuiteGainMap:
         gDet_MaxEffGain.Write()
         gDet_MinEffGain.Write()
         
-    	return
+        return
 
     #Plot Average Gain Over Entire Detector Area
     def plotPDSummary(self, strDetName):
         #Create the Plot - Average
         gDet_AvgPD = TGraphErrors( len(self.PD_AVG_POINTS) )
-        #gDet_AvgPD.SetName("g_" + strDetName + "_PDAvg")
         gDet_AvgPD.SetName("g_{0}_PDAvg".format(strDetName))
         
         #Create the Plot - Max Gain
         gDet_MaxPD = TGraphErrors( len(self.PD_MAX_POINTS) )
-        #gDet_MaxPD.SetName("g_" + strDetName + "_PDMax")
         gDet_MaxPD.SetName("g_{0}_PDMax".format(strDetName))
 
         #Create the Plot - Min Gain
@@ -577,7 +536,6 @@ class AnalysisSuiteGainMap:
             gDet_MinPD.SetPoint(i,self.GAIN_AVG_POINTS[i],self.PD_MIN_POINTS[i])
         
         #Draw
-        #canv_AvgPD = TCanvas("canv_" + strDetName + "_PDAvg",strDetName + " Discharge Probability",600,600)
         canv_AvgPD = TCanvas("canv_{0}_PDAvg".format(strDetName),"{0} Discharge Probability".format(strDetName),600,600)
         canv_AvgPD.cd()
         canv_AvgPD.cd().SetLogx()
@@ -598,7 +556,7 @@ class AnalysisSuiteGainMap:
         gDet_MaxPD.Write()
         gDet_MinPD.Write()
         
-    	return
+        return
 
     #Open Input File
     def openInputFile(self, inputfilename):
