@@ -1,3 +1,5 @@
+#!/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt/bin/python2.7
+
 import xlrd
 from array import array
 import numpy as np
