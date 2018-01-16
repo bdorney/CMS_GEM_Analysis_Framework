@@ -13,6 +13,7 @@ fi
 
 # Add to paths
 export PATH=$PATH:$FRAMEWORK_BASE
+export PATH=$PATH:$FRAMEWORK_BASE/python
 export PATH=$PATH:$FRAMEWORK_BASE/scripts
 
 #Setup eos
@@ -53,6 +54,7 @@ else
 	export PYTHONPATH=$DIR_PIP/lib/python2.7/site-packages:$PYTHONPATH
 	export PATH="$PATH:~/.local/bin"
 	alias pip2.7="$DIR_PIP/bin/pip"
+    alias ipython2.7="~/.local/bin/ipython"
 fi
 
 which root
