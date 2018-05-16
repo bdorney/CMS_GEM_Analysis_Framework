@@ -5,6 +5,7 @@ clear
 #Define Base Directory
 export GEM_BASE=$PWD
 export PATH=$PATH:$GEM_BASE
+export PATH=$PATH:$GEM_BASE/python
 export PATH=$PATH:$GEM_BASE/scripts
 
 #Setup eos
