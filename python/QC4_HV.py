@@ -1,3 +1,5 @@
+#!/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt/bin/python2.7
+
 from subprocess import CalledProcessError
 from wrappers import runCommand,envCheck
 from PlotOptions import parser
@@ -6,9 +8,7 @@ import xlrd
 
 (args,opts)=parser.parse_args()
 
-envCheck('GEM_BASE')
-dataPath  = os.getenv('GEM_BASE')
-cmd = ["python","%s/python/Produce_Config_File.py"%(dataPath)]
+cmd = ["Produce_Config_File.py"]
 
 for filelist in args.file:
 	cmd.append("--file=%s"%(filelist))
