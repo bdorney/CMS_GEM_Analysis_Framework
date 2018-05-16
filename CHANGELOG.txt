@@ -2,14 +2,26 @@
 *                                                *
 *	CHANGELOG: CMS_GEM_Analysis_Framework        *
 *	VERSION: 5.1.0                               *
-*	LAST UPDATE: Aug 21 2017                     *
+*	LAST UPDATE: Aug 29 2017                     *
 *                                                *
 **************************************************
+
+Update: August 29th 2017
+==================================================
+-> README.md: Edited instructions for genericPlotter helper scripts.
+
+Update: August 25th 2017
+==================================================
+-> README.md: Rewrite all the instructions section in MarkDown
+->Produce_Config_File.py:  LatexLines option: Added a check that is not none, added tabs in data printing to improve readability.
+-> PlotOptions: Improved the help descriptions 
 
 Update: August 21st 2017
 ==================================================
 ->Finished re-writting README.md in Markdown
 ->Added Table of Contents to README.md
+-> README.md: Added instructions for Produce_Config_File.py,QC3.py,QC4_*.py and QC5_*.py scripts ( 3.c.iii Analysis of QC data stored in an excel file )
+-> QC3.py,QC4_*.py and QC5_*.py: Import PlotOptions instead of Options
 
 Update: August 18th 2017
 ==================================================
@@ -21,6 +33,28 @@ Update: August 17th 2017
 ->Updated .gitignore to be cleaner
 ->README.txt renamed to README.md
 ->Started process of re-writting README.md in Markdown
+->options.py: Switched from argparse to optparse, add append action to LatexLines option
+->Produce_Config_File.py: add loop to print Latexlines from list
+-> QC3.py,QC4_*.py,QC5_*.py: append LatexLines to cmd
+->options.py: changed YaxisScale, SetErrX, SetErrY and Fit arguments store type (back to boolean)
+->Produce_Config_File.py: Changed the if statement for the arguments mentioned above (boolean instead of strings)
+->QC3.py: Changed the way the above arguments are appended to cmd 
+->QC4_*.py: Changed the way the above arguments are appended to cmd 
+->QC5_*.py: Changed the way the above arguments are appended to cmd 
+
+Update: August 16th 2017
+==================================================
+->scripts/setup_CMS_GEM.sh: add pip2.7 install --user xlrd (library used by produce_config_file.py)
+
+Update: August 15th 2017
+==================================================
+->Produce_Config_File.py: Added code to fit the plotted data (only when —Fit option is true)
+->Produce_Config_File.py and options.py: Changed all bool statements to strings after addressing a problem with bool(args.Fit) argument being true/false when appending to cmd 
+->options.py: Added arguments to choose the details for the fit
+->QC3.py: Added Arguments to perform the Pressure-Time fit if the —Fit option is true
+->QC4_HV.py: Added Arguments to perform the Vmon-Imon fit if the —Fit option is true
+->wrappers.py: add function envCheck to check that the $GEM_BASE variable has been declared.
+->gemlogger.py: removed unnecessary functions and commented lines
 
 Update: August 8th 2017
 ==================================================

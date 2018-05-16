@@ -30,7 +30,7 @@ strcmp() {
 DIR_ORIG=$PWD
 
 #store the run config file
-FILE_RUN_TEMP=$GEM_BASE/config/configRun_Template_Grid_Reco.cfg
+FILE_RUN_TEMP=$FRAMEWORK_BASE/config/configRun_Template_Grid_Reco.cfg
 
 #setup input variables
 NAME_DET=$1
@@ -44,23 +44,23 @@ CMS_GEM_EOS_COMM=/eos/cms/store/group/dpg_gem/comm_gem/QualityControl
 EOS=/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select
 
 #Check for the stderr directory
-DIR_STDERR=$GEM_BASE/stderr
+DIR_STDERR=$FRAMEWORK_BASE/stderr
 if [[ !  -d $DIR_STDERR ]]; then
-    echo "Creating stdout directory: $GEM_BASE/stderr"
+    echo "Creating stdout directory: $FRAMEWORK_BASE/stderr"
     mkdir $DIR_STDERR
 fi
 
 #Check for the stdlog directory
-DIR_STDLOG=$GEM_BASE/stdlog
+DIR_STDLOG=$FRAMEWORK_BASE/stdlog
 if [[ ! -d $DIR_STDLOG ]]; then
-    echo "Creating stdout directory: $GEM_BASE/stdlog"
+    echo "Creating stdout directory: $FRAMEWORK_BASE/stdlog"
     mkdir $DIR_STDLOG
 fi
 
 #Check for the stdout directory
-DIR_STDOUT=$GEM_BASE/stdout
+DIR_STDOUT=$FRAMEWORK_BASE/stdout
 if [[ ! -d $DIR_STDOUT ]]; then
-    echo "Creating stdout directory: $GEM_BASE/stdout"
+    echo "Creating stdout directory: $FRAMEWORK_BASE/stdout"
     mkdir $DIR_STDOUT
 fi
 
@@ -72,7 +72,7 @@ do
     let COUNTER=$(( ${COUNTER} + 1 ))
 
     #copy file
-    FILE_RUN=$GEM_BASE/config/configRun_JobNo${COUNTER}.cfg
+    FILE_RUN=$FRAMEWORK_BASE/config/configRun_JobNo${COUNTER}.cfg
     cp $FILE_RUN_TEMP $FILE_RUN
 
     #Replace filenames - Reco
@@ -120,12 +120,12 @@ do
 
     #make the script to send to the scheduler
     DIR_JOBNUM=/tmp/JobNo${COUNTER}
-    DIR_SCRIPTS=$GEM_BASE/scripts
-    FILE_SCRIPT=$GEM_BASE/scripts/submitFrameworkJob_JobNo${COUNTER}.sh
+    DIR_SCRIPTS=$FRAMEWORK_BASE/scripts
+    FILE_SCRIPT=$FRAMEWORK_BASE/scripts/submitFrameworkJob_JobNo${COUNTER}.sh
     echo '#!/bin/zsh' >> $FILE_SCRIPT
     echo "" >> $FILE_SCRIPT
     echo "#Setup environment" >> $FILE_SCRIPT
-    echo "cd $GEM_BASE" >> $FILE_SCRIPT
+    echo "cd $FRAMEWORK_BASE" >> $FILE_SCRIPT
     echo "source scripts/setup_CMS_GEM.sh" >> $FILE_SCRIPT
     echo "" >> $FILE_SCRIPT
     echo "#Make temporary directory" >> $FILE_SCRIPT
