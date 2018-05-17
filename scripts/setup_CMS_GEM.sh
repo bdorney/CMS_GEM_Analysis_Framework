@@ -48,7 +48,8 @@ if [[ !  -d $DIR_PIP ]]; then
 	alias pip2.7="$DIR_PIP/bin/pip"
 
 	#Installing packages
-	$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy xlrd
+	#$DIR_PIP/bin/pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose root_numpy xlrd
+	$DIR_PIP/bin/pip install --user numpy root_numpy xlrd
 else
 	#Update environment	
 	export PYTHONPATH=$DIR_PIP/lib/python2.7/site-packages:$PYTHONPATH
