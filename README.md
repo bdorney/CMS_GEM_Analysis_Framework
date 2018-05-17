@@ -558,7 +558,7 @@ For full example:
 
 ```
 source scripts/setup_CMS_GEM.sh
-python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> ...
+Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> ...
 
 ```
 Where:
@@ -573,7 +573,7 @@ An example of the produced config file is shown in session: [4.e.iv.VI Example C
 Moreover if the fit option is added in the command above:
 
 ```
-python2.7 python/Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> --Fit
+Produce_Config_File.py —-PlotOption1=<Desired Value> —-PlotOption2=<Desired Value> --Fit
 ```
 
 the header parameters for the fit will be created as shown here: [4.e.iv.IX Example Config File - TH1F](#4eivix-example-config-file---th1f). If the user doesn't provide values for the rest fit PlotOptions the default values will be given to all the fit parameters.
@@ -606,7 +606,7 @@ For full example:
 1) As before for each new shell navigate to the base directory of the repository and execute: 
 
 	source scripts/setup_CMS_GEM.sh
-	python2.7 python/QC3.py --file=Filename1.xlsm --file=Filename2.xlsm --Fit
+	QC3.py --file=Filename1.xlsm --file=Filename2.xlsm --Fit
 	
 Where:
 
@@ -778,7 +778,7 @@ source scripts/setup_CMS_GEM.sh
 The usage for the `computeGainMap.py` script is:
 
 ```
-    python2.7 python/computeGainMap.py --file=<Framework Output File> --gp0=<Gain P0> --gp0Err=<Gain P0Err> --gp1=<Gain P1> --gp1Err=<Gain P1Err> --name=<Detector Name> --hvPoint=<HV Val> --hvlist=<HV List> --fileMap=<Config File - Mapping>
+    computeGainMap.py --file=<Framework Output File> --gp0=<Gain P0> --gp0Err=<Gain P0Err> --gp1=<Gain P1> --gp1Err=<Gain P1Err> --name=<Detector Name> --hvPoint=<HV Val> --hvlist=<HV List> --fileMap=<Config File - Mapping>
 ```
 
 Where: 
@@ -793,7 +793,7 @@ Where:
 An example call is given as:
 
 ```
-python2.7 python/computeGainMap.py --file=FrameworkOutput.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=config/Mapping_GE11-VII-L.cfg
+computeGainMap.py --file=FrameworkOutput.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=config/Mapping_GE11-VII-L.cfg
 ```
 
 Here the gain curve was parameterized in terms of divider current and as a result the `hvPoint` and `hvlist` fields are also given in terms of divider current. If you would like to analyze multiple files simultaneously, or prefer to not type everything in on command line, the helper script:
@@ -840,13 +840,13 @@ source scripts/setup_CMS_GEM.sh
 The usage for the `computeEffCurves.py` script is:
 
 ```
-python2.7 python/computeEffCurves.py  --file=<Efficiency Predictor Config File> --debug=<True/False>
+computeEffCurves.py  --file=<Efficiency Predictor Config File> --debug=<True/False>
 ```
 
 Where the **Efficiency Predictor Config File** is described in Section 4.e.v and the debug flag is a True/False value which will print more verbose information to the terminal. An example call is given as:
 
 ```
-python2.7 python/computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
+computeEffCurves.py --file=config/configEffPredictor.cfg --deubg=True
 ```
 
 # 4. Documentation
