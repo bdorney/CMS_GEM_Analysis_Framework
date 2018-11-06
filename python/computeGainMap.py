@@ -9,7 +9,7 @@
 #
 #    Example call:
 #    
-#        python2.7 python/computeGainMap.py --file=$PWD/data/sliceTestAna/QC5_Resp_Uni/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=$PWD/config/Mapping_GE11-VII-L.cfg
+#        computeGainMap.py --file=$PWD/data/sliceTestAna/QC5_Resp_Uni/GE11-VII-L-CERN-0002_Summary_Physics_Optimized_RandTrig_XRay40kV100uA_580uA_TimeCorr_DPGGeo_AnaWithFits.root --gp0=3.49545e-02 --gp0Err=1.98035e-04 --gp1=-1.40236e+01 --gp1Err=1.28383e-01 --name=GE11-VII-L-CERN-0002 --hvPoint=580 --hvlist=600,625,650,660,670,680,690,700,710,720,730 --fileMap=$PWD/config/Mapping_GE11-VII-L.cfg
 #    
 #"""
 
@@ -70,7 +70,10 @@ if __name__ == "__main__":
     params_det.loadMapping(options.filename_Map, debug=options.debug)
 
     #Initialize analysis suite
-    anaSuite = AnalysisSuiteGainMap(inputfilename=options.filename, 
+    import ROOT as r
+    outF = r.TFile("GainMap_%s.root"%(options.det_name),"RECREATE","",1)
+    anaSuite = AnalysisSuiteGainMap(file_out=outF,
+                    inputfilename=options.filename, 
 				    params_gain=params_gain, 
 				    params_det=params_det, 
 				    debug=options.debug)

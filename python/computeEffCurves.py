@@ -9,7 +9,7 @@
 #
 #    Example call:
 #    
-#        python2.7 python/computeEffCurves.py --file=$PWD/config/configEffPredictor.cfg --deubg=True
+#        computeEffCurves.py --file=$PWD/config/configEffPredictor.cfg --deubg=True
 #    
 #"""
 

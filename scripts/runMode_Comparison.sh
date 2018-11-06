@@ -14,8 +14,8 @@
 DIR_ORIG=$PWD
 
 #store the run config file
-FILE_RUN=$GEM_BASE/config/configComp.cfg
-FILE_RUN_TEMP=$GEM_BASE/config/configComp_Template.cfg
+FILE_RUN=$FRAMEWORK_BASE/config/configComp.cfg
+FILE_RUN_TEMP=$FRAMEWORK_BASE/config/configComp_Template.cfg
 cp $FILE_RUN_TEMP $FILE_RUN
 
 #setup input variables
@@ -74,5 +74,5 @@ echo "To view this file execute:"
 echo "gedit $FILE_RUN &"
 echo ""
 echo "To launch the analysis execute:"
-echo "cd $GEM_BASE"
+echo "cd $FRAMEWORK_BASE"
 echo "./frameworkMain $FILE_RUN true"

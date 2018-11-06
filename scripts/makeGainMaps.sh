@@ -28,9 +28,9 @@ do
 		echo "processing file: " ${argList[1]}
 		echo "with command:"
 		echo ""
-		echo python2.7 $GEM_BASE/python/computeGainMap.py --file=${argList[1]} --gp0=${argList[2]} --gp0Err=${argList[3]} --gp1=${argList[4]} --gp1Err=${argList[5]} --name=${argList[6]} --hvPoint=${argList[7]} --hvlist=${argList[8]} --fileMap=${argList[9]}
+		echo python2.7 $FRAMEWORK_BASE/python/computeGainMap.py --file=${argList[1]} --gp0=${argList[2]} --gp0Err=${argList[3]} --gp1=${argList[4]} --gp1Err=${argList[5]} --name=${argList[6]} --hvPoint=${argList[7]} --hvlist=${argList[8]} --fileMap=${argList[9]}
 		echo ""
-		python2.7 $GEM_BASE/python/computeGainMap.py --file=${argList[1]} --gp0=${argList[2]} --gp0Err=${argList[3]} --gp1=${argList[4]} --gp1Err=${argList[5]} --name=${argList[6]} --hvPoint=${argList[7]} --hvlist=${argList[8]} --fileMap=${argList[9]}
+		python2.7 $FRAMEWORK_BASE/python/computeGainMap.py --file=${argList[1]} --gp0=${argList[2]} --gp0Err=${argList[3]} --gp1=${argList[4]} --gp1Err=${argList[5]} --name=${argList[6]} --hvPoint=${argList[7]} --hvlist=${argList[8]} --fileMap=${argList[9]}
 		echo ""
 		echo ""
 		echo "================="
